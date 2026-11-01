@@ -45,6 +45,8 @@ interface QuickSelectionKernel {
 }
 
 export interface PixelKernel extends QuickSelectionKernel {
+  compositeHdrWetFloat(before:number,field:number,output:number,pixels:number,opacity:number):number;
+  sampleProjectiveHdrWet(source:number,output:number,settings:number):number;
   loadWetPaintFloat(source:number,output:number,pixels:number,red:number,green:number,blue:number,alpha:number,amount:number):number;
   mixWetPaintFloat(source:number,carried:number,coverage:number,output:number,next:number,pixels:number,flow:number,wetness:number,pickup:number):number;
   envelopeWetPaintFloat(before:number,after:number,coverage:number,output:number,pixels:number,opacity:number):number;

@@ -62,6 +62,7 @@ const generatedPages = [
   ["PERSPECTIVE_ENGINE", "Native perspective engine dependency"],
   ["MASK_PLANES", "Retained mask planes"],
   ["FLOAT_PROCESSING", "Native float pixel processing dependency"],
+  ["HDR_WET_FIELDS", "Prepared HDR wet assets and fields"],
   ["FLOAT_SOURCES", "Owned float originals and derived tiles"],
   ["FLOAT_DOCUMENTS", "Float document editing"],
   ["FLOAT_PROOFING", "Float device soft proofing"],

@@ -88,6 +88,9 @@ self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
+    floatCompositeHdrWet?:{pixels:Float32Array;field:Float64Array;opacity:number};
+    floatProjectiveHdrWet?:{field:Float64Array;options:ProjectiveFieldOptions};
+    floatMappedHdrWet?:{field:Float64Array;options:MappedFieldOptions};
     floatWetLoad?:{pixels:Float32Array;options:FloatWetLoadSettings};
     floatWetMix?:{pixels:Float32Array;carried:Float32Array;coverage:Float32Array;options:WetPaintMixSettings};
     floatWetEnvelope?:{before:Float32Array;after:Float32Array;coverage:Float32Array;opacity:number};
@@ -181,6 +184,11 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
+    if(data.floatCompositeHdrWet||data.floatProjectiveHdrWet||data.floatMappedHdrWet){
+      const owned=floating??=new FloatPixelProcessor(await kernel),c=data.floatCompositeHdrWet,p=data.floatProjectiveHdrWet,m=data.floatMappedHdrWet;
+      const pixels=c?owned.compositeHdrWet(c.pixels,c.field,c.opacity):p?owned.projectiveHdrWet(p.field,p.options):owned.mappedHdrWet(m!.field,m!.options);
+      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
+    }
     if(data.floatWetLoad||data.floatWetMix||data.floatWetEnvelope){
       const owned=floating??=new FloatPixelProcessor(await kernel);
       if(data.floatWetMix){const r=data.floatWetMix,floatWetPaint=owned.wetMix(r.pixels,r.carried,r.coverage,r.options);self.postMessage({id:data.id,floatWetPaint},{transfer:[floatWetPaint.pixels.buffer as ArrayBuffer,floatWetPaint.carried.buffer as ArrayBuffer]});}

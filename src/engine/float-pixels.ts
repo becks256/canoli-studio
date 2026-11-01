@@ -1,4 +1,6 @@
 import {validateWetField} from '../core/wet-field';
+import {validateHdrWetField} from '../core/hdr-wet-field';
+import {compileHdrWetProjectiveField} from '../core/hdr-wet-projective';
 import {floatWetLoadSchema,floatWetMixSchema,floatWetOpacitySchema,validateFloatWetCarried,validateFloatWetResult,type FloatWetLoadOptions,type FloatWetResult} from '../core/float-wet';
 import type {WetPaintMixOptions} from '../core/wet-paint';
 import{floatConvolutionSchema,floatConvolutionLength,floatConvolutionRadius,fractionalBoxWeights,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
@@ -42,6 +44,27 @@ export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
  constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.convolveAlphaFloat!=='function'||typeof kernel.styleFloat!=='function'||typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
+ compositeHdrWet(pixels:Float32Array,field:Float64Array,opacity=1):Float32Array<ArrayBuffer>{
+  const kernel=this.owner();if(typeof kernel.compositeHdrWetFloat!=='function')throw new Error('Native HDR wet compositor is unavailable.');
+  validateFloatWorkerWindow(pixels);validateHdrWetField(field,pixels.length/4);floatWetOpacitySchema.parse(opacity);const result=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count,false,count*40);new Float32Array(kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));new Float64Array(kernel.memory.buffer,p.matrix,count*5).set(field.subarray(at/4*5,(at/4+count)*5));checked(kernel.compositeHdrWetFloat(p.source,p.matrix,p.output,count,opacity));result.set(new Float32Array(kernel.memory.buffer,p.output,count*4),at);}
+  validateFloatWorkerWindow(result);return result;
+ }
+ projectiveHdrWet(field:Float64Array,input:ProjectiveFieldOptions):Float64Array<ArrayBuffer>{
+  this.owner();return this.sampleHdrWet(field,compileHdrWetProjectiveField(input));
+ }
+ mappedHdrWet(field:Float64Array,input:MappedFieldOptions):Float64Array<ArrayBuffer>{
+  this.owner();return this.sampleHdrWet(field,compileMappedField(input));
+ }
+ private sampleHdrWet(field:Float64Array,{options,values}:{options:{background:number;source:{width:number;height:number};output:{width:number;height:number}};values:Float64Array}):Float64Array<ArrayBuffer>{
+  if(options.background!==0)throw new Error('HDR wet fields require zero background.');validateHdrWetField(field,options.source.width*options.source.height);
+  const kernel=this.owner();if(typeof kernel.sampleProjectiveHdrWet!=='function')throw new Error('Native HDR wet sampler is unavailable.');
+  const count=options.output.width*options.output.height,source=Math.ceil(kernel.bufferOffset()/8)*8,output=source+field.byteLength,settings=output+count*40,required=settings+values.byteLength;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Float64Array(kernel.memory.buffer,source,field.length).set(field);new Float64Array(kernel.memory.buffer,settings,values.length).set(values);
+  const status=kernel.sampleProjectiveHdrWet(source,output,settings);if(status===3)throw new Error('HDR wet sample falls outside the captured field window.');if(status!==0)throw new Error('Invalid native HDR wet field or unrepresentable output.');
+  const result=new Float64Array(new Float64Array(kernel.memory.buffer,output,count*5));validateHdrWetField(result,count);return result;
+ }
  wetLoad(pixels:Float32Array,input:FloatWetLoadOptions={}):Float32Array<ArrayBuffer>{
   const kernel=this.owner();if(typeof kernel.loadWetPaintFloat!=='function')throw new Error('Native float wet-load export is unavailable.');
   validateFloatWorkerWindow(pixels);const options=floatWetLoadSchema.parse(input),result=new Float32Array(pixels.length);

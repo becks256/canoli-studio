@@ -9954,3 +9954,40 @@ photographic/device/sustained F14 memory/performance and every unfinished
 original professional, AI, workflow, ChatGPT/live identity, commercial,
 specialist and motion gate remain required. No performance clearance, physical
 pigment/device quality, paid operation, upload or browser/REST sync is inferred.
+
+
+### 2026-10-31 — F03/F10 lossless HDR wet assets and Float64 replacement fields
+
+Owner: implementation agent; bounded increment from `f45f0d5`; classification:
+progress. Retained Float32 stroke output now has a lossless private TIFF asset
+codec, complete original/pair validation and ordered Float64 replacement fields.
+Native mapped/projective sampling and final Float32 composition avoid the extra
+rounding of a Float32 premultiplied field. The independent old-field control
+changes 2,818 reference words; full-removal positive-alpha replacements now retain
+their original Float32 words. Exact affine quads avoid identity homography drift,
+including forward/input/origin mappings, with accepted byte/scalar math unchanged.
+[Exact private contract](HDR_WET_FIELDS.md).
+
+Verified: **3,261 unit/API/native tests across 315 files; 73 source-browser cases across 8 files; 11 selected production cases across 6 files**; zero browser skips, retries, flakes or runner errors.
+Independent libtiff reads all 16 prepared TIFF assets and their complete ICC;
+NumPy matches every recorded expected/actual/reopened native word. Real small
+and 10000x5000 originals supply independently checked 64x48 windows, and result
+files outlive original-source closure. This is not every-pixel HDR wet document
+editing/delivery. The separate existing full 50 MP float pipeline retains all
+200 million exact samples. Worker ownership, overflow, malformed replies,
+disposal/retry, 65,539-pixel partitions and native horizons pass. The built guide
+is readable at 390 px with JavaScript disabled; 45 developer pages build.
+Product/test sources remain frozen, and build/typecheck passes. Earlier identity/
+signed-zero pilot failures remain in [findings and compact evidence](benchmarks/hdr-wet-fields-2026-10-31.md).
+
+The full original goal remains active. These private files/fields do not add a
+public document wet contract. Next required work is versioned HDR wet metadata
+and host asset validation, shared OO commands, actual FloatScene replay in order,
+projection/resize and source-bearing history/project/workspace/recipe transport,
+then guarded authoring/previews/commit and real float tools/automation as scoped.
+Schema 56 and public wet constructors/grants remain; float Smudge/Mixer stays
+disabled. Wider mask/master/nested-projective acceptance, general warp,
+photographic/device/sustained F14 memory/performance and every unfinished original
+professional, AI, workflow, ChatGPT/live identity, commercial, specialist and
+motion gate remain required. No continuous-60fps, physical pigment, paid call,
+upload or browser/REST synchronization claim follows from this dependency.

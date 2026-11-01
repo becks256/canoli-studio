@@ -1,7 +1,9 @@
+import {validateHdrWetField} from '../core/hdr-wet-field';
+import {compileHdrWetProjectiveField} from '../core/hdr-wet-projective';
 import {validateWetField} from '../core/wet-field';
 import {captureFieldBounds,compileProjectiveField,type ProjectiveFieldOptions,type ProjectiveFieldDirection,type ProjectiveFieldInput} from '../core/projective-field';
 import type {ProjectiveQuad} from '../core/projective';
-import {captureFieldMapping,compileMappedField,type FieldMapping,type MappedFieldOptions} from '../core/mapped-field';
+import {captureFieldMapping,fieldMappingFromFrame,compileMappedField,type FieldMapping,type MappedFieldOptions} from '../core/mapped-field';
 import {validateWindow,type FloatSourceWindow,type FloatSourceControl} from '../core/float-source/types';
 import {validateFloatAlpha} from '../core/float-shadow';
 import type {FloatProjectionControl} from './float-projection';
@@ -66,8 +68,8 @@ export async function projectPerspectiveFieldWindow(
       JSON.stringify(source.input)!==signature||!!source.bounds!==!!absoluteField||absoluteField&&(source.bounds!.x!==absoluteField.x||source.bounds!.y!==absoluteField.y||source.bounds!.width!==absoluteField.width||source.bounds!.height!==absoluteField.height))
       throw new Error('Perspective field source geometry changed.');
   };
-  return streamFieldWindow({channels,field,bounds,background,...compiled,read:(b,c)=>read.call(source,b,c),check,
-    sample:(alpha,nativeBounds,region)=>(channels===5?processor.floatProjectiveWet!.bind(processor):processor.floatProjectiveField.bind(processor))(alpha,{sourceWidth:width,sourceHeight:height,corners:quad,field:absoluteField??nativeBounds,background,direction,input:compiled.options.input,source:nativeBounds,output:region})},control);
+  return streamFieldWindow({channels,field,bounds,background,...compiled,create:(length:number)=>new Float32Array(length),validate:channels===5?validateWetField:validateFloatAlpha,read:(b,c)=>read.call(source,b,c),check,
+    sample:(alpha,nativeBounds,region)=>(channels===5?processor.floatProjectiveWet!.bind(processor):processor.floatProjectiveField.bind(processor))(alpha,{sourceWidth:width,sourceHeight:height,corners:quad,field:absoluteField??nativeBounds,background,direction,input:compiled.options.input,source:nativeBounds,output:region})},control) as Promise<Float32Array<ArrayBuffer>>;
 }
 
 export interface MappedFieldSource {
@@ -90,22 +92,44 @@ export async function projectMappedFieldWindow(source:MappedFieldSource,processo
     if((source.channels??1)!==channels||source.background!==background||source.readWindow!==read||!!source.bounds!==!!absoluteField||absoluteField&&(source.bounds!.x!==absoluteField.x||source.bounds!.y!==absoluteField.y||source.bounds!.width!==absoluteField.width||source.bounds!.height!==absoluteField.height))
       throw new Error('Mapped field source geometry changed.');
   };
-  return streamFieldWindow({channels,field,bounds,background,...compiled,read:(b,c)=>read.call(source,b,c),check,
-    sample:(alpha,nativeBounds,region)=>(channels===5?processor.floatMappedWet!.bind(processor):processor.floatMappedField.bind(processor))(alpha,{mapping,field:absoluteField??nativeBounds,background,source:nativeBounds,output:region})},control);
+  return streamFieldWindow({channels,field,bounds,background,...compiled,create:(length:number)=>new Float32Array(length),validate:channels===5?validateWetField:validateFloatAlpha,read:(b,c)=>read.call(source,b,c),check,
+    sample:(alpha,nativeBounds,region)=>(channels===5?processor.floatMappedWet!.bind(processor):processor.floatMappedField.bind(processor))(alpha,{mapping,field:absoluteField??nativeBounds,background,source:nativeBounds,output:region})},control) as Promise<Float32Array<ArrayBuffer>>;
 }
 
-interface FieldStream {
+/** Private prepared HDR fields always have finite native support and zero
+ * background. Geometry/ROI subdivision is shared with scalar and byte fields. */
+export interface HdrWetFieldSource {bounds:FloatSourceWindow;readWindow(bounds:FloatSourceWindow,control?:FloatSourceControl):Promise<Float64Array>}
+export interface HdrWetFieldSampler {floatMappedHdrWet(field:Float64Array,options:MappedFieldOptions):Promise<Float64Array>}
+export async function projectMappedHdrWetFieldWindow(source:HdrWetFieldSource,processor:HdrWetFieldSampler,inputMapping:FieldMapping,input:FloatSourceWindow,control:FloatProjectionControl={}):Promise<Float64Array<ArrayBuffer>>{
+  const mapping=captureFieldMapping(inputMapping),absoluteField=captureFieldBounds(source.bounds),bounds=validateWindow(input),read=source.readWindow;
+  const compiled=compileMappedField({mapping,field:absoluteField,source:{x:absoluteField.x,y:absoluteField.y,width:1,height:1},output:bounds,background:0});
+  const field={...absoluteField,x:absoluteField.x-mapping.sourceOrigin.x,y:absoluteField.y-mapping.sourceOrigin.y};
+  const check=()=>{control.signal?.throwIfAborted();checkRenderCurrent(control.isCancelled);if(source.readWindow!==read||!source.bounds||source.bounds.x!==absoluteField.x||source.bounds.y!==absoluteField.y||source.bounds.width!==absoluteField.width||source.bounds.height!==absoluteField.height)throw new Error('HDR wet field source changed.');};
+  return streamFieldWindow({channels:5,field,bounds,background:0,...compiled,create:(length:number)=>new Float64Array(length),validate:validateHdrWetField,read:(b,c)=>read.call(source,b,c),check,
+    sample:(field,nativeBounds,region)=>processor.floatMappedHdrWet(field,{mapping,field:absoluteField,background:0,source:nativeBounds,output:region})},control) as Promise<Float64Array<ArrayBuffer>>;
+}
+export async function projectPerspectiveHdrWetFieldWindow(source:HdrWetFieldSource&{width:number;height:number;direction?:ProjectiveFieldDirection;input?:ProjectiveFieldInput},processor:HdrWetFieldSampler,corners:ProjectiveQuad,input:FloatSourceWindow,control:FloatProjectionControl={}):Promise<Float64Array<ArrayBuffer>>{
+  const field=captureFieldBounds(source.bounds),width=source.width,height=source.height,direction=source.direction,signature=JSON.stringify(source.input),read=source.readWindow;
+  const check=()=>{control.signal?.throwIfAborted();checkRenderCurrent(control.isCancelled);if(source.width!==width||source.height!==height||source.direction!==direction||JSON.stringify(source.input)!==signature||source.readWindow!==read||!source.bounds||source.bounds.x!==field.x||source.bounds.y!==field.y||source.bounds.width!==field.width||source.bounds.height!==field.height)throw new Error('HDR wet projective source changed.');};
+  check();const compiled=compileHdrWetProjectiveField({sourceWidth:width,sourceHeight:height,field,source:{x:field.x,y:field.y,width:1,height:1},output:input,background:0,direction,input:source.input,corners});
+  const result=await projectMappedHdrWetFieldWindow({bounds:field,readWindow:async(b,c)=>{check();const result=await read.call(source,b,c);check();return result;}},processor,fieldMappingFromFrame(compiled),input,control);check();return result;
+}
+
+type FieldArray=Float32Array|Float64Array;
+interface FieldStream<T extends FieldArray> {
   channels:1|5;field:FloatSourceWindow|undefined;bounds:FloatSourceWindow;background:number;
   inputOrigin:{x:number;y:number};sourceOrigin:{x:number;y:number};values:Float64Array;
-  read(bounds:FloatSourceWindow,control?:FloatSourceControl):Promise<Float32Array>;
-  sample(alpha:Float32Array,source:FloatSourceWindow,output:FloatSourceWindow):Promise<Float32Array>;
+  create(length:number):T;
+  validate(value:unknown,pixels:number):void;
+  read(bounds:FloatSourceWindow,control?:FloatSourceControl):Promise<T>;
+  sample(alpha:T,source:FloatSourceWindow,output:FloatSourceWindow):Promise<T>;
   check():void;
 }
 
-async function streamFieldWindow(stream:FieldStream,control:FloatProjectionControl):Promise<Float32Array<ArrayBuffer>>{
+async function streamFieldWindow<T extends FieldArray>(stream:FieldStream<T>,control:FloatProjectionControl):Promise<T>{
   const {channels,field,bounds,background,values:m,read,sample,check}=stream,compiled=stream,signal=control.signal;
-  const validate:(value:unknown,pixels:number)=>asserts value is Float32Array=channels===5?validateWetField:validateFloatAlpha;
-  check();const output=new Float32Array(bounds.width*bounds.height*channels).fill(background);let deadline=performance.now()+2;
+  const validate=stream.validate;
+  check();const output=stream.create(bounds.width*bounds.height*channels);output.fill(background);let deadline=performance.now()+2;
   const render=async(region:FloatSourceWindow):Promise<void>=>{
     check();if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+2;}
     const points=[];let negative=false,positive=false,horizon=false;

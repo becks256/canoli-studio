@@ -1,3 +1,4 @@
+import {validateHdrWetField} from '../core/hdr-wet-field';
 import {validateWetField} from '../core/wet-field';
 import {floatWetLoadSchema,floatWetMixSchema,floatWetOpacitySchema,validateFloatWetCarried,validateFloatWetResult,type FloatWetLoadOptions,type FloatWetLoadSettings,type FloatWetResult} from '../core/float-wet';
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
@@ -120,6 +121,22 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatCompositeHdrWet(pixels:Float32Array,field:Float64Array,opacity=1):Promise<Float32Array>{
+    validateFloatWorkerWindow(pixels);validateHdrWetField(field,pixels.length/4);floatWetOpacitySchema.parse(opacity);const length=pixels.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatCompositeHdrWet:{pixels:pixels.slice(),field:field.slice(),opacity}});
+    validateFloatWorkerWindow(result);if(result.length!==length||result.byteOffset||result.byteLength!==result.buffer.byteLength)throw new Error('HDR wet compositor returned incomplete output.');return result;
+  }
+  async floatProjectiveHdrWet(field:Float64Array,input:ProjectiveFieldOptions):Promise<Float64Array>{
+    const {options}=compileProjectiveField(input);if(options.background!==0)throw new Error('HDR wet fields require zero background.');validateHdrWetField(field,options.source.width*options.source.height);
+    const result=await this.request(new Uint8ClampedArray(0),{floatProjectiveHdrWet:{field:field.slice(),options}});
+    validateHdrWetField(result,options.output.width*options.output.height);if(result.byteOffset||result.byteLength!==result.buffer.byteLength)throw new Error('HDR wet sampler returned incomplete output.');return result;
+  }
+  async floatMappedHdrWet(field:Float64Array,input:MappedFieldOptions):Promise<Float64Array>{
+    const {options}=compileMappedField(input);if(options.background!==0)throw new Error('HDR wet fields require zero background.');validateHdrWetField(field,options.source.width*options.source.height);
+    const result=await this.request(new Uint8ClampedArray(0),{floatMappedHdrWet:{field:field.slice(),options}});
+    validateHdrWetField(result,options.output.width*options.output.height);if(result.byteOffset||result.byteLength!==result.buffer.byteLength)throw new Error('HDR wet sampler returned incomplete output.');return result;
+  }
+
   async floatWetLoad(pixels:Float32Array,input:FloatWetLoadOptions={}):Promise<Float32Array>{
     validateFloatWorkerWindow(pixels);const options=floatWetLoadSchema.parse(input),length=pixels.length;
     const result=await this.request(new Uint8ClampedArray(0),{floatWetLoad:{pixels:pixels.slice(),options}});
@@ -479,6 +496,9 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
+      floatCompositeHdrWet?:{pixels:Float32Array;field:Float64Array;opacity:number};
+      floatProjectiveHdrWet?:{field:Float64Array;options:ProjectiveFieldOptions};
+      floatMappedHdrWet?:{field:Float64Array;options:MappedFieldOptions};
       floatWetLoad?:{pixels:Float32Array;options:FloatWetLoadSettings};
       floatWetMix?:{pixels:Float32Array;carried:Float32Array;coverage:Float32Array;options:WetPaintMixSettings};
       floatWetEnvelope?:{before:Float32Array;after:Float32Array;coverage:Float32Array;opacity:number};
@@ -591,6 +611,9 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.floatCompositeHdrWet){tryTransfer(payload.floatCompositeHdrWet.pixels.buffer);tryTransfer(payload.floatCompositeHdrWet.field.buffer);}
+    if(payload.floatProjectiveHdrWet)tryTransfer(payload.floatProjectiveHdrWet.field.buffer);
+    if(payload.floatMappedHdrWet)tryTransfer(payload.floatMappedHdrWet.field.buffer);
     if(payload.floatWetLoad)tryTransfer(payload.floatWetLoad.pixels.buffer);
     if(payload.floatWetMix){tryTransfer(payload.floatWetMix.pixels.buffer);tryTransfer(payload.floatWetMix.carried.buffer);tryTransfer(payload.floatWetMix.coverage.buffer);}
     if(payload.floatWetEnvelope){tryTransfer(payload.floatWetEnvelope.before.buffer);tryTransfer(payload.floatWetEnvelope.after.buffer);tryTransfer(payload.floatWetEnvelope.coverage.buffer);}

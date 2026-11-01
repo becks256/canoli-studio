@@ -57,3 +57,22 @@ export function envelopeWetPaintFloat(before:usize,after:usize,mask:usize,output
  }
  return 0;
 }
+
+/** Complete prepared replacement: independent removal, already covered pigment.
+ * Keep intermediate fields in f64 and store straight destination f32 once. */
+export function compositeHdrWetFloat(before:usize,field:usize,output:usize,count:i32,opacity:f64):i32{
+ if(!rgba(before,count)||!unit(opacity))return 1;
+ for(let i=0;i<count;i++){
+  const p=field+<usize>i*40,a=load<f64>(p+24),coverage=load<f64>(p+32);
+  if(!unit(a)||!unit(coverage)||a>coverage)return 1;
+  for(let c:usize=0;c<3;c++){const v=load<f64>(p+c*8);if(!isFinite(v)||a==0&&v!=0)return 1;}
+ }
+ for(let i=0;i<count;i++){
+  const p=before+<usize>i*16,f=field+<usize>i*40,q=output+<usize>i*16,coverage=load<f64>(f+32);
+  if(opacity==0||coverage==0){copy(p,q);continue;}
+  const left=1-opacity*coverage,a=left==0?load<f64>(f+24)*opacity:<f64>load<f32>(p+12)*left+load<f64>(f+24)*opacity,stored=<f32>a;
+  for(let c:usize=0;c<3;c++){const pigment=load<f64>(f+c*8)*opacity,numerator=left==0?pigment:<f64>load<f32>(p+c*4)*<f64>load<f32>(p+12)*left+pigment,v=stored==0?<f32>0:<f32>(numerator/a);if(!isFinite(v))return 3;store<f32>(q+c*4,v);}
+  store<f32>(q+12,stored);
+ }
+ return 0;
+}

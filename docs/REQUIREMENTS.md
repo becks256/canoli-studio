@@ -1418,3 +1418,12 @@ retains its existing precision, while private custom dab coverage supports
 Float32. HDR edit asset serialization, document replay/projection, persistence
 and public authoring/tools remain required before F03/F10 wet-tool acceptance.
 [Exact lifecycle](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
+
+
+Prepared HDR wet replay must retain completed Float32 words without a second
+Float32 premultiplication step. Private lossless TIFF pairs, validated Float64
+replacement fields, exact affine/projective sampling and one final Float32
+composition supply this dependency. Positive-alpha full replacement and inert
+destination identities are exact; hidden originals remain in the files. This
+does not fulfill public HDR wet strokes, FloatScene replay, persistence or
+authoring/tools. [Exact boundary](HDR_WET_FIELDS.md).

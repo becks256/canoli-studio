@@ -1,5 +1,5 @@
 export {convolveAlphaFloat} from './float-shadow';
-export {loadWetPaintFloat,mixWetPaintFloat,envelopeWetPaintFloat} from './float-wet';
+export {loadWetPaintFloat,mixWetPaintFloat,envelopeWetPaintFloat,compositeHdrWetFloat} from './float-wet';
 export {styleFloat} from './float-style';
 export {colorFloat} from "./float-color";
 export {tonalFloat} from "./float-tonal";
@@ -8,7 +8,7 @@ export {lookupFloat} from './float-lookup';
 export {transferFloat} from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { sampleProjectiveFloat } from "./projective-sampling";
-export { sampleProjectiveFieldFloat,sampleProjectiveWetFloat } from "./projective-field";
+export { sampleProjectiveFieldFloat,sampleProjectiveWetFloat,sampleProjectiveHdrWet } from "./projective-field";
 export { encodeFrequencyBand } from "./frequency-band";
 export { medianFilter } from "./median-filter";
 export { bilateralFilter } from "./bilateral-filter";

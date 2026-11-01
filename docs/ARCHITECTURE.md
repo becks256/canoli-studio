@@ -2458,3 +2458,20 @@ when capture/storage initialization fails.
 Job databases and read-only native source replay are not a public HDR wet edit
 format. Float tools still require assets/replay/projection, persistence and
 guarded authoring integration through shared document commands.
+
+
+## Prepared HDR wet asset/field dependency
+
+`core/float-wet-tile.ts` writes and validates lossless straight Float32 TIFF
+working tiles with an exact linear ICC and complete sample validation. The core
+codec uses portable TIFF reading/encoding without an engine dependency.
+`engine/hdr-wet-field.ts` captures immutable color/coverage originals, checks
+complete pair coverage and derives ordered Float64 premultiplied fields.
+`core/hdr-wet-projective.ts` retains exact affine geometry in the new HDR path;
+`projective-field.ts` shares conservative streaming geometry across scalar,
+byte and HDR fields with separate validation/allocation policies. Native worker
+sampling keeps Float64 until one final straight Float32 composition.
+[Contract and limits](HDR_WET_FIELDS.md). No public schema, constructor, command,
+script/REST route or plugin authority is added. These files are not yet native
+document wet assets; FloatScene replay, versioned transport and guarded
+authoring/tools remain required.

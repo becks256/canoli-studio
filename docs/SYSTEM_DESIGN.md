@@ -1179,3 +1179,16 @@ results outlive source closure and parent disposal.
 These private read-only jobs do not add project HDR replacement assets, schema,
 shared commands, script/REST services or plugin authority; actual float wet
 authoring remains rejected pending those connected boundaries.
+
+
+## HDR wet replacement precision boundary
+
+Completed Float32 straight samples persist losslessly in private TIFF pairs.
+Derived premultiplied RGB/alpha/removal uses Float64 to retain the exact Float32
+product, shares relative-origin ROI streaming, and applies removal and already
+covered pigment separately. Final composition stores Float32 once. Exact affine
+quads avoid identity homography roundoff; byte field math stays separate. Full
+validation precedes reusable proofs, owned results outlive source closure, and
+disposal releases originals. [Equations and boundaries](HDR_WET_FIELDS.md).
+No public DTO, document precision, host grant or native project contract changes;
+current float wet authoring remains unavailable.

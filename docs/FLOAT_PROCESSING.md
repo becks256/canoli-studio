@@ -246,3 +246,15 @@ history/project/recipe/workspace transport and actual tools remain required.
 Float Smudge/Mixer stay unavailable. No document schema, isolated service, REST
 route, plugin permission, account/upload or browser/headless synchronization
 contract changes in this increment.
+
+
+## Prepared HDR wet asset and field dependency
+
+Private lossless Float32 TIFF tiles retain completed straight samples. Validated
+color/coverage pairs assemble Float64 premultiplied replacement fields; native
+mapped/projective sampling and final composition avoid an extra Float32 pigment
+rounding step. Exact affine quads retain identity pixel centers. These are
+derived intermediates, not a new document precision or public wet DTO.
+[Format, equations, ownership, budgets and remaining integration](HDR_WET_FIELDS.md).
+Public HDR wet assets/commands, FloatScene replay, original-bearing persistence
+and authoring/tools remain required; float Smudge/Mixer stay disabled.

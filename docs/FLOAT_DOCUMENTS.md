@@ -1075,3 +1075,10 @@ and source closure. These read-only job results do not become document edits.
 HDR replacement assets, composed replay/projection, source-bearing persistence
 and public authoring/previews/commit remain required; float Smudge/Mixer stay
 unavailable. [Retained preparation contract](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
+
+
+Private prepared HDR assets now retain straight Float32 TIFF samples, validate
+complete color/coverage pairs and sample Float64 intermediate replacement fields
+before a single native Float32 composition. This is not yet a document wet
+stroke or native history/project transport. Public replay and authoring remain
+required; float Smudge/Mixer stay unavailable. [Contract](HDR_WET_FIELDS.md).
