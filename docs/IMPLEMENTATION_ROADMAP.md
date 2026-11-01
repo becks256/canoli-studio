@@ -10851,3 +10851,56 @@ unfinished original professional-editor/device/quality/performance gate remain
 required. The complete original roadmap stays active. No public mutation,
 schema, grant, ordinary native appearance, source-resolution policy or
 REST/browser session synchronization contract changes.
+
+### 2026-11-01 — F08/F10 native vertical glyph decomposition in progress
+
+Previous accepted goal increment: curved native baselines at fe83338. Private
+source-owned SVG glyph fields now retain upright/sideways orientation, native
+vertical substitutions/metrics, central/alphabetic baselines and curved paths.
+Original full-text context and source GIDs remain; every published placement must
+match complete original native ink exactly at opacities 1 and 0.5. The first
+expanded run passed eight font matrices (576 lines), actual Float32 coverage and
+metric fault/retry checks, but upright Arabic failed twelve direction variants.
+Native caret metadata exposes a resolved BTT item that differs from the paragraph
+attribute and changes required substitutions. That correction and independent
+FontTools coverage references are under verification. These are private renderer
+dependencies; connected Float32 TextLayer/tool/scenes/export/shared transport/
+persistence, broad native font/script/fallback/intrinsic paint, device/quality/
+performance and every unfinished original roadmap requirement remain active.
+No public mutation, schema, grant or REST/browser synchronization changes.
+
+### 2026-11-01 — F08/F10 native vertical glyph dependency verified
+
+Full build/typecheck and all 3,405 unit/API tests across 337 files pass. One
+complete 190-case affected native run across eighteen files and fourteen
+production cases pass without retries, skips, flakes or failures. Eight original
+fonts retain 576 complete vertical layouts; 108 direction/reflection/path
+variants include the corrected original BTT Arabic substitutions. Native vert
+substitutions and their negative control, combining marks, optical/variable/
+compressed/CFF sources, alignment and affine/curved placement all match complete
+original native ink exactly at both opacity samples. Twenty-four independent
+original-font/FontTools Float32 cases retain HDR RGB, alpha 1e-8 and every window
+word. Metric and origin faults reject, retire probes and permit retry. The
+production harness now resolves the actual emitted namespace; its failed pilot
+and complete corrected run remain retained. Emitted component tests use prepared
+fixture adapters; complete ownership/itemization/matching is verified separately
+in the source matrix. No pixel tolerance or source geometry was fitted.
+
+Independent decoding compares every RGBA sample in both complete ordinary 50 MP
+curve and vertical outputs against complete independently authored native SVG
+references, with zero channel error and identical PNG files (200 million samples
+each). The separate RAW/variable-font workflow retains its exact 100,000,672-byte
+original, complete independent 600 × 200 text-region pixels and preceding accepted
+full PNG bytes. These are ordinary byte regressions, not Float32 TextLayer or
+universal native-host acceptance. VORG reader units do not establish native
+CFF/VORG interop. [Findings and limits](benchmarks/svg-vertical-glyph-2026-11-01.md)
+and [compact source/release/raw-run/reference receipt](benchmarks/svg-vertical-glyph-2026-11-01.json.gz)
+retain the baseline, metric, path, direction and namespace failures/corrections.
+
+Full styled/bidi/script/font fallback, missing/intrinsic paint, broader path/
+vertical layouts, complete native/legacy/optical extents and hosts, connected
+Float32 TextLayer authoring/scenes/export/shared transport/persistence, and every
+unfinished original professional-editor/quality/device/performance and other
+roadmap requirement remain required. The complete original goal stays active.
+No public mutation, model schema, grant, ordinary native appearance, original-
+resolution policy or REST/browser synchronization contract changes.

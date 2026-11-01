@@ -1,5 +1,17 @@
 # Architecture
 
+## Private native vertical source-glyph matching
+
+`native-svg-vertical.ts` consumes captured whole-source orientation and resolved
+caret metadata, retaining original UTF-16 context and original TTB/BTT/LTR/RTL
+GSUB/GPOS runs. Independent native metrics and selected-glyph SVG origins support
+vertical baseline placement. `native-svg-verify.ts` shares the complete native/
+candidate union-ink gate with horizontal and path matching. Private writing/
+baseline metadata feeds scalar canonical coverage and ordered linear WASM paint.
+No public TextLayer, model schema or extension authority is added. Full float
+text/tool/scene/interchange integration and broader typography remain required.
+[Private contract](FLOAT_TEXT.md#native-vertical-glyph-paint-private).
+
 ## Captured native SVG glyph paint
 
 Captured text plans can match a uniform horizontal source line, including a
@@ -62,7 +74,7 @@ A whole uniform Canvas-run matcher compares complete native ink/advance with
 positioned glyphs, including two opacity samples, before supplying Float32 paint
 placements. It introduces no text spans, document mutations or new grants. The
 ordinary byte renderer does not invoke shaping/matching. Full native bidi/font
-fallback, compressed/missing/intrinsic glyphs, SVG/path/vertical matching and
+fallback, compressed/missing/intrinsic glyphs, broader SVG/path/vertical layouts and
 connected float TextLayer remain required. [Contract](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
 
 ## Private native glyph paint dependency — full float text remains required

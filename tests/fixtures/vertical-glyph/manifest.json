@@ -1,0 +1,17 @@
+{
+  "fontTools": "4.51.0",
+  "sourceSha256": "50731d8a540f1ed632dee94ef84b6a0a92152575deee5fbce684fc3c5ff7b15b",
+  "referenceSha256": "178cc146d51cda0c5d9d6285aab8c2c4c78bb8822e612e5ac8db4ddcf0b459ed",
+  "glyphs": 18,
+  "originalMappings": 12,
+  "referenceSelectorBase": 1048576,
+  "featuresDisabled": [
+    "fina",
+    "init",
+    "kern",
+    "liga",
+    "mark",
+    "medi",
+    "rlig"
+  ]
+}

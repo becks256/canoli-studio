@@ -1,5 +1,17 @@
 # Canoli Studio editor requirements
 
+## Private vertical glyph dependency
+
+For private vertical source-owned paint, retain original glyph identity and
+complete text context through orientation/resolved-direction itemization,
+vertical substitutions, native metrics and curved baselines. Publish placements
+only after exact complete native ink comparison at both opacity samples. Preserve
+source-linear HDR/tiny alpha and exact caller-window composition, fail closed on
+stale/cancelled/invalid metadata, and retire private resources. This dependency
+does not admit Float32 TextLayer authoring, scene/export/shared transport or
+persistence; those and broader typography/device/performance acceptance remain
+required. [Contract and limits](FLOAT_TEXT.md#native-vertical-glyph-paint-private).
+
 ## Private captured SVG line matching
 
 Preserve complete source shaping chunks, native alignment/cluster baselines and

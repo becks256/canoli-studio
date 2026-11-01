@@ -50,6 +50,10 @@ it('resolved native baselines and rotations snapshot before coverage and reject 
  const actual=await renderFloatGlyphs([source],area,processor,()=>{},async glyph=>{path.data='M0 0H1';path.startOffset=999;source.rotation=90;captured=glyph.path!.startOffset===210&&glyph.path!.data==='M24 150C100 30 340 30 420 150'&&Object.isFrozen(glyph.path)&&glyph.rotation===12;return new Float32Array([1]);});expect(captured).toBe(true);expect(actual).toEqual(new Float32Array([4,-.25,1.5,.5]));
  for(const bad of [{...source,rotation:NaN},{...source,surface:undefined},{...source,path:{...path,startOffset:Infinity}},{...source,path:{...path,baselineOffset:NaN}},{...source,path:{...path,data:''}}])await expect(renderFloatGlyphs([bad],area,processor,()=>{},async()=>new Float32Array([1]))).rejects.toThrow();
 });
+it('native writing and dominant baselines snapshot before asynchronous glyph coverage',async()=>{
+ const writing={mode:'vertical-rl'as 'vertical-rl'|'vertical-lr',orientation:'upright'as const},source={...primitive([4,-.25,1.5,.5]),surface:'svg'as const,writing,baseline:'central'as const};let captured=false;await renderFloatGlyphs([source],area,processor,()=>{},async glyph=>{writing.mode='vertical-lr';captured=glyph.writing!.mode==='vertical-rl'&&Object.isFrozen(glyph.writing)&&glyph.baseline==='central';return new Float32Array([1]);});expect(captured).toBe(true);
+ for(const bad of [{...source,surface:undefined},{...source,baseline:'invalid'as 'central'},{...source,writing:{mode:'invalid'as 'vertical-rl',orientation:'upright'as const}}])await expect(renderFloatGlyphs([bad],area,processor,()=>{},async()=>new Float32Array([1]))).rejects.toThrow();
+});
 
 it('never overwrites existing private Unicode mappings when choosing glyph selectors',async()=>{
  const original=compileGlyphSelectors(new Uint8Array(await readFile('tests/fixtures/fonts/Regular.ttf'))),next=compileGlyphSelectors(original.bytes);validateGlyphSelectors(original.bytes,next);const font=create(next.bytes)as Font;

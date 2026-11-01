@@ -7,7 +7,7 @@ import type {AssetStore} from '../core/assets';
 import {yieldTask} from '../core/task-yield';
 import {acquireFontWorkerSlot} from '../fonts/client';
 import {glyphFeatureSettings,validateGlyphSelectorSteps,type GlyphSelectorBytes} from '../fonts/glyph-sfnt';
-import type {NativeSvgMetricsStyle,NativeSvgMetrics} from './native-svg-metrics';
+import type {NativeSvgMetricsStyle,NativeSvgMetrics,NativeSvgMetricsRequest} from './native-svg-metrics';
 import type {FontRunCss} from '../fonts/css-instance';
 
 export interface NativeGlyphFontControl {signal?:AbortSignal;timeoutMs?:number;check?:()=>void}
@@ -17,7 +17,7 @@ export interface NativeGlyphFont {
  shapeRun(input:FontRunInput,control?:NativeGlyphFontControl):Promise<OwnedFontRun>;
  character(glyphId:number):string;
  svgFont?(control?:NativeGlyphFontControl):Promise<Readonly<{definitions:string;features:string}>>;
- svgMetrics?(ids:readonly number[],style:NativeSvgMetricsStyle,css:FontRunCss,computedSize:number,control?:NativeGlyphFontControl):Promise<NativeSvgMetrics>;
+ svgMetrics?(ids:readonly number[],style:NativeSvgMetricsStyle,css:FontRunCss,computedSize:number,control?:NativeGlyphFontControl,projection?:NativeSvgMetricsRequest):Promise<NativeSvgMetrics>;
  check():void;release():void;
 }
 let serial=0;
@@ -52,8 +52,8 @@ export async function captureNativeGlyphFont(assets:AssetStore,id:string,setting
   let deadline=performance.now()+2;for(const _ of validateGlyphSelectorSteps(bytes,result)){if(performance.now()>=deadline){await guarded(yieldTask());check();deadline=performance.now()+2;}void _;}check();if(result.glyphCount!==info.glyphCount)throw new Error('Native glyph count differs from its retained source.');selectors=result.selectors;
   const featureSettings=glyphFeatureSettings(bytes);
   svgBlob=new Blob([Uint8Array.from(result.bytes).buffer],{type:new DataView(result.bytes.buffer,result.bytes.byteOffset).getUint32(0)===0x4f54544f?'font/otf':'font/ttf'});
-  const svgMetrics=async(input:readonly number[],style:NativeSvgMetricsStyle,css:FontRunCss,size:number,options:NativeGlyphFontControl={}):Promise<NativeSvgMetrics>=>{
-   const ids=[...input],paint={...style},request=normalizeFontRun({text:'',css}),child={...options},childSignal=AbortSignal.any([signal,...(child.signal?[child.signal]:[])]),current=()=>{childSignal.throwIfAborted();check();child.check?.();check();childSignal.throwIfAborted();};current();if(ids.some(n=>!Number.isInteger(n)||n<1||n>=info.glyphCount))throw new Error('Native SVG metrics require original nonzero glyph IDs.');const names=ids.map(n=>String.fromCodePoint(selectors![n])),blob=svgBlob!,bytes=new Uint8Array(await blob.arrayBuffer());current();if(svgBlob!==blob)throw new Error('Native SVG metric source changed.');const {captureNativeSvgMetrics}=await import('./native-svg-metrics');current();return captureNativeSvgMetrics(assets,id,bytes,family,effective,ids,names,paint,request.css!,size,{...child,signal:childSignal,check:current});
+  const svgMetrics=async(input:readonly number[],style:NativeSvgMetricsStyle,css:FontRunCss,size:number,options:NativeGlyphFontControl={},projection:NativeSvgMetricsRequest={}):Promise<NativeSvgMetrics>=>{
+   const projected={...projection},ids=[...input],paint={...style},request=normalizeFontRun({text:'',css,nominal:true,direction:projected.direction}),child={...options},childSignal=AbortSignal.any([signal,...(child.signal?[child.signal]:[])]),current=()=>{childSignal.throwIfAborted();check();child.check?.();check();childSignal.throwIfAborted();};current();if(ids.some(n=>!Number.isInteger(n)||n<1||n>=info.glyphCount))throw new Error('Native SVG metrics require original nonzero glyph IDs.');const names=ids.map(n=>String.fromCodePoint(selectors![n])),blob=svgBlob!,bytes=new Uint8Array(await blob.arrayBuffer());current();if(svgBlob!==blob)throw new Error('Native SVG metric source changed.');const {captureNativeSvgMetrics}=await import('./native-svg-metrics');current();return captureNativeSvgMetrics(assets,id,bytes,family,effective,ids,names,paint,request.css!,size,{...child,signal:childSignal,check:current},projected);
   };
   const svgFont=async(input:NativeGlyphFontControl={})=>{
    const child={...input},time=child.timeoutMs??60000;if(!Number.isInteger(time)||time<=0||time>0x7fffffff)throw new Error('Invalid SVG glyph font time budget.');const signal=AbortSignal.any([abort.signal,...(control.signal?[control.signal]:[]),...(child.signal?[child.signal]:[])]),current=()=>{signal.throwIfAborted();check();child.check?.();signal.throwIfAborted();check();};current();

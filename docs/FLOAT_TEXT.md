@@ -1,11 +1,12 @@
 # Native float text — implementation in progress
 
-The captured horizontal SVG-line dependency is verified by 3,398 unit/API tests,
-101 affected native-browser cases and 11 production cases. The new source matrix
-contains 36 complete fixture lines and 12 complete RTL lines, plus lifecycle,
-refusal, independent glyph-coverage and exact Float32 partition checks. This is
-private groundwork; the float TextLayer/tool gates below still apply.
-[Verification and limits](benchmarks/svg-glyph-2026-11-01.md).
+The private vertical source-glyph dependency is verified by 3,405 unit/API tests,
+190 affected native-browser cases and fourteen production cases. Eight original
+font matrices retain 576 complete layouts; 108 direction/reflection/path cases
+and twenty-four independent Float32 coverage runs preserve exact native ink,
+HDR/tiny alpha and every partition word. This remains private groundwork; the
+float TextLayer/tool gates below still apply.
+[Verification and limits](benchmarks/svg-vertical-glyph-2026-11-01.md).
 
 TextLayer integration remains required for the full F08/F10 roadmap. Float
 documents still reject text and the text tool remains unavailable. The private
@@ -296,9 +297,9 @@ colors. The font must belong to that plan and match the line's single owned
 family/explicit axis instance. The plan must have requested `captureLinearPaint`.
 Original chunks remain whole: no per-character tspan rewriting, bitmap RGB
 flattening or document mutation is introduced. Native UTF-16 addressing must
-cover the source exactly. Mixed styles, missing/fallback glyphs, intrinsic color,
-vertical geometry and other unsupported addressing return unavailable. Uniform
-horizontal paths use the baseline dependency below.
+cover the source exactly. Mixed styles, missing/fallback glyphs, intrinsic color and
+unsupported addressing return unavailable. Uniform horizontal paths use the
+baseline dependency below; vertical lines use the private vertical dependency.
 
 Original HarfBuzz supplies glyph IDs and within-cluster offsets. Captured native
 character metadata supplies cluster baselines, including native alignment and
@@ -317,7 +318,8 @@ reshaping authored text. A separate screen-font projection uses original nominal
 HarfBuzz advances, independently measured native advances and the backend's
 font-size projection. The nominal worker request adds private `nominal?:boolean`,
 default false: true returns cmap IDs/original horizontal advances in LTR source
-order, without substitutions/GPOS; non-LTR nominal requests reject. Original
+order without substitutions/GPOS. The vertical companion adds TTB nominal
+metrics; RTL/BTT nominal requests reject. Original
 UTF-16 ranges, units, glyph identity, queue, deadline and transfer checks remain.
 It is an internal metric operation, not a scripting or REST method.
 
@@ -547,3 +549,89 @@ pixels and preceding accepted PNG bytes; this is not full 50 MP/float acceptance
 [compact raw-run/source/release/reference receipt](benchmarks/optical-font-2026-11-01.json.gz)
 retain failed/corrected pilots. Full native typography, float TextLayer/tool
 integration and all remaining original roadmap gates stay required.
+
+
+## Native vertical glyph paint (private)
+
+Captured uniform monochrome SVG lines can now use original source-font glyph
+IDs for vertical-rl/vertical-lr, mixed/upright/sideways orientation and curved
+baselines. This is a private renderer dependency, not public Float32 TextLayer
+admission. Source text stays whole. Captured native rotations and resolved caret
+directions form item ranges passed alongside the complete original UTF-16 context
+to the original HarfBuzz source. Upright items use TTB/BTT; sideways items use
+LTR/RTL. Paragraph direction alone is insufficient, including for upright Arabic
+required substitutions. Original vert substitutions and GPOS remain authoritative.
+
+The private successful match adds frozen `runs`, one source run per orientation/
+direction item; `run` is its first entry for the existing private result shape.
+Every glyph keeps the original GID, source owner, linear color and frozen native
+writing/baseline metadata. Mixed/upright uses a central baseline; all-sideways uses
+alphabetic. Independent candidate SVG caret origins remove the nominal native
+origin once. Original path data, unfolded native path metadata, source offsets,
+hidden-character metadata and candidate advances retain curved placement. An
+equivalent origin/matrix or native-path representation can be selected only when
+complete source/candidate union ink matches exactly at opacity 1 and 0.5. No
+geometry is fitted from verification pixels. Mismatch/unavailable returns no paint.
+
+Private nominal shaping now accepts LTR or TTB. TTB returns original cmap IDs,
+vertical advances and negative vertical origins without GSUB/GPOS; RTL/BTT nominal
+requests reject. Non-nominal TTB/BTT still run original source substitution and
+positioning. The typed worker output remains version 1 with seven Float64 words
+per glyph and existing GID/context/cluster-order/identity validation.
+
+A private optional `nativeMetrics` request snapshots `{em,glyphs}`. Each unique
+original `glyphId` has native horizontal/vertical advances, vertical origins and
+bounds `{xBearing,yBearing,width,height}` in screen pixels. Finite, signed 16.16
+representability, unique/in-range IDs and positive representable em are required.
+Float32 pixels convert by truncation toward zero, matching the native integer
+callback conversion. Original selected-face/variation font callbacks remain the
+parent fallback; only captured GIDs override metrics. Complete original GSUB/GPOS
+still executes, and output converts back to original source units. This request
+is renderer-owned data, never third-party callback code or a new script grant.
+
+`font.svgMetrics` privately accepts a final `{direction?:'ltr'|'ttb',native?:boolean}`
+projection after the existing control argument (defaults LTR/false). Native mode
+reads original hmtx/vmtx/VORG and independent Canvas metadata for the captured
+selector font: horizontal half advance for x origin, VORG override/default if
+present, otherwise native outline top plus original top bearing, or font ascent
+when vmtx is absent. Missing vertical advance uses native font height. Bounds and
+advance capture reads no artwork pixels. Table counts, lengths and GIDs validate;
+original bytes do not change. These native metric choices follow the current
+[Chromium shaping callbacks](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/platform/fonts/shaping/harfbuzz_face.cc),
+[vertical data](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/platform/fonts/opentype/open_type_vertical_data.cc)
+and [16.16 conversion](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/platform/fonts/skia/skia_text_metrics.h).
+They remain guarded by native ink equality rather than a cross-platform promise.
+
+Abort, source/parent release, deadline, invalid measurements and host removal
+retire temporary resources before publication. Ordinary byte text does not request
+these private fields or callback projections. Broader script/bidi/font-fallback/
+missing/intrinsic paint, native/legacy/optical extents and hosts, and connected
+Float32 TextLayer authoring/scenes/export/shared transport/persistence remain
+required. VORG reader unit coverage alone does not establish native CFF/VORG
+interop. Current browser/build/large-original acceptance is recorded in the dated
+implementation log; do not infer universal font or device support.
+
+
+## Native vertical glyph verification (2026-11-01)
+
+Full build/typecheck, all 3,405 unit/API tests across 337 files, one complete
+190-case affected native run across eighteen files and fourteen production
+cases pass. Eight fonts cover original/no-substitution vertical data, TTF/CFF,
+variable/optical sources, compressed fonts and complete pinned Manrope. All
+576 line layouts and 108 direction/reflection/path variants match complete native
+ink exactly. Independent original-font/FontTools coverage with actual WASM
+preserves twenty-four HDR/tiny-alpha cases and every window-partition word.
+Metric and origin faults clean up and support retry. The emitted vertical worker
+and coverage module pass with prepared fixture adapters; complete ownership/
+itemization/matching is separately verified in the source matrix.
+
+Independent full-image decoding compares every RGBA sample in both complete
+ordinary 50 MP curve/vertical references (200 million samples each), with zero
+error. The separate RAW/variable-font workflow preserves the complete original,
+exact 600 × 200 reference region and preceding accepted full PNG bytes. None
+establish admitted Float32 TextLayer or universal native-font/device support.
+[Findings and remaining scope](benchmarks/svg-vertical-glyph-2026-11-01.md) and
+[compact source/release/raw-run/reference receipt](benchmarks/svg-vertical-glyph-2026-11-01.json.gz)
+retain failed/corrected baseline, metric, path, direction and production-namespace
+pilots. Full connected text/tool/scene/export/shared transport/persistence and
+every unfinished original roadmap requirement remain active.

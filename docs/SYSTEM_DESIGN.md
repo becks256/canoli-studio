@@ -1,5 +1,18 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native vertical itemization and private metric projection
+
+Native orientation and resolved caret direction define source-font shaping
+items; paragraph direction alone must not select vertical GSUB behavior. Keep
+full original UTF-16 context per item, original GIDs and source ownership. Original
+nominal vertical metrics separate default origins from GPOS; independently
+captured native font callbacks reproduce platform metrics when required, with
+strict data validation and existing disposable-worker ownership. Central versus
+alphabetic baselines and original native paths survive decomposition. Exact
+complete union-ink equality remains the publication gate. No pixel fitting, new
+public schema, callback code grant or Float32 TextLayer/tool admission follows.
+[Contract and remaining scope](FLOAT_TEXT.md#native-vertical-glyph-paint-private).
+
 ## Native SVG source-line decomposition
 
 Treat native character rectangles as source geometry, never a glyph-ID oracle
@@ -56,7 +69,7 @@ parent release aborts queued/active children. A private uniform Canvas matcher
 uses whole native text and positioned original glyphs on the same fixed lattice,
 compares complete union ink at opacity 1 and 0.5, and never exposes mismatched
 placements. Authored linear RGB/alpha remain independent of verification pixels.
-This dependency does not implement native bidi/fallback itemization, SVG/path/
+This dependency does not implement native bidi/fallback itemization, broader SVG/path/
 vertical equivalence or complete float TextLayer. [Contract](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
 
 ## Native text preparation ownership
