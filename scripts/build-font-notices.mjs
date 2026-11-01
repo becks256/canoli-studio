@@ -30,7 +30,7 @@ for(const [directory,pkg]of [...seen].sort((a,b)=>(a[1].name+'@'+a[1].version).l
 }
 sections.push('HarfBuzz 15.0.0 upstream notice\n\n'+await readFile(path.join(root,'third_party/harfbuzz/COPYING'),'utf8'));
 sections.push('HarfBuzz generated USE table upstream notice\n\n'+await readFile(path.join(root,'third_party/harfbuzz/MS-USE-COPYING'),'utf8'));
-sections.push('Unicode data notice for HarfBuzz generated tables\n\n'+await readFile(path.join(root,'third_party/harfbuzz/UNICODE-LICENSE.txt'),'utf8'));
+sections.push('Unicode data notice for HarfBuzz generated tables and private text-item properties\n\n'+await readFile(path.join(root,'third_party/harfbuzz/UNICODE-LICENSE.txt'),'utf8'));
 sections.push('Complete WOFF2 native decoder notice\n\n'+await readFile(path.join(root,'third_party/woff2/LICENSE'),'utf8'));
 sections.push('Native Brotli 1.2.1 notice\n\n'+await readFile(path.join(root,'third_party/brotli/LICENSE'),'utf8'));
 sections.push('Brotli decoder upstream notice\n\n'+await readFile(path.join(root,'node_modules/brotli/dec/bit_reader.js'),'utf8').then(text=>text.slice(0,text.indexOf('*/')+2)));

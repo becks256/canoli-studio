@@ -1,5 +1,21 @@
 # Architecture
 
+## Original script and resolved native direction items
+
+The private `native-text-items.ts` selects grapheme-safe script/direction ranges
+inside existing original spans. Pinned Unicode property data has complete source
+hashes and reproducible generation; native whole-source caret/path metadata
+retains resolved geometry. `native-svg-glyph.ts` shapes every item with complete
+original line context, assembles original glyph fields and verifies complete
+native ink before publishing. A whole-source nonnegative-spacing probe supplies
+native visual order/direction only, independently of original paint poses.
+Tracked SVG fragment allocation can retain original font metrics through private
+paint spacing. Signed tracked advances, native visual order and original GPOS
+fragment allocation pass the focused complete-ink and Float32 matrices. The
+complete affected source regression passes; cross-span mixed-bidi colored paint
+ordering, owned font fallback and connected public Float32 text remain required.
+[Current evidence and limits](FLOAT_TEXT.md#original-script-and-native-direction-items-private).
+
 ## Private styled source-glyph assembly
 
 `native-svg-styled.ts` selects existing native span items while retaining complete

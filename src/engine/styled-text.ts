@@ -76,10 +76,14 @@ export interface StyledTextCharacterGeometry {
   readonly rotation:number;
 }
 export interface StyledTextNativePaint {
+  /** Whole-source nonnegative-spacing probe: only visual order and direction,
+   * never authored glyph poses, IDs, colors or actual coverage. */
+  readonly visual?:readonly (readonly NativeTextVisualPosition[]|null)[];
   readonly pathCharacters:readonly (readonly StyledTextCharacterGeometry[]|null)[];
   readonly colors:readonly (readonly LinearTextColor[])[];
   readonly characters:readonly (readonly StyledTextCharacterGeometry[])[];
 }
+export interface NativeTextVisualPosition {readonly order:number;readonly direction:'ltr'|'rtl'|null}
 export interface StyledTextPlan {
   readonly scene:StyledTextScene;
   readonly metrics:readonly StyledTextLineMetrics[];
@@ -228,7 +232,7 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
     const metrics=Object.freeze(elements.map(({text,line,path})=>{const box=text.getBBox(),advance=text.getComputedTextLength(),pathLength=path?.getTotalLength();if(![box.x,box.y,box.width,box.height,advance].every(Number.isFinite))throw new Error('The native styled-text geometry is not finite.');if(pathLength!==undefined&&(!Number.isFinite(pathLength)||pathLength<=0))throw new Error('Native text requires a finite, positive baseline length.');return Object.freeze({advance,ink:Object.freeze({x:box.x+(path?line.x:0),y:box.y+(path?line.y:0),width:box.width,height:box.height}),...(pathLength===undefined?{}:{pathLength})});}));
     let paint:StyledTextNativePaint|undefined;
     if(linear){
-      const characters:(readonly StyledTextCharacterGeometry[])[]=[],pathCharacters:(readonly StyledTextCharacterGeometry[]|null)[]=[],colors:(readonly LinearTextColor[])[]=[];let offset=0;
+      const characters:(readonly StyledTextCharacterGeometry[])[]=[],pathCharacters:(readonly StyledTextCharacterGeometry[]|null)[]=[],colors:(readonly LinearTextColor[])[]=[],visual:(readonly NativeTextVisualPosition[]|null)[]=[];let offset=0;
       for(const {text,line} of elements){
         colors.push(Object.freeze(linear.slice(offset,offset+line.spans.length)));offset+=line.spans.length;
         if(['getNumberOfChars','getStartPositionOfChar','getEndPositionOfChar','getExtentOfChar','getRotationOfChar'].some(name=>typeof (text as unknown as Record<string,unknown>)[name]!=='function'))throw new Error('Native text character geometry is unavailable.');
@@ -241,12 +245,26 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
           if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
         }
         characters.push(Object.freeze(current));
+        if(!verticalWriting(line.writing)){
+          // Spacing and path placement do not choose bidi embedding levels.
+          // Recover the native visual order with positive advances so negative
+          // tracked/clamped rectangles cannot erase that ordering information.
+          const probe=text.cloneNode(true)as SVGTextElement;
+          for(const content of probe.querySelectorAll('textPath'))content.replaceWith(...content.childNodes);
+          probe.removeAttribute('transform');probe.removeAttribute('dx');probe.removeAttribute('dy');probe.setAttribute('x','0');probe.setAttribute('y','0');probe.setAttribute('text-anchor',line.direction==='ltr'?'start':'end');
+          for(const node of [probe,...probe.querySelectorAll('tspan')]){node.style.letterSpacing='0px';node.style.wordSpacing='0px';node.style.fontKerning='none';}
+          group.append(probe);
+          try{const size=probe.getNumberOfChars();check();if(size!==count)throw new Error('Native visual text addressing differs from its source.');const positions:NativeTextVisualPosition[]=[];
+            for(let index=0;index<size;index++){check();const a=probe.getStartPositionOfChar(index);check();const b=probe.getEndPositionOfChar(index);check();if(![a.x,a.y,b.x,b.y].every(Number.isFinite))throw new Error('Native visual text geometry is invalid.');const advance=b.x-a.x;positions.push(Object.freeze({order:Math.min(a.x,b.x),direction:advance<0?'rtl':advance>0?'ltr':null}));if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}}
+            visual.push(Object.freeze(positions));
+          }finally{probe.remove();}
+        }else visual.push(null);
         if(line.path){
           const flat=text.cloneNode(true)as SVGTextElement,content=flat.querySelector('textPath')!,defs=globalThis.document.createElementNS(SVG_NS,'defs'),path=globalThis.document.createElementNS(SVG_NS,'path'),id='canoli-unfolded-path-'+pathCharacters.length;path.setAttribute('id',id);path.setAttribute('d',`M0 0${verticalWriting(line.writing)?'V':'H'}${Math.max(64,text.getComputedTextLength()+64)}`);defs.append(path);svg.prepend(defs);content.setAttribute('href','#'+id);content.setAttribute('startOffset','0');flat.setAttribute('text-anchor',verticalWriting(line.writing)&&line.writing?.orientation==='upright'?'start':line.direction==='ltr'?'start':'end');flat.removeAttribute('transform');flat.removeAttribute('dx');flat.removeAttribute('dy');flat.setAttribute('x','0');flat.setAttribute('y','0');group.append(flat);
           try{const count=flat.getNumberOfChars();check();if(count!==current.length)throw new Error('Unfolded native path addressing differs from its source.');const unfolded:StyledTextCharacterGeometry[]=[];for(let index=0;index<count;index++){check();const a=flat.getStartPositionOfChar(index);check();const b=flat.getEndPositionOfChar(index);check();const box=flat.getExtentOfChar(index);check();const rotation=flat.getRotationOfChar(index);check();if(![a.x,a.y,b.x,b.y,box.x,box.y,box.width,box.height,rotation].every(Number.isFinite)||box.width<0||box.height<0)throw new Error('Unfolded native path geometry is invalid.');unfolded.push(Object.freeze({index,start:Object.freeze({x:a.x,y:a.y}),end:Object.freeze({x:b.x,y:b.y}),extent:Object.freeze({x:box.x,y:box.y,width:box.width,height:box.height}),rotation}));if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}}pathCharacters.push(Object.freeze(unfolded));}finally{flat.remove();defs.remove();}
         }else pathCharacters.push(null);
       }
-      paint=Object.freeze({pathCharacters:Object.freeze(pathCharacters),colors:Object.freeze(colors),characters:Object.freeze(characters)});
+      paint=Object.freeze({visual:Object.freeze(visual),pathCharacters:Object.freeze(pathCharacters),colors:Object.freeze(colors),characters:Object.freeze(characters)});
     }
     const definitions=await fonts.definitions(check);check();
     markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);

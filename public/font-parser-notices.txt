@@ -634,7 +634,7 @@ HarfBuzz generated USE table upstream notice
 
 ========================================================================
 
-Unicode data notice for HarfBuzz generated tables
+Unicode data notice for HarfBuzz generated tables and private text-item properties
 
 UNICODE LICENSE V3
 

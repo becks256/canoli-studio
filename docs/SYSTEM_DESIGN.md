@@ -1,5 +1,21 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native source-item interpretation
+
+Original spans are immutable layout sources, not mandatory shaping-run units.
+Select grapheme-safe ranges using pinned Unicode script/extension properties and
+native resolved caret direction, retaining full original text in every shaping
+request. Native metadata never identifies glyphs. Negative tracked rectangles
+require signed source-advance interpretation before complete original/candidate
+ink validation. Use a whole-source nonnegative-spacing probe only for native
+direction/visual-order ranking; never use its reflowed positions as authored
+paint coordinates. Replay tracked native fragment allocation without altering
+original font metrics/hints. These private corrections pass the current complete-ink and
+Float32 matrices. Retain original font/color ownership, no partial fields,
+existing lifetimes and public authority. Wider itemization and public Float32
+text integration remain required.
+[Current evidence and limits](FLOAT_TEXT.md#original-script-and-native-direction-items-private).
+
 ## Styled glyph item and paint authority
 
 Use original font/metric-style ranges with full-line context; extend compatible

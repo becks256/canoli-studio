@@ -1,18 +1,100 @@
 # Native float text — implementation in progress
 
-The private styled source-glyph dependency is verified by 3,406 unit/API tests,
-196 affected native-browser cases and fifteen production cases. Seventy-two
-styled layouts retain complete original contexts, fonts/tuples, native ink and
-paint ownership; twelve independent original-font Float32 composition cases
-retain HDR/tiny alpha and exact partition words. The prior vertical, direction,
-path and complete ordinary 50 MP regressions also pass. This remains private
-groundwork; float TextLayer/tool gates below still apply.
-[Verification and limits](benchmarks/svg-styled-glyph-2026-11-01.md).
+The private original-script/native-direction glyph dependency is verified by
+3,412 unit/API tests, 201 affected native-browser cases across 22 files and fifteen
+production cases. All 96 mixed-script layouts retain exact native ink; nine
+independent original-font Float32 compositions retain HDR/tiny alpha and every
+partition word. Prior styled, vertical, path and complete ordinary 50 MP
+regressions also pass. This remains private groundwork; float TextLayer/tool
+gates below still apply. [Verification and limits](benchmarks/native-text-items-2026-11-01.md).
 
 TextLayer integration remains required for the full F08/F10 roadmap. Float
 documents still reject text and the text tool remains unavailable. The private
 color dependency below is implemented; it is not a public text-rendering API or
 evidence that native float typography has shipped.
+
+## Original script and native direction items (private)
+
+The horizontal SVG matcher now selects script and resolved-direction ranges
+inside an existing original span. Every item retains the entire normalized line
+as shaping context and selects an original UTF-16 range. It never creates new
+character spans or changes authored text. Successful results expose all `runs`;
+`run` remains the first run. Original font glyph IDs and captured source-linear
+paint remain separate from native geometry and comparison pixels.
+
+`native-text-items.ts` interprets whole-source caret metadata on original
+grapheme boundaries, using unfolded metadata for curves. Native caret progression
+selects direction; zero-width cases retain Unicode directional intent or resolved
+neighbors. Unicode 17 script/extension sets and paired brackets select compatible
+script ranges. Property lookup covers every code point, including declared
+defaults; original sources, hashes, license and reproducible generation are in
+`third_party/unicode-17` and `scripts/build-unicode-text.py`. This is a pinned
+private dependency, not a claim to match every host's Unicode itemization.
+
+A separate whole-source native probe removes negative spacing and curve
+placement to recover visual order and resolved direction without clamped
+rectangles. Its positions only rank original items; they never supply authored
+glyph poses, IDs, source colors or actual coverage. Original fonts/tuples, text,
+span boundaries and paragraph direction remain. The source caret/path geometry
+still supplies paint coordinates. This avoids substituting paragraph direction
+or logical item order for the host's resolved bidi paint order.
+
+Native character rectangles can reorder the endpoints of negative tracked
+advances. Signed original shaping advances and native caret geometry retain the
+correct anchor. Cursive scripts follow the host's separate spacing handling.
+Native visual order retains glyph order inside each original shaping run.
+No position is searched or fitted from reference pixels. Exact complete
+original/candidate ink at both opacity samples still guards publication;
+mismatches return no glyph fields.
+
+Private `FloatGlyph.paintLetterSpacing` retains SVG fragment allocation without
+changing original font metrics, outlines or hinting. It defaults to zero and must
+be finite and SVG-only; it is not document data or persisted state. Curved native
+placement can require original tracking plus the original glyph's GPOS advance
+difference. Candidate metrics are keyed by both original glyph ID and spacing,
+because the same glyph can have different contextual allocation. Actual native
+coverage and original path metadata remain authoritative.
+
+The focused 96-layout matrix now matches every Latin/Hebrew/Arabic, paragraph-
+direction, straight/curve, identity/affine and ordinary/negative-tracking case.
+Nine independent original-font Float32 compositions match every alpha/RGB value
+and partition word, including signed/HDR colors and alpha 1e-8. A Hebrew-only
+control needs no tracked fragments; mixed-script and GPOS cases exercise the new
+allocation. The reference uses independent FontTools glyph sources and literal
+SVG at separately verified poses; it does not independently discover poses.
+Three visual-probe faults (abort, removed host and nonfinite geometry) reject,
+clean up and permit retry. Invalid paint spacing rejects before compositing.
+Six focused pure units include independent property checks for all 1,114,112
+Unicode code points, all 128 brackets and the existing 10,000-character budget.
+
+Full build/typecheck, all 3,412 unit/API cases across 340 files and fifteen
+production cases pass. The production path case includes nine transform/tracking
+variants; it uses prepared source adapters and does not establish complete native
+source capture. The complete affected 201-case source run across 22 files passes
+without retries, skips or flakes. Independent readers compare every RGBA sample in both
+complete ordinary 50 MP curve and vertical outputs against complete native SVG
+references: 200 million samples each, zero error and identical PNGs. The separate
+RAW regression retains its exact 100,000,672-byte original, complete 600 × 200
+text-reference region and preceding accepted full PNG bytes. These are ordinary
+byte regressions, not public Float32 TextLayer acceptance.
+
+Earlier complete matrix attempts matched 55/96, 75/96, 90/96 and 94/96 before the
+signed anchor, native visual ordering, tracked allocation and original GPOS
+allocation corrections. Their failures and diagnostics remain retained; no
+cases or exact-ink assertions were removed. An initial numerical fixture used
+Hebrew letters where Arabic was intended: the passing Hebrew numerical control
+is retained, and mixed Arabic/Hebrew and GPOS cases expand the final matrix to
+nine. The current complete targets all remain required.
+
+Owned fallback-font selection, cross-span mixed-bidi colored paint ordering,
+intrinsic/missing paint, broader script/vertical/host itemization and connected
+public Float32 text remain required. This private increment does not admit public
+TextLayer authoring, scenes, export, shared transport or persistence.
+
+The design follows the separate shaping-run properties described in the
+[HarfBuzz manual](https://harfbuzz.github.io/text-runs.html), native character
+geometry in [SVG 2](https://www.w3.org/TR/SVG/text.html), and the native rectangle
+conventions visible in [Chromium's character queries](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/layout/svg/svg_text_query.cc).
 
 ## Authored CSS color capture
 

@@ -1,5 +1,18 @@
 # Canoli Studio editor requirements
 
+## Original script and native direction ranges
+
+Private source-owned text paint must retain complete original context and
+grapheme/scalar boundaries while selecting native script/direction items inside
+existing spans. Preserve native bidi resolution separately from paragraph
+direction, including zero-width and negative tracked advances. Verify complete
+original/candidate ink before publishing any fields; mismatch must not return
+partial paint. Pin property-source versions/hashes and retain Unicode notices.
+The private dependency passes its affected regression matrix. Owned fallback,
+cross-span mixed-bidi colored ordering and connected public Float32 text remain
+required; no public Float32 text is admitted.
+[Current evidence and limits](FLOAT_TEXT.md#original-script-and-native-direction-items-private).
+
 ## Private styled native paint dependency
 
 Preserve complete original normalized text context across existing style/font

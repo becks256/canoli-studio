@@ -10967,3 +10967,59 @@ unfinished original professional-editor/device/quality/performance/other roadmap
 requirement remain required. No public model/schema/grant, ordinary appearance,
 source-resolution or REST/browser synchronization contract changes. The complete
 original goal remains active.
+
+
+### 2026-11-01 — F08/F10 native script/direction/fallback items in progress
+
+Owner: implementation agent; estimate L within T16/T17. Previous goal turn made
+progress at 19991bf, verifying styled original-span glyph assembly. The complete
+original roadmap remains active. The next dependency retains whole source text
+while selecting script, resolved native direction and owned fallback-font items
+inside an existing span. Pinned Unicode 17 script/extensions, bidi-class and
+bracket data support metadata interpretation; browser caret/whole-path geometry
+and exact complete native ink remain authoritative. Original DOM chunks, font
+bytes/tuples, source-linear colors, command authority and source resolution must
+remain intact. Missing/unowned/intrinsic paint must never publish partial fields.
+Broad native layouts/hosts, connected Float32 TextLayer/tool/scenes/export/shared
+transport/persistence and every unfinished original roadmap gate remain required.
+No public schema, grants, REST/browser synchronization, paid calls or uploads are
+authorized by this internal dependency.
+
+
+### 2026-11-01 — F08/F10 original script and tracked native item dependency verified
+
+Owner: implementation agent; estimate L within T16/T17. Starting from 19991bf,
+private full-context script/direction runs now retain original spans, original
+font GIDs/tuples, native visual ranking and signed tracked caret anchors. Pinned
+Unicode 17 data is licensed, source-hashed and reproducibly generated. Private
+SVG fragment allocation retains original metrics/hints and contextual GPOS
+advances. Exact complete native ink at opacity 1 and 0.5 guards publication;
+no pose is fitted from comparison pixels. The complete original goal stays active.
+
+Full build/typecheck and all 3,412 unit/API tests across 340 files pass. One
+complete affected source run passes 201 cases across 22 files, and fifteen
+production cases pass, all without retries/skips/flakes. All 96 mixed-script
+layouts match. Nine independent original-font Float32 compositions retain every
+alpha/RGB sample and partition word, signed/HDR RGB and alpha 1e-8. Three visual-
+probe faults reject, retire probes/faces and allow retry. Invalid spacing rejects
+before compositing. Independent units check every Unicode code point and all
+128 brackets. The emitted production path case covers nine transform/tracking
+variants with prepared fixture adapters; complete capture runs in source tests.
+
+Independent readers compare all 200 million RGBA samples each in both complete
+ordinary 50 MP curve and vertical outputs against complete native SVG references:
+zero error and identical PNGs. The RAW case retains its exact 100,000,672-byte
+original, complete 600 × 200 text reference and prior accepted full PNG bytes.
+These remain ordinary byte regressions. Failed 55/75/90/94-of-96 attempts,
+diagnostic-only observations and numerical-fixture corrections remain retained;
+no target or exact-ink assertion was removed. [Findings and limits](benchmarks/native-text-items-2026-11-01.md)
+and [compact source/release/run/reference receipt](benchmarks/native-text-items-2026-11-01.json.gz)
+bind the evidence. New raw benchmark ZIPs stay local and ignored.
+
+Owned font fallback, cross-span mixed-bidi colored paint ordering, missing/
+intrinsic paint, broader scripts/vertical/native/legacy/optical layouts/extents/
+hosts, connected Float32 TextLayer authoring/tools/scenes/export/shared transport/
+persistence and every unfinished original professional-editor, photographic,
+precision/workflow, quality/device/performance, provider/installed ChatGPT/live
+identity/commercial and other roadmap gate remain required. No public model,
+schema, grants, source-resolution or REST/browser synchronization changes.
