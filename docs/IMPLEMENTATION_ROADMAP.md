@@ -10248,3 +10248,97 @@ outputs and the seven-file amendment. Numeric assertions/tolerances remain.
 The complete original professional/AI/workflow/collaboration/commercial/specialist/
 motion roadmap and unfinished photographic/device/sustained all-tool F14, float
 text/smart/other tools/spaces/HDR/CMYK and warp/master gates remain active.
+
+### 2026-11-01 — F05/F10 native linear Patch and Spot Healing in progress
+
+Owner: implementation agent; estimate XL. Previous goal turn: progress, native
+float vectors accepted at d3279b3. The complete original roadmap remains active.
+Current Patch/Spot Healing preparation, donor search and replay use byte pixels;
+float documents reject their adjustment values. This work connects native linear
+source capture, signed/HDR Poisson guidance and unquantized alpha-preserving
+correction through versioned prepared assets, normal controls, shared OO/history,
+isolated/plugin preparation, independent REST prepared edits and source-bearing
+project/workspace/recipe transport. Existing byte operations keep their operator.
+
+Require actual WASM numerical/reference checks, complete native source/profile
+and host-current validation, private preparation/cancellation, strict external
+results, real browser/production controls and a genuine 50 MP original workflow.
+Keep solver/search working memory separate from original image resolution; no
+arbitrary import limit or SDR display readback is an HDR editing source. No paid
+call, account action, upload or new isolated worker/pixel/file authority follows
+from this local integration. Photographic/device/sustained performance and the
+full unfinished original professional/AI/workflow/commercial/specialist/motion
+scope remain required beyond this increment.
+
+
+### 2026-11-01 — F05/F10 native linear Patch and Spot Healing verified
+
+The preceding goal turn made concrete implementation and verification progress;
+this continuation completes the connected native retouch increment. The full
+original roadmap remains active. Schema 59 versions explicit native Patch
+adjustments with canonical linear RGBA32 TIFF corrected RGB and continuous
+coverage, complete original/source interpretation validation and retained alpha.
+Trusted Patch/Healing controls and isolated repairs sample the captured native
+scene before proof/display, run the existing Float64 WASM Poisson/donor operators,
+and publish private native assets through shared validation and one Undo.
+Independent REST accepts prepared corrections without gaining a composed solver
+or browser synchronization. [Signatures, defaults, limits and errors](FLOAT_RETOUCH.md).
+
+Verification:
+
+- `npm run build` and typecheck pass, including 50 developer guides. Initial full
+  `npm test -- --maxWorkers=2` passed 3,346 cases; the expanded final full suite
+  passed **3,355 unit/API cases across 330 files** against the same emitted WASM.
+- **61 distinct source-browser cases across 16 files** and **eight distinct
+  normal-production cases across three files** pass across the full matrix and
+  focused rechecks. The 60-case broad run passed 56 and failed four only at a
+  missing system-Python PDF reader; all four unchanged cases pass in the
+  established PDF environment. There are no unresolved asserted failures.
+- Independent SciPy source/mixed references cover irregular support, holes,
+  disconnected components and soft coverage. Actual WASM results satisfy their
+  equation/inverse/storage bounds. Deterministic boundary-only donor search
+  matches the independent candidate/score/tie oracle. Worker protocol tests
+  reject malformed results and retain request ownership, alpha and retry.
+- Actual isolated examples, trusted preparation, Source/Destination parity,
+  precise Healing opacity, cancellation and changed/restored ordered selection
+  rejection retain sources and atomic history. Hidden/nonfinite-tail originals,
+  stale interpretation identities, native-source misuse, false schema ages,
+  locks, independent REST revisions/project output, inert plugins, missing
+  grants, late errors and recipe/redo-only workspace source transport are checked.
+- Native correction replay under rotation/reflection, layer/group masks,
+  Color Overlay, Fill and layer/pass-through opacity matches an independent
+  staged scalar reference exactly; native partitions, alpha and untouched words
+  remain exact. Production uses actual Patch drag/Healing pointer controls,
+  Undo/Redo, native TIFF delivery and project reopen without developer globals.
+- Native libtiff/NumPy checks **198,404 values per complete production TIFF**.
+  Patch equals the independent clean field exactly; Healing and reopened RGB
+  differ by at most **5.960464477539063e-8**, preserving all alpha/outside words.
+  A genuine **10,000x5,000** source retains complete original bytes/geometry;
+  its **64x48 / 12,288-value repair window** matches an independent Dirichlet
+  solve (maximum error 5.221247079134628e-8, bound 3.788246741661659e-7).
+  Existing complete 50 MP float32/uint16 clipping, exposure and full-tone outputs
+  pass separate native readers. These bulk runs do not establish sustained F14.
+
+Initial model tests exposed detached native values being validated in temporary
+byte contexts; constructor/command parsing now selects a valid detached context
+and still validates the actual destination. Partial adjustment interpolation
+also lost unchanged transparent hidden RGB; exact neutral backdrops now retain
+all words after coverage validation. Pilots corrected fixture assumptions about
+TIFF selection, expanded toolbar coordinates, full-transform translation and
+recorded layer renaming. A worker trace identified unrelated recent-file hashing
+in a global termination counter; the test now counts the dedicated donor worker,
+retaining its exact one-termination/rollback/retry assertions. No numerical bound
+or original pixel assertion was widened. Raw failures and corrections remain in
+the compact evidence.
+
+[Findings](benchmarks/float-retouch-2026-11-01.md) and
+[compact receipt](benchmarks/float-retouch-2026-11-01.json.gz). New raw benchmark
+ZIPs remain local/ignored. The two previously rejected oversized archives remain
+locally preserved and absent from reachable history. No paid operation, account,
+upload, new isolated capability or arbitrary original-resolution cap is added.
+
+Float text/smart/frequency/other filters/tools, richer working spaces/HDR/CMYK,
+photographic/device/sustained all-tool performance, professional workflow quality
+and every unfinished original AI/provider/collaboration/installed-ChatGPT/live-
+identity/commercial/specialist/motion gate remain required. This increment does
+not complete the original professional-editor objective.

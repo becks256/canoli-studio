@@ -15,7 +15,8 @@ export interface DodgeBurnOptions {
 export type PoissonBlendMode = "source" | "mixed";
 export interface PoissonBlendOptions {
   mode?: PoissonBlendMode;
-  /** Maximum absolute equation residual, in 8-bit RGB units. Default 0.001. */
+  /** Maximum absolute equation residual: byte RGB units (default 0.001),
+   * or linear RGB units in float documents (default 1e-7). */
   tolerance?: number;
   /** Iterations per color channel. Default 500. */
   maxIterations?: number;

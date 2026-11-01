@@ -52,7 +52,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 58;
+export const SCHEMA_VERSION = 59;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -231,6 +231,7 @@ export interface DocumentData {
     | 55
     | 56
     | 57
+    | 58
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -930,6 +931,10 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           throw new Error("Tonal strokes require schema version 8.");
         if (node.adjustment.kind === "patch" && Number(value.schemaVersion) < 9)
           throw new Error("Patch adjustments require schema version 9.");
+        if(node.adjustment.kind==='patch'&&node.adjustment.precision==='float32'){
+          if(Number(value.schemaVersion)<59)throw new Error('Native float patch adjustments require schema version 59.');
+          if(value.precision!=='float32')throw new Error('Native float patch adjustments require a float32 document.');
+        }
         if (node.adjustment.kind === "hsl" && Number(value.schemaVersion) < 15)
           throw new Error("HSL adjustments require schema version 15.");
         if ((node.adjustment.kind === "color-balance" || node.adjustment.kind === "vibrance") && Number(value.schemaVersion) < 17)

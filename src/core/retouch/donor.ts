@@ -1,3 +1,4 @@
+import {validateFloatRetouchPixels,validateFloatRetouchCoverage} from './float-types';
 /** Local exemplar search. Scores visible boundary context, never damaged target pixels. */
 export interface DonorSearchOptions {
   radius?: number;
@@ -21,7 +22,7 @@ export interface DonorValidityInput {
 export type DonorValidity = (input: DonorValidityInput) => Uint8Array;
 
 function searchDonor(
-  pixels: Uint8ClampedArray,
+  pixels: Uint8ClampedArray|Float32Array,
   width: number,
   height: number,
   coverage: Uint8Array | Uint8ClampedArray,
@@ -225,6 +226,14 @@ export function findRetouchDonor(
   validity?: DonorValidity,
 ): DonorSearchResult {
   return searchDonor(pixels, width, height, coverage, options, true, validity);
+}
+
+/** Native linear scores and alpha comparisons, with the same intact-support,
+ * boundary-only scoring, packed validity and deterministic tie order. */
+export function findFloatRetouchDonor(pixels:Float32Array,width:number,height:number,coverage:Uint8Array|Uint8ClampedArray,options:DonorSearchOptions={},validity?:DonorValidity):DonorSearchResult {
+ validateFloatRetouchPixels(pixels,width,height);
+ validateFloatRetouchCoverage(coverage,width,height);
+ return searchDonor(pixels,width,height,coverage,options,true,validity);
 }
 
 /** Scalar oracle for packed-support parity tests and profiling. */

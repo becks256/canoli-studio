@@ -211,6 +211,7 @@ test("aborting donor search terminates its dedicated worker and a subsequent rep
     );
     const before = JSON.stringify(editor.document.toJSON()),
       assets = editor.assetStore.values().length;
+    const donorWorkers = new WeakSet<Worker>();
     const NativeWorker = window.Worker,
       controller = new AbortController();
     let dispatched = false,
@@ -221,6 +222,7 @@ test("aborting donor search terminates its dedicated worker and a subsequent rep
         message: any,
         transfer: Transferable[] | StructuredSerializeOptions = [],
       ) {
+        if (message.donorSearch) donorWorkers.add(this);
         if (Array.isArray(transfer)) super.postMessage(message, transfer);
         else super.postMessage(message, transfer);
         if (message.donorSearch) {
@@ -229,7 +231,7 @@ test("aborting donor search terminates its dedicated worker and a subsequent rep
         }
       }
       terminate() {
-        terminated++;
+        if (donorWorkers.has(this)) terminated++;
         super.terminate();
       }
     } as typeof Worker;

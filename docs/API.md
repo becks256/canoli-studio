@@ -1,5 +1,13 @@
 # REST and scripting APIs
 
+## Native linear Patch and Spot Healing
+
+Schema 59 adds explicitly native corrected TIFF values, linear private repair
+preparation and existing Patch/Healing controls. Shared validation, Undo,
+isolated/plugin grants and independent REST boundaries remain. Full source
+validation and retained original samples apply before publication.
+[Signatures, defaults, errors, limits and verification status](FLOAT_RETOUCH.md).
+
 ## Editable native float vectors
 
 Existing VectorLayer/VectorPath commands now support linear solid and continuous

@@ -35,6 +35,7 @@ export class PatchAdjustment {
   get assetId(): string {
     return this.data.assetId;
   }
+  get precision():'float32'|undefined{return this.data.precision;}
   get width(): number {
     return this.data.width;
   }

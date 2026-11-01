@@ -51,6 +51,7 @@ import type { ToneEffectData } from "../core/model";
 import type { HistogramData } from "../core/histogram";
 export interface FloatLookupLease{apply(pixels:Float32Array):Promise<Float32Array>;dispose():void}
 import type { SelectionTile, FeatherTile } from "./wasm";
+import {captureFloatPoissonOptions,validateFloatRetouchPixels,validateFloatRetouchCoverage,validateFloatPoissonResult,type FloatPoissonBlendResult} from '../core/retouch/float-types';
 
 export class PixelProcessor {
   private worker = new Worker(new URL("./pixels.worker.ts", import.meta.url), {
@@ -59,7 +60,7 @@ export class PixelProcessor {
   private sequence = 0;
   private pending = new Map<
     number,
-    { resolve(value: any): void; reject(error: Error): void; onProgress?(value: SelectionModificationProgress): void }
+    { resolve(value: any): void; reject(error: Error): void; onProgress?(value: SelectionModificationProgress): void;expectedReply?:string }
   >();
   readonly ready: Promise<void>;
   private failure: Error | null = null;
@@ -96,6 +97,9 @@ export class PixelProcessor {
         }
         this.pending.delete(event.data.id);
         if (event.data.error) request.reject(new Error(event.data.error));
+        else if(request.expectedReply&&!Object.hasOwn(event.data,request.expectedReply))request.reject(new Error('Image worker returned the wrong native retouch result kind.'));
+        else if(event.data.floatPoissonResult)request.resolve(event.data.floatPoissonResult);
+        else if(event.data.floatDonorResult)request.resolve(event.data.floatDonorResult);
         else if (event.data.png) request.resolve(event.data.png);
         else if (event.data.clipboard) request.resolve(event.data.clipboard);
         else if (event.data.coverage) request.resolve(event.data.coverage);
@@ -121,6 +125,20 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatPoissonBlend(target:Float32Array,donor:Float32Array,width:number,height:number,coverage:Uint8Array|Uint8ClampedArray,input:PoissonBlendOptions={}):Promise<FloatPoissonBlendResult>{
+    validateFloatRetouchPixels(target,width,height);validateFloatRetouchPixels(donor,width,height);validateFloatRetouchCoverage(coverage,width,height);
+    const options=captureFloatPoissonOptions(input),pixels=target.slice(),sample=donor.slice(),support=coverage.slice(),alpha=new Uint32Array(width*height),words=new Uint32Array(pixels.buffer);
+    for(let p=0;p<alpha.length;p++)alpha[p]=words[p*4+3];
+    const result=await this.request(new Uint8ClampedArray(0),{floatPoisson:{pixels,donor:sample,width,height,coverage:support,options}},undefined,'floatPoissonResult');
+    validateFloatPoissonResult(result,width,height,options,alpha);return result;
+  }
+  async findFloatDonor(input:Float32Array,width:number,height:number,coverage:Uint8Array|Uint8ClampedArray,options:DonorSearchOptions={}):Promise<DonorSearchResult>{
+    validateFloatRetouchPixels(input,width,height);validateFloatRetouchCoverage(coverage,width,height);
+    if(!options||Object.keys(options).some(key=>key!=='radius'))throw new Error('Invalid float donor search options.');const radius=options.radius??64;
+    if(!Number.isSafeInteger(radius)||radius<1)throw new Error('Donor search radius must be a positive safe integer.');
+    const result=await this.request(new Uint8ClampedArray(0),{floatDonor:{pixels:input.slice(),width,height,coverage:coverage.slice(),options:{radius}}},undefined,'floatDonorResult');
+    if(!result||Object.keys(result).some(key=>!['x','y','score','candidates'].includes(key))||![result.x,result.y,result.candidates].every(Number.isSafeInteger)||Math.abs(result.x)>radius||Math.abs(result.y)>radius||Math.abs(result.x)>=width||Math.abs(result.y)>=height||result.x===0&&result.y===0||!Number.isFinite(result.score)||result.score<0||result.candidates<1)throw new Error('Invalid native float donor-search result.');return result;
+  }
   async floatCompositeHdrWet(pixels:Float32Array,field:Float64Array,opacity=1):Promise<Float32Array>{
     validateFloatWorkerWindow(pixels);validateHdrWetField(field,pixels.length/4);floatWetOpacitySchema.parse(opacity);const length=pixels.length;
     const result=await this.request(new Uint8ClampedArray(0),{floatCompositeHdrWet:{pixels:pixels.slice(),field:field.slice(),opacity}});
@@ -496,6 +514,8 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
+      floatPoisson?:{pixels:Float32Array;donor:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:PoissonBlendOptions};
+      floatDonor?:{pixels:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:DonorSearchOptions};
       floatCompositeHdrWet?:{pixels:Float32Array;field:Float64Array;opacity:number};
       floatProjectiveHdrWet?:{field:Float64Array;options:ProjectiveFieldOptions};
       floatMappedHdrWet?:{field:Float64Array;options:MappedFieldOptions};
@@ -590,6 +610,7 @@ export class PixelProcessor {
       mattingSolve?:boolean;
     },
     onProgress?: (value: SelectionModificationProgress) => void,
+    expectedReply?:string,
   ): Promise<any> {
     await this.ready;
     if (this.failure) throw this.failure;
@@ -611,6 +632,8 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.floatPoisson){tryTransfer(payload.floatPoisson.pixels.buffer);tryTransfer(payload.floatPoisson.donor.buffer);tryTransfer(payload.floatPoisson.coverage.buffer);}
+    if(payload.floatDonor){tryTransfer(payload.floatDonor.pixels.buffer);tryTransfer(payload.floatDonor.coverage.buffer);}
     if(payload.floatCompositeHdrWet){tryTransfer(payload.floatCompositeHdrWet.pixels.buffer);tryTransfer(payload.floatCompositeHdrWet.field.buffer);}
     if(payload.floatProjectiveHdrWet)tryTransfer(payload.floatProjectiveHdrWet.field.buffer);
     if(payload.floatMappedHdrWet)tryTransfer(payload.floatMappedHdrWet.field.buffer);
@@ -661,7 +684,7 @@ export class PixelProcessor {
       }
     }
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject, onProgress });
+      this.pending.set(id, { resolve, reject, onProgress,expectedReply });
       try {
         this.worker.postMessage({ id, pixels, ...payload }, transfer);
       } catch (error) {

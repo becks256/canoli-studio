@@ -438,7 +438,7 @@ export class ToolController {
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
-    if(tool==='dodge'||tool==='burn'||tool==='fill'||tool==='clone')return true;
+    if(tool==='dodge'||tool==='burn'||tool==='fill'||tool==='clone'||tool==='heal'||tool==='patch')return true;
     if(tool==='brush'||tool==='pencil')return this.state.settings.paintTarget==='layer'||this.state.settings.paintTarget.startsWith('mask-')&&!!this.editor.document.selectedLayer?.mask;
     if(tool==='smudge'||tool==='mixer'){
       const target=this.state.settings.paintTarget,selected=this.editor.document.selectedLayer;
@@ -839,7 +839,7 @@ export class ToolController {
     if(retainedDocuments(state.document,captureRetainedHistory(state))
       .some(document=>referencedAssets(document).has(lease.asset.id)))return;
     lease.assets.remove(lease.asset.id);
-    }finally{gesture.previewAssets?.dispose();gesture.previewAssets=undefined;}
+    }finally{gesture.stopChanges?.();gesture.stopChanges=undefined;gesture.previewAssets?.dispose();gesture.previewAssets=undefined;}
   }
   private textureCurrent(gesture:BaseGesture){
     const lease=gesture.textureLease;if(!lease)return true;
@@ -957,9 +957,12 @@ export class ToolController {
       document: doc,
       revision: doc.getSnapshot().revision,
       generation: this.generation,
-      ...(tool==='clone'&&doc.precision==='float32'?{selectionIds:[...doc.getSnapshot().selectedIds]}:{}),
+      ...(['clone','heal','patch'].includes(tool)&&doc.precision==='float32'?{selectionIds:[...doc.getSnapshot().selectedIds]}:{}),
     };
     this.startingGesture=base;
+    if((tool==='heal'||tool==='patch')&&base.selectionIds){
+      base.stopChanges=doc.subscribe(()=>{if(this.gesture?.stopChanges!==base.stopChanges)return;const state=doc.getSnapshot();if(state.revision!==base.revision||state.selectedIds.length!==base.selectionIds!.length||state.selectedIds.some((key,i)=>key!==base.selectionIds![i]))this.cancel();});
+    }
     if(tool==='smudge'||tool==='mixer'){
       const selected=doc.selectedLayer,settings=structuredClone(this.state.settings),target=settings.paintTarget==='layer'?'layer':settings.paintTarget.startsWith('filter-mask-')?'filter-mask':'mask';
       const mask=target==='layer'?null:target==='filter-mask'?selected instanceof SmartObjectLayer?selected.filterMask:null:selected?.mask;
@@ -994,6 +997,7 @@ export class ToolController {
       this.publish({drawing:true,quickSelectionPoints:[{...point}]});return;
     }
     if (tool === "heal") {
+      if(doc.precision==='float32'){base.previewAssets=new AssetStore();base.hostAssets=this.editor.assetStore;for(const key of referencedAssets(doc._read()))this.editor.assetStore.shareTo(base.previewAssets,key,key);}
       const settings = { ...this.state.settings };
       const stroke = new BrushStroke({
         ...settings,
@@ -2173,13 +2177,8 @@ export class ToolController {
         const abort = new AbortController();
         this.patchAbort = abort;
         try {
-          const layer = await this.editor.healStroke(
-            new BrushStroke(gesture.stroke),
-            { mode: gesture.settings.patchSampling },
-            { mode: gesture.settings.patchMode },
-            gesture.settings.healingRadius,
-            abort.signal,
-          );
+          const brush=new BrushStroke(gesture.stroke),sampling={mode:gesture.settings.patchSampling},options={mode:gesture.settings.patchMode};
+          const layer=gesture.previewAssets?await this.editor._healStrokeWithAssets(brush,sampling,options,gesture.settings.healingRadius,abort.signal,gesture.previewAssets):await this.editor.healStroke(brush,sampling,options,gesture.settings.healingRadius,abort.signal);
           committed = true;
           doc.selectedLayer = layer;
         } catch (error) {

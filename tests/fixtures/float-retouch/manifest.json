@@ -1,0 +1,131 @@
+{
+  "cases": [
+    {
+      "active": 101,
+      "inverseInfinityBound": 3.182311344906042,
+      "mode": "source",
+      "name": "source-binary",
+      "reference": "source-binary.f64.gz",
+      "referenceResidual": 1.7763568394002505e-14,
+      "soft": false
+    },
+    {
+      "active": 101,
+      "inverseInfinityBound": 3.182311344906042,
+      "mode": "source",
+      "name": "source-soft",
+      "reference": "source-soft.f64.gz",
+      "referenceResidual": 1.7763568394002505e-14,
+      "soft": true
+    },
+    {
+      "active": 101,
+      "inverseInfinityBound": 3.182311344906042,
+      "mode": "mixed",
+      "name": "mixed-binary",
+      "reference": "mixed-binary.f64.gz",
+      "referenceResidual": 1.5987211554602254e-14,
+      "soft": false
+    },
+    {
+      "active": 101,
+      "inverseInfinityBound": 3.182311344906042,
+      "mode": "mixed",
+      "name": "mixed-soft",
+      "reference": "mixed-soft.f64.gz",
+      "referenceResidual": 1.5987211554602254e-14,
+      "soft": true
+    }
+  ],
+  "donor": {
+    "candidates": 302,
+    "height": 25,
+    "radius": 9,
+    "score": 0.0,
+    "width": 31,
+    "x": -7,
+    "y": -5
+  },
+  "environment": {
+    "numpy": "1.26.4",
+    "scipy": "1.13.0"
+  },
+  "files": {
+    "clean-original.f32.gz": {
+      "bytes": 401336,
+      "rawSha256": "f91aaeaa0aa7d5bcb60e0de1fc0becf6a33ee7cd13ccfcad90118f11417becb7",
+      "sha256": "faa6de49fc49d73cb0a517a7db2ab6c0939569438a35c8159c02aade6cc3ff9a"
+    },
+    "coverage.u8.gz": {
+      "bytes": 166,
+      "rawSha256": "0d1285e40669f207183ad3d4a44d2aecf1d001829787f121083377a75dcb8bce",
+      "sha256": "f1f7f5c0b95ec113a58a9b2d0d1f64efc871c77bc69049ea0b08cf5c0e3a9841"
+    },
+    "damaged-original.f32.gz": {
+      "bytes": 401474,
+      "rawSha256": "22c553eb5a231011485eecce64b8467878ba57d10e873d7ed34730b3e2b2942a",
+      "sha256": "7f59ac1abcc8476c1814d9e924b344591f97b85fb6ba671f530733b830bc2583"
+    },
+    "damaged-original.tif": {
+      "bytes": 403376,
+      "sha256": "c5b0d656660da403db2d26d7eaee1d87205e2df4c7564cf9481b49f6f1b87132"
+    },
+    "donor-search.f32.gz": {
+      "bytes": 477,
+      "rawSha256": "538e237e58beb8b723108fb83c2c73ba202c24860d3e7696dd9a51c90a003080",
+      "sha256": "a0d2ad4c4c301f52311c1e7fa4c26906f0d3cd7ffcc6ae577adf0a1e4267ab69"
+    },
+    "donor-search.u8.gz": {
+      "bytes": 34,
+      "rawSha256": "1310523ebb7d79cda391d8b9758bfced4aa98c8925a996b2b7d7f8ea6e0c2c62",
+      "sha256": "a006de2414ed2345f100560bda59bc67b98a0d6eab019ab521402bca8324a392"
+    },
+    "donor.f32.gz": {
+      "bytes": 2409,
+      "rawSha256": "eeb926de8409d21fac378837934b1551575366b251e329006615cbe9557c1428",
+      "sha256": "cfc36539f39b2fbefe1bdb29d261b9ba08e3c73a66b4600bded65f1316dbea34"
+    },
+    "invalid-tail.tif": {
+      "bytes": 718,
+      "sha256": "78a4f6f891e0dcd9721a4ec551d65527a3f9c0e21a465a318969b37279e68dd2"
+    },
+    "mixed-binary.f64.gz": {
+      "bytes": 4329,
+      "rawSha256": "646e6d1b61fa9dc4340a9619a38f0aafdace00a5a211844f919cd62030ff055e",
+      "sha256": "6f9d8ec904546a6b38c28703afa134691fa070ef4a85d28adc6a2484bd6b141f"
+    },
+    "mixed-soft.f64.gz": {
+      "bytes": 4343,
+      "rawSha256": "ca426b2850f149bf3ff2a2f8d226a703c596aa57aea36dbbd10269c609a8ffca",
+      "sha256": "710bd8b3a37ab63258e62e2ea081094911af4f1f0440cff24d8f36cd3d4cfdd2"
+    },
+    "source-binary.f64.gz": {
+      "bytes": 4332,
+      "rawSha256": "322bbfb75f27baea32c31173aeea68ab2dcef521be806ffd6fe2a47f6e20dcef",
+      "sha256": "6980bd9265fef85c2e1dbf5986d1ff72e235871f82c312aa9e1e62b14e3005dd"
+    },
+    "source-soft.f64.gz": {
+      "bytes": 4339,
+      "rawSha256": "aa982248592d09d826a639f70327f42d71dc27ca406d169333ec93d4939d4815",
+      "sha256": "11ce70a181dd78a0b34c0b4611a7d7bc79401d024d3fca16af7186359f219577"
+    },
+    "target.f32.gz": {
+      "bytes": 2703,
+      "rawSha256": "481292cdcdda96dcce2806f6dc0c5064bc94078024b3567621415725cb111c86",
+      "sha256": "168cafbaa7db5df566e5276218bfcc7f03f42e2b0d03f0d40831e69a855a3bab"
+    }
+  },
+  "generatorSha256": "97e9fcf3bc3756e09e785a305a294f49d2a1316404a40972cad23e8a5b0d8318",
+  "height": 13,
+  "original": {
+    "defectCenter": [
+      128,
+      96
+    ],
+    "defectRadius": 3,
+    "height": 193,
+    "width": 257
+  },
+  "version": 1,
+  "width": 17
+}

@@ -28,14 +28,15 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='vector'){
         // Existing strict paths and paint transforms are native geometry.
       }else if(layer.kind==='adjustment'){
-        if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
+        if(layer.adjustment.kind==='patch'){if(layer.adjustment.precision!=='float32')return 'Float patch adjustments require explicit native float corrected sources.';}
+        else if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='white-balance'){try{compileFloatWhiteBalance(layer.adjustment);}catch(error){return String(error);}}
         else if(isFloatColorAdjustment(layer.adjustment)){try{compileFloatColor(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='gradient-map'){try{compileFloatGradient(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='lut'){try{captureLutHeader(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup and editable Dodge/Burn only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, editable paint and vector layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup and editable Dodge/Burn adjustments. Other layer types require their float integration.';
+        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup editable Dodge/Burn and native Patch only.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, editable paint and vector layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup editable Dodge/Burn and native Patch adjustments. Other layer types require their float integration.';
     }
     return null;
   };
@@ -45,6 +46,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
  * must still meet that role's native-byte contract. */
 export function floatPaintAssetReferences(layer:LayerData):ReadonlySet<object>{
  const references=new Set<object>();
+ if(layer.kind==='adjustment'&&layer.adjustment.kind==='patch'&&layer.adjustment.precision==='float32')references.add(layer.adjustment);
  if(layer.kind==='raster')for(const entry of layer.erasures??[])if(entry.stroke.kind==='wet'&&entry.stroke.precision==='float32')for(const tile of entry.stroke.tiles){references.add(tile);references.add(tile.coverage);}
  if(layer.kind==='paint')for(const stroke of layer.strokes)if(stroke.kind==='clone'&&stroke.precision==='float32'){for(const tile of stroke.tiles)references.add(tile);}else if(stroke.kind==='wet'&&stroke.precision==='float32')for(const tile of stroke.tiles){references.add(tile);references.add(tile.coverage);}
  return references;

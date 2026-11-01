@@ -1,5 +1,6 @@
 import {renderFloatPaint,type FloatPaintCoverage,type FloatCloneRead} from './float-paint';
 import {renderFloatVector} from './float-vector';
+import {captureFloatPatch,applyFloatPatch,type CapturedFloatPatch} from './float-patch';
 import {captureFloatClone,type CapturedFloatClone} from './float-clone';
 import{applyFloatStyle}from'./float-style';
 import {activePerspective,perspectiveLocalQuad,perspectiveMatrix,perspectiveRect} from '../core/perspective';
@@ -112,6 +113,7 @@ export class FloatSceneRenderer {
   const erasureCaptures=new Map<object,import('./projected-erasure').CapturedProjectedErasure>();
   const wetCaptures=new Map<object,CapturedFloatWetReplay>();
   const cloneCaptures=new Map<object,CapturedFloatClone>();
+  const patchCaptures=new Map<object,CapturedFloatPatch>();
   const perspectiveMasks=new Map<string,CapturedPerspectiveMask>();
   const planeMasks=new Map<string,CapturedMaskPlane>(),gridPins=new Map<string,ReturnType<typeof captureAssetSource>>();
   const whiteBalances=new Map<string,readonly number[]|null>();
@@ -122,7 +124,7 @@ export class FloatSceneRenderer {
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
    for(const pin of gridPins.values())pin.check();
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();shadowCache.clear();maskService.clear?.();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();for(const capture of patchCaptures.values())capture.dispose();patchCaptures.clear();shadowCache.clear();maskService.clear?.();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    const hdrReferences=floatPaintAssetReferences(layer);
    visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'||hdrReferences.has(reference)){if(!gridPins.has(reference.assetId))gridPins.set(reference.assetId,captureAssetSource(assets,reference.assetId));return;}if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
@@ -145,6 +147,9 @@ export class FloatSceneRenderer {
       const captured=await captureFloatWetReplay(stroke,assets,this.processor,new AffineTransform(),check);
       try{check();wetCaptures.set(stroke,captured);}catch(error){captured.dispose();throw error;}
      }
+    }
+    else if(layer.kind==='adjustment'&&layer.adjustment.kind==='patch'){
+     const captured=await captureFloatPatch(layer.adjustment,wetBrowserAssets(assets,check),{check});try{check();patchCaptures.set(layer.adjustment,captured);}catch(error){captured.dispose();throw error;}
     }
     else if(layer.kind==='raster')for(const entry of layer.erasures??[])if(entry.stroke.kind==='wet'&&entry.stroke.precision==='float32'&&entry.stroke.opacity>0){
      const original=sources.get(layer.assetId)!.source,captured=await captureFloatWetReplay(entry.stroke,assets,this.processor,AffineTransform.scale(original.width/entry.width,original.height/entry.height),check);
@@ -320,6 +325,8 @@ export class FloatSceneRenderer {
        }else{const pixels=await readIntrinsic(area);backdrop=await compositeStyled(pixels,layer.fillOpacity??1);}
       }else if(layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'){
        const fill=layer.fillOpacity??1,pixels=directRaster&&fill===0?undefined:await readIntrinsic(area);check();backdrop=await compositeStyled(pixels,fill);
+      }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='patch'){
+       const corrected=await patchCaptures.get(layer.adjustment)!.read(area,world);check();const after=await applyFloatPatch(backdrop,corrected,check),styled=await applyFloatStyle(layer,after,backdrop,coverage,this.processor,check);check();backdrop=await blendFloatAdjustment(backdrop,styled.pixels,mode,opacity,styled.mask,{floatComposite:composite},check);
       }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='tonal'){
        let after=backdrop;
        for(const {brush,...options} of layer.adjustment.strokes){

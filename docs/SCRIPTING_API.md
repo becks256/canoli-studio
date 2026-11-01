@@ -1,5 +1,13 @@
 # Scripting API
 
+## Native linear Patch and Spot Healing
+
+Schema 59 adds explicitly native corrected TIFF values, linear private repair
+preparation and existing Patch/Healing controls. Shared validation, Undo,
+isolated/plugin grants and independent REST boundaries remain. Full source
+validation and retained original samples apply before publication.
+[Signatures, defaults, errors, limits and verification status](FLOAT_RETOUCH.md).
+
 ## Recorded vector appends
 
 Recipe v1 action `{type:"path.add", path:VectorPathData}` appends to a semantic
@@ -2855,9 +2863,9 @@ retouch.addTonalStroke(
 
 ## Persistent patch adjustments
 
-`new PatchAdjustment({ assetId, width, height })` captures a registered image asset ID and positive safe-integer local dimensions. All three fields are required. Read-only `assetId`, `width`, and `height` getters expose the captured values; `toJSON()` returns detached data. Invalid geometry or an empty ID throws. The image contains corrected RGB with alpha representing coverage. Patch blending preserves the preceding backdrop alpha, including transparent pixels; ordinary layer opacity, masks, positioning and blend modes remain available. Saved corrected RGB is a snapshot and is not recomputed when underlying artwork changes.
+`new PatchAdjustment({ assetId, width, height })` captures a registered image asset ID and positive safe-integer local dimensions. All three fields are required. Read-only `assetId`, `width`, `height`, and `precision` getters expose the captured values; `toJSON()` returns detached data. Invalid geometry or an empty ID throws. Optional `precision: "float32"` selects the explicit native contract; omission returns undefined from `.precision` and keeps the byte contract. The image contains corrected RGB with alpha representing coverage. Patch blending preserves the preceding backdrop alpha, including transparent pixels; ordinary layer opacity, masks, positioning and blend modes remain available. Saved corrected RGB is a snapshot and is not recomputed when underlying artwork changes.
 
-Pass the value as `new AdjustmentLayer({ adjustment: patch })`, or call `layer.setPatch(patch: PatchAdjustment): void` to replace an existing adjustment through shared commands. A plain object passed to `setPatch`, a locked layer, or a missing asset at script commit throws. The complete successful script creates one undo entry. Projects store these layers in document schema v9 and retain original image assets. Rendering uses the Canvas/WASM fallback with bounded working tiles.
+Pass the value as `new AdjustmentLayer({ adjustment: patch })`, or call `layer.setPatch(patch: PatchAdjustment): void` to replace an existing adjustment through shared commands. A plain object passed to `setPatch`, a locked layer, or a missing asset at script commit throws. The complete successful script creates one undo entry. Byte values require schema 9; explicit `precision:"float32"` requires schema 59 and native canonical TIFF sources in a float document. Native replay preserves linear RGB and backdrop alpha; see [the native contract](FLOAT_RETOUCH.md). Original assets are retained.
 
 ```js
 // Use an existing registered asset containing corrected RGB and coverage alpha.
@@ -2881,7 +2889,7 @@ const layer = document.layers.add(
 
 This constructor stores an already prepared result. It does not run healing, choose a donor, or expose the internal Poisson preparation service. A trusted application host operation can solve and commit patches, but it is not exposed in isolated scripts or REST. The interactive Patch tool (`J`) uses an existing selection and a donor-offset drag. Its controls expose current-layer/current-and-below/all-layer sampling and source/mixed gradients; these UI controls do not add a solver binding to isolated scripts.
 
-The interactive Spot Healing tool (`Shift+J`) now commits local donor-search/Poisson repairs as patch adjustments. `EditorApplication.healStroke` is host-only; planned `healSpot`/`patchRegion` sandbox APIs are not yet available. Scripts can inspect or replace the resulting patch descriptor through `AdjustmentLayer` and `PatchAdjustment`.
+The interactive Spot Healing tool (`Shift+J`) now commits local donor-search/Poisson repairs as patch adjustments. `EditorApplication.healStroke` is host-only; isolated `healSpot`/`patchRegion` APIs are documented below. Scripts can inspect or replace the resulting patch descriptor through `AdjustmentLayer` and `PatchAdjustment`.
 
 ### Document tonal sculpt operation
 
@@ -2922,7 +2930,7 @@ Patch placement now supports both Source and Destination in the tool options. In
 
 `await document.patchRegion(targetRegion, sourceOffset, options = {}): Promise<AdjustmentLayer>` prepares a repair through the application host and returns its attached adjustment layer in the script's private document. `targetRegion` is a `MarqueeSelection` constructor value or serialized `SelectionData`; `sourceOffset` is `{ x, y }` in safe integer document pixels. The operation does not change the document's pixel selection. In default Source direction, the region identifies pixels to repair and the offset identifies donor pixels relative to them. Destination direction translates the supplied donor selection by the offset and repairs that destination.
 
-Options are `direction` (`"source"` default or `"destination"`), `mode` (`"source"` gradient guidance by default or `"mixed"`), `tolerance` (positive finite residual tolerance, default 0.001), `maxIterations` (positive safe integer per channel, default 500), `sampling` (`"all-layers"` default, `"current-layer"`, or `"current-and-below"`), and optional `layerId` (defaults to the script's selected layer). Sampling modes other than all-layers require a valid layer. Coordinates retain original resolution; device allocation/encoding limits still apply.
+Options are `direction` (`"source"` default or `"destination"`), `mode` (`"source"` gradient guidance by default or `"mixed"`), `tolerance` (positive finite residual tolerance, default 0.001 in byte RGB units or 1e-7 in linear RGB units for float documents), `maxIterations` (positive safe integer per channel, default 500), `sampling` (`"all-layers"` default, `"current-layer"`, or `"current-and-below"`), and optional `layerId` (defaults to the script's selected layer). Sampling modes other than all-layers require a valid layer. Coordinates retain original resolution; device allocation/encoding limits still apply.
 
 ```js
 const patch = await document.patchRegion(

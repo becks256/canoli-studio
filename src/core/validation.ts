@@ -107,7 +107,10 @@ const patch = z
   .strict();
 const layer = z.unknown().transform((value, context) => {
   try {
-    validateDocument({ ...createDocument(), children: [value] }, false);
+    // Detached command data has no document precision yet. Accept a tree valid
+    // in either editing mode; execution still validates its real destination.
+    try { validateDocument({ ...createDocument(), children: [value] }, false); }
+    catch { validateDocument({ ...createDocument(), precision:'float32', colorSpace:'linear-srgb', children:[value] }, false); }
     return value as LayerData;
   } catch {
     context.addIssue({ code: "custom", message: "Invalid layer tree." });

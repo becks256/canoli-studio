@@ -34,7 +34,6 @@ import type { VectorBooleanRequest, VectorBooleanControl, VectorBooleanResult } 
 import { prepareVectorBoolean } from './engine/prepare-vector-boolean';
 import {inspectSvgFile,prepareSvgImport} from './engine/svg-import';
 import type {SvgImportControl,SvgImportOptions,SvgImportReport} from './core/svg-import';
-import { encodeRgbaPng } from "./engine/png";
 import {prepareMatting} from './engine/prepare-matting';
 import {preparePreflight} from './engine/preflight';
 import type {PreflightOptions,PreflightControl} from './core/preflight';
@@ -58,6 +57,7 @@ import { prepareSmartRaster } from "./engine/smart-raster";
 import { computeSha256 } from "./ai/batch/manifest";
 import { ComponentRegistry } from "./core/smart/manager";
 import { prepareHealingStroke } from "./engine/healing";
+import {encodeRetouchAsset} from './engine/retouch-asset';
 import { prepareRetouchPatch } from "./engine/patch";
 import { PixelProcessor } from "./engine/processor";
 import type {
@@ -510,6 +510,11 @@ export class EditorApplication {
     );
   }
 
+  /** @internal Trusted tool coverage view; never an isolated script capability. */
+  _healStrokeWithAssets(brush:BrushStroke,sampling:RetouchSamplingOptions,options:PoissonBlendOptions,radius:number,signal:AbortSignal,sourceAssets:AssetStore):Promise<AdjustmentLayer>{
+    if(!(brush instanceof BrushStroke))throw new Error('Healing requires a BrushStroke.');return this.commitRetouch(null,sampling,options,signal,brush.toJSON() as import('./core/drawing').BrushStrokeData,radius,sourceAssets);
+  }
+
   private async commitRetouch(
     sourceOffset: { x: number; y: number } | null,
     sampling: RetouchSamplingOptions,
@@ -517,24 +522,30 @@ export class EditorApplication {
     signal?: AbortSignal,
     brush?: import("./core/drawing").BrushStrokeData,
     radius = 64,
+    sourceAssets?:AssetStore,
   ): Promise<AdjustmentLayer> {
     const document = this.document,
       assets = this.assetStore;
     const revision = document.getSnapshot().revision,
       generation = this.ioGeneration;
     const selectedId = document.selectedLayer?.id ?? null;
+    const selectedIds=[...document.getSnapshot().selectedIds],sampleAssets=sourceAssets??assets,alive=assets.captureLifetime(),sampleAlive=sampleAssets.captureLifetime(),sourceIds=new Set(referencedAssets(document._read()));if(brush?.texture)sourceIds.add(brush.texture.assetId);
+    let selectionRetired=false;
+    const sourcePins=isFloatDocument(document._read())?[...referencedAssets(document._read())].map(key=>captureAssetSource(assets,key)):[],samplePins=isFloatDocument(document._read())?[...sourceIds].map(key=>captureAssetSource(sampleAssets,key)):[];
     const selection = document.selection;
     if (!selection && !brush)
       throw new Error("Select a region to patch first.");
     const check = () => {
       signal?.throwIfAborted();
+      if(selectionRetired)throw new Error('The selection changed while preparing the patch.');
+      alive();sampleAlive();for(const pin of sourcePins)pin.check();for(const pin of samplePins)pin.check();
       if (
         this.ioGeneration !== generation ||
         this.document !== document ||
         this.assetStore !== assets ||
         !this.sessions.some((session) => session.document === document) ||
         document.getSnapshot().revision !== revision ||
-        (document.selectedLayer?.id ?? null) !== selectedId
+        (document.selectedLayer?.id ?? null) !== selectedId||document.getSnapshot().selectedIds.length!==selectedIds.length||document.getSnapshot().selectedIds.some((key,i)=>key!==selectedIds[i])
       )
         throw new Error(
           "Document changed while preparing the patch. Retry after reviewing the target.",
@@ -551,7 +562,8 @@ export class EditorApplication {
     signal?.addEventListener("abort", cancelWorker, { once: true });
     const staging = new AssetStore();
     let installed: string | undefined;
-    let transferred = false;
+    let installedRecord:ReturnType<AssetStore['get']>|undefined;
+    const unsubscribeSelection=document.subscribe(()=>{const ids=document.getSnapshot().selectedIds;if(ids.length!==selectedIds.length||ids.some((key,i)=>key!==selectedIds[i]))selectionRetired=true;});
     try {
       check();
       const capturedSampling = {
@@ -561,7 +573,7 @@ export class EditorApplication {
       const patch = brush
         ? await prepareHealingStroke(
             document.toJSON(),
-            assets,
+            sampleAssets,
             this.renderer,
             processor,
             brush,
@@ -569,10 +581,11 @@ export class EditorApplication {
             options,
             radius,
             signal,
+            check,
           )
         : await prepareRetouchPatch(
             document.toJSON(),
-            assets,
+            sampleAssets,
             this.renderer,
             processor,
             selection!.toJSON(),
@@ -580,20 +593,14 @@ export class EditorApplication {
             capturedSampling,
             options,
             signal,
+            check,
           );
       check();
       // Encode the detached correction directly. HTMLCanvasElement.toBlob can
       // defer its idle task for a full second while editor renders are pending.
-      const rgba = new Uint8Array(patch.correctedPixels);
-      for (let p = 0; p < patch.coverage.length; p++)
-        rgba[p * 4 + 3] = patch.coverage[p];
-      const blob = await encodeRgbaPng(
-        rgba,
-        patch.bounds.width,
-        patch.bounds.height,
-      );
+      const blob=await encodeRetouchAsset(patch,{signal,check});
       check();
-      const asset = await staging.add(blob, "Retouch patch", id(), false);
+      const asset = await staging.add(blob, "Retouch patch", id(), false,patch.precision==='float32'?{tiff:{editingPrecision:'float32'},signal,onProgress:check}:undefined);
       check();
       const layer = new AdjustmentLayer({
         name: brush ? "Healing stroke" : "Retouch patch",
@@ -603,11 +610,14 @@ export class EditorApplication {
           assetId: asset.id,
           width: patch.bounds.width,
           height: patch.bounds.height,
+          ...(patch.precision==='float32'?{precision:'float32' as const}:{}),
         }),
       });
-      assets.install(asset, false);
+      const candidate=execute(document._read(),{type:'layer.add',layer:layer.toJSON()});
+      await validatePreparedPaintAssets(candidate,wetBrowserAssets({get:key=>staging.has(key)?staging.get(key):assets.get(key),captureLifetime:()=>()=>{check();staging.captureLifetime()();}},check));check();
+      installedRecord=staging.shareTo(assets,asset.id,asset.id);
       installed = asset.id;
-      transferred = true;
+      check();
       document.transaction(brush ? "Healing stroke" : "Patch selection", () =>
         document.layers.add(layer),
       );
@@ -615,15 +625,8 @@ export class EditorApplication {
       reusable = true;
       return layer;
     } finally {
-      if (installed) assets.remove(installed);
-      if (!transferred)
-        for (const asset of staging.values()) asset.bitmap.close();
-      signal?.removeEventListener("abort", cancelWorker);
-      staging.metadata.dispose();
-      this.retouchProcessors.delete(processor);
-      if (reusable && !cancelled && !this.retouchDisposed && !this.idleRetouchProcessor)
-        this.idleRetouchProcessor = processor;
-      else processor.dispose();
+      try{if(installed&&assets.has(installed)&&assets.get(installed)===installedRecord){const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));if(!retained.has(installed))assets.remove(installed);}}
+      finally{unsubscribeSelection();signal?.removeEventListener("abort",cancelWorker);try{staging.dispose();}finally{this.retouchProcessors.delete(processor);if(reusable&&!cancelled&&!this.retouchDisposed&&!this.idleRetouchProcessor)this.idleRetouchProcessor=processor;else processor.dispose();}}
     }
   }
 
@@ -1908,6 +1911,8 @@ export class EditorApplication {
     };
     const checkRawOrigins=()=>{for(const key of usedRawOrigins){const pin=rawOriginPins.get(key);if(!pin)throw new Error('RAW source was not present in the script snapshot.');pin.check();}};
     let retouch: ScriptRetouch | undefined;
+    let retouchSelectionRetired=false;
+    let unsubscribeRetouchSelection=()=>{};
     const selectionAbort = new AbortController();
     const scriptCommitAbort = new AbortController(), scriptCommitDeadline = performance.now() + 5000;
     let unsubscribeScriptCancellation = () => {};
@@ -1922,6 +1927,8 @@ export class EditorApplication {
         throw new Error("Permission denied: document:write is required to modify the document.");
     };
     const checkRetouch = () => {
+      if(retouchSelectionRetired)throw new Error('The selection changed during script repair preparation.');
+      if (document.getSnapshot().selectedIds.length!==selectedIds.length||document.getSnapshot().selectedIds.some((key,i)=>key!==selectedIds[i]))throw new Error('The selection changed during script repair preparation.');
       if (
         this.ioGeneration !== generation ||
         this.document !== document ||
@@ -2063,6 +2070,7 @@ export class EditorApplication {
               method !== "rasterize" && method!=='matting' && method!=='raw-develop'
             )
               return Promise.reject(new Error("Unknown retouch method."));
+            if(!retouch)unsubscribeRetouchSelection=document.subscribe(()=>{const ids=document.getSnapshot().selectedIds;if(ids.length!==selectedIds.length||ids.some((key,i)=>key!==selectedIds[i]))retouchSelectionRetired=true;});
             retouch ??= new ScriptRetouch(
               snapshot,
               this.renderer,
@@ -2146,6 +2154,7 @@ export class EditorApplication {
       return result.logs;
     } finally {
       scriptCommitAbort.abort(new Error('Script execution finished. Pending host edits cannot commit.'));
+      unsubscribeRetouchSelection();
       unsubscribeScriptCancellation();
       selectionAbort.abort();
       retouch?.dispose();

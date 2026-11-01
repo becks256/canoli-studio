@@ -39,10 +39,11 @@ import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
 import type {BilateralFilterOptions} from '../core/smart/bilateral-filter';
 import {
   findRetouchDonor,
+  findFloatRetouchDonor,
   type DonorSearchOptions,
 } from "../core/retouch/donor";
 import { applyDodgeBurn } from "../core/retouch/dodgeBurn";
-import { poissonBlend } from "../core/retouch/poisson";
+import { poissonBlend,floatPoissonBlend } from "../core/retouch/poisson";
 import type { PoissonBlendOptions } from "../core/retouch/types";
 import type { DodgeBurnOptions } from "../core/retouch/types";
 import {
@@ -88,6 +89,8 @@ self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
+    floatPoisson?:{pixels:Float32Array;donor:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:PoissonBlendOptions};
+    floatDonor?:{pixels:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:DonorSearchOptions};
     floatCompositeHdrWet?:{pixels:Float32Array;field:Float64Array;opacity:number};
     floatProjectiveHdrWet?:{field:Float64Array;options:ProjectiveFieldOptions};
     floatMappedHdrWet?:{field:Float64Array;options:MappedFieldOptions};
@@ -184,6 +187,8 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
+    if(data.floatPoisson){const r=data.floatPoisson,floatPoissonResult=floatPoissonBlend(r.pixels,r.donor,r.width,r.height,r.coverage,r.options,wasmPoissonSolver(await kernel));self.postMessage({id:data.id,floatPoissonResult},{transfer:[floatPoissonResult.pixels.buffer as ArrayBuffer]});return;}
+    if(data.floatDonor){const r=data.floatDonor,floatDonorResult=findFloatRetouchDonor(r.pixels,r.width,r.height,r.coverage,r.options,wasmDonorValidity(await kernel));self.postMessage({id:data.id,floatDonorResult});return;}
     if(data.floatCompositeHdrWet||data.floatProjectiveHdrWet||data.floatMappedHdrWet){
       const owned=floating??=new FloatPixelProcessor(await kernel),c=data.floatCompositeHdrWet,p=data.floatProjectiveHdrWet,m=data.floatMappedHdrWet;
       const pixels=c?owned.compositeHdrWet(c.pixels,c.field,c.opacity):p?owned.projectiveHdrWet(p.field,p.options):owned.mappedHdrWet(m!.field,m!.options);

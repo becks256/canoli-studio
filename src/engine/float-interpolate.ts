@@ -9,7 +9,7 @@ export async function interpolateFloatBackdrops(before:Float32Array,after:Float3
  const output=new Float32Array(before.length);let deadline=performance.now()+2;
  for(let i=0;i<before.length;i+=4){
   const amount=opacity*(mask?mask[i/4]:1);if(!Number.isFinite(amount)||amount<0||amount>1)throw new Error('Float backdrop interpolation coverage is invalid.');
-  if(amount===0)output.set(before.subarray(i,i+4),i);
+  if(amount===0||(Object.is(before[i],after[i])&&Object.is(before[i+1],after[i+1])&&Object.is(before[i+2],after[i+2])&&Object.is(before[i+3],after[i+3])))output.set(before.subarray(i,i+4),i);
   else if(amount===1)output.set(after.subarray(i,i+4),i);
   else{
    const a=before[i+3]*(1-amount),b=after[i+3]*amount,alpha=a+b;output[i+3]=alpha;

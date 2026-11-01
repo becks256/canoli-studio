@@ -22,7 +22,7 @@ it('owns strict HDR metadata and defaults while preserving byte constructors',()
 });
 
 it('retains HDR modifiers on shared OO history and rejects false schema ages even for inert values',()=>{
- const{d,r}=document(),before=d.toJSON();r.applyWetPaint(stroke());const after=d.toJSON();expect(after.schemaVersion).toBe(SCHEMA_VERSION);expect(SCHEMA_VERSION).toBe(58);expect(Document.fromJSON(after).toJSON()).toEqual(after);d.undo();expect(d.toJSON()).toEqual(before);d.redo();expect(d.toJSON()).toEqual(after);
+ const{d,r}=document(),before=d.toJSON();r.applyWetPaint(stroke());const after=d.toJSON();expect(after.schemaVersion).toBe(SCHEMA_VERSION);expect(Document.fromJSON(after).toJSON()).toEqual(after);d.undo();expect(d.toJSON()).toEqual(before);d.redo();expect(d.toJSON()).toEqual(after);
  expect(referencedAssets(after)).toEqual(new Set(['original','pigment','removal']));
  for(const opacity of [0,1]){const old=structuredClone(after);old.schemaVersion=56;const layer=old.children[0];if(layer.kind!=='raster')throw new Error('No raster');layer.erasures![0].stroke.opacity=opacity;expect(()=>validateDocument(old)).toThrow('57');}
  const layer=after.children[0];if(layer.kind!=='raster')throw new Error('No raster');const command={type:'layer.update',id:r.id,patch:{erasures:layer.erasures}};expect(parseCommands([command])).toHaveLength(1);

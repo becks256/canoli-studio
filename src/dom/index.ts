@@ -1374,7 +1374,7 @@ export abstract class Layer {
       this.document._dispatch({ type: "layer.update", id: this.id, patch });
     else {
       const updated = execute(
-        { ...createDocument(), children: [this.data] },
+        detachedLayerDocument([this.data], patch.adjustment),
         { type: "layer.update", id: this.id, patch },
         false,
       );
@@ -1829,6 +1829,16 @@ export class RasterLayer extends Layer {
   }
 }
 
+/** Detached native corrections need a native validation context before they
+ * have a document owner. Attachment still validates the actual document. */
+function detachedLayerDocument(children: LayerData[], adjustment?: AdjustmentData): DocumentData {
+  const native = (layers: LayerData[]): boolean => layers.some(layer =>
+    layer.kind === 'adjustment' && layer.adjustment.kind === 'patch' && layer.adjustment.precision === 'float32' ||
+    layer.kind === 'group' && native(layer.children));
+  return {...createDocument(), ...(native(children) || adjustment?.kind === 'patch' && adjustment.precision === 'float32'
+    ? {precision:'float32' as const,colorSpace:'linear-srgb' as const} : {}), children};
+}
+
 export class LayerGroup extends Layer {
   readonly layers: LayerCollection;
   constructor(options: Omit<LayerOptions, 'blendMode'> & {blendMode?:LayerBlendMode;frequencyRadius?:number|null} = {}) {
@@ -1894,7 +1904,7 @@ export class LayerCollection implements Iterable<Layer> {
       layer._attach(document);
     } else {
       const prospective = [...this.data, layer.toJSON()];
-      validateDocument({ ...createDocument(), children: prospective }, false);
+      validateDocument(detachedLayerDocument(prospective), false);
       // Preserve detached object identity until the subtree is attached.
       this.data.push(layer._read());
       layer._parent = this.owner as LayerGroup;
@@ -2767,7 +2777,7 @@ export class AdjustmentLayer extends Layer {
       ),
       ...base,
     });
-    validateDocument({ ...createDocument(), children: [this.data] });
+    validateDocument(detachedLayerDocument([this.data]));
   }
 
   get adjustment(): AdjustmentData {

@@ -64,6 +64,7 @@ export interface PatchAdjustmentData {
   assetId: string;
   width: number;
   height: number;
+  precision?:'float32';
 }
 export const patchAdjustmentSchema = z
   .object({
@@ -71,6 +72,7 @@ export const patchAdjustmentSchema = z
     assetId: z.string().min(1),
     width: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
     height: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+    precision:z.literal('float32').optional(),
   })
   .strict();
 export const tonalStrokeSchema = z

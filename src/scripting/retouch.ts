@@ -1,7 +1,7 @@
 import { prepareSmartRaster } from "../engine/smart-raster";
 import {prepareMatting} from '../engine/prepare-matting';
 import {mattingRequestSchema} from '../core/matting';
-import { AssetStore } from "../core/assets";
+import { AssetStore,captureAssetSource } from "../core/assets";
 import {Document} from '../dom';
 import {ComponentRegistry} from '../core/smart/manager';
 import {rawDevelopmentRequestSchema,rawDevelopmentPlanSchema,rawComponentSource} from '../core/interchange/raw/commands';
@@ -23,7 +23,7 @@ import type { BrushStrokeData } from "../core/drawing";
 import { prepareHealingStroke } from "../engine/healing";
 import { prepareRetouchPatch } from "../engine/patch";
 import { PixelProcessor } from "../engine/processor";
-import { createCanvas, release } from "../engine/canvas";
+import { encodeRetouchAsset } from "../engine/retouch-asset";
 import type { DocumentRenderer } from "../engine/renderer";
 
 /** Per-script private assets. Source bitmaps are borrowed; prepared bitmaps are owned. */
@@ -33,6 +33,8 @@ export class ScriptRetouch {
   private readonly abort = new AbortController();
   private busy = false;
   private rawOrigins=new Set<string>();
+  private nativeOriginPins=new Map<string,ReturnType<typeof captureAssetSource>>();
+  private nativeOrigins=new Set<string>();
   constructor(
     private readonly snapshot: DocumentData,
     private readonly renderer: DocumentRenderer,
@@ -40,7 +42,7 @@ export class ScriptRetouch {
     private readonly check: () => void,
     private readonly checkRawOrigin:(assetId:string)=>void=()=>{},
   ) {
-    try { for (const asset of assets.values()) assets.shareTo(this.view,asset.id,asset.id); }
+    try { for (const asset of assets.values()){if(asset.tiff)this.nativeOriginPins.set(asset.id,captureAssetSource(assets,asset.id));assets.shareTo(this.view,asset.id,asset.id);} }
     catch(error){this.view.dispose();throw error;}
   }
   async prepare(
@@ -62,7 +64,8 @@ export class ScriptRetouch {
       label: "Prepare script repair",
       commands: parseCommands(commands),
     });
-    for (const assetId of referencedAssets(document)) this.view.get(assetId);
+    for (const assetId of referencedAssets(document)){this.view.get(assetId);if(!this.owned.has(assetId)&&this.nativeOriginPins.has(assetId))this.nativeOrigins.add(assetId);}
+    this.assertActive();
     if (
       heal &&
       (!findLayer(document, heal.layerId) || isLocked(document, heal.layerId))
@@ -162,6 +165,7 @@ export class ScriptRetouch {
               options,
               searchRadius,
               signal,
+              ()=>this.assertActive(),
             );
           })()
         : await (() => {
@@ -180,40 +184,18 @@ export class ScriptRetouch {
               { mode: sampling, layerId },
               options,
               signal,
+              ()=>this.assertActive(),
             );
           })();
       this.assertActive();
-      const surface = createCanvas(
-        patch.bounds.width,
-        patch.bounds.height,
-        true,
-      );
-      let blob: Blob;
-      try {
-        const context = surface.getContext("2d")!,
-          pixels = context.createImageData(surface.width, surface.height);
-        pixels.data.set(patch.correctedPixels);
-        for (let p = 0; p < patch.coverage.length; p++)
-          pixels.data[p * 4 + 3] = patch.coverage[p];
-        context.putImageData(pixels, 0, 0);
-        blob = await new Promise<Blob>((resolve, reject) =>
-          surface.toBlob(
-            (value) =>
-              value
-                ? resolve(value)
-                : reject(new Error("Could not encode patch.")),
-            "image/png",
-          ),
-        );
-      } finally {
-        release(surface);
-      }
+      const blob=await encodeRetouchAsset(patch,{signal,check:()=>this.assertActive()});
       this.assertActive();
       const asset = await this.view.add(
         blob,
         heal ? "Script healing" : "Script patch",
         id(),
         false,
+        patch.precision==='float32'?{tiff:{editingPrecision:'float32'},signal,onProgress:()=>this.assertActive()}:undefined,
       );
       assetId = asset.id;
       this.assertActive();
@@ -224,6 +206,7 @@ export class ScriptRetouch {
           assetId: asset.id,
           width: patch.bounds.width,
           height: patch.bounds.height,
+          ...(patch.precision==='float32'?{precision:'float32' as const}:{}),
         }),
         x: patch.bounds.x,
         y: patch.bounds.y,
@@ -241,6 +224,7 @@ export class ScriptRetouch {
     this.abort.signal.throwIfAborted();
     this.check();
     for(const key of this.rawOrigins)this.checkRawOrigin(key);
+    for(const key of this.nativeOrigins)this.nativeOriginPins.get(key)!.check();
   }
   rawSettings(document:DocumentData,layerId:string){
     this.assertActive();const layer=findLayer(document,layerId);if(layer?.kind!=='smart-object')throw new Error('Choose an attached smart object.');
@@ -281,7 +265,7 @@ export class ScriptRetouch {
   }
   dispose() {
     this.abort.abort(new Error("Script retouch stopped."));
-    this.owned.clear();
+    this.owned.clear();this.nativeOrigins.clear();this.nativeOriginPins.clear();
     this.view.dispose();
   }
 }
