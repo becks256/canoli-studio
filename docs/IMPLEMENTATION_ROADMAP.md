@@ -10342,3 +10342,62 @@ photographic/device/sustained all-tool performance, professional workflow qualit
 and every unfinished original AI/provider/collaboration/installed-ChatGPT/live-
 identity/commercial/specialist/motion gate remain required. This increment does
 not complete the original professional-editor objective.
+
+
+### 2026-11-01 — F08/F10 native float text implementation started
+
+Previous goal turn: progress, native Patch/Spot Healing accepted at 544cf9d.
+The complete original roadmap remains active. TextLayer is still rejected by
+float scene validation; this work must connect existing whole-line/native SVG
+shaping and all typography/paint fields to native working RGB without losing
+font identity, alpha, original sources or shared editing/history/isolation.
+
+Source inspection and native probes rejected two tempting shortcuts. A single
+opaque field multiplied by CSS alpha loses overlapping-glyph paint (native MM
+at half alpha reaches 192/255). Per-character opacity masks alter tightly
+tracked Latin/combining ink and cannot be assumed to preserve ligatures or
+paint ownership. The retained probe data informs the required whole-shaping-
+chunk/native paint plan; no byte flatten, altered text geometry or approximation
+is enabled as the finished float path.
+
+The first implemented dependency captures authored CSS colors directly from
+native CSS color metadata. Exact sRGB hex/named/byte aliases share the existing
+transfer; signed/HDR CSS colors and sub-byte alpha remain Float32. High and
+residual reads avoid CSS serialization becoming another color quantizer.
+Private ownership/cancellation, frozen inputs/results, no pixel readback and
+independence from dark/forced-color UI are checked. This does not enable text,
+change the public scripting API/schema or close F08/F10/F14. Full glyph/paint,
+font/tuple/source capture, native scene/UI/export, shared transport, independent
+references and actual large-original verification remain required.
+[Current dependency, errors, limitations and remaining contract](FLOAT_TEXT.md).
+
+
+### 2026-11-01 — F08/F10 native CSS color dependency verified; text painting remains open
+
+The private color dependency above now passes full build/typecheck with 51
+developer guides and **3,357 unit/API cases across 331 files**. All four real
+source-browser cases and the narrow no-JavaScript production guide case pass.
+Direct linear CSS components, including +/-3e38 RGB and alpha 1e-8, retain their
+exact Float32 values. Tests prohibit Canvas RGB readback, demonstrate ordinary
+CSS string precision loss, retain equivalent sRGB aliases and verify wide-gamut
+signed values, frozen snapshots, cancellation, reentrant retirement, retry and
+independence from dark/forced-color UI. The initial red-alias mismatch was fixed
+by avoiding the browser's unnecessary XYZ conversion for declared sRGB; exact
+expectations were retained.
+
+The previous accepted application executable/CSS/WASM/index resources remain
+byte-identical: this dependency is not yet called by the float scene. Only the
+architecture guide and new groundwork guide change. Glyph-overlap, per-character
+opacity/visibility and color-glyph probes remain design evidence. The tested
+browser exposes neither getTextClusters nor fillTextCluster; they are not
+silently assumed or enabled through experimental flags. Font sources, complete
+native shaping/paint primitives and their connected scene/tool/export/API/
+persistence acceptance are still required. Float TextLayer and tool gates stay
+unchanged. This is progress toward the full text integration, not its substitute
+or completion; the whole original roadmap stays active.
+
+[Findings](benchmarks/float-text-color-2026-11-01.md) and
+[compact receipt](benchmarks/float-text-color-2026-11-01.json.gz) retain exact
+source/release identities, tests, the failed/corrected pilot and native probes.
+No account, upload, paid call, font permission or new isolated capability is
+introduced.

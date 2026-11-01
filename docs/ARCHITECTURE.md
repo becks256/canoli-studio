@@ -1,5 +1,14 @@
 # Architecture
 
+## Native text color dependency — float text remains in progress
+
+Private `engine/float-text-color.ts` captures authored CSS source colors as
+immutable linear Float32 values without Canvas RGB readback. It preserves
+extended channels, source alpha and CSS serialization precision, and owns its
+probe/cancellation lifecycle. Native glyph painting and TextLayer integration
+remain required; float text/tool validation gates stay in place.
+[Implemented dependency and remaining native paint contract](FLOAT_TEXT.md).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair
