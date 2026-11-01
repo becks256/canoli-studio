@@ -1,7 +1,7 @@
 import {sfntChecksum} from './sfnt';
 
 /** Private already-shaped glyph access. Source files and public text stay intact. */
-export const GLYPH_LAYOUT_TABLES=Object.freeze(['GSUB','GPOS','GDEF','BASE','JSTF','kern','kerx','morx','mort','ankr','trak','opbd','prop','feat','lcar','just','bsln','Silf','Glat','Gloc','Feat','Sill','DSIG']);
+export const GLYPH_OMITTED_TABLES=Object.freeze(['BASE','JSTF','kern','kerx','morx','mort','ankr','trak','opbd','prop','feat','lcar','just','bsln','Silf','Glat','Gloc','Feat','Sill','DSIG']);
 export interface GlyphSelectorBytes {bytes:Uint8Array;selectors:Uint32Array;glyphCount:number}
 interface Sfnt {flavor:number;tables:Map<string,Uint8Array>;glyphCount:number}
 const inside=(length:number,at:number,size:number)=>{if(!Number.isSafeInteger(at)||!Number.isSafeInteger(size)||at<0||size<0||at+size>length)throw new Error('Glyph font table exceeds its source.');};
@@ -34,7 +34,7 @@ function augmentedCmap(original:Uint8Array,map:Map<number,number>):Uint8Array{
  v.setUint16(at,12);v.setUint32(at+4,length);v.setUint32(at+12,groups.length);groups.forEach((g,i)=>{const p=at+16+i*12;v.setUint32(p,g.first);v.setUint32(p+4,g.last);v.setUint32(p+8,g.glyph);});return bytes;
 }
 function pack(source:Sfnt,cmap:Uint8Array):Uint8Array{
- const tables=[...source.tables].filter(([tag])=>!GLYPH_LAYOUT_TABLES.includes(tag)).map(([tag,body])=>[tag,tag==='cmap'?cmap:body]as const);
+ const tables=[...source.tables].filter(([tag])=>!GLYPH_OMITTED_TABLES.includes(tag)).map(([tag,body])=>[tag,tag==='cmap'?cmap:body]as const);
  // SFNT directory order is unsigned byte order, independent of locale.
  tables.sort(([a],[b])=>a<b?-1:a>b?1:0);const n=tables.length,power=2**Math.floor(Math.log2(n));if(power*16>65535)throw new Error('Glyph font directory cannot represent its table count.');let size=12+n*16;for(const [,body]of tables)size+=Math.ceil(body.length/4)*4;if(!Number.isSafeInteger(size)||size>0xffffffff)throw new Error('Glyph font exceeds SFNT offsets.');
  const bytes=new Uint8Array(size),v=view(bytes);v.setUint32(0,source.flavor===0x4f54544f?source.flavor:0x00010000);v.setUint16(4,n);v.setUint16(6,power*16);v.setUint16(8,Math.log2(power));v.setUint16(10,n*16-power*16);let offset=12+n*16,head=0;
@@ -51,7 +51,7 @@ export function compileGlyphSelectors(input:Uint8Array,check:()=>void=()=>{}):Gl
 export function* validateGlyphSelectorSteps(sourceBytes:Uint8Array,result:GlyphSelectorBytes):Generator<void>{
  if(!(result.bytes instanceof Uint8Array)||!(result.selectors instanceof Uint32Array))throw new Error('Invalid native glyph selector result.');const source=sfnt(sourceBytes),derived=sfnt(result.bytes);if(derived.flavor!==(source.flavor===0x4f54544f?source.flavor:0x00010000)||result.glyphCount!==source.glyphCount||derived.glyphCount!==source.glyphCount||result.selectors.length!==source.glyphCount||result.selectors[0]!==0)throw new Error('Native glyph selector identity differs.');
  let checksum=0;for(let i=0;i<result.bytes.length;i+=4){const b=result.bytes;checksum=(checksum+((b[i]??0)*0x1000000+(b[i+1]??0)*0x10000+(b[i+2]??0)*0x100+(b[i+3]??0)))>>>0;if(i%16384===0)yield;}if(checksum!==0xb1b0afba)throw new Error('Native glyph selector checksum differs.');
- const expected=[...source.tables.keys()].filter(tag=>!GLYPH_LAYOUT_TABLES.includes(tag));if(derived.tables.size!==expected.length||expected.some(tag=>!derived.tables.has(tag)))throw new Error('Native glyph selector table set differs.');
+ const expected=[...source.tables.keys()].filter(tag=>!GLYPH_OMITTED_TABLES.includes(tag));if(derived.tables.size!==expected.length||expected.some(tag=>!derived.tables.has(tag)))throw new Error('Native glyph selector table set differs.');
  for(const tag of expected){if(tag==='cmap')continue;const a=source.tables.get(tag)!,b=derived.tables.get(tag)!;if(a.length!==b.length)throw new Error('Native glyph selector altered source '+tag+' bytes.');for(let i=0;i<a.length;i++){if(!(tag==='head'&&i>=8&&i<12)&&a[i]!==b[i])throw new Error('Native glyph selector altered source '+tag+' bytes.');if(i%16384===0)yield;}}
  const original=new Map<number,number>(),actual=new Map<number,number>();let visited=0;
  for(const entry of mappings(source.tables.get('cmap')!)){if(entry[1])original.set(...entry);if(++visited%1024===0)yield;}
@@ -61,3 +61,10 @@ export function* validateGlyphSelectorSteps(sourceBytes:Uint8Array,result:GlyphS
  if(actual.size!==original.size+source.glyphCount-1)throw new Error('Native glyph selector added unexpected mappings.');
 }
 export function validateGlyphSelectors(sourceBytes:Uint8Array,result:GlyphSelectorBytes):void{for(const _ of validateGlyphSelectorSteps(sourceBytes,result))void _;}
+
+/** Preserve layout tables for native hint/script classification, while disabling
+ * their features on the private already-resolved glyph face. */
+export function glyphFeatureSettings(bytes:Uint8Array):string{
+ const source=sfnt(bytes),features=new Set<string>();for(const tag of ['GSUB','GPOS']){const table=source.tables.get(tag);if(!table)continue;inside(table.length,0,10);const v=view(table),offset=v.getUint16(6);if(!offset)continue;inside(table.length,offset,2);const n=v.getUint16(offset);inside(table.length,offset+2,n*6);for(let i=0;i<n;i++){const at=offset+2+i*6,name=String.fromCharCode(...table.subarray(at,at+4));if(!/^[\x20-\x7e]{4}$/.test(name))throw new Error('Invalid private glyph feature tag.');features.add(name);}}
+ return [...features].sort().map(tag=>JSON.stringify(tag)+' 0').join(', ')||'normal';
+}

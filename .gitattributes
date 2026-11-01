@@ -14,3 +14,4 @@ public/licenses/zlib-1.3.2-LICENSE.txt -whitespace
 public/licenses/lcms-2.19.1-LICENSE.txt -whitespace
 # Preserve the pinned full HarfBuzz compiler output byte-for-byte.
 src/fonts/codec/canoli_harfbuzz.js -whitespace linguist-generated=true
+src/fonts/decode-codec/canoli_font_decoder.js -whitespace linguist-generated=true

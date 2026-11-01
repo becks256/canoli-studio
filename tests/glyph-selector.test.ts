@@ -45,3 +45,8 @@ it('never overwrites existing private Unicode mappings when choosing glyph selec
  const original=compileGlyphSelectors(new Uint8Array(await readFile('tests/fixtures/fonts/Regular.ttf'))),next=compileGlyphSelectors(original.bytes);validateGlyphSelectors(original.bytes,next);const font=create(next.bytes)as Font;
  for(let glyph=1;glyph<original.glyphCount;glyph++){expect(font.glyphForCodePoint(original.selectors[glyph]).id).toBe(glyph);expect(font.glyphForCodePoint(next.selectors[glyph]).id).toBe(glyph);expect([...original.selectors]).not.toContain(next.selectors[glyph]);}
 });
+
+it('retains original OpenType layout bytes for hint classification while declaring all source features disabled',async()=>{
+ const {glyphFeatureSettings}=await import('../src/fonts/glyph-sfnt'),source=new Uint8Array(await readFile('tests/fixtures/shaping-font/Shaping.ttf')),result=compileGlyphSelectors(source),tables=(bytes:Uint8Array)=>{const v=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);return new Map(Array.from({length:v.getUint16(4)},(_,i)=>{const p=12+i*16;return[String.fromCharCode(...bytes.subarray(p,p+4)),bytes.slice(v.getUint32(p+8),v.getUint32(p+8)+v.getUint32(p+12))]as const;}));},a=tables(source),b=tables(result.bytes);
+ for(const tag of ['GSUB','GPOS','GDEF'])expect(b.get(tag)).toEqual(a.get(tag));const settings=glyphFeatureSettings(source);for(const tag of ['liga','rlig','kern','mark','init','medi','fina'])expect(settings).toContain('"'+tag+'" 0');
+});

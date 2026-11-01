@@ -1,5 +1,17 @@
 # Architecture
 
+## Complete private compressed-font preparation
+
+Selected WOFF/WOFF2 glyph sources now use complete private SFNT preparation;
+public font bytes/IDs and ordinary registrations/appearance remain. A pinned
+memory-only WOFF2/Brotli worker and native WOFF Deflate preserve tables, metrics,
+composites and instructions. Host fingerprint/directory/checksum/identity/native
+checks share source/parent leases, cancellation and the existing font-job queue.
+Captured glyph owners cache checked SFNT only for their lifetime. Native hinting
+requires retained OpenType layout data; private faces disable declared features
+rather than discard GSUB/GPOS/GDEF. Full float text remains required.
+[Contract and limits](FLOAT_TEXT.md#complete-compressed-font-preparation-private).
+
 ## Native CSS font-instance projection
 
 Private Canvas-run matching snapshots native weight/stretch and closest owned

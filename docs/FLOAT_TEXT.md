@@ -60,8 +60,8 @@ publication and closes failed/cancelled bitmaps. This is a private renderer
 boundary, with no new public constructor, mutation method or isolated grant.
 
 This owner is required groundwork, not completed native float glyph painting.
-Paint decomposition, intrinsic color-glyph sources and exact authored-alpha
-composition still need an implementation. The float TextLayer/tool gates remain.
+Complete native text decomposition, intrinsic color-glyph sources and connected
+Float32 composition still need integration. The float TextLayer/tool gates remain.
 
 ## Owned glyph selection and native float paint (private)
 
@@ -75,8 +75,8 @@ runs, perform fallback or replace whole-chunk shaping.
 A separate small worker copies selected uncompressed TTF/OTF glyph, hint,
 metric, variation and intrinsic paint tables. It adds collision-free private
 Unicode selectors while retaining the original mappings that native hinting can
-rely on. Already-resolved glyph paint removes layout/substitution tables from
-the temporary font; originals remain unchanged in the source store, native
+rely on. Already-resolved glyph paint retains GSUB/GPOS/GDEF for native hint/script
+classification, and disables their declared features on the temporary face; originals remain unchanged in the source store, native
 project and authored SVG. Complete retained-table bytes, mappings, selector IDs
 and SFNT checksums validate before private native registration. Validation yields
 between bounded groups. Original and derived faces have independent lifetimes;
@@ -92,11 +92,10 @@ partitions retain exact output words. Parent/source/native-face retirement and
 cancellation reject without publishing a field, and parent release retires its
 child registrations.
 
-This dependency currently requires selected uncompressed SFNT bytes and supported
+This dependency accepts selected native TTF/OTF/WOFF/WOFF2 sources with supported
 Unicode cmap formats 0/4/6/10/12/13. It explicitly rejects glyph zero, exhausted
-private selector space, unsupported compressed glyph preparation and intrinsic
-color-font float paint. Existing font imports and ordinary rendering are not
-restricted. Full compressed-source/native fallback/glyph-run identification,
+private selector space and intrinsic color-font float paint. Existing font imports and ordinary rendering are not
+restricted. Complete native fallback/glyph-run identification,
 missing-glyph and intrinsic color painting remain required, together with the
 connected float TextLayer tool/scene/export/transport/persistence acceptance.
 The float document and tool gates remain in place. This is actual private
@@ -105,7 +104,7 @@ per-glyph float painting, not completed float typography.
 ## Source-font shaping and whole Canvas-run matching (private)
 
 `NativeGlyphFont.shapeRun(input,control)` shapes one original-font item from
-retained, selected uncompressed SFNT bytes. Inputs retain the entire original
+retained selected sources, with complete private SFNT decoding for compressed fonts. Inputs retain the entire original
 UTF-16 text (existing 10,000-character budget), scalar-aligned `itemOffset` and
 `itemLength`, direction `ltr`/`rtl`/`ttb`/`btt`, optional four-letter script,
 language (default `und`) and global OpenType feature tag/value pairs. Omitted
@@ -149,8 +148,8 @@ plan fonts reject. These are private renderer methods, with no public scripting,
 REST, plugin, document-model or persistence contract change.
 
 This is native uniform Canvas-run matching at the compared transform, not a
-complete browser text shaper. Mixed bidi, script/fallback itemization, implicit
-CSS-to-variable-axis resolution, compressed preparation, glyph zero/intrinsic
+complete browser text shaper. Mixed bidi, script/fallback itemization, automatic
+optical/broader CSS selection, compressed collection selection, glyph zero/intrinsic
 paint, native SVG character/path/vertical layout and full text scene/controls/
 interchange remain required. A mismatch cannot fall back to a byte-flattened
 Float32 image. Full TextLayer/tool gates and broad roadmap acceptance remain.
@@ -189,11 +188,59 @@ The ordinary renderer, font registrations and authored appearance remain.
 
 This resolves the private weight/width/style dependency for verified native
 runs; automatic optical sizing, full CSS/fallback itemization, native registration
-behavior for every font/browser, compressed and missing/intrinsic glyph paint,
+behavior for every font/browser, complete collection/legacy cases and missing/intrinsic paint,
 SVG/path/vertical matching and complete float TextLayer integration remain
 required. In particular, this does not repair or promise automatic italic-axis
 selection in the existing ordinary native host. Explicit authored ital remains
 available through the existing variable-axis controls.
+
+## Complete compressed font preparation (private)
+
+Captured glyph fonts now decode selected WOFF and WOFF2 to complete private SFNT
+bytes before selector preparation. Public original/render font Blobs, source IDs,
+authored mappings, document/font model, registrations and transport stay unchanged.
+The original source lease, shared single font-job queue, 60-second active budget
+and cancellation cover decoder work, host validation, native load and selector
+preparation. Cancellation/error paths retire their workers without private faces;
+release clears the private SFNT shaping cache and aborts child jobs. Subsequent
+source shaping uses those checked complete cached bytes, with original layout/
+variation tables; it does not decode or reread the compressed source on every run.
+Uncompressed inputs retain the separate small SFNT-selector worker path.
+
+WOFF1 uses native Deflate streams and complete table repacking. WOFF2 uses a
+pinned full Google WOFF2 decoder with Brotli 1.2.1 in a self-contained disposable
+WASM worker, including glyph/loca/hmtx transforms, composites and instructions.
+The worker installs its first handler before async initialization. The stream
+writer does not trust the advisory original-SFNT size and has no application
+output-size tier. Existing upstream format/compression-ratio checks and actual
+WASM/browser/native memory limits remain; no image import limit is introduced.
+
+Before private registration the host checks original/decoded SHA-256 fingerprints,
+complete source-directory correspondence, table bounds/overlap/lengths, per-table
+and whole-SFNT checksums, original units/glyph count and unregistered native
+loading. WOFF table checksums also bind to its original directory. WOFF2 glyf/loca
+reconstruction may change byte lengths, so its advisory size is not treated as a
+fixed output allocation. Checks yield between bounded groups and check lifetime
+through publication. These are strict host format/native checks, not a claim that
+a digest alone proves decompression correctness. Independent table/instruction/
+outline/metric/native references verify the implemented decoder separately.
+
+Source GSUB/GPOS/GDEF data must remain in temporary glyph faces: removing these
+can change native hinting of glyphs not present in the original character map.
+The private face disables each declared OpenType feature instead of discarding
+those tables. All retained payload bytes still validate against checked SFNT
+source bytes. A single-glyph substitution control verifies already-resolved paint
+cannot reapply a source substitution. The isolated Manrope ligature failure and
+its correction are consistent with FreeType's documented use of OpenType data to
+classify unencoded glyphs for auto-hinting; this host's rasterizer internals were
+not instrumented. [FreeType driver properties](https://freetype.org/freetype2/docs/reference/ft2-properties.html).
+
+This adds selected compressed-source preparation and fixes that native hinting
+dependency. It does not complete WOFF2 collection selection, every font/host/
+legacy shaping case, native bidi/script/fallback/optical selection, missing or
+intrinsic-color paint, SVG/path/vertical matching, connected float TextLayer or
+broader performance/device/quality acceptance. [Rebuild pins, runtime, licenses
+and actual limits](../src/fonts/decode-codec/README.md).
 
 ## Required native paint work
 
@@ -308,3 +355,21 @@ and [compact receipt](benchmarks/css-font-instance-2026-11-01.json.gz) include
 failed/corrected native-style and static-rounding probes. These results do not
 close automatic optical sizing, universal native style/fallback behavior,
 compressed/missing/intrinsic paint, full float TextLayer or the original roadmap.
+
+## Complete compressed-font verification (2026-11-01)
+
+Full build/typecheck, 3,392 unit/API tests across 335 files, one complete 66-case
+native run and seven production checks pass. Independent FontTools references
+verify 17 complete outputs, including four emitted production files: 587 glyphs,
+140 composites and 9,810 glyph-instruction bytes, plus exact untransformed tables,
+cmap and horizontal metrics. Seventy-two complete native runs match geometric
+and full pinned compressed fonts. Source/cache lifetime, corruption/cancel/timeout/
+retry and missing private-feature capability cannot publish partial fonts. Actual
+Float32 paint retains ordered alpha, HDR RGB, alpha 1e-8 and exact window words.
+The ordinary 50 MP byte workflow retains its complete source identity and every
+sample in its independent 600 × 200 text reference region; its full PNG bytes
+also match the preceding accepted release. [Findings and limitations](benchmarks/font-decode-2026-11-01.md)
+and [compact receipt](benchmarks/font-decode-2026-11-01.json.gz) retain the failed
+Manrope/precision/ligature trials, isolated diagnosis and corrected hint-table/
+feature-control checks. Full native text/tool, collection/fallback/optical,
+missing/intrinsic paint and remaining original roadmap acceptance stay required.

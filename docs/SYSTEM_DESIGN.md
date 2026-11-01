@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Complete private source-font decoding
+
+Font glyph preparation owns a disposable complete WOFF2/Brotli decoder or native
+WOFF Deflate job under the existing queue/deadline/abort boundary. Validate original
+fingerprints, selected-font directory, full checksums, source identity and native
+load before private SFNT/selector publication. Cache complete checked source SFNT
+only with its captured glyph owner; retire cached bytes and children on release.
+Original compressed public records never change. Preserve GSUB/GPOS/GDEF for
+native hint classification and disable private-face features for resolved paint.
+[Contract, limits and remaining scope](FLOAT_TEXT.md#complete-compressed-font-preparation-private).
+
 ## Native font selection before private shaping
 
 Capture immutable numeric weight/width and source descriptors separately from

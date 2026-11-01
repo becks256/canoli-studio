@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "profile": "WOFF2 complete decoder; Brotli 1.2.1; memory-only, original tables/hints retained",
+  "sourceRevisions": {
+    "emsdk": "62a853cd3b3134398ce85cde8bb5cbb2ef0194cb",
+    "woff2": "7b67e12355fe7da148db5c19d4261f0a498a9537",
+    "brotli": "db24a98aed38a16de78cc05ca15cdd8dc2a0d92d"
+  },
+  "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.10 (b7dc6e5747465580df5984e723b9d1f10d8e804b)",
+  "commands": [
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/common/constants.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-constants.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/common/context.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-context.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/common/dictionary.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-dictionary.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/common/platform.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-platform.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/common/shared_dictionary.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-shared_dictionary.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/common/transform.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-transform.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/dec/bit_reader.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-bit_reader.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/dec/decode.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-decode.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/dec/huffman.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-huffman.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/dec/prefix.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-prefix.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/dec/state.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-state.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/emcc",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "-c",
+      "/tmp/canoli-font-decode-2026-11-01/brotli/c/dec/static_init.c",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-static_init.o"
+    ],
+    [
+      "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/em++",
+      "-std=c++17",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-Oz",
+      "-flto",
+      "-DNDEBUG",
+      "-I/tmp/canoli-font-decode-2026-11-01/woff2/include",
+      "-I/tmp/canoli-font-decode-2026-11-01/woff2/src",
+      "-I/tmp/canoli-font-decode-2026-11-01/brotli/c/include",
+      "--no-entry",
+      "-sMODULARIZE=1",
+      "-sEXPORT_ES6=1",
+      "-sEXPORT_NAME=createFontDecoder",
+      "-sENVIRONMENT=web,worker",
+      "-sFILESYSTEM=0",
+      "-sEXPORTED_FUNCTIONS=[\"_malloc\", \"_free\", \"_canoli_woff2_decode\", \"_canoli_font_data\", \"_canoli_font_size\", \"_canoli_font_release\"]",
+      "-sEXPORTED_RUNTIME_METHODS=[\"HEAPU8\"]",
+      "-sINITIAL_MEMORY=16777216",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sABORTING_MALLOC=0",
+      "-o",
+      "/tmp/canoli-font-decode-2026-11-01/build/canoli_font_decoder.js",
+      "/home/kestrel/projects/luma-editor/src/fonts/decode-codec/bridge.cc",
+      "/tmp/canoli-font-decode-2026-11-01/woff2/src/table_tags.cc",
+      "/tmp/canoli-font-decode-2026-11-01/woff2/src/variable_length.cc",
+      "/tmp/canoli-font-decode-2026-11-01/woff2/src/woff2_common.cc",
+      "/tmp/canoli-font-decode-2026-11-01/woff2/src/woff2_dec.cc",
+      "/tmp/canoli-font-decode-2026-11-01/woff2/src/woff2_out.cc",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-constants.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-context.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-dictionary.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-platform.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-shared_dictionary.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/common-transform.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-bit_reader.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-decode.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-huffman.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-prefix.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-state.o",
+      "/tmp/canoli-font-decode-2026-11-01/build/dec-static_init.o"
+    ]
+  ],
+  "sourceFiles": {
+    "scripts/build-font-decoder.py": "cb9998484dc08b3365ad5f21f82644170045c090f5644bc77699a7962743834c",
+    "src/fonts/decode-codec/bridge.cc": "e2a7c9726bd1fa13a9433661c39ec8571fe132585c765f8c49576280c2df78b0"
+  },
+  "artifacts": {
+    "canoli_font_decoder.js": {
+      "bytes": 8893,
+      "sha256": "d37937d1b7e2e2946f1579e097e00833b1dae20114e80f797ef9925d2f0a7667"
+    },
+    "canoli_font_decoder.wasm": {
+      "bytes": 191608,
+      "sha256": "e7236f2b169c6bbf492799d7d005cc2cc6ad150795153f88bdfcb4f63b657970"
+    }
+  },
+  "limits": "No wrapper source/output size tier; writer max is native size_t. Upstream format/compression-ratio validation and actual WASM/browser memory remain. Host controls time and cancellation."
+}

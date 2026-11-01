@@ -1,0 +1,61 @@
+{
+  "license": "CC0-1.0; original geometric artwork and hint programs",
+  "references": {
+    "Hinted": "compressed-font/Hinted.ttf",
+    "Shaping": "shaping-font/Shaping.ttf",
+    "Variable": "css-font/Css.ttf",
+    "CFF": "fonts/CFF.otf",
+    "Hinted-hmtx": "compressed-font/Hinted.ttf",
+    "Hinted-null": "compressed-font/Hinted.ttf"
+  },
+  "files": {
+    "CFF.woff": {
+      "bytes": 760,
+      "sha256": "cc11ccd6b7ba8423cb7466d1ab0e1b8d20b0b783a5e9335757924ee26597359e"
+    },
+    "CFF.woff2": {
+      "bytes": 444,
+      "sha256": "53d98c3d982b2ec510ee9563ac7198c56edc538784de2d83f84e0a9e1b7d3d18"
+    },
+    "FeatureGuard.woff2": {
+      "bytes": 484,
+      "sha256": "93813c7aaa3c3f717f3a5fd4ad34bc01246a3f7d9408c040ea4461b08fcb819e"
+    },
+    "Hinted-hmtx.woff2": {
+      "bytes": 448,
+      "sha256": "56b9265e787de112f53886ae1ca3af716362c4ec3b00a2b4f34ada86a3a36141"
+    },
+    "Hinted-null.woff2": {
+      "bytes": 448,
+      "sha256": "b72c1f7fd06f430e334ac6c7cf90e8530ec5a90891f1be3fefa82cafb25861ae"
+    },
+    "Hinted.ttf": {
+      "bytes": 1044,
+      "sha256": "81ac3f15d60189ebb05b979613ed47bb3ad5982f0c3a1d824b8e16ec5ad28cc3"
+    },
+    "Hinted.woff": {
+      "bytes": 864,
+      "sha256": "00956a5de29083c2a508d9cc60720365c2c4806f17f9c5f5bd16024472cd2856"
+    },
+    "Hinted.woff2": {
+      "bytes": 444,
+      "sha256": "531646133024596dcaeb79c313f20c1fb29a2d85dd5ce1fff7cfeb4e5b76384a"
+    },
+    "Shaping.woff": {
+      "bytes": 1532,
+      "sha256": "1084920cf1e662cb9c7a40a4c466976a4b684374e61d25fbe3942ef459c57da4"
+    },
+    "Shaping.woff2": {
+      "bytes": 884,
+      "sha256": "fcf3e566534c58b1ae88d8d190ad5b13814f9c5ccee7422a8ea77862546c3c2c"
+    },
+    "Variable.woff": {
+      "bytes": 1228,
+      "sha256": "ef7e458a07b2e21e5e72f179607784ff77d8c4bed3b319e6faebfe8306f225e3"
+    },
+    "Variable.woff2": {
+      "bytes": 720,
+      "sha256": "d9d70b16e9fd0e72598718f144253030ca2d4d6c115cb2e2dab7f6c93089fd3c"
+    }
+  }
+}

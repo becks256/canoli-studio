@@ -10614,3 +10614,56 @@ CSS/bidi/script/font fallback, compressed/missing/intrinsic paint, SVG/path/
 vertical matching, connected float TextLayer tools/scenes/export/shared transport/
 persistence and every unfinished original professional-editor/device/performance
 gate remain required. The complete original roadmap stays active.
+
+### 2026-11-01 — F08/F10 complete private compressed-font preparation
+
+Previous goal turn: progress, native CSS matching accepted at 58c67e6. The complete
+original roadmap remains active. Captured glyph fonts now prepare complete
+selected WOFF/WOFF2 SFNT data, including hint programs, composites, original
+layout, variable metrics and transform modes. Original public source bytes,
+registrations/appearance, source/model/history and transport remain. Existing
+queue/leases/deadline/cancellation bracket complete checked private decoding,
+native loading and selector preparation; cached complete SFNT feeds later shaping
+and retires with its owner. No paid calls, public schema, scripting/plugin/REST
+service or image-size limit is added. [Contract](FLOAT_TEXT.md#complete-compressed-font-preparation-private).
+
+The full Manrope check exposed a 13 px ligature mismatch despite exact decoded
+source data. Isolated native clusters localized it to an unencoded fi glyph.
+Finer shaping precision and optional-ligature trials did not fix it and are
+reverted. Retaining original GSUB/GPOS/GDEF while disabling private face features
+fixes native hinting and all full-font checks without widening pixel assertions.
+A single-glyph substitution control proves resolved paint cannot reapply shaping.
+The 18-case compressed/native/fault/float pilot passes; independent FontTools
+checks verify complete instructions/points/composites/metrics and unchanged
+untransformed tables. Final broad build/unit/native/production verification follows.
+
+Full compressed collection selection, every native/legacy font case, bidi/script/
+fallback/optical selection, missing/intrinsic paint, SVG/path/vertical matching,
+complete float TextLayer authoring/rendering/export/shared transport/persistence
+and all unfinished original professional-editor/quality/device/performance gates
+remain required. Full native float text admission remains gated.
+
+### 2026-11-01 — F08/F10 complete compressed source and native hinting verified
+
+Full build/typecheck and 3,392 unit/API tests across 335 files pass. A single
+66-case affected native run and seven production checks pass. Independent
+FontTools verifies 17 full outputs, including four emitted production files:
+587 glyphs, 140 composites and 9,810 instruction bytes, with exact original
+untransformed tables/cmap/metrics. Seventy-two complete native runs cover fixture
+transform modes, hinted/composite/CFF/variable/layout data and full pinned fonts.
+The isolated Manrope 13 px failure is corrected by retaining GSUB/GPOS/GDEF for
+hint classification and disabling private features, without widened pixels or
+changed native layout. Source substitution/capability controls, queue/lease/cache
+lifetime, corrupt/abort/timeout retry, actual HDR/tiny-alpha paint and exact window
+words pass. The ordinary 50 MP workflow preserves original identity and every
+sample in its independent 600 × 200 reference region; full PNG bytes match the
+preceding accepted release. This is not full 50 MP pixel/float text acceptance.
+
+[Findings and remaining scope](benchmarks/font-decode-2026-11-01.md) and
+[compact source/release/raw-run/reference receipt](benchmarks/font-decode-2026-11-01.json.gz)
+retain the trials and successful checks. Full collection/native/legacy font
+coverage, bidi/script/fallback/optical selection, missing/intrinsic paint,
+SVG/path/vertical matching, connected float TextLayer authoring/scenes/export/
+shared transport/persistence and every unfinished original quality/device/
+performance/professional-editor gate remain required. The original roadmap stays
+active; no public source/model/grant or REST/browser synchronization changes.

@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Private compressed native font sources
+
+Prepare complete selected WOFF/WOFF2 tables and instructions before native glyph
+selection. Preserve original compressed sources and shared model/command/history/
+transport contracts. Check complete output structure/checksums/source identity,
+source/parent lifetime and native validity before private publication; retire
+cancelled/failed workers and registrations. Retain hint-classification tables
+without reapplying source shaping. Full text admission and broader native font,
+layout, color/missing glyph and device/performance acceptance remain required.
+[Current private contract](FLOAT_TEXT.md#complete-compressed-font-preparation-private).
+
 ## Private CSS font-instance matching
 
 Retain numeric and relative native weight intent, font width and selected source
