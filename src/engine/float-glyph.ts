@@ -1,3 +1,4 @@
+import {snapshotGlyphPath,type NativeGlyphPath} from './native-glyph-path';
 import {AffineTransform} from '../core/affine';
 import {characterFormatSchema,DEFAULT_CHARACTER_FORMAT,type CharacterFormat} from '../core/character-format';
 import {validateWindow,type FloatSourceWindow} from '../core/float-source/types';
@@ -15,6 +16,8 @@ export interface FloatGlyph {
  readonly font:NativeGlyphFont;readonly glyphId:number;
  readonly surface?:'svg';
  readonly origin?:Readonly<{x:number;y:number}>;
+ readonly rotation?:number;
+ readonly path?:Readonly<NativeGlyphPath>;
  readonly paintFontSize?:number;
  readonly style:Pick<CharacterFormat,'fontSize'|'fontWeight'|'fontStyle'|'fontStretch'>;
  readonly transform:AffineTransform;readonly color:LinearTextColor;
@@ -42,7 +45,7 @@ export const renderFloatGlyphCoverage:FloatGlyphCoverage=async(glyph,input,check
 /** Ordered per-glyph native linear source-over; whole-text union alpha cannot
  * substitute for these independently owned paint primitives. */
 export async function renderFloatGlyphs(input:readonly FloatGlyph[],window:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,check:()=>void,coverage:FloatGlyphCoverage=renderFloatGlyphCoverage):Promise<Float32Array>{
- const area=validateWindow({...window}),glyphs=input.map(glyph=>{const origin=glyph.origin?Object.freeze({...glyph.origin}):undefined;if(glyph.paintFontSize!==undefined&&(!Number.isFinite(glyph.paintFontSize)||glyph.paintFontSize<=0)||origin&&![origin.x,origin.y].every(Number.isFinite)||glyph.surface!==undefined&&glyph.surface!=='svg')throw new Error('Invalid native glyph paint placement.');const style=characterFormatSchema.parse({...DEFAULT_CHARACTER_FORMAT,...glyph.style}),color=Array.from(glyph.color,Math.fround);if(color.length!==4||color.some(v=>!Number.isFinite(v))||color[3]<0||color[3]>1)throw new Error('Native glyph paint requires finite linear RGB and alpha in [0,1].');return Object.freeze({...glyph,...(origin?{origin}:{}),style:Object.freeze(style),color:Object.freeze(color)as unknown as LinearTextColor,transform:AffineTransform.fromJSON(glyph.transform)});});
+ const area=validateWindow({...window}),glyphs=input.map(glyph=>{const origin=glyph.origin?Object.freeze({...glyph.origin}):undefined;if(glyph.path&&glyph.surface!=='svg'||glyph.rotation!==undefined&&(!Number.isFinite(glyph.rotation)||glyph.surface!=='svg')||glyph.paintFontSize!==undefined&&(!Number.isFinite(glyph.paintFontSize)||glyph.paintFontSize<=0)||origin&&![origin.x,origin.y].every(Number.isFinite)||glyph.surface!==undefined&&glyph.surface!=='svg')throw new Error('Invalid native glyph paint placement.');const style=characterFormatSchema.parse({...DEFAULT_CHARACTER_FORMAT,...glyph.style}),color=Array.from(glyph.color,Math.fround);if(color.length!==4||color.some(v=>!Number.isFinite(v))||color[3]<0||color[3]>1)throw new Error('Native glyph paint requires finite linear RGB and alpha in [0,1].');return Object.freeze({...glyph,...(glyph.path?{path:snapshotGlyphPath(glyph.path)}:{}),...(origin?{origin}:{}),style:Object.freeze(style),color:Object.freeze(color)as unknown as LinearTextColor,transform:AffineTransform.fromJSON(glyph.transform)});});
  const fonts=[...new Set(glyphs.map(glyph=>glyph.font))];const current=()=>{check();for(const font of fonts)font.check();};current();for(const glyph of glyphs){glyph.font.character(glyph.glyphId);if(!glyph.font.monochrome)throw new Error('Float glyph paint requires intrinsic color-font integration.');}let output:Float32Array=new Float32Array(area.width*area.height*4);
  for(const glyph of glyphs){current();if(!glyph.color[3])continue;const mask=await coverage(glyph,area,current);current();validateFloatAlpha(mask,area.width*area.height);const source=new Float32Array(output.length);let deadline=performance.now()+2;
   for(let i=0;i<mask.length;i++){if(mask[i]){const p=i*4;source[p]=glyph.color[0];source[p+1]=glyph.color[1];source[p+2]=glyph.color[2];source[p+3]=glyph.color[3]*mask[i];}if((i&511)===0&&performance.now()>=deadline){current();await yieldTask();current();deadline=performance.now()+2;}}

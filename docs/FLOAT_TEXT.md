@@ -297,7 +297,8 @@ family/explicit axis instance. The plan must have requested `captureLinearPaint`
 Original chunks remain whole: no per-character tspan rewriting, bitmap RGB
 flattening or document mutation is introduced. Native UTF-16 addressing must
 cover the source exactly. Mixed styles, missing/fallback glyphs, intrinsic color,
-path/vertical geometry and other unsupported addressing return unavailable.
+vertical geometry and other unsupported addressing return unavailable. Uniform
+horizontal paths use the baseline dependency below.
 
 Original HarfBuzz supplies glyph IDs and within-cluster offsets. Captured native
 character metadata supplies cluster baselines, including native alignment and
@@ -339,8 +340,61 @@ up on success and failure; returned fields have independent storage.
 
 This is a renderer bridge for verified captured source lines. It does not admit
 float TextLayer or enable its tool. Full styled/bidi/script/font fallback,
-missing/intrinsic paint, path/vertical layouts, complete scene/tool/export/shared
+missing/intrinsic paint, broader path/vertical layouts, complete scene/tool/export/shared
 transport/persistence and all unfinished original acceptance gates remain.
+
+## Native baseline glyph paint (private)
+
+Captured uniform horizontal source lines can retain native path glyph rotation,
+line placement, original/reversed/closed baselines, authored start/baseline offsets,
+alignment, RTL ligature ranges and native off-path visibility. Source glyph IDs
+and within-cluster positioning still come from the complete original font run.
+Entirely hidden native path clusters supply no paint primitives. Character
+metadata alone never authorizes publication: complete original/candidate ink at
+opacities 1 and 0.5 must still match exactly.
+
+Rounded path-caret positions do not recover every original paint transform.
+Private `paint.pathCharacters` captures an additional whole-source straight
+textPath with identical spans/fonts and native path itemization. Its returned
+positions have left alignment in the native user plane; the original source
+line, markup and native appearance remain intact. The additional probe is removed
+before source serialization. The ordinary byte renderer requests neither this
+probe nor other linear paint metadata.
+
+`native-svg-path.ts` recovers native inline units from this metadata and measures
+candidate SVG advances independently. Original glyph offsets and cluster advances
+place each candidate on the original path; the native path backend supplies the
+rotation and clipping. Center alignment retains half-unit placement. The checked
+screen-font projection uses native 1/64 units and Float32 path arithmetic as
+observed on the verified Chromium host. Other hosts or unsupported layouts may
+refuse a match; every published candidate still requires exact full ink equality.
+No coordinates or axes are fitted from verification pixels.
+
+Private `FloatGlyph.rotation` carries finite native SVG degrees. Optional
+`FloatGlyph.path` retains immutable derived SVG path data, startOffset and
+baselineOffset; `origin` is then a local translation of that baseline glyph.
+These values require `surface:"svg"` and snapshot before asynchronous work.
+They are renderer data, not public path constructors or isolated mutation DTOs.
+Baseline strings and serialized path definitions are shared across glyphs.
+Preparation yields between bounded groups, checks each distinct font owner,
+and retains source/parent/image/URL/measurement lifetimes throughout.
+
+Seven source/instance fixtures currently pass 84 complete curve combinations,
+including CFF, compressed/variable/optical sources and full Manrope. Eighteen
+additional reflected RTL/closed/clipped cases and twelve actual Float32 runs
+match independent original-font curve coverage at three alphas, including 1e-8,
+with exact partition words. Fault checks cover abort, host removal and nonfinite
+unfolded metadata. Full build/typecheck, 3,399 unit/API tests, 148 affected native
+cases and twelve production cases pass. Independent external decoding matches
+all 200,000,000 RGBA samples of the ordinary 50 MP curve regression, retaining
+source identity and identical complete PNGs. This is ordinary byte acceptance,
+not admitted Float32 TextLayer editing.
+[Verification and remaining scope](benchmarks/svg-path-glyph-2026-11-01.md).
+
+This dependency does not enable float TextLayer or its tool. Mixed styles, full
+bidi/script/font fallback, missing/intrinsic paint, vertical layout, universal
+native/legacy/optical extents and hosts, connected scene/tool/export/shared
+transport/persistence and every unfinished original roadmap gate remain required.
 
 ## Required native paint work
 

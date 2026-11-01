@@ -1,5 +1,6 @@
 import {AffineTransform} from '../core/affine';
 import type {FloatGlyph} from './float-glyph';
+import {snapshotGlyphPath} from './native-glyph-path';
 import type {NativeGlyphRunInput,NativeGlyphMatch} from './native-glyph-match';
 import type {NativeSvgGlyphMatch} from './native-svg-glyph';
 import type {FloatSourceWindow} from '../core/float-source/types';
@@ -75,6 +76,7 @@ export interface StyledTextCharacterGeometry {
   readonly rotation:number;
 }
 export interface StyledTextNativePaint {
+  readonly pathCharacters:readonly (readonly StyledTextCharacterGeometry[]|null)[];
   readonly colors:readonly (readonly LinearTextColor[])[];
   readonly characters:readonly (readonly StyledTextCharacterGeometry[])[];
 }
@@ -182,7 +184,7 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
   };
   let plan:StyledTextPlan;
   const renderGlyphs=async(input:readonly FloatGlyph[],window:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,current:()=>void=()=>{}):Promise<Float32Array>=>{
-    const primitives=input.map(glyph=>({...glyph,...(glyph.origin?{origin:Object.freeze({...glyph.origin})}:{}),style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
+    const primitives=input.map(glyph=>({...glyph,...(glyph.path?{path:snapshotGlyphPath(glyph.path)}:{}),...(glyph.origin?{origin:Object.freeze({...glyph.origin})}:{}),style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
     const active=()=>{check();current();check();};active();if(primitives.some(glyph=>!glyphs.has(glyph.font)))throw new Error('The glyph primitive is outside this captured text source.');
     const {renderFloatGlyphs}=await import('./float-glyph');active();return renderFloatGlyphs(primitives,area,processor,active);
   };
@@ -222,7 +224,7 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
     const metrics=Object.freeze(elements.map(({text,line,path})=>{const box=text.getBBox(),advance=text.getComputedTextLength(),pathLength=path?.getTotalLength();if(![box.x,box.y,box.width,box.height,advance].every(Number.isFinite))throw new Error('The native styled-text geometry is not finite.');if(pathLength!==undefined&&(!Number.isFinite(pathLength)||pathLength<=0))throw new Error('Native text requires a finite, positive baseline length.');return Object.freeze({advance,ink:Object.freeze({x:box.x+(path?line.x:0),y:box.y+(path?line.y:0),width:box.width,height:box.height}),...(pathLength===undefined?{}:{pathLength})});}));
     let paint:StyledTextNativePaint|undefined;
     if(linear){
-      const characters:(readonly StyledTextCharacterGeometry[])[]=[],colors:(readonly LinearTextColor[])[]=[];let offset=0;
+      const characters:(readonly StyledTextCharacterGeometry[])[]=[],pathCharacters:(readonly StyledTextCharacterGeometry[]|null)[]=[],colors:(readonly LinearTextColor[])[]=[];let offset=0;
       for(const {text,line} of elements){
         colors.push(Object.freeze(linear.slice(offset,offset+line.spans.length)));offset+=line.spans.length;
         if(['getNumberOfChars','getStartPositionOfChar','getEndPositionOfChar','getExtentOfChar','getRotationOfChar'].some(name=>typeof (text as unknown as Record<string,unknown>)[name]!=='function'))throw new Error('Native text character geometry is unavailable.');
@@ -235,8 +237,12 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
           if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
         }
         characters.push(Object.freeze(current));
+        if(line.path){
+          const flat=text.cloneNode(true)as SVGTextElement,content=flat.querySelector('textPath')!,defs=globalThis.document.createElementNS(SVG_NS,'defs'),path=globalThis.document.createElementNS(SVG_NS,'path'),id='canoli-unfolded-path-'+pathCharacters.length;path.setAttribute('id',id);path.setAttribute('d',`M0 0H${Math.max(64,text.getComputedTextLength()+64)}`);defs.append(path);svg.prepend(defs);content.setAttribute('href','#'+id);content.setAttribute('startOffset','0');flat.setAttribute('text-anchor',line.direction==='ltr'?'start':'end');flat.removeAttribute('transform');flat.removeAttribute('dx');flat.removeAttribute('dy');flat.setAttribute('x','0');flat.setAttribute('y','0');group.append(flat);
+          try{const count=flat.getNumberOfChars();check();if(count!==current.length)throw new Error('Unfolded native path addressing differs from its source.');const unfolded:StyledTextCharacterGeometry[]=[];for(let index=0;index<count;index++){check();const a=flat.getStartPositionOfChar(index);check();const b=flat.getEndPositionOfChar(index);check();const box=flat.getExtentOfChar(index);check();const rotation=flat.getRotationOfChar(index);check();if(![a.x,a.y,b.x,b.y,box.x,box.y,box.width,box.height,rotation].every(Number.isFinite)||box.width<0||box.height<0)throw new Error('Unfolded native path geometry is invalid.');unfolded.push(Object.freeze({index,start:Object.freeze({x:a.x,y:a.y}),end:Object.freeze({x:b.x,y:b.y}),extent:Object.freeze({x:box.x,y:box.y,width:box.width,height:box.height}),rotation}));if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}}pathCharacters.push(Object.freeze(unfolded));}finally{flat.remove();defs.remove();}
+        }else pathCharacters.push(null);
       }
-      paint=Object.freeze({colors:Object.freeze(colors),characters:Object.freeze(characters)});
+      paint=Object.freeze({pathCharacters:Object.freeze(pathCharacters),colors:Object.freeze(colors),characters:Object.freeze(characters)});
     }
     const definitions=await fonts.definitions(check);check();
     markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);

@@ -45,6 +45,11 @@ it('invalid coverage, retired owners, unsupported intrinsic color and malformed 
  await expect(renderFloatGlyphs([{...primitive([1,0,0,1]),font:{...font,monochrome:false}}],area,processor,()=>{})).rejects.toThrow('intrinsic color-font');
  let cancelled=false;await expect(renderFloatGlyphs([primitive([1,0,0,1])],area,processor,()=>{if(cancelled)throw new Error('Owner retired');},async()=>{cancelled=true;return new Float32Array([1]);})).rejects.toThrow('Owner retired');
 });
+it('resolved native baselines and rotations snapshot before coverage and reject invalid paint',async()=>{
+ const path={data:'M24 150C100 30 340 30 420 150',startOffset:210,baselineOffset:-7},source={...primitive([4,-.25,1.5,.5]),surface:'svg'as const,path,rotation:12};let captured=false;
+ const actual=await renderFloatGlyphs([source],area,processor,()=>{},async glyph=>{path.data='M0 0H1';path.startOffset=999;source.rotation=90;captured=glyph.path!.startOffset===210&&glyph.path!.data==='M24 150C100 30 340 30 420 150'&&Object.isFrozen(glyph.path)&&glyph.rotation===12;return new Float32Array([1]);});expect(captured).toBe(true);expect(actual).toEqual(new Float32Array([4,-.25,1.5,.5]));
+ for(const bad of [{...source,rotation:NaN},{...source,surface:undefined},{...source,path:{...path,startOffset:Infinity}},{...source,path:{...path,baselineOffset:NaN}},{...source,path:{...path,data:''}}])await expect(renderFloatGlyphs([bad],area,processor,()=>{},async()=>new Float32Array([1]))).rejects.toThrow();
+});
 
 it('never overwrites existing private Unicode mappings when choosing glyph selectors',async()=>{
  const original=compileGlyphSelectors(new Uint8Array(await readFile('tests/fixtures/fonts/Regular.ttf'))),next=compileGlyphSelectors(original.bytes);validateGlyphSelectors(original.bytes,next);const font=create(next.bytes)as Font;

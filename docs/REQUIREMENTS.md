@@ -11,6 +11,15 @@ workers, font readers, images, URLs and measurement hosts. This does not enable
 the public float text tool or expand source/model/isolated/REST authority.
 [Current contract and limits](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
 
+Curved horizontal lines must preserve original/reversed/closed baselines,
+native glyph rotation, authored offsets, alignment, RTL ligature ranges and
+off-path visibility. Preserve whole-source textPath itemization during native
+metadata capture. Native baseline replay must retain shared path data, finite
+immutable poses and source-linear Float32 composition across caller windows;
+exact complete native ink remains the publication gate. Native probe retirement
+or cancellation between reads must reject and permit a healthy retry.
+[Private baseline contract and verification](FLOAT_TEXT.md#native-baseline-glyph-paint-private).
+
 ## Private compressed native font sources
 
 Prepare complete selected WOFF/WOFF2 tables and instructions before native glyph

@@ -13,6 +13,16 @@ resources on every terminal path. No public float text admission, source/model
 schema or external grant changes.
 [Contract and remaining work](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
 
+Horizontal baseline decomposition retains whole native textPath items. Capture
+their unfolded inline metadata using another whole-source textPath, independently
+measure candidate SVG advances, and replay original baseline geometry before
+complete ink verification. Keep original glyph IDs/GPOS, source paint order and
+off-path visibility. Share immutable derived path strings across glyphs; no
+pixel-based coordinate fitting or bitmap RGB flattening is involved. The private
+native-unit projection remains guarded by exact native equality; wider native
+hosts, full text admission and remaining typography gates are still required.
+[Baseline contract](FLOAT_TEXT.md#native-baseline-glyph-paint-private).
+
 ## Complete private source-font decoding
 
 Font glyph preparation owns a disposable complete WOFF2/Brotli decoder or native

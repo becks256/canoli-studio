@@ -2,15 +2,24 @@
 
 ## Captured native SVG glyph paint
 
-Captured text plans can match a uniform horizontal source line to source-owned
+Captured text plans can match a uniform horizontal source line, including a
+native curved baseline, to source-owned
 SVG glyph primitives and linear Float32 color. Retain whole native chunks,
 complete temporary font data, native cluster metadata and original glyph IDs.
 Verify complete native/candidate union ink before publication. Private nominal
 metrics and native advances handle a separate screen-font projection; they are
 not document mutation or external scripting/REST surfaces. Parent cancellation,
 font/read/image/URL/measurement lifetimes apply throughout. Full float text,
-mixed/path/vertical/fallback/intrinsic work remains required.
+mixed/vertical/fallback/intrinsic work remains required.
 [Contract and limits](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
+
+Path decomposition retains original GIDs, native rotation, off-path visibility
+and line placement. A whole-source straight textPath probe preserves native
+typographic itemization; `native-svg-path.ts` combines its native inline metrics
+with independent candidate SVG advances and original GPOS for baseline replay.
+Complete original/candidate ink equality still gates publication. Immutable
+derived baseline strings are shared across glyphs, with bounded preparation and
+source/parent checks. [Private baseline contract](FLOAT_TEXT.md#native-baseline-glyph-paint-private).
 
 ## Private automatic optical font instances
 

@@ -10788,3 +10788,66 @@ export/shared transport/persistence and every unfinished original quality/device
 performance/professional-editor gate remain required. The complete original
 roadmap stays active. No public mutation, schema, grant or REST/browser session
 synchronization contract changes.
+
+### 2026-11-01 — F08/F10 native baseline glyph decomposition in progress
+
+Previous goal turn: progress, captured horizontal SVG source-line paint accepted
+at af21389. The complete original roadmap remains active. Uniform horizontal
+source lines now retain curved-path rotation, line placement, reversed baselines
+and native off-path visibility during private glyph decomposition. Whole original
+chunks and complete source-font identity remain; exact native/candidate ink at
+opacities 1 and 0.5 still gates publication. Ordinary byte text skips this work.
+
+The first curve matrix matched 39 of 48 complete lines. Native hidden-character
+metadata fixed clipped path ends, while midpoint and matrix-only rotation
+representations did not fix all native placement differences. Replaying original
+baselines fixed several cases. An unfolded plain-text probe still differed:
+native textPath retains different typographic itemization. A whole-source straight
+textPath probe now retains that context and supplies native inline metadata;
+source-owned candidate SVG advances and original GPOS supply per-glyph baseline
+replay. No source text is split and no coordinates are fitted from verification
+pixels. All 48 original curve cases now match exactly, including complete Manrope,
+TTF/WOFF2, ligatures, combining marks, alignment and affine/reversed placement.
+
+Expanded RTL/closed/clipped/reflected/variable/optical/CFF cases, original-font
+Float32 coverage and cancellation checks are under verification. Full native
+style/bidi/script/fallback/missing/intrinsic/vertical coverage, native/legacy/host
+extents, connected float TextLayer authoring/scenes/export/shared transport/
+persistence, sustained device/performance/quality and every other unfinished
+original professional-editor gate remain required. No public constructor,
+mutation, schema, grant, REST/browser synchronization or original-resolution
+policy changes are introduced.
+
+### 2026-11-01 — F08/F10 native baseline glyph dependency verified
+
+Full build/typecheck and 3,399 unit/API tests across 336 files pass. One complete
+148-case affected native run across twelve files and twelve production cases
+pass. The added suite retains 84 complete font/layout matches, 18 reflected
+direction/path-end cases and twelve independent original-font Float32 runs at
+three alphas, including 1e-8. Original GIDs/ligatures/marks, reversed/closed
+baselines, clipping, offsets, HDR RGB, once-only alpha and exact partition words
+survive. Abort, host removal and nonfinite unfolded metadata reject, retire
+probes and permit retry. The expanded pilot exposed a missing lifetime check
+between native reads; the fixed complete run retains the original expectation.
+Emitted baseline coverage matches original-font pixels under identity, affine
+and reflected transforms with a prepared fixture adapter; complete source
+ownership/itemization/matching is verified in the native source matrix.
+
+Independent Pillow decoding compares all 200,000,000 RGBA samples of the ordinary
+10,000 × 5,000 curved-text output with a complete independently authored native
+SVG reference. Every sample and both complete PNG files match; original PNG
+identity and model remain intact. The separate 50 MP RAW/variable-font workflow
+retains its 100,000,672-byte original, exact independent 600 × 200 text region
+and preceding accepted complete PNG bytes. Neither establishes admitted Float32
+TextLayer authoring or universal native typography.
+
+[Findings and limits](benchmarks/svg-path-glyph-2026-11-01.md) and the
+[compact source/release/raw-run/reference receipt](benchmarks/svg-path-glyph-2026-11-01.json.gz)
+retain failed/corrected rotation, midpoint, plain-unfolded and native-path pilots.
+Full styled/bidi/script/font fallback, missing/intrinsic paint, vertical and
+broader path layouts, complete native/legacy/optical extents and hosts, connected
+float TextLayer authoring/scenes/export/shared transport/persistence, and every
+unfinished original professional-editor/device/quality/performance gate remain
+required. The complete original roadmap stays active. No public mutation,
+schema, grant, ordinary native appearance, source-resolution policy or
+REST/browser session synchronization contract changes.
