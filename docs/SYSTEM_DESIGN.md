@@ -1,5 +1,18 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native SVG source-line decomposition
+
+Treat native character rectangles as source geometry, never a glyph-ID oracle
+or sufficient paint proof. Retain original-source glyph IDs/within-cluster
+positioning and source-owned temporary SVG font data. Validate complete native
+and candidate union ink at opacity 1/0.5 before publication. Independently read
+nominal/native metrics when screen-font projection is needed; do not fit source
+geometry from reference pixels. Per-glyph canonical SVG alpha feeds existing
+ordered linear WASM composition. Abort parent-owned work and retire temporary
+resources on every terminal path. No public float text admission, source/model
+schema or external grant changes.
+[Contract and remaining work](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
+
 ## Complete private source-font decoding
 
 Font glyph preparation owns a disposable complete WOFF2/Brotli decoder or native

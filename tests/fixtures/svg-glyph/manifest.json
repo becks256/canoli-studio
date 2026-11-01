@@ -1,0 +1,27 @@
+{
+  "fontTools": "4.51.0",
+  "license": "SIL OFL 1.1; original license retained in LICENSE",
+  "sourcePackage": "@fontsource-variable/manrope@5.3.0",
+  "source": "node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2",
+  "sourceSha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+  "sourceGlyphCount": 280,
+  "referenceSelectorBase": 1048576,
+  "featuresDisabled": [
+    "calt",
+    "dnom",
+    "frac",
+    "kern",
+    "liga",
+    "locl",
+    "numr",
+    "pnum",
+    "tnum"
+  ],
+  "reference": {
+    "file": "Manrope-glyphs.ttf",
+    "bytes": 63604,
+    "sha256": "d9d905e7e2689a3d001a535de7d4bc3ba3393b320fb03e24afb2899d909129d5"
+  },
+  "originalMappings": 218,
+  "allOriginalTablesRetained": true
+}

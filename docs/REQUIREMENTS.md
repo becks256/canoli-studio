@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Private captured SVG line matching
+
+Preserve complete source shaping chunks, native alignment/cluster baselines and
+original font IDs while decomposing verified horizontal SVG glyph paint. Compare
+all original and candidate ink at two opacities; never publish mismatched or
+unsupported primitives. Keep source-linear color/alpha separate from scalar
+coverage and preserve native Float32 composition. Cancel/retire parent-owned
+workers, font readers, images, URLs and measurement hosts. This does not enable
+the public float text tool or expand source/model/isolated/REST authority.
+[Current contract and limits](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
+
 ## Private compressed native font sources
 
 Prepare complete selected WOFF/WOFF2 tables and instructions before native glyph

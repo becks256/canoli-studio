@@ -10721,3 +10721,70 @@ scenes/export/shared transport/persistence and every unfinished original
 professional-editor/device/quality/performance gate remain required. The complete
 original roadmap stays active. Public sources/model/grants and ordinary native
 registrations/appearance remain; no REST/browser synchronization is added.
+
+### 2026-11-01 — F08/F10 captured SVG source-line glyph paint in progress
+
+Previous goal turn: progress, automatic optical/native em-size capture accepted
+at 6ef81e0. The complete original roadmap stays active. Captured uniform horizontal
+SVG lines now connect original glyph IDs, native cluster metadata and source-linear
+colors to private SVG glyph fields. Original native chunks remain intact. Source
+and candidate reported geometry participate in fixed-cell whole-ink comparison
+at opacities 1 and 0.5; unsupported or mismatched cases return no paint primitives.
+Private font definitions retain complete checked SFNT sources and disabled resolved
+features. Parent release/abort now reaches image/font preparation as well as glyph
+workers. No public schema, ordinary appearance, shared command/grant, REST/browser
+synchronization or source-bearing persistence change is introduced.
+
+Initial Canvas-gated pilots exposed actual SVG/Canvas advance differences. Native
+SVG cluster anchoring and SVG glyph paint fixed the geometric fixtures, but one
+complete Manrope affine/center case exposed rounded caret positions. Equivalent
+matrix/local-origin representations and a separate native screen-font projection
+retain the hard case without widened pixels. Original nominal HarfBuzz metrics
+and independent native advances supply that projection; no axes or coordinates
+are fitted from reference pixels. Optical sources keep the native metadata modes.
+A new private nominal request returns cmap IDs/advances without GSUB/GPOS and keeps
+existing original-source queue/transfer/lifetime boundaries.
+
+The 18-case native/fault pilot, separate independent coverage and measurement
+fault checks pass. A licensed FontTools reference retains 280 original glyphs,
+54 composites and 218 original mappings with independent glyph selectors;
+GPOS/GSUB are equivalently recompiled. Exact HDR/tiny-alpha and window-word checks
+include the difficult screen-font case. Full build/unit, wider native/production
+and retained large-original acceptance follow below.
+
+This remains a private renderer bridge. Complete styled/bidi/script/font fallback,
+missing/intrinsic paint, path/vertical layouts, full native/legacy/optical extents
+and hosts, connected float TextLayer authoring/scenes/export/shared transport/
+persistence, and all unfinished original quality/device/performance/professional
+editor gates remain required. [Contract](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
+
+### 2026-11-01 — F08/F10 captured SVG source-line dependency verified
+
+Full build/typecheck and 3,398 unit/API tests across 336 files pass. One complete
+101-case affected native-browser run across nine files and 11 production checks
+pass. The added source matrix verifies 36 complete fixture lines and 12 complete
+RTL lines, including original ligature ranges, alignment and affine transforms.
+Exact whole-line alpha at 1 and 0.5 gates every published match. Independent
+FontTools reference coverage verifies the difficult screen-font path at source
+alphas 0.5, 0.64123012345 and 1e-8, including actual WASM signed/HDR RGB and exact
+Float32 partition words. The coverage reference uses separately verified poses;
+it does not independently derive native positioning. The emitted nominal worker
+and emitted SVG coverage module pass first-message/component checks with prepared
+fixture fonts; full source ownership is verified in the native source matrix.
+
+Abort, release, timeout, font-encoding/image-decode faults and invalid/retired
+measurement hosts clean up and permit retry. A corrupted glyph beyond the
+original line bounds cannot publish paint. The ordinary 50 MP workflow retains
+the original 100,000,672-byte source, an exact independent 600 × 200 reference
+region and the preceding accepted full PNG bytes. This does not establish full
+50 MP reference pixels or admitted float typography.
+
+[Findings and limits](benchmarks/svg-glyph-2026-11-01.md) and the
+[compact source/release/raw-run/reference receipt](benchmarks/svg-glyph-2026-11-01.json.gz)
+retain failed/corrected geometry and screen-font pilots. Full styled/bidi/script/
+font fallback, missing/intrinsic paint, path/vertical layouts, complete native/
+legacy/optical extents and hosts, connected float TextLayer authoring/scenes/
+export/shared transport/persistence and every unfinished original quality/device/
+performance/professional-editor gate remain required. The complete original
+roadmap stays active. No public mutation, schema, grant or REST/browser session
+synchronization contract changes.

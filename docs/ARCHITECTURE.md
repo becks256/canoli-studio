@@ -1,5 +1,17 @@
 # Architecture
 
+## Captured native SVG glyph paint
+
+Captured text plans can match a uniform horizontal source line to source-owned
+SVG glyph primitives and linear Float32 color. Retain whole native chunks,
+complete temporary font data, native cluster metadata and original glyph IDs.
+Verify complete native/candidate union ink before publication. Private nominal
+metrics and native advances handle a separate screen-font projection; they are
+not document mutation or external scripting/REST surfaces. Parent cancellation,
+font/read/image/URL/measurement lifetimes apply throughout. Full float text,
+mixed/path/vertical/fallback/intrinsic work remains required.
+[Contract and limits](FLOAT_TEXT.md#captured-horizontal-svg-lines-private).
+
 ## Private automatic optical font instances
 
 The source-font matcher captures original numeric size before asynchronous work

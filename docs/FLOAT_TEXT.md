@@ -1,5 +1,12 @@
 # Native float text — implementation in progress
 
+The captured horizontal SVG-line dependency is verified by 3,398 unit/API tests,
+101 affected native-browser cases and 11 production cases. The new source matrix
+contains 36 complete fixture lines and 12 complete RTL lines, plus lifecycle,
+refusal, independent glyph-coverage and exact Float32 partition checks. This is
+private groundwork; the float TextLayer/tool gates below still apply.
+[Verification and limits](benchmarks/svg-glyph-2026-11-01.md).
+
 TextLayer integration remains required for the full F08/F10 roadmap. Float
 documents still reject text and the text tool remains unavailable. The private
 color dependency below is implemented; it is not a public text-rendering API or
@@ -281,6 +288,60 @@ intrinsic-color paint, SVG/path/vertical matching, connected float TextLayer or
 broader performance/device/quality acceptance. [Rebuild pins, runtime, licenses
 and actual limits](../src/fonts/decode-codec/README.md).
 
+## Captured horizontal SVG lines (private)
+
+`StyledTextPlan.matchGlyphLine(font,lineIndex,control)` connects a captured
+uniform horizontal SVG line to its original-source glyph IDs and source-linear
+colors. The font must belong to that plan and match the line's single owned
+family/explicit axis instance. The plan must have requested `captureLinearPaint`.
+Original chunks remain whole: no per-character tspan rewriting, bitmap RGB
+flattening or document mutation is introduced. Native UTF-16 addressing must
+cover the source exactly. Mixed styles, missing/fallback glyphs, intrinsic color,
+path/vertical geometry and other unsupported addressing return unavailable.
+
+Original HarfBuzz supplies glyph IDs and within-cluster offsets. Captured native
+character metadata supplies cluster baselines, including native alignment and
+RTL ligature ranges. Those metrics do not alone prove glyph paint. Source-owned
+temporary SVG font definitions retain complete checked selector SFNT bytes,
+original native hint/layout context and disabled resolved-glyph features. The
+renderer compares the complete original SVG line against the complete candidate
+at opacities 1 and 0.5 on fixed world cells before publishing any primitives.
+The comparison domain includes both reported native and candidate SVG geometry; extra ink
+outside the original text box cannot evade verification. Only scalar alpha is
+read. Authored working RGB and alpha remain separately captured source values.
+
+SVG caret rectangles can round positions differently from actual glyph paint.
+Equivalent matrix/local-origin representations are checked without moving or
+reshaping authored text. A separate screen-font projection uses original nominal
+HarfBuzz advances, independently measured native advances and the backend's
+font-size projection. The nominal worker request adds private `nominal?:boolean`,
+default false: true returns cmap IDs/original horizontal advances in LTR source
+order, without substitutions/GPOS; non-LTR nominal requests reject. Original
+UTF-16 ranges, units, glyph identity, queue, deadline and transfer checks remain.
+It is an internal metric operation, not a scripting or REST method.
+
+The screen projection follows the font-size/position distinction documented in
+[Chromium SVG font scaling](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/layout/svg/layout_svg_inline_text.cc)
+and [SVG character queries](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/layout/svg/svg_text_query.cc).
+It currently applies only to sources without opsz; optical sources retain the
+native metadata representations. No coordinate/axis fitting from verification
+pixels or relaxed pixel threshold is used. Other native hosts/projections may
+refuse a match. Every mode still requires complete original SVG ink equality.
+
+Matched private FloatGlyphs can retain a native SVG surface, local baseline and
+computed paint font size independently of authored style. Canonical cell reads
+produce per-glyph alpha; actual WASM composes source-linear Float32 color/alpha
+in original paint order. The original source/style/model remains unchanged.
+Source definitions cache only for the captured glyph owner's lifetime. Parent
+release/abort interrupts queued/active glyph jobs, font encoding and image loads.
+Temporary readers, images, object URLs, native faces and measurement hosts clean
+up on success and failure; returned fields have independent storage.
+
+This is a renderer bridge for verified captured source lines. It does not admit
+float TextLayer or enable its tool. Full styled/bidi/script/font fallback,
+missing/intrinsic paint, path/vertical layouts, complete scene/tool/export/shared
+transport/persistence and all unfinished original acceptance gates remain.
+
 ## Required native paint work
 
 The current ordinary renderer uses whole-line Canvas text; character-formatted,
@@ -300,8 +361,8 @@ split looks unchanged. Those probes are design evidence, not a rendering
 fallback. A byte whole-text RGB flatten or silent glyph-opacity substitution
 must not be presented as the completed native float text path.
 
-The preparation owner retains whole shaping chunks; the next required step is
-a native paint decomposition that preserves those chunks and paint primitives. SVG typographic-character geometry is
+The preparation owner retains whole shaping chunks. Remaining native paint
+decomposition must preserve those chunks and paint primitives. SVG typographic-character geometry is
 defined by the [SVG 2 text specification](https://www.w3.org/TR/SVG/text.html);
 actual browser behavior must be checked before relying on it for isolation.
 Enhanced Canvas text-cluster APIs are not an assumed baseline. The complete

@@ -34,6 +34,11 @@ it('coverage and source alpha multiply once, caller mutations cannot retarget a 
  const source=[primitive([4,-.25,1.5,.64123])],mask=Math.fround(17/255),expected=new Float32Array([4,-.25,1.5,Math.fround(.64123)*mask]);let changed=false;
  const result=await renderFloatGlyphs(source,area,processor,()=>{},async()=>{if(!changed){changed=true;source[0]=primitive([0,0,0,0]);}return new Float32Array([mask]);});expect(result).toEqual(expected);
 });
+it('native baseline and computed-size projections snapshot before awaits and reject nonfinite geometry',async()=>{
+ const origin={x:3,y:4},source={...primitive([4,-.25,1.5,.5]),origin,paintFontSize:13.64123012345};let captured=false;
+ const actual=await renderFloatGlyphs([source],area,processor,()=>{},async glyph=>{origin.x=999;captured=glyph.origin!.x===3&&Object.isFrozen(glyph.origin)&&glyph.paintFontSize===13.64123012345;return new Float32Array([1]);});expect(captured).toBe(true);expect(actual).toEqual(new Float32Array([4,-.25,1.5,.5]));
+ for(const bad of [{...source,origin:{x:Infinity,y:0}},{...source,paintFontSize:0},{...source,paintFontSize:NaN},{...source,surface:'unknown'as 'svg'}])await expect(renderFloatGlyphs([bad],area,processor,()=>{},async()=>new Float32Array([1]))).rejects.toThrow('placement');
+});
 it('invalid coverage, retired owners, unsupported intrinsic color and malformed worker output cannot publish',async()=>{
  for(const mask of [new Float32Array(),new Float32Array([NaN]),new Float32Array([1.1])])await expect(renderFloatGlyphs([primitive([1,0,0,1])],area,processor,()=>{},async()=>mask)).rejects.toThrow();
  await expect(renderFloatGlyphs([primitive([1,0,0,1])],area,{floatComposite:async()=>new Float32Array(8)},()=>{},async()=>new Float32Array([1]))).rejects.toThrow('geometry');

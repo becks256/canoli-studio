@@ -1,6 +1,7 @@
 import {AffineTransform} from '../core/affine';
 import type {FloatGlyph} from './float-glyph';
 import type {NativeGlyphRunInput,NativeGlyphMatch} from './native-glyph-match';
+import type {NativeSvgGlyphMatch} from './native-svg-glyph';
 import type {FloatSourceWindow} from '../core/float-source/types';
 import type {PixelProcessor} from './processor';
 import type {NativeGlyphFont,NativeGlyphFontControl} from './native-glyph-font';
@@ -89,6 +90,7 @@ export interface StyledTextPlan {
   retireMeasurement():void;
   captureGlyphFont(id:string,settings?:string,control?:NativeGlyphFontControl):Promise<NativeGlyphFont>;
   matchGlyphRun(font:NativeGlyphFont,input:NativeGlyphRunInput,control?:NativeGlyphFontControl):Promise<NativeGlyphMatch>;
+  matchGlyphLine(font:NativeGlyphFont,lineIndex:number,control?:NativeGlyphFontControl):Promise<NativeSvgGlyphMatch>;
   renderGlyphs(glyphs:readonly FloatGlyph[],area:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,check?:()=>void):Promise<Float32Array>;
   check():void;
   release():void;
@@ -161,22 +163,26 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
   if(typeof globalThis.document==='undefined')throw new Error('Native styled text preparation requires a browser SVG host.');
   let fonts:ReturnType<typeof captureStyledTextFonts>|undefined;
   let host:HTMLDivElement|undefined,markup:string|undefined,released=false,handedOff=false;
-  const glyphs=new Set<NativeGlyphFont>();
+  const glyphs=new Set<NativeGlyphFont>(),abort=new AbortController(),lifetime=AbortSignal.any([abort.signal,...(control.signal?[control.signal]:[])]);
   const retireMeasurement=()=>{host?.remove();host=undefined;};
-  const release=()=>{if(released)return;released=true;markup=undefined;retireMeasurement();for(const glyph of glyphs)glyph.release();glyphs.clear();fonts?.release();fonts=undefined;};
+  const release=()=>{if(released)return;released=true;abort.abort(new Error('The styled text plan was released.'));markup=undefined;retireMeasurement();for(const glyph of glyphs)glyph.release();glyphs.clear();fonts?.release();fonts=undefined;};
   const check=()=>{if(released)throw new Error('The styled text plan was released.');cancelled();fonts?.check();if(host&&!host.isConnected)throw new Error('The styled text measurement host was removed.');};
   const captureGlyphFont=async(id:string,settings='normal',input:NativeGlyphFontControl={}):Promise<NativeGlyphFont>=>{
     const child={...input};check();if(!fonts!.document.fontFiles?.some(file=>file.id===id))throw new Error('The glyph font is outside this captured text source.');
     const {captureNativeGlyphFont}=await import('./native-glyph-font');check();
-    const value=await captureNativeGlyphFont(assets,id,settings,{...child,check(){check();child.check?.();check();}});
+    const value=await captureNativeGlyphFont(assets,id,settings,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
     try{check();glyphs.add(value);return value;}catch(error){value.release();throw error;}
   };
   const matchGlyphRun=async(font:NativeGlyphFont,input:NativeGlyphRunInput,control:NativeGlyphFontControl={}):Promise<NativeGlyphMatch>=>{
     const request=structuredClone(input),child={...control};check();if(!glyphs.has(font))throw new Error('The glyph run is outside this captured text source.');
-    const {matchNativeGlyphRun}=await import('./native-glyph-match');check();return matchNativeGlyphRun(font,request,{...child,check(){check();child.check?.();check();}});
+    const {matchNativeGlyphRun}=await import('./native-glyph-match');check();return matchNativeGlyphRun(font,request,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
   };
+  const matchGlyphLine=async(font:NativeGlyphFont,index:number,control:NativeGlyphFontControl={}):Promise<NativeSvgGlyphMatch>=>{
+    const child={...control};check();if(!glyphs.has(font))throw new Error('The SVG glyph line is outside this captured text source.');const {matchNativeSvgGlyphLine}=await import('./native-svg-glyph');check();return matchNativeSvgGlyphLine(plan,font,index,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
+  };
+  let plan:StyledTextPlan;
   const renderGlyphs=async(input:readonly FloatGlyph[],window:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,current:()=>void=()=>{}):Promise<Float32Array>=>{
-    const primitives=input.map(glyph=>({...glyph,style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
+    const primitives=input.map(glyph=>({...glyph,...(glyph.origin?{origin:Object.freeze({...glyph.origin})}:{}),style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
     const active=()=>{check();current();check();};active();if(primitives.some(glyph=>!glyphs.has(glyph.font)))throw new Error('The glyph primitive is outside this captured text source.');
     const {renderFloatGlyphs}=await import('./float-glyph');active();return renderFloatGlyphs(primitives,area,processor,active);
   };
@@ -234,7 +240,7 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
     }
     const definitions=await fonts.definitions(check);check();
     markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
-    check();handedOff=true;return Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,captureGlyphFont,matchGlyphRun,renderGlyphs,check,release});
+    check();plan=Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,captureGlyphFont,matchGlyphRun,matchGlyphLine,renderGlyphs,check,release});handedOff=true;return plan;
   }finally{if(!handedOff)release();}
 }
 

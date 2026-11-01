@@ -19,6 +19,11 @@ it('uses source vertical metrics in the full runtime rather than em-square synth
  const rows=glyphs('AV',{text:'AV',direction:'ttb'});expect(rows.map(g=>g.yAdvance)).toEqual([-1100,-1100]);expect(rows.map(g=>g.xAdvance)).toEqual([0,0]);expect(rows.map(g=>g.xOffset)).toEqual([-300,-300]);
  expect(glyphs('AV',{text:'AV',direction:'btt'}).map(g=>g.cluster)).toEqual([1,0]);
 });
+it('nominal metrics retain original glyph identities and UTF-16 ranges without GSUB, GPOS or bidi substitution',()=>{
+ const a=glyphs('AV',{nominal:true}),b=glyphs('fi',{nominal:true});expect(a.map(g=>[g.glyphId,g.cluster,g.xAdvance])).toEqual([[2,0,600],[3,1,600]]);expect(b.map(g=>g.glyphId)).toEqual([4,5]);expect(b.every(g=>g.xOffset===0&&g.yOffset===0&&g.yAdvance===0&&g.flags===0)).toBe(true);
+ expect(glyphs('😀AV',{nominal:true,itemOffset:2,itemLength:2}).map(g=>[g.glyphId,g.cluster])).toEqual([[2,2],[3,3]]);expect(()=>normalizeFontRun({text:'A',direction:'rtl',nominal:true})).toThrow('left-to-right');
+ const request=normalizeFontRun({text:'fi',nominal:true}),result=shapeFontRun(bytes,request);expect(validateFontRun(result,request,'normal',{unitsPerEm:1000,glyphCount:18}).glyphs).toEqual(b);
+});
 it('reports original UTF-16 clusters, missing glyphs and empty runs explicitly',()=>{
  expect(glyphs('😀A').map(g=>[g.glyphId,g.cluster])).toEqual([[0,0],[2,2]]);expect(glyphs('')).toEqual([]);expect(glyphs('AV',{text:'AV',itemOffset:2,itemLength:0})).toEqual([]);
  for(const request of [{text:'\ud800'},{text:'😀A',itemOffset:1},{text:'😀A',itemLength:1},{text:'A',itemOffset:2},{text:'A',itemLength:2}])expect(()=>normalizeFontRun(request)).toThrow();
