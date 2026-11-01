@@ -10156,3 +10156,34 @@ Full original roadmap requirements remain active, including native float clone a
 layers/tools/spaces, general warp/master coverage, photographic/device quality,
 sustained F14 and unfinished professional/AI/workflow/ChatGPT/live identity/
 commercial/specialist/motion gates.
+
+
+### 2026-11-01 — F03/F10 native float clone integration
+
+Owner: implementation agent; increment from `0fd4065`; classification: progress.
+Schema 58 explicitly versions unmasked canonical linear CloneStroke sources.
+Native source-over, ordered overlaps, scalar coverage/opacity, complete original
+validation and source-bearing OO/isolated/plugin/independent REST transport now
+share the prepared-paint boundary. Trusted Clone samples a frozen merged native
+FloatScene, shares exact private preview/staging geometry, enforces source/
+revision/ordered-selection guards and promotes TIFFs in one Undo.
+[Exact contract](FLOAT_CLONE.md).
+
+Verified: **3,310 unit/API/native tests across 323 files; 57 accepted source-browser
+cases across 9 files; 11 production cases across 4 files**. Source acceptance
+combines 55 matrix passes and two corrected frame-coalescing fixture rechecks;
+exact Float32 equality remains. Independent native libtiff/NumPy matches complete
+native, reflected/scaled and reopened TIFF words/profiles. Source-over/overlaps,
+private textured/affine/pressure/symmetry/selection previews, mixed wet/clone
+order, actual source-marker gestures and retained aligned offsets, cancellation, source/
+selection guards, isolated/plugin/independent REST complete source validation,
+recipe/project/redo-only workspace transport and a complete 64x48 window on a
+real 50 MP original pass. Full unit and production runs have no failures, skips,
+retries or flakes. Build/typecheck pass; the frozen manifest, original failed
+fixture reports and compact evidence retain their precise scope.
+[Findings and compact evidence](benchmarks/float-clone-2026-11-01.md).
+
+The complete original roadmap remains active, including wider float tools/
+layers/spaces, warp/master breadth, photographic/device quality, sustained F14
+and unfinished professional/AI/workflow/ChatGPT/live identity/commercial/
+specialist/motion requirements.

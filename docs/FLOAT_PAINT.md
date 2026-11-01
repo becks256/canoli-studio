@@ -2,7 +2,8 @@
 
 Status: native PaintLayer replay in float32/linear-sRGB documents. Existing
 BrushStroke, PencilStroke, EraserStroke and solid PaintFill values remain editable
-commands; no prepared wet simulation substitutes for dry paint. Clone operations remain unsupported, including hidden/inert metadata. Explicit
+commands; no prepared wet simulation substitutes for dry paint. Explicit native CloneStroke values now use [schema 58](FLOAT_CLONE.md); byte
+clone values reject, including hidden/inert metadata. Explicit
 HDR wet replacements use the existing schema 57 prepared-pair contract.
 
 ## Color and coverage
@@ -83,7 +84,7 @@ preserves existing strokes; it does not replace the destination's contents.
 Created-layer step outputs retain their identity even with colliding names.
 Brush metadata is literal and uses existing limits; this action does not add
 parameter expressions inside the strict stroke DTO. Existing byte operations
-remain supported; float PaintLayers reject clone and byte wet values.
+remain supported; float PaintLayers require explicit native clone sources and reject byte wet values.
 
 Portable packages collect/remap original brush textures and applicable clone/
 prepared-wet pairs. Trusted asynchronous preparation pins prospective source

@@ -6,7 +6,7 @@ import {execute} from '../../core/commands';
 import {parseCommands} from '../../core/validation';
 import {referencedAssets} from '../../core/model';
 import{assetBitmapMatches}from'../../core/assets';
-import {validateWetPaintAssets} from '../../core/wet-assets';
+import {validatePreparedPaintAssets} from '../../core/prepared-paint-assets';
 import {wetBrowserAssets} from '../../engine/wet-composite';
 import {bridgeEventSchema,boundedJson,connectionPermissionsSchema,failure,MCP_BRIDGE_VERSION,MCP_METADATA_BYTES,parseConnectionCode,type ConnectionOperation,type ConnectionPermissions,type ConnectionResult} from './protocol';
 
@@ -89,7 +89,7 @@ export class ChatGptConnections {
   }else candidate=(operation.kind==='undo'?stateBefore.past:stateBefore.future).at(-1)?.document??candidate;
   const pinned=[...referencedAssets(candidate)].map(id=>{const source=assets.get(id);return{id,source,bitmap:source.bitmap,blob:source.blob,width:source.width,height:source.height};});
   const checkSources=()=>{check();lifetime();for(const entry of pinned){const source=assets.get(entry.id);if(source!==entry.source||source.bitmap!==entry.bitmap||source.blob!==entry.blob||source.width!==entry.width||source.height!==entry.height||!assetBitmapMatches(source))throw new Error('Source assets changed while preparing the connected edit.');}};
-  await validateWetPaintAssets(candidate,wetBrowserAssets(assets,checkSources));checkSources();
+  await validatePreparedPaintAssets(candidate,wetBrowserAssets(assets,checkSources));checkSources();
   z.object({authorized:z.literal(true)}).strict().parse(await this.request(owner,'/authorize/'+id,{method:'POST',signal}));checkSources();
   let warning:string|undefined;
   try{if(operation.kind==='apply')document._withHistoryOrigin({surface:'connected-client',connectionId:owner.id,requestId:id},()=>document._dispatch(command!));else if(operation.kind==='undo')document.undo();else document.redo();}

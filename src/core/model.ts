@@ -52,7 +52,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 57;
+export const SCHEMA_VERSION = 58;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -230,6 +230,7 @@ export interface DocumentData {
     | 54
     | 55
     | 56
+    | 57
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -674,7 +675,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       channelIds.add(channel.id);yield;
     }
   }
-  const checkBrush=(brush:{kind?:string;precision?:unknown;brush?:import('./drawing').BrushStrokeData;placement?:unknown;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[];clip:unknown})=>{if(brush.kind==='wet'){assertWetPaintVersion(brush,Number(value.schemaVersion));if(brush.precision==='float32'&&value.precision!=='float32')throw new Error('HDR wet paint requires a float32 document.');if(Number(value.schemaVersion)<33)throw new Error('Prepared wet paint requires schema version 33.');if(!brush.brush)throw new Error('Missing wet-paint brush metadata.');checkBrush(brush.brush);}assertBrushVersion(brush,Number(value.schemaVersion));checkSelection(brush.clip);};
+  const checkBrush=(brush:{kind?:string;precision?:unknown;brush?:import('./drawing').BrushStrokeData;placement?:unknown;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[];clip:unknown})=>{if(brush.kind==='clone'&&brush.precision==='float32'&&value.precision!=='float32')throw new Error('HDR clone paint requires a float32 document.');if(brush.kind==='wet'){assertWetPaintVersion(brush,Number(value.schemaVersion));if(brush.precision==='float32'&&value.precision!=='float32')throw new Error('HDR wet paint requires a float32 document.');if(Number(value.schemaVersion)<33)throw new Error('Prepared wet paint requires schema version 33.');if(!brush.brush)throw new Error('Missing wet-paint brush metadata.');checkBrush(brush.brush);}assertBrushVersion(brush,Number(value.schemaVersion));checkSelection(brush.clip);};
   checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;

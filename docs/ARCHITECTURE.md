@@ -1,5 +1,15 @@
 # Architecture
 
+## Native float clone values (schema 58)
+
+Explicit `CloneStroke.precision:"float32"` retains unmasked canonical linear
+TIFF sources, once-only scalar brush coverage/opacity and native source-over.
+Complete originals and identities validate through shared commands, isolated/
+plugin/independent REST commits and source-bearing persistence. Trusted Clone gestures now sample a frozen original FloatScene, keep private
+native previews, and stage linear TIFF tiles before one-Undo publication.
+[Signatures, defaults, errors, coordinates and limits](FLOAT_CLONE.md).
+
+
 ## Editable native float paint
 
 Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
@@ -9,7 +19,7 @@ masks/appearance, Undo and source-bearing persistence use existing boundaries.
 Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
 Prepared HDR wet strokes now join dry paint on the content-local native grid
 before current affine placement; inert wet records retain the dry rendering
-path. Clone remains unsupported.
+path. Explicit native clone source values use schema 58; byte clone values reject.
 [Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
 
 

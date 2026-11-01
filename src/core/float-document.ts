@@ -23,7 +23,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='raster'){
         if(layer.erasures?.some(entry=>entry.stroke.kind==='wet'&&entry.stroke.precision!=='float32'))return 'Float raster replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
       }else if(layer.kind==='paint'){
-        if(layer.strokes.some(stroke=>stroke.kind==='clone'))return 'Float paint layers require native integration for clone operations.';
+        if(layer.strokes.some(stroke=>stroke.kind==='clone'&&stroke.precision!=='float32'))return 'Float clone strokes require explicit native float sources.';
         if(layer.strokes.some(stroke=>stroke.kind==='wet'&&stroke.precision!=='float32'))return 'Float paint replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
       }else if(layer.kind==='adjustment'){
         if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
@@ -41,17 +41,17 @@ export function floatSceneIssue(document:DocumentData):string|null {
 }
 /** Reference objects, not IDs: the same image used as a brush texture or mask
  * must still meet that role's native-byte contract. */
-export function floatWetAssetReferences(layer:LayerData):ReadonlySet<object>{
+export function floatPaintAssetReferences(layer:LayerData):ReadonlySet<object>{
  const references=new Set<object>();
  if(layer.kind==='raster')for(const entry of layer.erasures??[])if(entry.stroke.kind==='wet'&&entry.stroke.precision==='float32')for(const tile of entry.stroke.tiles){references.add(tile);references.add(tile.coverage);}
- if(layer.kind==='paint')for(const stroke of layer.strokes)if(stroke.kind==='wet'&&stroke.precision==='float32')for(const tile of stroke.tiles){references.add(tile);references.add(tile.coverage);}
+ if(layer.kind==='paint')for(const stroke of layer.strokes)if(stroke.kind==='clone'&&stroke.precision==='float32'){for(const tile of stroke.tiles)references.add(tile);}else if(stroke.kind==='wet'&&stroke.precision==='float32')for(const tile of stroke.tiles){references.add(tile);references.add(tile.coverage);}
  return references;
 }
 export function assertFloatSources(document:DocumentData,assets:Pick<AssetStore,'get'>):void{
  const float=isFloatDocument(document);
  const checkByteRole=(id:string)=>{if(assets.get(id).tiff?.editingPrecision==='float32')throw new Error('This operation requires native byte pixels. A float source thumbnail is display-only; use the float document renderer.');};
  const visit=(layers:LayerData[])=>{for(const layer of layers){
-  const hdrReferences=floatWetAssetReferences(layer);
+  const hdrReferences=floatPaintAssetReferences(layer);
   if(layer.kind==='raster'&&float){const asset=assets.get(layer.assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF raster sources.');}
   visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'||float&&hdrReferences.has(reference)){assets.get(reference.assetId);return;}if(!(float&&layer.kind==='raster'&&reference===layer))checkByteRole(reference.assetId);});
   if(layer.kind==='group')visit(layer.children);

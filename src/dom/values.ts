@@ -165,6 +165,8 @@ export class BrushTexture {
 }
 
 export interface BrushOptions {
+  /** Valid only for clone values with explicit native source tiles. */
+  precision?: 'float32';
   points: (Point & { pressure?: number;tilt?:PenTiltData })[];
   size?: number;
   hardness?: number;
@@ -219,6 +221,7 @@ export class BrushStroke extends PaintOperation {
     super({
       id: id(),
       kind: options.kind ?? "brush",
+      ...(options.precision!==undefined?{precision:options.precision}:{}),
       points: options.points.map((point) => ({
         ...point,
         pressure: point.pressure ?? 1,
@@ -323,6 +326,7 @@ export class CloneStroke extends BrushStroke {
   constructor(options: BrushOptions & { tiles: CloneTile[] }) {
     super({ ...options, kind: "clone" });
   }
+  get precision() { return (this.data as BrushStrokeData).precision; }
 }
 export class PaintFill extends PaintOperation {
   override toJSON(): FillData { return structuredClone(this.data as FillData); }

@@ -1120,3 +1120,11 @@ placement; inert wet records preserve dry reconstruction. Trusted authoring and
 Smudge/Mixer support paint targets and empty selections through existing private
 preparation and one-Undo publication. Clone and wider roadmap gates remain open.
 [Signatures, defaults, reconstruction and boundaries](FLOAT_PAINT.md#native-wet-paint).
+
+## Native float Clone (schema 58)
+
+Explicit native CloneStroke sources and trusted original-scene sampling now
+retain unmasked canonical float TIFFs, source alpha and ordered source-over.
+Private preview/texture/staging views preserve source identity and one-Undo
+publication. Byte clone values remain a separate contract; conversion does not
+silently promote their display pixels. [Current behavior, limits and acceptance](FLOAT_CLONE.md).

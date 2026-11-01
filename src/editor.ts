@@ -146,7 +146,7 @@ import {type IccControl} from './core/color/icc-client';
 import {normalizeColorSettings,normalizeColorOutput,serializeColorSettings,restoreColorSettings,preflightColorSettings,type ColorSettings} from './core/color/color-settings';
 import type { StandardRgbSpaceId, SoftProofOptions } from "./core/color/types";
 import {inspectPhotoshop,decodePhotoshop} from './engine/photoshop-import';
-import { validateWetPaintAssets } from './core/wet-assets';
+import { validatePreparedPaintAssets } from './core/prepared-paint-assets';
 import { wetBrowserAssets } from './engine/wet-composite';
 import { applyPreparedWetPaint, createPreparedWetPaintJob, type ApplyWetPaintOptions, type WetBrushBuilder } from './engine/wet-authoring';
 export type { ApplyWetPaintOptions } from './engine/wet-authoring';
@@ -2130,7 +2130,7 @@ export class EditorApplication {
           }
           for (const entry of pinned) { const source = sources.get(entry.id); if (source !== entry.source || source.bitmap !== entry.bitmap || source.blob !== entry.blob || source.width !== entry.width || source.height !== entry.height || !assetBitmapMatches(source)) throw new Error('Script source assets changed. No script edits were applied.'); }
         };
-        await validateWetPaintAssets(next, wetBrowserAssets(sources, checkWetCommit));
+        await validatePreparedPaintAssets(next, wetBrowserAssets(sources, checkWetCommit));
         checkWetCommit();
         installed = retouch ? retouch.installReferenced(next, assets) : [];
         for (const id of installed) installedRecords.set(id, assets.get(id));

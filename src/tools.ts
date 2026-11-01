@@ -11,12 +11,17 @@ import {paintStampGeometry} from './core/paint-stamps';
 import {pressureCurveSchema,type PressureCurveData} from './core/pressure-curve';
 import { BrushPreset, type BrushTool } from './brushes/presets';
 import {BrushTextureSourceOwner,brushTexturePreferenceSchema,type BrushTexturePreference} from './brushes/texture-source';
-import type {AssetStore,ImageAsset} from './core/assets';
+import {AssetStore,type ImageAsset} from './core/assets';
 import {referencedAssets} from './core/model';
 import type {BrushTextureData} from './core/brush-texture';
 import { strokeCaptureRegion, strokeIntersectsRegion } from "./engine/stroke-region";
 import { freeze } from "./core/immutable";
 import { ClonePreviewSource } from "./engine/clone-preview";
+import {FloatClonePreviewSource} from './engine/float-clone-preview';
+import {floatCloneCaptureRegions} from './engine/float-clone-regions';
+import {encodeFloatWetTile} from './core/float-wet-tile';
+import {captureFloatCloneAssets} from './core/float-clone-assets';
+import {wetBrowserAssets} from './engine/wet-composite';
 import { lassoSelection } from "./core/lasso";
 import { CanvasRenderer } from "./engine/renderer";
 import { CropController } from "./crop-controller";
@@ -160,6 +165,9 @@ interface ToolState {
   drawing: boolean;
 }
 interface BaseGesture {
+  previewAssets?:AssetStore;
+  hostAssets?:AssetStore;
+  selectionIds?:readonly string[];
   stopChanges?:()=>void;
   document: Document;
   revision: number;
@@ -180,6 +188,7 @@ interface PaintGesture extends BaseGesture {
   offset: Point | null;
   stroke: BrushStrokeData;
   cloneSource?: ClonePreviewSource;
+  floatCloneSource?:FloatClonePreviewSource;
   erasurePlacement?:import('./core/drawing').ErasurePlacementData;
 }
 interface WetGesture extends BaseGesture {
@@ -429,7 +438,7 @@ export class ToolController {
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
-    if(tool==='dodge'||tool==='burn'||tool==='fill')return true;
+    if(tool==='dodge'||tool==='burn'||tool==='fill'||tool==='clone')return true;
     if(tool==='brush'||tool==='pencil')return this.state.settings.paintTarget==='layer'||this.state.settings.paintTarget.startsWith('mask-')&&!!this.editor.document.selectedLayer?.mask;
     if(tool==='smudge'||tool==='mixer'){
       const target=this.state.settings.paintTarget,selected=this.editor.document.selectedLayer;
@@ -628,7 +637,7 @@ export class ToolController {
     this.polygonLasso = null;
     this.cancelFrame();
     this.generation++;
-    if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
+    if(this.gesture?.kind === "paint"){this.gesture.cloneSource?.dispose();this.gesture.floatCloneSource?.dispose();}
     if(this.gesture)this.releaseTexture(this.gesture);
     this.gesture = null;
     this.publish({
@@ -658,7 +667,7 @@ export class ToolController {
     this.maskPoint = null;
     this.cancelFrame();
     this.generation++;
-    if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
+    if(this.gesture?.kind === "paint"){this.gesture.cloneSource?.dispose();this.gesture.floatCloneSource?.dispose();}
     if(this.gesture)this.releaseTexture(this.gesture);
     this.gesture = null;
     this.publish({
@@ -819,20 +828,22 @@ export class ToolController {
   private symmetryIn(mapping:AffineTransform){return this.state.settings.symmetry?new BrushSymmetry(this.state.settings.symmetry).transformed(mapping).toJSON():null;}
   private captureTexture(gesture:BaseGesture):BrushTextureData|null{
     const preference=this.state.settings.texture;if(!preference)return null;
-    const assets=this.editor.assetStore,{asset,created}=this.editor.brushTextureSource.leaseIn(assets);
+    const assets=gesture.previewAssets??this.editor.assetStore,{asset,created}=this.editor.brushTextureSource.leaseIn(assets);
     gesture.textureLease={assets,asset,created};
     return {assetId:asset.id,...preference};
   }
   private releaseTexture(gesture:BaseGesture){
+    try{
     const lease=gesture.textureLease;if(!lease?.created||!lease.assets.has(lease.asset.id)||lease.assets.get(lease.asset.id)!==lease.asset)return;
     const state=gesture.document.getSnapshot();
     if(retainedDocuments(state.document,captureRetainedHistory(state))
       .some(document=>referencedAssets(document).has(lease.asset.id)))return;
     lease.assets.remove(lease.asset.id);
+    }finally{gesture.previewAssets?.dispose();gesture.previewAssets=undefined;}
   }
   private textureCurrent(gesture:BaseGesture){
     const lease=gesture.textureLease;if(!lease)return true;
-    return this.editor.assetStore===lease.assets&&lease.assets.has(lease.asset.id)&&
+    return this.editor.assetStore===(gesture.hostAssets??lease.assets)&&lease.assets===(gesture.previewAssets??this.editor.assetStore)&&lease.assets.has(lease.asset.id)&&
       lease.assets.get(lease.asset.id)===lease.asset&&lease.asset.bitmap.width===lease.asset.width&&lease.asset.bitmap.height===lease.asset.height;
   }
   private point(
@@ -908,7 +919,7 @@ export class ToolController {
     tool:Tool,point:Point,modifiers:{alt:boolean;shift:boolean;pressure:number;tilt?:PenTiltData},zoom:number,cropHandle?:CropHandle,
   ){
     try{this.beginGesture(tool,point,modifiers,zoom,cropHandle);}
-    catch(error){if(this.startingGesture)this.releaseTexture(this.startingGesture);throw error;}
+    catch(error){if(this.startingGesture){if(this.startingGesture.previewAssets&&this.gesture?.kind==='paint'&&this.gesture.previewAssets===this.startingGesture.previewAssets){this.gesture.floatCloneSource?.dispose();this.gesture=null;}this.releaseTexture(this.startingGesture);}throw error;}
     finally{this.startingGesture=null;}
   }
   private beginGesture(
@@ -947,6 +958,7 @@ export class ToolController {
       document: doc,
       revision: doc.getSnapshot().revision,
       generation: this.generation,
+      ...(tool==='clone'&&doc.precision==='float32'?{selectionIds:[...doc.getSnapshot().selectedIds]}:{}),
     };
     this.startingGesture=base;
     if(tool==='smudge'||tool==='mixer'){
@@ -1246,6 +1258,10 @@ export class ToolController {
             }
         : null;
     const raster=layer instanceof RasterLayer?findLayer(doc._read(),layer.id):undefined;
+    if(tool==='clone'&&doc.precision==='float32'){
+      base.previewAssets=new AssetStore();base.hostAssets=this.editor.assetStore;
+      for(const id of referencedAssets(doc._read()))base.hostAssets.shareTo(base.previewAssets,id,id);
+    }
     this.gesture = {
       ...base,
       kind: "paint",
@@ -1967,7 +1983,7 @@ export class ToolController {
     return gesture.tool === "pencil"
       ? new PencilStroke(options)
       : gesture.tool === "clone"
-        ? new CloneStroke({ ...options, tiles })
+        ? new CloneStroke({ ...options, tiles,...(gesture.document.precision==='float32'?{precision:'float32' as const}:{}) })
         : gesture.tool === "eraser"
           ? new EraserStroke(options)
           : new BrushStroke(options);
@@ -1987,7 +2003,12 @@ export class ToolController {
 
   private updatePaintPreview(gesture: PaintGesture) {
     if(!this.textureCurrent(gesture)){this.cancel();return;}
-    if (gesture.tool === "clone" && !gesture.cloneSource) {
+    if (gesture.tool === "clone" && gesture.document.precision==='float32' && !gesture.floatCloneSource) {
+      const snapshot=gesture.document.getSnapshot().document,root=gesture.inputTransform.multiply(AffineTransform.translation(-gesture.offset!.x,-gesture.offset!.y));
+      const capture=this.editor.renderer.captureFloatScene(snapshot,this.editor.assetStore,{isCancelled:()=>{this.assertCurrent(gesture);return false;}});
+      gesture.floatCloneSource=new FloatClonePreviewSource(capture,snapshot.width,snapshot.height,root,()=>this.assertCurrent(gesture));
+    }
+    if (gesture.tool === "clone" && gesture.document.precision!=='float32' && !gesture.cloneSource) {
       const snapshot=gesture.document.getSnapshot().document,assets=this.editor.assetStore;
       const inverse=gesture.inputTransform;
       const affine=inverse.a!==1||inverse.b!==0||inverse.c!==0||inverse.d!==1;
@@ -2013,6 +2034,8 @@ export class ToolController {
       paintPreview: {
         layerId: gesture.layer.id,
         cloneSource: gesture.cloneSource,
+        floatCloneSource:gesture.floatCloneSource,
+        nativeAssets:gesture.previewAssets,
         erasurePlacement:gesture.erasurePlacement,
         stroke: { ...gesture.stroke, color: gesture.tool === "clone" ? "#ffffff" : gesture.stroke.color, points: gesture.points.slice() },
         tonal:
@@ -2053,8 +2076,10 @@ export class ToolController {
     if(!this.textureCurrent(gesture))throw new Error('The brush texture source changed during this gesture. Try again.');
     if (
       gesture.generation !== this.generation ||
+      !!gesture.hostAssets&&this.editor.assetStore!==gesture.hostAssets ||
       this.editor.document !== gesture.document ||
-      gesture.document.getSnapshot().revision !== gesture.revision
+      gesture.document.getSnapshot().revision !== gesture.revision ||
+      !!gesture.selectionIds&&(gesture.document.getSnapshot().selectedIds.length!==gesture.selectionIds.length||gesture.document.getSnapshot().selectedIds.some((id,i)=>id!==gesture.selectionIds![i]))
     )
       throw new Error("The document changed during this gesture. Try again.");
   }
@@ -2128,6 +2153,7 @@ export class ToolController {
     if (gesture.kind === "paint") gesture.cloneSource?.dispose();
     const assets = this.editor.assetStore;
     let stagedTiles: CloneTile[] = [];
+    const stagedNative=new Map<string,ImageAsset>();
     let committed = false;
     try {
       this.assertCurrent(gesture);
@@ -2259,8 +2285,12 @@ export class ToolController {
         return;
       }
       let tiles: CloneTile[] = [];
-      if (gesture.tool === "clone") tiles = await this.sampleClone(gesture);
-      stagedTiles = tiles;
+      if (gesture.tool === "clone") tiles = gesture.document.precision==='float32'?await this.sampleFloatClone(gesture):await this.sampleClone(gesture);
+      if(gesture.previewAssets){
+        this.assertCurrent(gesture);
+        const ids=new Set([...tiles.map(tile=>tile.assetId),...(gesture.stroke.texture?[gesture.stroke.texture.assetId]:[])]);
+        for(const id of ids){if(assets.has(id))throw new Error('A native clone source ID collided with existing artwork.');const installed=gesture.previewAssets.shareTo(assets,id,id);stagedNative.set(id,installed);}
+      }else stagedTiles = tiles;
       this.assertCurrent(gesture);
       doc.transaction(
         gesture.tool === "clone"
@@ -2295,10 +2325,13 @@ export class ToolController {
       if (gesture.offset && gesture.settings.cloneAligned)
         this.publish({ cloneOffset: gesture.offset });
     } finally {
-      if(gesture.kind === "paint")gesture.cloneSource?.dispose();
+      if(gesture.kind === "paint"){gesture.cloneSource?.dispose();gesture.floatCloneSource?.dispose();}
       this.releaseTexture(gesture);
-      if (!committed)
+      if (!committed){
         stagedTiles.forEach((tile) => assets.remove(tile.assetId));
+        const state=gesture.document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(document=>[...referencedAssets(document)]));
+        for(const[id,record]of stagedNative)if(!retained.has(id)&&assets.has(id)&&assets.get(id)===record)assets.remove(id);
+      }
       this.publish({
         quickSelectionPoints:null,
         quickSelectionProgress:null,
@@ -2319,6 +2352,19 @@ export class ToolController {
         else this.cancel();
       }
     }
+  }
+  private async sampleFloatClone(gesture:PaintGesture):Promise<CloneTile[]>{
+    const source=gesture.floatCloneSource;if(!source)throw new Error('Native clone sampling is unavailable.');
+    const stage=gesture.previewAssets;if(!stage)throw new Error('Native clone staging is unavailable.');const tiles:CloneTile[]=[],stroke={...gesture.stroke,points:gesture.points};
+    try{
+      for(const region of floatCloneCaptureRegions(stroke)){
+        source.check();
+        const pixels=await source.read(region);source.check();const blob=await encodeFloatWetTile(pixels,region.width,region.height,{check:()=>source.check()});source.check();
+        const asset=await stage.add(blob,'Native clone source',undefined,false,{tiff:{editingPrecision:'float32'}});source.check();tiles.push({...region,assetId:asset.id});
+      }
+      if(tiles.length){const validated=await captureFloatCloneAssets(tiles,wetBrowserAssets(stage,()=>source.check()));validated.dispose();}
+      source.check();return tiles;
+    }catch(error){stage.dispose();gesture.previewAssets=undefined;throw error;}
   }
   private async sampleClone(gesture: PaintGesture): Promise<CloneTile[]> {
     const snapshot = gesture.document.toJSON(),

@@ -29,6 +29,7 @@ import { maskSignature } from "./mask-signature";
 import {BrushTextureSampler} from './brush-texture';
 import { checkRenderCurrent } from "./render-control";
 import type { ClonePreviewSource } from "./clone-preview";
+import type {FloatClonePreviewSource} from './float-clone-preview';
 import type { TonalStrokeData } from "../core/adjustments";
 import { isImmutable } from "../core/immutable";
 import { contentSignature } from "./content-signature";
@@ -88,6 +89,9 @@ export interface PaintPreview {
   erasurePlacement?:import('../core/drawing').ErasurePlacementData;
   maskPlacement?:import('../core/masks').MaskPlacementData;
   cloneSource?: ClonePreviewSource;
+  floatCloneSource?:FloatClonePreviewSource;
+  /** Private native Clone sources/texture leases, never serialized. */
+  nativeAssets?:AssetStore;
   /** Mask coverage target; absent for normal paint-layer previews. */
   maskMode?: "hide" | "reveal";
   /** Apply coverage to smart filters rather than the ordinary layer mask. */
@@ -253,17 +257,19 @@ export class CanvasRenderer implements DocumentRenderer {
     service.erasure=(entry,check)=>captureProjectedErasure(entry,assets,this.processor,{isCancelled:()=>{check();return!!isCancelled?.();}},this.brushTextures);
     return service;
   }
-  private floatStrokes(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatStrokeService{
+  private floatStrokes(assets:AssetStore,isCancelled?:()=>boolean,preview?:PaintPreview|null):import('./float-scene').FloatStrokeService{
     const service:import('./float-scene').FloatStrokeService=async(brush,space,world,check)=>{
       check();const bytes=await renderRetouchCoverage(brush,space,this.processor,world,assets,this.brushTextures,()=>{check();return!!isCancelled?.();});check();
       const coverage=new Float32Array(bytes.length);for(let i=0;i<bytes.length;i++)coverage[i]=bytes[i]/255;return coverage;
     };
     service.paint=(operation,space,world,check)=>renderFloatPaintCoverage(operation,space,world,this.processor,assets,this.brushTextures,()=>{check();checkRenderCurrent(isCancelled);});
+    if(preview?.floatCloneSource){const source=preview.floatCloneSource;service.clonePreview={layerId:preview.layerId,id:preview.stroke.id,read:(_stroke,area,world)=>source.readPlaced(preview.stroke,area,world)};}
     return service;
   }
-  async captureFloatScene(document:DocumentData,assets:AssetStore,control:FloatSceneControl={}):Promise<CapturedFloatScene>{
+  async captureFloatScene(document:DocumentData,assets:AssetStore,control:FloatSceneControl={},preview?:PaintPreview|null):Promise<CapturedFloatScene>{
     if(!isFloatDocument(document))throw new Error('Native float scene output requires a float32 linear-sRGB document.');
-    return this.floatScene.capture(document,assets,this.floatMasks(assets,control.isCancelled),control,this.floatStrokes(assets,control.isCancelled));
+    assets=preview?.nativeAssets??assets;
+    return this.floatScene.capture(this.floatPreview(document,preview),assets,this.floatMasks(assets,control.isCancelled),control,this.floatStrokes(assets,control.isCancelled,preview));
   }
 
   private signature(layer: LayerData): string {
@@ -767,8 +773,9 @@ export class CanvasRenderer implements DocumentRenderer {
   ): Promise<HTMLCanvasElement> {
     checkRenderCurrent(options.isCancelled);
     if(isFloatDocument(document)){
+      assets=options.paintPreview?.nativeAssets??assets;
       const sizeRegion=options.region??{x:0,y:0,width:document.width,height:document.height},size=workingSize(options.outputSize?.width??sizeRegion.width,options.outputSize?.height??sizeRegion.height,options.outputSize?1:options.scale,options.maxPixels,options.maxDimension);
-      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback,options.colorProof,options.cache!==false,this.floatStrokes(assets,options.isCancelled));
+      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback,options.colorProof,options.cache!==false,this.floatStrokes(assets,options.isCancelled,options.paintPreview));
     }
     if(!options.taskBudget)options={...options,taskBudget:{deadline:performance.now()+8}};
     const ownedFrequencyScratch=options.frequencyScratch?undefined:new FilterTileCache(8*1024*1024);

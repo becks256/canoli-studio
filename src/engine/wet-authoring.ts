@@ -25,7 +25,7 @@ import {maskCoverage} from './masks';
 import {BrushTextureSampler} from './brush-texture';
 import { layerTransform } from '../core/spatial';
 import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintMixOptions } from '../core/wet-paint';
-import { validateWetPaintAssets } from '../core/wet-assets';
+import { validatePreparedPaintAssets } from '../core/prepared-paint-assets';
 import type { WetPaintTileData } from '../core/wet-operation';
 import { BrushStroke, PaintLayer, RasterLayer, SmartObjectLayer, WetPaintStroke } from '../dom';
 import type { EditorApplication } from '../editor';
@@ -228,7 +228,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
         const tiles = [...entries.values()].sort((a, b) => a.region.y - b.region.y || a.region.x - b.region.x).map(entry => entry.tile);
         if (!view || !tiles.length) return null;
         const operation = new WetPaintStroke({...(floatColor?{precision:'float32' as const}:{}),brush: session!.stroke, load, mix, nativeTransform: localToNative.inverse(), tiles,...(placement?{placement:'geometry'in placement?maskPaintPlacementValue(placement):placement}:{}) }), command = commandFor(operation), candidate = execute(snapshot.document, command);
-        await validateWetPaintAssets(candidate, wetBrowserAssets(view, current)); current();
+        await validatePreparedPaintAssets(candidate, wetBrowserAssets(view, current)); current();
         const frame = new WetPaintPreview(owner, assets, view, candidate, command, operation, ++version);
         prefixRecords.set(frame, entries);
         return frame;

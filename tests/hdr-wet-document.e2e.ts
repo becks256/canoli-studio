@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION} from '../src/core/model';
 import {test,expect} from '@playwright/test';
 import {readFile,writeFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
@@ -35,7 +36,7 @@ test('documented isolated HDR constructor commits native pixels through one Undo
   const allSourceBytesExact=(await Promise.all(Object.entries(assetFiles).map(async([id,original])=>{const data=new Uint8Array(await editor.assetStore.get(id).blob.arrayBuffer());return data.length===original.length&&data.every((v,i)=>v===original[i]);}))).every(Boolean);
   const output=(a:Float32Array)=>[...new Uint8Array(a.buffer)];return {oneUndo,undo,redo,modelExact,originalBytesExact,allSourceBytesExact,area,before:output(before),after:output(after),reopened:output(reopened),setupProject:[...new Uint8Array(await setupProject.arrayBuffer())],pixels:[...new Uint8Array(await fixture.pixels.arrayBuffer())],coverage:[...new Uint8Array(await fixture.coverage.arrayBuffer())],schema:editor.document.toJSON().schemaVersion,precision:editor.document.precision};
  },{bytes:[...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')],code:code!});
- expect(result).toMatchObject({oneUndo:true,undo:true,redo:true,modelExact:true,originalBytesExact:true,allSourceBytesExact:true,schema:57,precision:'float32'});
+ expect(result).toMatchObject({oneUndo:true,undo:true,redo:true,modelExact:true,originalBytesExact:true,allSourceBytesExact:true,schema:SCHEMA_VERSION,precision:'float32'});
  for(const name of ['before','after','reopened'] as const)await writeFile(info.outputPath(name+'.f32le'),Buffer.from(result[name]));for(const name of ['pixels','coverage'] as const)await writeFile(info.outputPath(name+'.tif'),Buffer.from(result[name]));
  await writeFile(info.outputPath('hdr-setup.luma'),Buffer.from(result.setupProject));await writeFile(info.outputPath('hdr-document.json'),JSON.stringify({...result,before:undefined,after:undefined,reopened:undefined,setupProject:undefined,pixels:undefined,coverage:undefined},null,2));
  const checked=spawnSync(process.env.CANOLI_REFERENCE_PYTHON??'python3',['scripts/check-hdr-wet-document.py',info.outputDir],{encoding:'utf8',timeout:120000});expect(checked.status,checked.stderr||checked.stdout).toBe(0);await writeFile(info.outputPath('independent-hdr-document.json'),checked.stdout);

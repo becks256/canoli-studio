@@ -1,9 +1,10 @@
-import {renderFloatPaint,type FloatPaintCoverage} from './float-paint';
+import {renderFloatPaint,type FloatPaintCoverage,type FloatCloneRead} from './float-paint';
+import {captureFloatClone,type CapturedFloatClone} from './float-clone';
 import{applyFloatStyle}from'./float-style';
 import {activePerspective,perspectiveLocalQuad,perspectiveMatrix,perspectiveRect} from '../core/perspective';
 import {ProjectiveTransform,type ProjectiveQuad} from '../core/projective';
 import {captureFloatWetReplay,type CapturedFloatWetReplay} from './float-wet-replay';
-import {validateHdrWetPaintAssets} from '../core/wet-assets';
+import {validateNativePaintAssets} from '../core/prepared-paint-assets';
 import {wetBrowserAssets} from './wet-composite';
 import type {CapturedPerspectiveMask,PerspectiveMaskOptions} from './projective-mask';
 import {projectPerspectiveWindow} from './projective-projection';
@@ -20,7 +21,7 @@ import{applyFloatCoverage,floatAlphaPlane,fillFloatCoverage}from'./float-coverag
 import{renderFloatShadow,FloatShadowCache}from'./float-shadow';
 import type{DocumentData,LayerData}from'../core/model';
 import{validateDocument}from'../core/model';
-import{floatSceneIssue,assertFloatSources,floatWetAssetReferences}from'../core/float-document';
+import{floatSceneIssue,assertFloatSources,floatPaintAssetReferences}from'../core/float-document';
 import{visitLayerAssets}from'../core/asset-references';
 import type{AssetStore,ImageAsset}from'../core/assets';
 import {captureAssetSource} from '../core/assets';
@@ -44,7 +45,7 @@ import type{ColorProof}from'../core/color/color-settings';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
 export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{plane?(mask:LayerMaskData,owner:MaskPlanePoseData,check:()=>void):CapturedMaskPlane;perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
-export type FloatStrokeService=((brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{paint?:FloatPaintCoverage};
+export type FloatStrokeService=((brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{paint?:FloatPaintCoverage;clonePreview?:{layerId:string;id:string;read:FloatCloneRead}};
 export interface CapturedFloatScene {
  readonly document:DocumentData;
  readonly signal:AbortSignal;
@@ -109,6 +110,7 @@ export class FloatSceneRenderer {
   const shadowCache=new FloatShadowCache();
   const erasureCaptures=new Map<object,import('./projected-erasure').CapturedProjectedErasure>();
   const wetCaptures=new Map<object,CapturedFloatWetReplay>();
+  const cloneCaptures=new Map<object,CapturedFloatClone>();
   const perspectiveMasks=new Map<string,CapturedPerspectiveMask>();
   const planeMasks=new Map<string,CapturedMaskPlane>(),gridPins=new Map<string,ReturnType<typeof captureAssetSource>>();
   const whiteBalances=new Map<string,readonly number[]|null>();
@@ -119,9 +121,9 @@ export class FloatSceneRenderer {
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
    for(const pin of gridPins.values())pin.check();
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
-   const hdrReferences=floatWetAssetReferences(layer);
+   const hdrReferences=floatPaintAssetReferences(layer);
    visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'||hdrReferences.has(reference)){if(!gridPins.has(reference.assetId))gridPins.set(reference.assetId,captureAssetSource(assets,reference.assetId));return;}if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
    else if(layer.kind==='adjustment'&&layer.adjustment.kind==='white-balance')whiteBalances.set(layer.id,compileFloatWhiteBalance(layer.adjustment));
@@ -130,10 +132,14 @@ export class FloatSceneRenderer {
    check();visit(document.children);check();
    // Validate every HDR operation, including hidden/inert metadata and unused
    // embedded definitions, before publishing any scene pixels.
-   await validateHdrWetPaintAssets(document,wetBrowserAssets(assets,check));check();
+   await validateNativePaintAssets(document,wetBrowserAssets(assets,check));check();
    const prepareWet=async(layers:LayerData[])=>{for(const layer of layers){
     if(layer.kind==='group')await prepareWet(layer.children);
     else if(layer.kind==='paint'){
+     for(const stroke of layer.strokes)if(stroke.kind==='clone'&&stroke.precision==='float32'&&stroke.opacity>0&&stroke.flow!==0){
+      const captured=await captureFloatClone(stroke.tiles,wetBrowserAssets(assets,check),this.processor,{check});
+      try{check();cloneCaptures.set(stroke,captured);}catch(error){captured.dispose();throw error;}
+     }
      for(const stroke of layer.strokes)if(stroke.kind==='wet'&&stroke.precision==='float32'&&stroke.opacity>0){
       const captured=await captureFloatWetReplay(stroke,assets,this.processor,new AffineTransform(),check);
       try{check();wetCaptures.set(stroke,captured);}catch(error){captured.dispose();throw error;}
@@ -270,7 +276,11 @@ export class FloatSceneRenderer {
       const readIntrinsic=async(region:FloatSourceWindow):Promise<Float32Array>=>{
        check();validateWindow(region);
        if(layer.kind==='raster')return raster(layer,world,region);
-       if(layer.kind==='paint'){if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');return renderFloatPaint(layer.strokes,region,world,strokeService.paint,this.processor,check,(stroke,region)=>wetCaptures.get(stroke)!.read(region));}
+       if(layer.kind==='paint'){
+        if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');const preview=strokeService.clonePreview?.layerId===layer.id?strokeService.clonePreview:undefined;
+        const clone:FloatCloneRead=(stroke,region,world)=>stroke.id===preview?.id?preview.read(stroke,region,world):cloneCaptures.get(stroke)!.read(region,world);clone.previewId=preview?.id;
+        return renderFloatPaint(layer.strokes,region,world,strokeService.paint,this.processor,check,(stroke,region)=>wetCaptures.get(stroke)!.read(region),clone);
+       }
        if(layer.kind==='group')return paint(layer.children,new Float32Array(region.width*region.height*4),world,false,region);
        throw new Error('A shadow requires intrinsic artwork pixels.');
       };

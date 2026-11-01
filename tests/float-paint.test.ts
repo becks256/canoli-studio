@@ -20,7 +20,7 @@ it('eraser/clear keep surviving linear RGB and round alpha once after unquantize
 });
 it('float PaintLayers share commands, ancestry locks, rollback, history and strict unsupported operation gates',()=>{
  const document=new Document({precision:'float32'}),group=document.layers.add(new LayerGroup()),paint=group.layers.add(new PaintLayer()),before=document.toJSON();document.transaction('Editable float paint',()=>{paint.strokes.add(new PencilStroke({points:[{x:1,y:1}]}));paint.strokes.add(new PaintFill({bounds:area}));});const after=document.toJSON();document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);group.locked=true;expect(()=>paint.strokes.add(new EraserStroke({points:[{x:1,y:1}]}))).toThrow(/unlock/i);group.locked=false;
- const saved=document.toJSON();expect(()=>document.transaction('Invalid float clone',()=>{paint.name='Must roll back';paint.strokes.add(new CloneStroke({points:[{x:1,y:1}],tiles:[{assetId:'sample',x:0,y:0,width:1,height:1}]}));})).toThrow(/native integration/);expect(document.toJSON()).toEqual(saved);
+ const saved=document.toJSON();expect(()=>document.transaction('Invalid float clone',()=>{paint.name='Must roll back';paint.strokes.add(new CloneStroke({points:[{x:1,y:1}],tiles:[{assetId:'sample',x:0,y:0,width:1,height:1}]}));})).toThrow(/explicit native float sources/);expect(document.toJSON()).toEqual(saved);
 });
 it('rejects malformed asynchronous coverage/native results and cancellation before publishing',async()=>{
  const strokes=[new PencilStroke({points:[{x:.5,y:.5}],color:'#ff0000'}).toJSON()];

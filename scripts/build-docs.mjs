@@ -67,6 +67,7 @@ const generatedPages = [
   ["FLOAT_SOURCES", "Owned float originals and derived tiles"],
   ["FLOAT_DOCUMENTS", "Float document editing"],
   ["FLOAT_PAINT", "Editable linear float paint"],
+  ["FLOAT_CLONE", "Native float clone paint"],
   ["FLOAT_PROOFING", "Float device soft proofing"],
 ];
 const pageDescriptions = {

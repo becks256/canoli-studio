@@ -1,5 +1,15 @@
 # Plugins and extensions
 
+## Native float clone values (schema 58)
+
+Explicit `CloneStroke.precision:"float32"` retains unmasked canonical linear
+TIFF sources, once-only scalar brush coverage/opacity and native source-over.
+Complete originals and identities validate through shared commands, isolated/
+plugin/independent REST commits and source-bearing persistence. Trusted Clone gestures now sample a frozen original FloatScene, keep private
+native previews, and stage linear TIFF tiles before one-Undo publication.
+[Signatures, defaults, errors, coordinates and limits](FLOAT_CLONE.md).
+
+
 ## Prepared HDR raster values (schema 57)
 
 Existing `WetPaintStroke` values accept `precision:"float32"` and linear native

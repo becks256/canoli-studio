@@ -18,12 +18,13 @@ import {projectFloatWindow} from './float-projection';
 
 export type FloatPaintOperation=BrushStrokeData|FillData;
 export type FloatPaintCoverage=(operation:FloatPaintOperation,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
+export type FloatCloneRead=((stroke:BrushStrokeData,area:FloatSourceWindow,world:AffineTransform)=>Promise<Float32Array>)&{previewId?:string};
 
 /** Only scalar coverage crosses Canvas. A fixed lattice retains crop parity;
  * opacity is deliberately removed here and applied once in float composition. */
 export async function renderFloatPaintCoverage(operation:FloatPaintOperation,space:RenderSpace,world:AffineTransform,processor:PixelProcessor,assets:AssetStore,textures:BrushTextureSampler,check:()=>void):Promise<Float32Array>{
  check();space={...space};const cell=256,gutter=2;
- const neutral=operation.kind==='fill'?{...operation,color:'#ffffff',opacity:1,erase:false}:{...operation,kind:operation.kind==='eraser'?'brush' as const:operation.kind,color:'#ffffff',opacity:1};
+ const neutral=operation.kind==='fill'?{...operation,color:'#ffffff',opacity:1,erase:false}:{...operation,precision:undefined,tiles:[],kind:operation.kind==='eraser'||operation.kind==='clone'?'brush' as const:operation.kind,color:'#ffffff',opacity:1};
  const pixelX=space.x*space.sx,pixelY=space.y*space.sy;
  if(![pixelX,pixelY,pixelX+space.width,pixelY+space.height].every(Number.isSafeInteger))throw new Error('Float paint coverage requires a native integer pixel window.');
  if(![space.sx,space.sy].every(value=>Number.isFinite(value)&&value>0))throw new Error('Invalid float paint coverage scale.');
@@ -44,10 +45,10 @@ export async function renderFloatPaintCoverage(operation:FloatPaintOperation,spa
 
 /** Ordered editable native paint. A wet reader supplies validated, captured
  * premultiplied pigment/alpha/removal, never display pixels or brush coverage. */
-export async function replayFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'>&Partial<Pick<PixelProcessor,'floatCompositeHdrWet'>>,check:()=>void,wet?:(stroke:WetPaintStrokeData,area:FloatSourceWindow)=>Promise<Float64Array>):Promise<Float32Array>{
+export async function replayFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'>&Partial<Pick<PixelProcessor,'floatCompositeHdrWet'>>,check:()=>void,wet?:(stroke:WetPaintStrokeData,area:FloatSourceWindow)=>Promise<Float64Array>,clone?:FloatCloneRead):Promise<Float32Array>{
  check();area=validateWindow(area);let output:Float32Array=new Float32Array(area.width*area.height*4);
  for(const stroke of strokes){
-  check();if(stroke.kind==='clone')throw new Error('Float paint layers require native integration for clone operations.');
+  check();if(stroke.kind==='clone'&&stroke.precision!=='float32')throw new Error('Float clone strokes require explicit native float sources.');
   if(stroke.kind==='wet'){
    if(stroke.precision!=='float32')throw new Error('Float paint replacements require explicit HDR wet paint.');
    if(stroke.opacity===0)continue;
@@ -57,6 +58,11 @@ export async function replayFloatPaint(strokes:readonly PaintOperationData[],are
   }
   if(stroke.opacity===0||stroke.kind!=='fill'&&stroke.flow===0)continue;
   const mask=await coverage(stroke,{...area,sx:1,sy:1},world,check);check();validateFloatAlpha(mask,area.width*area.height);
+  if(stroke.kind!=='fill'&&(stroke.kind==='clone'||stroke.id===clone?.previewId)){
+   if(!clone)throw new Error('Float clone source service is unavailable.');
+   const source=await clone(stroke,area,world);check();validateFloatWorkerWindow(source);if(source.length!==output.length)throw new Error('Float clone source returned the wrong geometry.');
+   const next=await processor.floatComposite(source,output,{mode:'normal',opacity:stroke.opacity,mask});check();validateFloatWorkerWindow(next);if(next.length!==output.length)throw new Error('Float clone composition returned the wrong geometry.');output=next;continue;
+  }
   if(stroke.kind==='eraser'||stroke.kind==='fill'&&stroke.erase){
    output=output.slice();let deadline=performance.now()+2;
    for(let p=0;p<output.length;p+=4){output[p+3]=output[p+3]*(1-mask[p/4]*stroke.opacity);if((p&511)===0&&performance.now()>=deadline){check();await yieldTask();check();deadline=performance.now()+2;}}
@@ -72,11 +78,11 @@ export async function replayFloatPaint(strokes:readonly PaintOperationData[],are
 /** Active replacements choose the same content-local reconstruction as byte
  * PaintLayers: all operations precede the current owner/ancestor affine. Inert
  * records must not change the established dry document-lattice rasterization. */
-export async function renderFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'|'floatCompositeHdrWet'>,check:()=>void,wet:(stroke:WetPaintStrokeData,area:FloatSourceWindow)=>Promise<Float64Array>):Promise<Float32Array>{
- check();if(!strokes.some(isActiveWetPaint))return replayFloatPaint(strokes,area,world,coverage,processor,check);
+export async function renderFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'|'floatCompositeHdrWet'>,check:()=>void,wet:(stroke:WetPaintStrokeData,area:FloatSourceWindow)=>Promise<Float64Array>,clone?:FloatCloneRead):Promise<Float32Array>{
+ check();if(!strokes.some(isActiveWetPaint))return replayFloatPaint(strokes,area,world,coverage,processor,check,undefined,clone);
  const bounds=unionBounds(strokes.filter(stroke=>stroke.kind!=='wet'||isActiveWetPaint(stroke)).map(strokeBounds));
  if(!bounds)return new Float32Array(validateWindow(area).width*area.height*4);
  const left=Math.floor(bounds.x)-2,top=Math.floor(bounds.y)-2,right=Math.ceil(bounds.x+bounds.width)+2,bottom=Math.ceil(bounds.y+bounds.height)+2,width=right-left,height=bottom-top;
  if(![left,top,right,bottom,width,height].every(Number.isSafeInteger)||width<=0||height<=0)throw new Error('Float wet paint content bounds exceed numeric precision.');
- return projectFloatWindow({width,height,readWindow:region=>replayFloatPaint(strokes,{...region,x:region.x+left,y:region.y+top},new AffineTransform(),coverage,processor,check,wet)},world.multiply(AffineTransform.translation(left,top)),area,{isCancelled:()=>{check();return false;}});
+ return projectFloatWindow({width,height,readWindow:region=>replayFloatPaint(strokes,{...region,x:region.x+left,y:region.y+top},new AffineTransform(),coverage,processor,check,wet,clone)},world.multiply(AffineTransform.translation(left,top)),area,{isCancelled:()=>{check();return false;}});
 }

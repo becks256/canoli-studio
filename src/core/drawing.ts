@@ -60,6 +60,8 @@ export interface CloneTile extends Rect {
 export interface BrushStrokeData {
   id: string;
   kind: "brush" | "pencil" | "clone" | "eraser";
+  /** Explicit canonical linear RGBA32 TIFF sources; valid only for clone. */
+  precision?: 'float32';
   points: StrokePoint[];
   size: number;
   hardness: number;
@@ -76,7 +78,8 @@ export interface BrushStrokeData {
   clip: SelectionData | null;
   tiles: CloneTile[];
 }
-export function assertBrushVersion(brush:{pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[]},version:number){
+export function assertBrushVersion(brush:{kind?:string;precision?:unknown;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[]},version:number){
+  if(brush.kind==='clone'&&brush.precision==='float32'&&version<58)throw new Error('HDR clone paint requires schema version 58.');
   if(version<29&&brush.pressureCurve!==undefined)throw new Error('Brush pressure curves require schema version 29.');
   if(version<30&&(brush.tip!==undefined||brush.points?.some(point=>point.tilt!==undefined)))throw new Error('Brush tips and pen tilt require schema version 30.');
   if(version<31&&brush.symmetry!==undefined)throw new Error('Brush symmetry requires schema version 31.');
@@ -185,6 +188,7 @@ export const brushStrokeSchema = z
       .object({
         id: identifier,
         kind: z.enum(["brush", "pencil", "clone", "eraser"]),
+        precision: z.literal('float32').optional(),
         points: z
           .array(point.extend({ pressure: unit, tilt:penTiltSchema.optional() }))
           .min(1)
@@ -208,7 +212,11 @@ export const brushStrokeSchema = z
       .refine(
         (stroke) => stroke.kind !== "clone" || stroke.tiles.length > 0,
         "Clone strokes require a source image.",
-      );
+      ).superRefine((stroke,context)=>{
+        if(stroke.precision===undefined)return;
+        if(stroke.kind!=='clone')context.addIssue({code:'custom',message:'Float source precision is valid only for clone strokes.'});
+        for(const tile of stroke.tiles)if(![tile.x,tile.y,tile.width,tile.height,tile.x+tile.width,tile.y+tile.height,tile.width*tile.height*4].every(Number.isSafeInteger))context.addIssue({code:'custom',message:'HDR clone tiles require safely representable native integer geometry.'});
+      });
 export const wetStrokeSchema = wetPaintOperationSchema(brushStrokeSchema);
 export const paintOperationSchema: z.ZodType<PaintOperationData> =
   z.discriminatedUnion('kind', [

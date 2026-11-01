@@ -1,4 +1,4 @@
-import {validateWetPaintAssets} from '../../core/wet-assets';
+import {validatePreparedPaintAssets} from '../../core/prepared-paint-assets';
 import {wetBrowserAssets} from '../../engine/wet-composite';
 import {recipeFontFiles} from './fonts';
 import {documentFontFiles} from '../../core/font-files';
@@ -79,7 +79,7 @@ export async function executeRecipeAsync(
     try{
       for(const asset of assets?.values()??[])assets!.shareTo(validation,asset.id,asset.id);
       for(const asset of staging.values())staging.shareTo(validation,asset.id,asset.id);
-      await validateWetPaintAssets(final,wetBrowserAssets(validation,current));current();
+      await validatePreparedPaintAssets(final,wetBrowserAssets(validation,current));current();
     }finally{validation.dispose();}
     current();
     for(const asset of staging.values()){staging.shareTo(assets!,asset.id,asset.id);promoted.push(asset.id);}

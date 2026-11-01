@@ -41,7 +41,7 @@ import { Document, LayerGroup, RasterLayer, VectorLayer } from "../src/dom";
 import { AssetStore,type ImageAsset } from "../src/core/assets";
 import { BLEND_MODES, id, findLayer, allLayers, type DocumentData } from "../src/core/model";
 import {visitLayerAssets} from '../src/core/asset-references';
-import { validateWetPaintAssets, wetDocumentOperations,commandHasWetPaint } from '../src/core/wet-assets';
+import { validatePreparedPaintAssets, hasPreparedPaint,commandHasPreparedPaint } from '../src/core/prepared-paint-assets';
 import { execute } from '../src/core/commands';
 import { wetServerAssets } from './wet-assets';
 import {
@@ -699,11 +699,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
           return;
         }
         const commands = parseCommands(parsed.commands);
-        if (commands.some(commandHasWetPaint) || !wetDocumentOperations(document._read()).next().done) {
+        if (commands.some(commandHasPreparedPaint) || hasPreparedPaint(document._read())) {
           const candidate = execute(document._read(), { type: 'transaction', label: parsed.label ?? 'REST transaction', commands });
           try {
-            await validateWetPaintAssets(candidate, wetServerAssets(session.assets, () => {
-              if (sessions.get(document.id) !== session || document.getSnapshot().revision !== parsed.expectedRevision) throw new Error('Document changed during wet-paint validation.');
+            await validatePreparedPaintAssets(candidate, wetServerAssets(session.assets, () => {
+              if (sessions.get(document.id) !== session || document.getSnapshot().revision !== parsed.expectedRevision) throw new Error('Document changed during prepared-paint validation.');
             }));
           } catch (error) {
             if (document.getSnapshot().revision !== parsed.expectedRevision) { send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision}); return; }
