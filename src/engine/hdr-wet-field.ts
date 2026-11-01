@@ -1,5 +1,8 @@
 import {validateHdrWetField} from '../core/hdr-wet-field';
-import {floatWetTileRows,readFloatWetTileWindow,type FloatWetTileControl} from '../core/float-wet-tile';
+import {validateFloatWetTilePair,readFloatWetTileWindow,type FloatWetTileControl} from '../core/float-wet-tile';
+import {captureHdrWetAssets} from '../core/hdr-wet-assets';
+import type {WetAssetProvider} from '../core/wet-assets';
+import type {WetPaintTileData} from '../core/wet-operation';
 import {captureFieldBounds} from '../core/projective-field';
 import {validateWindow,type FloatSourceWindow} from '../core/float-source/types';
 import type {HdrWetFieldSource} from './projective-field';
@@ -19,12 +22,8 @@ export async function captureHdrWetField(input:readonly HdrWetTile[],control:Flo
   check();if(!tiles.length)throw new Error('An HDR wet field requires prepared native tiles.');
   let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity;
   for(const tile of tiles){
-    const {width,height}=tile.region,a=floatWetTileRows(tile.pixels,width,height,{check})[Symbol.asyncIterator](),b=floatWetTileRows(tile.coverage,width,height,{check})[Symbol.asyncIterator]();
-    try{for(let y=0;y<height;y++){
-      const color=await a.next();check();const coverage=await b.next();check();if(color.done||coverage.done)throw new Error('HDR wet asset rows are incomplete.');
-      for(let at=3;at<color.value.length;at+=4)if(color.value[at]>coverage.value[at])throw new Error('HDR wet replacement must already be masked by its native removal coverage.');
-    }if(!(await a.next()).done||!(await b.next()).done)throw new Error('HDR wet asset rows exceed native geometry.');check();}
-    finally{try{await a.return?.(undefined);}finally{await b.return?.(undefined);}}
+    const {width,height}=tile.region;
+    await validateFloatWetTilePair(tile.pixels,tile.coverage,width,height,{check});check();
     left=Math.min(left,tile.region.x);top=Math.min(top,tile.region.y);right=Math.max(right,tile.region.x+width);bottom=Math.max(bottom,tile.region.y+height);
   }
   const bounds=Object.freeze(captureFieldBounds({x:left,y:top,width:right-left,height:bottom-top}));
@@ -48,4 +47,15 @@ export async function captureHdrWetField(input:readonly HdrWetTile[],control:Flo
     validateHdrWetField(result,region.width*region.height);current();return result;
   }};
   return Object.freeze(owner);
+}
+
+/** Private bridge from shared host asset references to native HDR sampling.
+ * The asset owner remains checked throughout reads, including cached proofs and
+ * windows disjoint from every tile. No display bitmap supplies color samples. */
+export async function captureHdrWetAssetField(tiles:readonly WetPaintTileData[],provider:WetAssetProvider,control:FloatWetTileControl={}):Promise<CapturedHdrWetField>{
+  const assets=await captureHdrWetAssets(tiles,provider,control);
+  try{
+    const field=await captureHdrWetField(assets.tiles,{check:assets.check});
+    return Object.freeze({bounds:field.bounds,check:field.check,readWindow:field.readWindow,dispose(){field.dispose();assets.dispose();}});
+  }catch(error){assets.dispose();throw error;}
 }

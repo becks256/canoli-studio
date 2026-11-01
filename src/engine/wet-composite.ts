@@ -3,6 +3,7 @@ import { AffineTransform } from '../core/affine';
 import type { AssetStore } from '../core/assets';
 import type { WetPaintStrokeData } from '../core/wet-operation';
 import { validateWetPaintTile, type WetAssetProvider, type WetImageSource } from '../core/wet-assets';
+import {assetBitmapMatches} from '../core/assets';
 import { createCanvas, release, renderTransform, type RenderSpace } from './canvas';
 import type { PixelProcessor } from './processor';
 import { checkRenderCurrent } from './render-control';
@@ -12,7 +13,11 @@ import {compositeProjectedWetPaint} from './projected-wet';
 export function wetBrowserAssets(assets: Pick<AssetStore, 'get' | 'captureLifetime'>, check: () => void = () => {}): WetAssetProvider {
   const lifetime = assets.captureLifetime();
   return {
-    get(id) { const asset = assets.get(id); if (asset.width !== asset.bitmap.width || asset.height !== asset.bitmap.height) throw new Error('Wet-paint decoded source dimensions changed.'); return { blob: asset.blob, width: asset.width, height: asset.height, identity: asset, pixels: asset.bitmap }; },
+    get(id,precision) {
+      const asset = assets.get(id), matches=precision==='float32'?assetBitmapMatches(asset):asset.width===asset.bitmap.width&&asset.height===asset.bitmap.height;
+      if (!matches) throw new Error('Wet-paint decoded source dimensions changed.');
+      return { blob: asset.blob, width: asset.width, height: asset.height, identity: asset, pixels: asset.bitmap };
+    },
     check() { lifetime(); check(); },
     async *alpha(source: WetImageSource) {
       const asset = source.identity as ReturnType<AssetStore['get']>;

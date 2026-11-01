@@ -9991,3 +9991,35 @@ photographic/device/sustained F14 memory/performance and every unfinished origin
 professional, AI, workflow, ChatGPT/live identity, commercial, specialist and
 motion gate remain required. No continuous-60fps, physical pigment, paid call,
 upload or browser/REST synchronization claim follows from this dependency.
+
+### 2026-10-31 — F03/F10 shared HDR wet host asset capture
+
+Owner: implementation agent; bounded increment from `da983fe`; classification:
+progress. Ordered native tile references now pin complete original identities
+through shared browser/headless asset providers before any await. Complete TIFF
+pair validation and immutable Blob-pair proofs retain geometry, source/lifetime
+and cancellation checks; native Float64 field reads preserve those checks even
+for disjoint windows. Disposal releases owned pins and callbacks. Byte wet
+validation retains its native PNG contract.
+[Exact private contract](HDR_WET_FIELDS.md#shared-host-asset-capture).
+
+Verified: **3,276 unit/API/native tests across 316 files; 75 source-browser cases across 9 files; 11 selected production cases across 6 files**. No failed/skipped cases, retries, flakes or runner errors.
+Independent native libtiff reads all 82,792 words and the complete ICC in two
+131x79 originals; NumPy matches all 51,745 field words and retry words despite an
+unrelated white display thumbnail. Stale/missing/malformed/offscreen assets,
+cancellation, disposal and reentrant retirement reject. Headless encoded sources
+need no ImageBitmap/PNG alpha decoder. Existing genuine 50 MP source acceptance
+retains its separately disclosed full-pipeline and 64x48 wet-window scopes.
+Build/typecheck passes; 3,438 frozen inputs and final tested runtime identities
+remain intact. [Findings and compact evidence](benchmarks/hdr-wet-host-assets-2026-10-31.md).
+
+The full original goal remains active. Next required work is versioned public
+HDR wet metadata and connecting host validation to shared commands, ordered
+FloatScene replay/projection/resize, source-bearing history/project/workspace/
+recipe transport, then guarded authoring/previews/commit and real tools. Schema
+56 and public byte wet constructors/grants remain; float Smudge/Mixer stays
+disabled. Wider mask/master/nested-projective acceptance, general warp,
+photographic/device/sustained F14 performance and every unfinished original
+professional, AI, workflow, ChatGPT/live identity, commercial, specialist and
+motion gate remain required. No full-image HDR wet editing, continuous-60fps,
+physical pigment, paid call, upload or browser/REST sync is inferred.

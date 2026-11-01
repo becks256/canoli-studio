@@ -8,6 +8,7 @@ import {validateIccSamples} from './color/icc-types';
 /** Private prepared-asset codec, not a new document schema or TIFF import rule. */
 export interface FloatWetTileControl {signal?:AbortSignal;check?():void}
 const headers=new WeakMap<Blob,InspectedTiff>(),verified=new WeakSet<Blob>();
+const pairs=new WeakMap<Blob,WeakSet<Blob>>();
 const linearProfile=new Uint8Array(STANDARD_PROFILES['linear-srgb'].iccBytes!);
 function checker(control:FloatWetTileControl){const signal=control.signal,external=control.check;return()=>{signal?.throwIfAborted();external?.();signal?.throwIfAborted();};}
 function geometry(width:number,height:number){if(![width,height,width*height*4].every(value=>Number.isSafeInteger(value)&&value>0))throw new Error('Float wet tile geometry is invalid.');}
@@ -31,6 +32,25 @@ async function checkedTile(blob:Blob,width:number,height:number,control:FloatWet
   check();return inspection;
 }
 export async function validateFloatWetTile(blob:Blob,width:number,height:number,control:FloatWetTileControl={}):Promise<void>{await checkedTile(blob,width,height,control);}
+/** Shared host/field invariant. Proofs belong to immutable original pairs, never
+ * a thumbnail, asset ID or viewport. Geometry and caller lifetime still check on
+ * every hit; failed/cancelled work cannot establish a completed pair proof. */
+export async function validateFloatWetTilePair(pixels:Blob,coverage:Blob,width:number,height:number,control:FloatWetTileControl={}):Promise<void>{
+  const check=checker(control);
+  await checkedTile(pixels,width,height,{check});check();
+  await checkedTile(coverage,width,height,{check});check();
+  if(pairs.get(pixels)?.has(coverage))return;
+  const a=floatWetTileRows(pixels,width,height,{check})[Symbol.asyncIterator](),b=floatWetTileRows(coverage,width,height,{check})[Symbol.asyncIterator]();
+  try{
+    for(let y=0;y<height;y++){
+      const color=await a.next();check();const removal=await b.next();check();
+      if(color.done||removal.done)throw new Error('HDR wet asset rows are incomplete.');
+      for(let at=3;at<color.value.length;at+=4)if(color.value[at]>removal.value[at])throw new Error('HDR wet replacement must already be masked by its native removal coverage.');
+    }
+    if(!(await a.next()).done||!(await b.next()).done)throw new Error('HDR wet asset rows exceed native geometry.');check();
+  }finally{try{await a.return?.(undefined);}finally{await b.return?.(undefined);}}
+  check();let proof=pairs.get(pixels);if(!proof)pairs.set(pixels,proof=new WeakSet());proof.add(coverage);
+}
 export async function* floatWetTileRows(blob:Blob,width:number,height:number,control:FloatWetTileControl={}):AsyncGenerator<Float32Array<ArrayBuffer>>{
   const check=checker(control),inspection=await checkedTile(blob,width,height,{check});
   for await(const row of floatTiffRows(inspection,inspection.pages[0])){check();yield row.samples;check();}

@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## HDR wet host-source invariants
+
+Host capture owns ordered native tile references and complete original TIFF
+pairs before asynchronous validation. A display thumbnail and an asset ID cannot
+establish an HDR pixel proof. Shared complete-pair validation checks replacement
+alpha against removal alpha; reusable proofs remain bound to immutable Blob
+pairs while geometry and host lifetime check on every use. Native field reads
+retain source identity checks, cancellation and independent returned buffers.
+Public HDR document commands, replay and persistence remain separate required
+integration. [Private contract](HDR_WET_FIELDS.md#shared-host-asset-capture).
+
 ## Completed float appearance dependencies
 
 A retained selection's raw rectangular shape does not identify its completed

@@ -1,5 +1,15 @@
 # Architecture
 
+## Shared HDR wet asset ownership
+
+Private `captureHdrWetAssets` pins ordered native references through the shared
+browser/headless `WetAssetProvider`; `captureHdrWetAssetField` connects that owner
+to Float64 field reads. Both use complete original TIFF pair validation from
+`float-wet-tile.ts`. Reusable Blob-pair proofs do not bypass geometry, source,
+cancellation or lifetime checks. Byte preparation keeps its native PNG contract;
+HDR uses no thumbnail color/alpha. Public document/command/replay integration is
+still required. [Signatures, ownership and limits](HDR_WET_FIELDS.md#shared-host-asset-capture).
+
 ## Retained masks in the float appearance cache
 
 The bounded native appearance key includes complete retained-plane data and the

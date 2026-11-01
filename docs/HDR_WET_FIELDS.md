@@ -16,6 +16,7 @@ restrictions apply only to prepared wet files.
 
 Private functions are `encodeFloatWetTile(pixels,width,height,control?)`,
 `validateFloatWetTile(blob,width,height,control?)`,
+`validateFloatWetTilePair(pixels,coverage,width,height,control?)`,
 `floatWetTileRows(blob,width,height,control?)` and
 `readFloatWetTileWindow(blob,width,height,region,control?)`. Controls capture
 AbortSignal/source checks before work; encoding owns samples before its first
@@ -26,6 +27,40 @@ zero outside the stored rectangle. Internal inspection objects stay private.
 Encoding/read windows have a 262,144-pixel working budget. Full file validation
 reads native rows; extreme row widths still depend on available memory. No new
 file-size or original-image megapixel limit is introduced.
+
+Pair validation is shared by direct field capture and host asset capture. A
+completed proof belongs to both immutable TIFF Blobs. Every use still checks
+native dimensions and caller cancellation/lifetime; failed or cancelled pair
+comparison establishes no pair proof. Replacement alpha must not exceed removal
+alpha anywhere in either complete original, including offscreen pixels.
+
+## Shared host asset capture
+
+Private `core/hdr-wet-assets.ts` exposes
+`captureHdrWetAssets(tiles,provider,control?)`. Input is an ordered, nonempty
+array of strict `{x,y,width,height,assetId,coverage:{assetId}}` references.
+Native geometry must have safely representable integer pixel centers; there is
+no original resolution, file-size or tile-count tier. Controls are the same
+optional `{signal,check}` used by the codec. All metadata and original source
+identities are captured before the first await. Every complete pair validates
+before the frozen owner exposes its `tiles`, `check()` and `dispose()`.
+
+The internal `WetAssetProvider.get(id,"float32")` supplies immutable original
+TIFF bytes and native dimensions. Browser providers validate the expected
+display-thumbnail dimensions but never read thumbnail color or alpha for HDR.
+Headless encoded TIFF records need no fabricated ImageBitmap or PNG decoder.
+The omitted precision argument preserves native byte geometry and PNG alpha
+validation for existing public wet strokes. Float preparation never calls the
+provider's byte `alpha()` stream.
+
+`engine/hdr-wet-field.ts` connects these hosts through private
+`captureHdrWetAssetField(tiles,provider,control?)`. Its field retains all source
+identity, dimensions, Blob and display-surface identity checks during reads,
+including a disjoint read and completed-proof reuse. Missing or changed sources,
+store disposal, cancellation and reentrant retirement reject before publishing
+samples. Disposal releases owned pins and the provider/check callback; arrays
+already returned remain independently owned. This is a dependency for public
+host commits, not a new scripting grant, REST route or accepted document DTO.
 
 ## Coupled field and ownership
 
@@ -86,7 +121,7 @@ complete ICC; NumPy replays them and checks exact reopened output. Genuine
 50 MP source acceptance uses a disclosed 64x48 native window, not every-pixel
 full-image wet editing or delivery. Dated findings record complete runs.
 
-Versioned public HDR wet strokes/assets, guarded host validation/shared commands,
+Versioned public HDR wet strokes/assets, connecting guarded validation to shared commands,
 FloatScene replay in operation order, projection/resize semantics, original-bearing
 history/project/workspace/recipe transport, independent REST/isolated surfaces
 as scoped, and authoring previews/commit plus tools remain required. Current

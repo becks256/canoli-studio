@@ -5,7 +5,9 @@ import type { WetPaintStrokeData, WetPaintTileData } from './wet-operation';
 
 export interface WetImageSource { blob: Blob; width: number; height: number; identity?: object; pixels?: object; }
 export interface WetAssetProvider {
-  get(id: string): WetImageSource;
+  /** Float preparation consumes original TIFF bytes, never display pixels. The
+   * omitted argument retains the existing strict native byte-PNG contract. */
+  get(id: string, precision?: 'float32'): WetImageSource;
   /** Complete native alpha in row order; independently sized bounded chunks. */
   alpha(source: WetImageSource): AsyncIterable<Uint8Array>;
   check?(): void;
