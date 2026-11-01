@@ -1,3 +1,5 @@
+import type {FontAxisRange} from '../fonts/css-instance';
+import type {FontDescriptors} from '../fonts/types';
 import {normalizeFontRun,type FontRunInput,type OwnedFontRun} from '../fonts/shaping-types';
 import {parseFontVariations,formatFontVariations} from '../core/font-variations';
 import type {AssetStore} from '../core/assets';
@@ -7,7 +9,7 @@ import {validateGlyphSelectorSteps,type GlyphSelectorBytes} from '../fonts/glyph
 
 export interface NativeGlyphFontControl {signal?:AbortSignal;timeoutMs?:number;check?:()=>void}
 export interface NativeGlyphFont {
- readonly sourceFamily:string;readonly family:string;readonly glyphCount:number;readonly settings:string;readonly monochrome:boolean;
+ readonly axes:readonly Readonly<FontAxisRange>[];readonly descriptors:readonly Readonly<FontDescriptors>[];readonly sourceFamily:string;readonly family:string;readonly glyphCount:number;readonly settings:string;readonly monochrome:boolean;
  shapeRun(input:FontRunInput,control?:NativeGlyphFontControl):Promise<OwnedFontRun>;
  character(glyphId:number):string;
  check():void;release():void;
@@ -35,7 +37,7 @@ export async function captureNativeGlyphFont(assets:AssetStore,id:string,setting
   let deadline=performance.now()+2;for(const _ of validateGlyphSelectorSteps(bytes,result)){if(performance.now()>=deadline){await guarded(yieldTask());check();deadline=performance.now()+2;}void _;}check();if(result.glyphCount!==info.glyphCount)throw new Error('Native glyph count differs from its retained source.');selectors=result.selectors;
   for(const descriptor of info.descriptors){check();const face=new FontFace(family,Uint8Array.from(result.bytes).buffer,{...descriptor,variationSettings:effective});await guarded(face.load());check();if(face.status!=='loaded')throw new Error('Cannot load native glyph font.');faces.push(face);states.push(nativeState(face));set.add(face);check();}
   const colorTables=['COLR','CPAL','CBDT','CBLC','EBDT','EBLC','sbix','SVG '],v=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),tags=Array.from({length:v.getUint16(4)},(_,i)=>String.fromCharCode(...bytes.subarray(12+i*16,16+i*16))),monochrome=!tags.some(tag=>colorTables.includes(tag));
-  check();return Object.freeze({sourceFamily:info.cssFamily,family,glyphCount:info.glyphCount,settings:effective,monochrome,async shapeRun(input:FontRunInput,requested:NativeGlyphFontControl={}){const run=normalizeFontRun(input),child={...requested};check();const {captureNativeFontRun}=await import('./native-font-shape');check();const signals=[abort.signal,...(control.signal?[control.signal]:[]),...(child.signal?[child.signal]:[])];return captureNativeFontRun(assets,id,run,effective,{...child,signal:AbortSignal.any(signals),check(){check();child.check?.();check();}});},character(glyphId:number){check();if(glyphId===0)throw new Error('Glyph zero requires missing-glyph paint integration.');if(!Number.isInteger(glyphId)||glyphId<1||glyphId>=info.glyphCount)throw new Error('Native glyph ID is outside its original font.');return String.fromCodePoint(selectors![glyphId]);},check,release});
+  check();return Object.freeze({axes:Object.freeze(info.axes.map(a=>Object.freeze({tag:a.tag,min:a.min,max:a.max}))),descriptors:Object.freeze(info.descriptors.map(d=>Object.freeze({...d}))),sourceFamily:info.cssFamily,family,glyphCount:info.glyphCount,settings:effective,monochrome,async shapeRun(input:FontRunInput,requested:NativeGlyphFontControl={}){const run=normalizeFontRun(input),child={...requested};check();const {captureNativeFontRun}=await import('./native-font-shape');check();const signals=[abort.signal,...(control.signal?[control.signal]:[]),...(child.signal?[child.signal]:[])];return captureNativeFontRun(assets,id,run,effective,{...child,signal:AbortSignal.any(signals),check(){check();child.check?.();check();}});},character(glyphId:number){check();if(glyphId===0)throw new Error('Glyph zero requires missing-glyph paint integration.');if(!Number.isInteger(glyphId)||glyphId<1||glyphId>=info.glyphCount)throw new Error('Native glyph ID is outside its original font.');return String.fromCodePoint(selectors![glyphId]);},check,release});
  }catch(error){release();throw error;}
  finally{worker?.terminate();worker=undefined;if(timer)clearTimeout(timer);slot?.();control.signal?.removeEventListener('abort',cancel);}
 }

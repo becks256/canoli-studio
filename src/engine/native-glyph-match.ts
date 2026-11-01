@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {captureNativeFontInstance} from './native-font-instance';
 import {AffineTransform} from '../core/affine';
 import {characterFormatSchema,DEFAULT_CHARACTER_FORMAT} from '../core/character-format';
 import {applyTextStyle} from '../core/text-style';
@@ -40,11 +41,13 @@ export async function matchNativeGlyphRun(font:NativeGlyphFont,input:NativeGlyph
  const native=(c:CanvasRenderingContext2D)=>{applyTextStyle(c,style);c.textAlign='left';c.textBaseline='alphabetic';c.direction=request.direction;c.fillStyle='#ffffff';};
  const glyph=(c:CanvasRenderingContext2D)=>{applyTextStyle(c,{...style,fontFamily:font.family,fontVariationSettings:'normal',fontKerning:'none',fontVariantCaps:'normal',letterSpacing:0,wordSpacing:0});c.textAlign='left';c.textBaseline='alphabetic';c.direction='ltr';c.fillStyle='#ffffff';};
  try{
-  check();native(context);const reference=context.measureText(request.text),nativeAdvance=reference.width;
+  check();context.font='1px monospace';native(context);if(context.font==='1px monospace')throw new Error('Invalid native glyph font request.');const reference=context.measureText(request.text),nativeAdvance=reference.width,css=captureNativeFontInstance(context,style.fontWeight,font.descriptors);
   const kerns=style.fontKerning==='auto'?[1,0]:[style.fontKerning==='none'?0:1];let last:NativeGlyphMatch|undefined;
-  for(const kern of kerns){
+  const styleAxes=font.axes.filter(a=>a.tag==='ital'||a.tag==='slnt').map(a=>a.tag as 'ital'|'slnt');
+  const cssModes=styleAxes.length?[...styleAxes.map(styleAxis=>({...css,styleAxis})),{...css,styleAxis:'none'as const}]:[css];
+  for(const kern of kerns)for(const mode of cssModes){
    const features=[{tag:'kern',value:kern},...(caps[style.fontVariantCaps??'normal']??[]).map(tag=>({tag,value:1})),...(style.letterSpacing?[{tag:'liga',value:0},{tag:'clig',value:0}]:[])];
-   check();const run=await font.shapeRun({text:request.text,direction:request.direction,script:request.script,language:request.language,features},{...options,timeoutMs:Math.max(1,Math.ceil(timeout-(performance.now()-started))),check});check();
+   check();const run=await font.shapeRun({text:request.text,direction:request.direction,script:request.script,language:request.language,features,css:mode},{...options,timeoutMs:Math.max(1,Math.ceil(timeout-(performance.now()-started))),check});check();
    if(run.glyphs.some(g=>g.glyphId===0))return Object.freeze({status:'unavailable',reason:'The run requires missing-glyph or font-fallback painting.'});
    const scale=style.fontSize/run.unitsPerEm,placements:NativeGlyphPlacement[]=[],draws:{character:string;transform:AffineTransform;bounds:ReturnType<AffineTransform['bounds']>}[]=[],measures=new Map<number,{character:string;metrics:TextMetrics}>(),sorted=[...new Set(run.glyphs.map(g=>g.cluster))].sort((a,b)=>a-b),ends=new Map(sorted.map((start,i)=>[start,sorted[i+1]??request.text.length]));let penX=0,penY=0;
    let left=-reference.actualBoundingBoxLeft,top=-reference.actualBoundingBoxAscent,right=reference.actualBoundingBoxRight,bottom=reference.actualBoundingBoxDescent;

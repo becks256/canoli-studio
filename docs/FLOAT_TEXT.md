@@ -156,6 +156,45 @@ interchange remain required. A mismatch cannot fall back to a byte-flattened
 Float32 image. Full TextLayer/tool gates and broad roadmap acceptance remain.
 Build pins, rebuild steps and licenses are in [the codec source](../src/fonts/codec/README.md).
 
+## CSS-selected source font instances (private)
+
+Whole Canvas matching now captures the native numeric weight, stretch and closest
+owned face descriptor, including relative weights and descriptor-range clamping.
+An authored numeric weight stays numeric: Canvas can serialize `639.75` as `639`
+without actually discarding that fraction from rendering. Matching therefore
+uses the original numeric request; relative/custom values use the resolved native
+shorthand. Invalid native font shorthand rejects rather than inheriting a pooled
+canvas's previous font. Frozen source descriptors and axis ranges cannot retarget
+a captured source.
+
+Private source-shaping input accepts optional `css:{weight,width,style,styleAxis?}`
+for an already selected native face request. Weight is finite in [1,1000], width
+is a positive percentage and style is normal/italic/oblique. `styleAxis` may be
+ital/slnt/none. Source-range clamps apply to wght/wdth and at most one automatic
+style axis, then the original authored axis tuple overrides them. Unrelated
+axes retain source defaults. An omitted `css` preserves explicit-only shaping.
+The returned run's `settings` records the effective merged coordinates; its
+request, CSS metadata, descriptors and source-axis metadata are immutable.
+
+The matcher checks supported ital/slnt and original-default modes against the
+unchanged complete native run. This handles observed native differences when
+both style axes exist, and declared faces whose automatic ital value is not
+applied by the host. Only exact native ink/advance matching publishes paint
+placements; it does not fit arbitrary axis values or change the requested font.
+Explicit original settings win in every mode. This follows the separation of
+native face selection, descriptor clamps and authored settings in
+[CSS Fonts 4 variation resolution](https://www.w3.org/TR/css-fonts-4/#font-feature-resolution),
+while recording actual browser results rather than assuming one native mapping.
+The ordinary renderer, font registrations and authored appearance remain.
+
+This resolves the private weight/width/style dependency for verified native
+runs; automatic optical sizing, full CSS/fallback itemization, native registration
+behavior for every font/browser, compressed and missing/intrinsic glyph paint,
+SVG/path/vertical matching and complete float TextLayer integration remain
+required. In particular, this does not repair or promise automatic italic-axis
+selection in the existing ordinary native host. Explicit authored ital remains
+available through the existing variable-axis controls.
+
 ## Required native paint work
 
 The current ordinary renderer uses whole-line Canvas text; character-formatted,
@@ -253,3 +292,19 @@ sample in its complete 600 × 200 independent native text reference region.
 [compact receipt](benchmarks/font-shaping-2026-11-01.json.gz) retain successful and
 failed pilots. Full native layout/fallback/paint and connected float TextLayer,
 large-original and remaining roadmap acceptance are still required.
+
+## CSS font-instance verification (2026-11-01)
+
+Full build/typecheck, 3,379 unit/API tests across 334 files, one complete 47-case
+native run and six production checks pass. Thirty-six full native/static reference
+comparisons match every RGBA sample and native advance across three sizes/two
+transforms. Six additional native cases retain relative/fractional weights,
+descriptor clamps and non-lattice authored settings with zero whole-run alpha
+error and unchanged model/source data. Matched CSS glyphs retain ordered native
+Float32 alpha, HDR RGB, alpha 1e-8 and exact partitions. The existing 50 MP byte
+workflow retains its original identity and every sample in the complete independent
+600 × 200 text reference region. [Findings and limitations](benchmarks/css-font-instance-2026-11-01.md)
+and [compact receipt](benchmarks/css-font-instance-2026-11-01.json.gz) include
+failed/corrected native-style and static-rounding probes. These results do not
+close automatic optical sizing, universal native style/fallback behavior,
+compressed/missing/intrinsic paint, full float TextLayer or the original roadmap.

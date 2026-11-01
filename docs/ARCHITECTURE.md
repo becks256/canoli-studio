@@ -1,5 +1,16 @@
 # Architecture
 
+## Native CSS font-instance projection
+
+Private Canvas-run matching snapshots native weight/stretch and closest owned
+face descriptors before original-source shaping. Shared pure resolution clamps
+registered coordinates, applies at most one automatic style axis and preserves
+later explicit authored overrides. Native whole-run comparison selects only
+supported style/default modes; it cannot infer arbitrary coordinates or mutate
+source/native registrations. Numeric authored weights retain fractions omitted
+by Canvas serialization. Frozen metadata and existing queue/lease/cancellation
+boundaries remain. [Contract and remaining native scope](FLOAT_TEXT.md#css-selected-source-font-instances-private).
+
 ## Private source shaping and native Canvas matching
 
 Pinned full HarfBuzz 15.0.0 runs lazily in disposable private workers. Retained

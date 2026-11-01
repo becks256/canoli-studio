@@ -10563,3 +10563,54 @@ implicit CSS axes, compressed/missing/intrinsic glyph paint, SVG/path/vertical
 native matching, full scene/tool/export/shared transport/persistence and original
 professional-editor/device/performance acceptance remain required. The original
 roadmap stays active.
+
+### 2026-11-01 — F08/F10 native CSS font-instance projection in progress
+
+Previous goal turn: progress, original-source shaping and whole native Canvas
+matching accepted at 1351cab. The full original roadmap stays active. This
+increment connects native numeric/relative weight, stretch and owned descriptor
+bounds to original-font shaping. It preserves numeric fractions omitted by
+Canvas serialization, applies source-range clamps and explicit tuple precedence,
+and matches supported style/default modes against complete native paint before
+publication. No ordinary native registration, authored appearance, source/model,
+command, scripting/plugin/REST or persistence contract changes.
+[Private behavior and remaining scope](FLOAT_TEXT.md#css-selected-source-font-instances-private).
+
+Early probes expose native slnt preference with both style axes, and original
+default-axis rendering in an italic-declared face without slnt. Natural source
+style/default modes retain those actual native results; this is not a fix for
+ordinary registration's automatic ital selection. Static FontTools instancing
+rounds nonintegral outlines: independent reference instances now use a lattice
+whose points/normalized coordinates remain exact, while the original harder
+639.75/550.25 requests retain separate whole-native-run checks. No alpha/advance
+assertion is widened. The seven-case native pilot passes; final Float32,
+full build/unit, broader native/50 MP and production acceptance follows below.
+
+Compressed font preparation still requires complete hint/metric/table decoding:
+Fontkit's transformed glyph objects omit instruction bytes, so reconstructing
+from those outlines alone is insufficient. Automatic optical sizing, full native
+bidi/script/font fallback, every native registration/browser, missing/intrinsic
+paint, SVG/path/vertical matching, complete float TextLayer authoring/rendering/
+transport/persistence and all unfinished original gates remain required.
+
+### 2026-11-01 — F08/F10 native CSS font-instance matching verified
+
+Full build/typecheck and all 3,379 unit/API tests across 334 files pass. One full
+47-case affected native run and six production checks pass. Independent static
+FontTools references match complete RGBA pixels and advances in 36 size/transform
+cases; six harder native cases retain relative/fractional weights, descriptor
+clamps and explicit override precedence with zero whole-ink alpha difference.
+Actual CSS-selected glyph paint retains ordered Float32 alpha, signed HDR RGB,
+alpha 1e-8 and exact work-window words. The existing 50 MP byte workflow retains
+the complete original identity and all 480,000 RGBA samples in its independent
+600 × 200 text reference region. This is not full 50 MP pixel/float text acceptance.
+
+[Findings and remaining scope](benchmarks/css-font-instance-2026-11-01.md) and
+[compact source/release/raw-run/reference receipt](benchmarks/css-font-instance-2026-11-01.json.gz)
+retain failed/corrected static instancing and native style probes. Ordinary native
+registrations/appearance remain; observed default-axis matching does not fix or
+promise universal automatic ital selection. Automatic optical size, full native
+CSS/bidi/script/font fallback, compressed/missing/intrinsic paint, SVG/path/
+vertical matching, connected float TextLayer tools/scenes/export/shared transport/
+persistence and every unfinished original professional-editor/device/performance
+gate remain required. The complete original roadmap stays active.

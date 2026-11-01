@@ -23,7 +23,7 @@ it('rejects malformed and compressed input, corrupt worker selectors and changed
 });
 let native:FloatPixelProcessor;beforeAll(async()=>{native=new FloatPixelProcessor(await instantiateKernel(new Uint8Array(await readFile('public/wasm/pixels.wasm'))));});
 const processor={floatComposite:async(...args:Parameters<FloatPixelProcessor['composite']>)=>native.composite(...args)};
-const font:NativeGlyphFont=Object.freeze({sourceFamily:'OriginalGlyph',family:'PrivateGlyph',glyphCount:3,settings:'normal',monochrome:true,async shapeRun(){throw new Error('Resolved glyph paint must not invoke shaping.');},character:()=>String.fromCodePoint(0xf0000),check(){},release(){}});
+const font:NativeGlyphFont=Object.freeze({axes:[],descriptors:[{style:'normal' as const,weight:'400',stretch:'100%'}],sourceFamily:'OriginalGlyph',family:'PrivateGlyph',glyphCount:3,settings:'normal',monochrome:true,async shapeRun(){throw new Error('Resolved glyph paint must not invoke shaping.');},character:()=>String.fromCodePoint(0xf0000),check(){},release(){}});
 const primitive=(color:readonly[number,number,number,number]):FloatGlyph=>({font,glyphId:2,style:{fontSize:40,fontWeight:'400',fontStyle:'normal'},color,transform:new AffineTransform()});
 const area={x:0,y:0,width:1,height:1};
 it('native glyph paint keeps signed HDR RGB and per-glyph alpha in actual WASM, including sub-byte overlap',async()=>{

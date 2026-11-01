@@ -1,5 +1,15 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native font selection before private shaping
+
+Capture immutable numeric weight/width and source descriptors separately from
+authored tuples. Clamp descriptor ranges before source axis ranges and apply
+explicit values last. Use only source-supported style/default modes and reject
+complete ink/advance mismatches. Do not derive fractional numeric requests from
+lossy Canvas shorthand serialization, mutate a shared face or approximate a
+native result with changed geometry. Automatic optical size, full fallback and
+complete float text remain required. [Private contract](FLOAT_TEXT.md#css-selected-source-font-instances-private).
+
 ## Private native shaping and paint verification
 
 The full pinned HarfBuzz worker installs its message handler before async WASM

@@ -1,0 +1,97 @@
+{
+  "license": "CC0-1.0; original geometric test artwork",
+  "axes": {
+    "wght": [
+      400,
+      400,
+      800
+    ],
+    "wdth": [
+      75,
+      100,
+      125
+    ],
+    "ital": [
+      0,
+      0,
+      1
+    ],
+    "slnt": [
+      -14,
+      0,
+      0
+    ]
+  },
+  "references": {
+    "weight": {
+      "wght": 600,
+      "wdth": 100,
+      "ital": 0,
+      "slnt": 0
+    },
+    "fraction": {
+      "wght": 637.5,
+      "wdth": 100,
+      "ital": 0,
+      "slnt": 0
+    },
+    "wide-italic": {
+      "wght": 700,
+      "wdth": 125,
+      "ital": 1,
+      "slnt": 0
+    },
+    "wide-upright": {
+      "wght": 700,
+      "wdth": 125,
+      "ital": 0,
+      "slnt": 0
+    },
+    "wide-slant": {
+      "wght": 700,
+      "wdth": 125,
+      "ital": 0,
+      "slnt": -14
+    },
+    "overridden": {
+      "wght": 550,
+      "wdth": 87.5,
+      "ital": 0.5,
+      "slnt": -7
+    }
+  },
+  "files": {
+    "Css-italic.ttf": {
+      "bytes": 1704,
+      "sha256": "d83b0d8fe76a6b78a3d59b27abe8774a87535ae02ed44d6d6387509a4aa82ed4"
+    },
+    "Css.ttf": {
+      "bytes": 1828,
+      "sha256": "275044b1c89de078a1d0d80b677b03af58a9afb161d4e0b98fb53bdcbb449061"
+    },
+    "fraction.ttf": {
+      "bytes": 1240,
+      "sha256": "5f3a68c5a8c84ba6ddb2a3ac381f50eb91cdd78d9313bbfe2772de024e6ed672"
+    },
+    "overridden.ttf": {
+      "bytes": 1240,
+      "sha256": "78a4f7184aee459b412b8fdb61bc8b146f6b0d11fcbacc3999f78b381bc69160"
+    },
+    "weight.ttf": {
+      "bytes": 1240,
+      "sha256": "4b85409b4111eaa0f9b53d47fce0079501e656de5e93beecdae48f451eaaf527"
+    },
+    "wide-italic.ttf": {
+      "bytes": 1240,
+      "sha256": "ac8540d95a15107667b74a8b37967b82cd22be6279644705208c3c2ecd3dae80"
+    },
+    "wide-slant.ttf": {
+      "bytes": 1240,
+      "sha256": "b5419afe28f2ca04f3ef8c5cb2d213f6aa051bdd8bbbdf1e03bcb9cc48d83bad"
+    },
+    "wide-upright.ttf": {
+      "bytes": 1240,
+      "sha256": "791519acaf7b85bd439cc3ec88c5190a46b07c61db93e3e7a95f0e584254dc00"
+    }
+  }
+}

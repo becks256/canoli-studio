@@ -1,13 +1,14 @@
 import {yieldTask} from '../core/task-yield';
 import {z} from 'zod';
-export const fontRunInputSchema=z.object({text:z.string().max(10000),direction:z.enum(['ltr','rtl','ttb','btt']).default('ltr'),script:z.string().regex(/^[A-Za-z]{4}$/).optional(),language:z.string().regex(/^[A-Za-z0-9-]{1,64}$/).default('und'),itemOffset:z.number().int().nonnegative().default(0),itemLength:z.number().int().nonnegative().optional(),features:z.array(z.object({tag:z.string().regex(/^[\x20-\x7e]{4}$/),value:z.number().int().min(0).max(0xffffffff).default(1)}).strict()).default([])}).strict();
+import {fontRunCssSchema,type FontRunCss} from './css-instance';
+export const fontRunInputSchema=z.object({text:z.string().max(10000),css:fontRunCssSchema.optional(),direction:z.enum(['ltr','rtl','ttb','btt']).default('ltr'),script:z.string().regex(/^[A-Za-z]{4}$/).optional(),language:z.string().regex(/^[A-Za-z0-9-]{1,64}$/).default('und'),itemOffset:z.number().int().nonnegative().default(0),itemLength:z.number().int().nonnegative().optional(),features:z.array(z.object({tag:z.string().regex(/^[\x20-\x7e]{4}$/),value:z.number().int().min(0).max(0xffffffff).default(1)}).strict()).default([])}).strict();
 export type FontRunInput=Omit<z.input<typeof fontRunInputSchema>,'features'>&{features?:readonly Readonly<{tag:string;value?:number}>[]};
-export type FontRunRequest=Readonly<Omit<z.output<typeof fontRunInputSchema>,'features'|'itemLength'>&{itemLength:number;features:readonly Readonly<{tag:string;value:number}>[]}>;
+export type FontRunRequest=Readonly<Omit<z.output<typeof fontRunInputSchema>,'features'|'itemLength'|'css'>&{css?:FontRunCss;itemLength:number;features:readonly Readonly<{tag:string;value:number}>[]}>;
 export function normalizeFontRun(input:FontRunInput):FontRunRequest{
  const value=fontRunInputSchema.parse(input),end=value.itemOffset+(value.itemLength??value.text.length-value.itemOffset),boundary=(i:number)=>i<=0||i>=value.text.length||!(value.text.charCodeAt(i)>=0xdc00&&value.text.charCodeAt(i)<=0xdfff&&value.text.charCodeAt(i-1)>=0xd800&&value.text.charCodeAt(i-1)<=0xdbff);
  if(value.itemOffset>value.text.length||end>value.text.length||!boundary(value.itemOffset)||!boundary(end))throw new Error('Font run range must retain complete Unicode scalars.');
  for(const char of value.text){const cp=char.codePointAt(0)!;if(cp>=0xd800&&cp<=0xdfff)throw new Error('Font run text contains an unpaired surrogate.');}
- return Object.freeze({...value,itemLength:end-value.itemOffset,features:Object.freeze(value.features.map(feature=>Object.freeze(feature)))});
+ return Object.freeze({...value,...(value.css?{css:Object.freeze(value.css)}:{}),itemLength:end-value.itemOffset,features:Object.freeze(value.features.map(feature=>Object.freeze(feature)))});
 }
 const glyphSchema=z.object({glyphId:z.number().int().min(0).max(65534),cluster:z.number().int().nonnegative(),flags:z.number().int().min(0).max(7),xAdvance:z.number().finite(),yAdvance:z.number().finite(),xOffset:z.number().finite(),yOffset:z.number().finite()}).strict();
 export const fontRunResultSchema=z.object({version:z.literal(1),engine:z.literal('HarfBuzz 15.0.0'),unitsPerEm:z.number().int().min(1).max(65535),glyphCount:z.number().int().min(1).max(65535),glyphs:z.array(glyphSchema)}).strict();
