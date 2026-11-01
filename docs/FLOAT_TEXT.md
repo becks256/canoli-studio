@@ -102,6 +102,60 @@ connected float TextLayer tool/scene/export/transport/persistence acceptance.
 The float document and tool gates remain in place. This is actual private
 per-glyph float painting, not completed float typography.
 
+## Source-font shaping and whole Canvas-run matching (private)
+
+`NativeGlyphFont.shapeRun(input,control)` shapes one original-font item from
+retained, selected uncompressed SFNT bytes. Inputs retain the entire original
+UTF-16 text (existing 10,000-character budget), scalar-aligned `itemOffset` and
+`itemLength`, direction `ltr`/`rtl`/`ttb`/`btt`, optional four-letter script,
+language (default `und`) and global OpenType feature tag/value pairs. Omitted
+range covers the remaining text; omitted direction is `ltr`. The captured
+resource's exact explicit variation settings apply, with no byte conversion.
+The full HarfBuzz 15.0.0 runtime preserves source vertical metrics. This performs
+one source-font shaping run; browser bidi, script/language and font fallback
+itemization remain separate required work.
+
+Returned immutable metadata identifies original GIDs, original UTF-16 clusters,
+unsafe flags and signed x/y advances/offsets in design units (1/64-unit shaping
+precision). Glyph zero is explicit in shaping output; it is not paintable yet.
+The disposable worker shares the single font-job queue, defaults to a 60-second
+active time budget, transfers typed glyph rows and terminates before checked
+cooperative host validation completes. Invalid font identity, nonfinite metrics,
+invalid GIDs/clusters/order, malformed Unicode/ranges, retirement, cancellation
+or timeout reject without publication. Parent glyph release aborts child jobs.
+Snapshots precede awaits; original source leases survive model/history removal.
+
+`plan.matchGlyphRun(font,input,control)` verifies a complete uniform Canvas run
+using a font owned by that captured plan. Input supplies text, optional ltr/rtl
+direction, script/language, existing character metric/feature properties and a
+six-number affine transform (identity by default). Family and variation tuple
+come from the retained font. Source-native exact variable instances stay pinned.
+The matcher retains whole reference text, uses original GSUB/GPOS placements,
+clusters and paint order, and compares the complete union of native/candidate
+ink in fixed 256-pixel cells with two-pixel gutters. Native advance must agree
+within the accumulated 1/64-design-unit rounding bound; every compared alpha
+sample at opacity 1 and 0.5 must agree exactly. Auto kerning may test both native
+kerning choices; nonzero tracking disables optional ligatures. Spaces use the
+existing word-spacing request. Work yields and checks ownership between bounded
+groups and tiles; document/font geometry is not capped by tile allocation.
+
+Only `status:"matched"` returns immutable color-free glyph paint placements and
+the source run. Its receipt records bounds, complete compared-pixel count,
+advances, sampled opacities and maximum alpha error. Colors still come from the
+authored source-linear color owner, never from those white verification pixels.
+`mismatch` publishes its reason/evidence and no placements; `unavailable` does
+the same for missing/fallback or intrinsic-color glyph requirements. Foreign
+plan fonts reject. These are private renderer methods, with no public scripting,
+REST, plugin, document-model or persistence contract change.
+
+This is native uniform Canvas-run matching at the compared transform, not a
+complete browser text shaper. Mixed bidi, script/fallback itemization, implicit
+CSS-to-variable-axis resolution, compressed preparation, glyph zero/intrinsic
+paint, native SVG character/path/vertical layout and full text scene/controls/
+interchange remain required. A mismatch cannot fall back to a byte-flattened
+Float32 image. Full TextLayer/tool gates and broad roadmap acceptance remain.
+Build pins, rebuild steps and licenses are in [the codec source](../src/fonts/codec/README.md).
+
 ## Required native paint work
 
 The current ordinary renderer uses whole-line Canvas text; character-formatted,
@@ -181,3 +235,21 @@ runs, the failed/corrected worker-route harness and native cmap probes. This is
 private resolved-glyph paint acceptance; full native text matching, missing and
 intrinsic color glyphs, compressed preparation and float TextLayer integration
 remain required. No 50 MP float text or universal font/performance claim follows.
+
+## Original-font shaping verification (2026-11-01)
+
+Full build/typecheck and all 3,374 unit/API cases across 333 files pass. Native
+browser coverage passes 29 source/font/glyph/plan cases and ten existing variable
+font workflows; five production checks include the emitted full shaping worker's
+first message and existing path/character/vertical workflows. Sixty complete
+Canvas runs match positioned original glyphs exactly across three sizes and two
+transforms. An independent native HarfBuzz library matches all IDs/clusters/flags/
+metrics in six runs. Actual WASM paint after matching retains exact ordered alpha,
+signed HDR RGB, alpha 1e-8 and exact window partitions. Ownership, cancellation,
+timeout, invalid output and explicit mismatches remain checked. The existing
+50 MP byte workflow preserves the full original identity and matches every RGBA
+sample in its complete 600 × 200 independent native text reference region.
+[Findings and limitations](benchmarks/font-shaping-2026-11-01.md) and
+[compact receipt](benchmarks/font-shaping-2026-11-01.json.gz) retain successful and
+failed pilots. Full native layout/fallback/paint and connected float TextLayer,
+large-original and remaining roadmap acceptance are still required.

@@ -12,10 +12,11 @@ async function collect(directory){
   for(const name of Object.keys(pkg.dependencies??{}))await collect(await locate(name,directory));
 }
 await collect(path.join(root,'node_modules/fontkit'));
+await collect(path.join(root,'node_modules/harfbuzzjs'));
 const mit=await readFile(path.join(root,'node_modules/restructure/LICENSE'),'utf8');
 const permission=mit.slice(mit.indexOf('Permission is hereby granted'));
 if(!permission.startsWith('Permission is hereby granted'))throw new Error('Missing standard MIT license text.');
-const sections=['Canoli Studio font-source parser notices\n\nThe parser is loaded only in the font-source worker. These notices cover its dependency tree. Font-file copyright/embedding declarations are separate source metadata.'];
+const sections=['Canoli Studio font-source parser notices\n\nFont parsing and shaping run only in private font workers. These notices cover its dependency tree. Font-file copyright/embedding declarations are separate source metadata.'];
 for(const [directory,pkg]of [...seen].sort((a,b)=>(a[1].name+'@'+a[1].version).localeCompare(b[1].name+'@'+b[1].version))){
   const files=(await readdir(directory)).filter(name=>/^licen[sc]e(?:\.|$)|^copying(?:\.|$)/i.test(name));
   let text=files.length?(await Promise.all(files.map(file=>readFile(path.join(directory,file),'utf8')))).join('\n\n'):'';
@@ -27,6 +28,9 @@ for(const [directory,pkg]of [...seen].sort((a,b)=>(a[1].name+'@'+a[1].version).l
   }
   sections.push(`${pkg.name} ${pkg.version} — ${pkg.license}\n${pkg.homepage??pkg.repository?.url??''}\n\n${text}`);
 }
+sections.push('HarfBuzz 15.0.0 upstream notice\n\n'+await readFile(path.join(root,'third_party/harfbuzz/COPYING'),'utf8'));
+sections.push('HarfBuzz generated USE table upstream notice\n\n'+await readFile(path.join(root,'third_party/harfbuzz/MS-USE-COPYING'),'utf8'));
+sections.push('Unicode data notice for HarfBuzz generated tables\n\n'+await readFile(path.join(root,'third_party/harfbuzz/UNICODE-LICENSE.txt'),'utf8'));
 sections.push('Brotli decoder upstream notice\n\n'+await readFile(path.join(root,'node_modules/brotli/dec/bit_reader.js'),'utf8').then(text=>text.slice(0,text.indexOf('*/')+2)));
 await writeFile(path.join(root,'public/font-parser-notices.txt'),(sections.join('\n\n'+'='.repeat(72)+'\n\n')+'\n').replace(/\r\n?/g,'\n'));
 console.log(`Built font-parser notices for ${seen.size} dependencies, including upstream Brotli attribution.`);

@@ -1,0 +1,25 @@
+{
+  "purpose": "Original glyphs and explicit ligature, kerning, mark and Arabic positional substitution rules. No third-party font data.",
+  "glyphOrder": [
+    ".notdef",
+    "space",
+    "A",
+    "V",
+    "f",
+    "i",
+    "fi",
+    "a",
+    "acutecomb",
+    "lam",
+    "alef",
+    "lam_alef",
+    "beh",
+    "beh.init",
+    "beh.medi",
+    "beh.fina",
+    "hebrewAlef",
+    "hebrewBet"
+  ],
+  "bytes": 2308,
+  "sha256": "50731d8a540f1ed632dee94ef84b6a0a92152575deee5fbce684fc3c5ff7b15b"
+}

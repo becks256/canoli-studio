@@ -1,5 +1,17 @@
 # Architecture
 
+## Private source shaping and native Canvas matching
+
+Pinned full HarfBuzz 15.0.0 runs lazily in disposable private workers. Retained
+original SFNT sources, exact explicit axis tuples, original UTF-16 context and
+strict GID/cluster/metric validation feed a captured plan's private glyph owner.
+A whole uniform Canvas-run matcher compares complete native ink/advance with
+positioned glyphs, including two opacity samples, before supplying Float32 paint
+placements. It introduces no text spans, document mutations or new grants. The
+ordinary byte renderer does not invoke shaping/matching. Full native bidi/font
+fallback, compressed/missing/intrinsic glyphs, SVG/path/vertical matching and
+connected float TextLayer remain required. [Contract](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
+
 ## Private native glyph paint dependency — full float text remains required
 
 Captured styled-text plans own private glyph-selector fonts and ordered native

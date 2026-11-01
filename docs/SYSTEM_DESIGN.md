@@ -1,5 +1,17 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Private native shaping and paint verification
+
+The full pinned HarfBuzz worker installs its message handler before async WASM
+initialization, retains original source-font context and terminates on every
+terminal path. Host decoding validates transferred glyph data cooperatively;
+parent release aborts queued/active children. A private uniform Canvas matcher
+uses whole native text and positioned original glyphs on the same fixed lattice,
+compares complete union ink at opacity 1 and 0.5, and never exposes mismatched
+placements. Authored linear RGB/alpha remain independent of verification pixels.
+This dependency does not implement native bidi/fallback itemization, SVG/path/
+vertical equivalence or complete float TextLayer. [Contract](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
+
 ## Native text preparation ownership
 
 Capture whole normalized native text chunks, original font definitions and exact

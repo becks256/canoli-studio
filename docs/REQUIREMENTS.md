@@ -1,5 +1,15 @@
 # Canoli Studio editor requirements
 
+## Private native text shaping dependency
+
+Source shaping must retain original font bytes/context/axes, validate original
+GIDs and UTF-16 clusters, share the font-job queue and honor cancellation/source
+retirement before publication. Whole Canvas-run verification must publish no
+paint placements for differing advance/ink, missing glyphs or intrinsic-color
+paint. Float32 TextLayer/tool admission stays gated pending complete native
+layout, paint, transport, persistence and large-original acceptance.
+[Implemented private contract and limits](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair

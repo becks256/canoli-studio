@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "harfbuzz": "15.0.0",
+  "profile": "full: no HB_TINY/HB_LEAN/HB_NO_VERTICAL defines",
+  "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.10 (b7dc6e5747465580df5984e723b9d1f10d8e804b)",
+  "sourceRevisions": {
+    "emsdk": "62a853cd3b3134398ce85cde8bb5cbb2ef0194cb",
+    "harfbuzz": "35f656a1a2bab548ea7f54a6dd3fba2b09680d14"
+  },
+  "command": [
+    "/tmp/canoli-shaped-text-2026-11-01/emsdk/upstream/emscripten/em++",
+    "-std=c++17",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-fno-threadsafe-statics",
+    "-fvisibility-inlines-hidden",
+    "-Oz",
+    "-flto",
+    "-DHB_USE_INTERNAL_QSORT",
+    "--no-entry",
+    "-sMODULARIZE=1",
+    "-sEXPORT_ES6=1",
+    "-sEXPORT_NAME=createHarfBuzz",
+    "-sENVIRONMENT=web,worker",
+    "-sFILESYSTEM=0",
+    "-sEXPORTED_FUNCTIONS=@/home/kestrel/projects/luma-editor/scripts/harfbuzz/harfbuzz.symbols",
+    "-sEXPORTED_RUNTIME_METHODS=@/home/kestrel/projects/luma-editor/scripts/harfbuzz/em.runtime",
+    "-sINITIAL_MEMORY=16777216",
+    "-sALLOW_MEMORY_GROWTH=1",
+    "-sALLOW_TABLE_GROWTH=1",
+    "-lexports.js",
+    "-o",
+    "/tmp/canoli-shaped-text-2026-11-01/full-build/canoli_harfbuzz.js",
+    "/tmp/canoli-shaped-text-2026-11-01/harfbuzz/src/harfbuzz.cc"
+  ],
+  "sourceFiles": {
+    "scripts/build-harfbuzz.py": "d7e9c1c8b4072f96aa74f1e0b731abc5776c82985a3a0ca73973f3cbd0c31ddd",
+    "scripts/harfbuzz/em.runtime": "32ad895731e19c058a2f26008c32bda610267257d368942a5cd447f342ea7169",
+    "scripts/harfbuzz/harfbuzz.symbols": "79089cbeae5c31806f1a20b50fdbc52db327ca93d2c87e7dbfe41aeadd400df1"
+  },
+  "artifacts": {
+    "canoli_harfbuzz.js": {
+      "bytes": 35239,
+      "sha256": "57d86b47495a4055b6ac4feab8b010ab1ffa595e25f04075d90d38fc2bb0b050"
+    },
+    "canoli_harfbuzz.wasm": {
+      "bytes": 630939,
+      "sha256": "596e41464a2c8c0323ae5dbc9a4adf7281d160c64052cd564cde587018d9afe0"
+    }
+  },
+  "scope": "Private memory-only shaping, glyph/cluster/metric and font-table access. No filesystem, native plugins, threads or source uploads; source/font ownership and native layout verification belong to the host."
+}

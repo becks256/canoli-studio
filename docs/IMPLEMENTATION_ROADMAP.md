@@ -10509,3 +10509,57 @@ float TextLayer scene/tool/export/shared transport/persistence/50 MP acceptance
 and every other unfinished original professional/AI/provider/workflow/device/
 performance/commercial gate. Model/tool validation remains gated; this does not
 substitute a narrower typography objective or complete the full roadmap.
+
+### 2026-11-01 — F08/F10 original-font shaping and whole Canvas-run matching
+
+Previous goal turn: progress/evidence, GitHub remote and cleaned outgoing history
+verified after accepted native glyph paint at 914d282. The complete original
+roadmap remains active. This increment adds a pinned full HarfBuzz 15.0.0 build,
+source-owned disposable shaping jobs and a captured plan's whole uniform native
+Canvas-run matcher. It retains original context, explicit axis tuples and actual
+GSUB/GPOS GIDs/poses, validates typed output cooperatively and compares complete
+union ink at opacity 1 and 0.5 before exposing color-free Float32 placements.
+Source/parent lifetime, cancellation/queue/deadline and authored linear paint
+stay separate. [Private contract and remaining scope](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
+
+The initial packaged HB_TINY runtime synthesized 1,000-unit vertical advances
+for the original fixture's 1,100-unit vmtx; the pinned full build restores native
+source metrics. An independent system-native HarfBuzz 2.7.4 compares exactly in
+six source-shaping probes. The first real browser pilot exposed first-message
+loss during top-level WASM initialization. Installing the handler before lazy
+initialization fixes that path. A fixture pilot also correctly refused absent
+V/M glyphs; corrected coverage retains explicit missing-glyph negative controls.
+Initial complete ten-case browser coverage passes; final build/full-unit and
+broader production/native regression verification are pending below.
+
+This does not implement complete browser bidi/script/font fallback itemization,
+implicit CSS axes, compressed/missing/intrinsic paint, SVG/path/vertical native
+matching, full float TextLayer/controls/export/shared transport/persistence or
+50 MP float text acceptance. Full F08/F10/F14 and every unfinished original gate
+remain required. No public schema, grant or browser/headless synchronization
+change is introduced.
+
+### 2026-11-01 — F08/F10 source shaping and whole Canvas-run matching verified
+
+Full build/typecheck and 3,374 unit/API tests across 333 files pass. One complete
+29-case affected source/font/glyph/plan run, ten existing variable-font workflows
+and five production checks pass. Sixty complete native Canvas runs match original
+source-shaped glyphs at three sizes and two transforms. An independent native
+HarfBuzz library matches six runs / 12 glyphs exactly. Matched actual WASM paint
+retains signed HDR RGB, unquantized alpha including 1e-8 and exact partitions.
+Source/parent release, cancelled/blocked/corrupt workers, retry and mismatched/
+unsupported paint refusals are checked. The ordinary 50 MP variable-font/RAW
+workflow preserves its complete original identity and all 480,000 samples in the
+independent 600 × 200 text reference region. This is not full 50 MP pixel or float
+text acceptance. The full engine keeps actual source vertical metrics; matching
+vertical native layout remains separate work.
+
+[Findings and remaining scope](benchmarks/font-shaping-2026-11-01.md) and
+[compact source/release/raw-run/reference receipt](benchmarks/font-shaping-2026-11-01.json.gz)
+retain the failed HB_TINY/worker-startup/fixture pilots and passing checks.
+No public schema, scripting/plugin grant, REST/browser session synchronization
+or float text/tool admission changes. Complete bidi/script/font fallback,
+implicit CSS axes, compressed/missing/intrinsic glyph paint, SVG/path/vertical
+native matching, full scene/tool/export/shared transport/persistence and original
+professional-editor/device/performance acceptance remain required. The original
+roadmap stays active.
