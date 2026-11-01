@@ -1,12 +1,13 @@
 # Native float text — implementation in progress
 
-The private vertical source-glyph dependency is verified by 3,405 unit/API tests,
-190 affected native-browser cases and fourteen production cases. Eight original
-font matrices retain 576 complete layouts; 108 direction/reflection/path cases
-and twenty-four independent Float32 coverage runs preserve exact native ink,
-HDR/tiny alpha and every partition word. This remains private groundwork; the
-float TextLayer/tool gates below still apply.
-[Verification and limits](benchmarks/svg-vertical-glyph-2026-11-01.md).
+The private styled source-glyph dependency is verified by 3,406 unit/API tests,
+196 affected native-browser cases and fifteen production cases. Seventy-two
+styled layouts retain complete original contexts, fonts/tuples, native ink and
+paint ownership; twelve independent original-font Float32 composition cases
+retain HDR/tiny alpha and exact partition words. The prior vertical, direction,
+path and complete ordinary 50 MP regressions also pass. This remains private
+groundwork; float TextLayer/tool gates below still apply.
+[Verification and limits](benchmarks/svg-styled-glyph-2026-11-01.md).
 
 TextLayer integration remains required for the full F08/F10 roadmap. Float
 documents still reject text and the text tool remains unavailable. The private
@@ -635,3 +636,74 @@ establish admitted Float32 TextLayer or universal native-font/device support.
 retain failed/corrected baseline, metric, path, direction and production-namespace
 pilots. Full connected text/tool/scene/export/shared transport/persistence and
 every unfinished original roadmap requirement remain active.
+
+
+## Styled source-glyph items (private)
+
+`plan.matchStyledGlyphLine(lineIndex,control={})` can capture the original font
+files/explicit tuples for existing styled spans and prepare private glyph fields.
+It requires captured linear paint/character metadata and nonempty spans. Index,
+positive integer time budget (default 60,000 ms), source ownership and native
+measurements validate before publication. Missing owned sources, fallback stacks,
+missing/intrinsic glyphs and unsupported native layouts return unavailable or
+mismatch without partial fields. This is not a public scripting/REST method and
+does not admit Float32 TextLayer/tool/scene/persistence.
+
+Metric-style groups retain the complete normalized UTF-16 line as HarfBuzz
+context and select original item ranges. The matcher starts with original span
+boundaries and extends compatible ranges when exact native ink requires a
+retained ligature or combining cluster. It never rewrites original DOM text or
+introduces character spans. Existing horizontal, native-path and vertical
+positioning consumes those source ranges; cluster-leading captured colors follow
+the native paint owner. Different original font sources and explicit axis tuples
+keep separate private owners. Original file bytes, public fonts and document data
+remain intact. Successful results retain frozen `runs` and `glyphs`; `run` is the
+first run. The complete line is checked again after item assembly.
+
+Whole-line union alpha cannot verify a glyph's color or occlusion order. A
+separate canonical comparison selects each distinct captured color: its R
+component is white, other colors' R is black, and G/B carry distinct temporary
+paint labels. The scalar red-byte-times-alpha-byte plane is compared exactly at
+opacities 1 and 0.5 over the same complete source/candidate union. Ordinary alpha
+comparison keeps those distinct labels too. Original spans remain in place; zero
+scalar fill opacity hides unrelated source paint during item verification.
+These synthetic comparison signals never supply glyph IDs, coordinates, actual
+coverage fields, authored RGB or source alpha. Working colors still come from
+the original CSS/linear capture; actual WASM composes independent original glyph
+coverage. The oracle is native byte coverage, not an independent high-precision
+color raster or universal native-host proof. Invalid native pixel-array type or
+length rejects.
+
+Native SVG paint and native carets differ at fragment boundaries: the browser
+rounds each fragment's line top while painting. The private vertical companion
+can recover the original fragment's CSS inline offset from whole-source native
+metadata on its 1/64 grid, apply that rounding, and rotate the correction on a
+curve. Publication still requires exact original ink and ownership equality. No
+displacement is searched or fitted from reference pixels. The rule follows
+[Chromium fragment painting](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/paint/text_fragment_painter.cc)
+and [line-relative transforms](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/paint/line_relative_rect.cc).
+
+Parent/deadline/observer checking remains separate from child-font checking:
+children invoke the parent check, so including those same children in their own
+parent callback would recurse. Aggregate checks validate all completed owners
+between work steps. Abort, release, malformed reads and failed comparisons retire
+temporary readers/images/URLs/probes and cannot publish partial fields. Full
+native script/bidi/font fallback, missing/intrinsic/host/extents behavior, connected
+Float32 TextLayer authoring/scenes/export/shared transport/persistence and all
+unfinished original roadmap/device/quality/performance requirements remain.
+
+
+The complete affected source run passes all 196 cases across twenty files and
+the complete production run passes fifteen cases, without retries/skips/flakes.
+All 3,406 unit/API tests across 338 files and full build/typecheck pass. The
+72-case styled matrix, twelve independent original-font Float32 compositions,
+ownership negative controls and fault/retry checks retain exact native coverage,
+source colors and original data. Emitted production matching uses prepared
+fixture source/plan adapters; complete source capture/ownership is verified in
+the source matrix. Independent decoding retains all 200 million ordinary RGBA
+samples each for curved and vertical 50 MP outputs, plus the separate RAW
+original/complete text-reference region. These byte regressions do not establish
+public Float32 TextLayer or universal host support.
+[Findings and remaining scope](benchmarks/svg-styled-glyph-2026-11-01.md) and
+[compact verification receipt](benchmarks/svg-styled-glyph-2026-11-01.json.gz)
+retain failed/corrected pilots, raw results and source/release identities.

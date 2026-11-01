@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Private styled native paint dependency
+
+Preserve complete original normalized text context across existing style/font
+items, native ligatures/joins/marks and explicit font tuples. Verify assembled
+whole-line ink and per-color ownership/order before private glyph fields publish.
+Retain authored HDR/tiny-alpha values independently from synthetic comparison
+paints. Reentrant abort/release and malformed native reads must clean up and
+permit retry without model edits. This does not admit public float text or close
+broader typography, persistence, quality/device/performance and roadmap gates.
+[Private contract](FLOAT_TEXT.md#styled-source-glyph-items-private).
+
 ## Private vertical glyph dependency
 
 For private vertical source-owned paint, retain original glyph identity and

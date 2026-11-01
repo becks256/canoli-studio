@@ -93,6 +93,7 @@ export interface StyledTextPlan {
   captureGlyphFont(id:string,settings?:string,control?:NativeGlyphFontControl):Promise<NativeGlyphFont>;
   matchGlyphRun(font:NativeGlyphFont,input:NativeGlyphRunInput,control?:NativeGlyphFontControl):Promise<NativeGlyphMatch>;
   matchGlyphLine(font:NativeGlyphFont,lineIndex:number,control?:NativeGlyphFontControl):Promise<NativeSvgGlyphMatch>;
+  matchStyledGlyphLine(lineIndex:number,control?:NativeGlyphFontControl):Promise<NativeSvgGlyphMatch>;
   renderGlyphs(glyphs:readonly FloatGlyph[],area:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,check?:()=>void):Promise<Float32Array>;
   check():void;
   release():void;
@@ -182,6 +183,9 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
   const matchGlyphLine=async(font:NativeGlyphFont,index:number,control:NativeGlyphFontControl={}):Promise<NativeSvgGlyphMatch>=>{
     const child={...control};check();if(!glyphs.has(font))throw new Error('The SVG glyph line is outside this captured text source.');const {matchNativeSvgGlyphLine}=await import('./native-svg-glyph');check();return matchNativeSvgGlyphLine(plan,font,index,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
   };
+  const matchStyledGlyphLine=async(index:number,control:NativeGlyphFontControl={}):Promise<NativeSvgGlyphMatch>=>{
+    const child={...control};check();const {matchNativeStyledSvgLine}=await import('./native-svg-styled');check();return matchNativeStyledSvgLine(plan,index,fonts!.document.fontFiles??[],{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
+  };
   let plan:StyledTextPlan;
   const renderGlyphs=async(input:readonly FloatGlyph[],window:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,current:()=>void=()=>{}):Promise<Float32Array>=>{
     const primitives=input.map(glyph=>({...glyph,...(glyph.writing?{writing:Object.freeze(textWritingSchema.parse(glyph.writing))}:{}),...(glyph.path?{path:snapshotGlyphPath(glyph.path)}:{}),...(glyph.origin?{origin:Object.freeze({...glyph.origin})}:{}),style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
@@ -246,7 +250,7 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
     }
     const definitions=await fonts.definitions(check);check();
     markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
-    check();plan=Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,captureGlyphFont,matchGlyphRun,matchGlyphLine,renderGlyphs,check,release});handedOff=true;return plan;
+    check();plan=Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,captureGlyphFont,matchGlyphRun,matchGlyphLine,matchStyledGlyphLine,renderGlyphs,check,release});handedOff=true;return plan;
   }finally{if(!handedOff)release();}
 }
 

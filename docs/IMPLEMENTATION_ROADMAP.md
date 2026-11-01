@@ -10904,3 +10904,66 @@ unfinished original professional-editor/quality/device/performance and other
 roadmap requirement remain required. The complete original goal stays active.
 No public mutation, model schema, grant, ordinary native appearance, original-
 resolution policy or REST/browser synchronization contract changes.
+
+### 2026-11-01 — F08/F10 original styled glyph items in progress
+
+Previous goal turn: progress, native vertical glyph dependency accepted at
+d07e6db. The complete original roadmap remains active. A private styled-line
+matcher now retains complete original UTF-16 context while selecting native
+font/metric-style items across existing spans. Color-only boundaries keep
+ligatures, kerning and combining clusters; cluster-leading paint ownership
+follows the native host. Separate source fonts/axis tuples remain privately owned.
+Original spans are never rewritten. Exact per-item and whole-line native ink
+comparison plus per-color canonical black/white scalar weights guard geometry,
+color ownership and occlusion order. The weights only verify synthetic paints;
+no original artwork RGB supplies source colors, working fields or positions.
+Native diagnostics proved that color-only fi/a-plus-mark clusters keep the first
+span's color, while font-size changes create distinct items. A complete mixed
+font/size/axis/color, Arabic, mark, vertical/curve/affine matrix is under test.
+Public Float32 TextLayer/tool/scene/export/shared transport/persistence, broader
+native script/bidi/fallback/missing/intrinsic/host behavior and every unfinished
+original quality/device/performance/professional-editor requirement remain. No
+public mutation, model schema, grant or REST/browser synchronization change.
+
+
+### 2026-11-01 — F08/F10 styled source-glyph dependency verified
+
+Owner: implementation agent; estimate L within T16/T17. Starting from d07e6db,
+private original-span item assembly now retains full source text context, native
+ligatures/marks/joins, separate original fonts/axis tuples and captured linear
+colors. Per-item and whole-line native ink plus per-color synthetic ownership
+weights guard publication, including colored occlusion order. Native vertical
+fragment line-top rounding comes from captured metadata and the browser rule;
+no displacement is fitted from pixels. Full original scope remains active.
+
+Full build/typecheck and all 3,406 unit/API tests across 338 files pass. One
+complete 196-case affected source run across twenty files and fifteen production
+cases pass with zero retries, skips, failures or flakes. Seventy-two styled
+horizontal/vertical/curve/affine layouts match exact complete native ink and
+ownership. Twelve independent original-font Float32 compositions retain exact
+alpha, signed/HDR RGB, alpha 1e-8 and all partition words. Reordered/recolored
+overlap fails ownership despite exact union alpha; abort/release/malformed reads
+clean up and permit retry. The 10,000-color label invariant preserves source
+values. Actual emitted production matching/worker/coverage uses prepared fixture
+adapters; full source capture and ownership run in the source browser matrix.
+
+Independent decoding compares all 200 million ordinary RGBA samples each in
+both complete 50 MP curved and vertical outputs against complete native SVG
+references, with zero error and identical PNGs. The separate RAW/variable-font
+case preserves its exact original, complete 600 × 200 reference region and
+preceding accepted full PNG bytes. These remain ordinary byte regressions.
+Initial fixture-range, recursive-owner, native-rounding and malformed-read
+failures/corrections remain retained. The first full source attempt omitted its
+generated-worker Vite allow configuration and was stopped after denied worker
+requests; the corrected invocation required no runtime/assertion change.
+[Findings and limits](benchmarks/svg-styled-glyph-2026-11-01.md) and
+[compact source/release/raw-run/reference receipt](benchmarks/svg-styled-glyph-2026-11-01.json.gz)
+retain the exact boundaries and failed/corrected evidence.
+
+Full native script/bidi/font fallback and universal item partitioning, missing/
+intrinsic paint, wider native/legacy/optical layouts/extents/hosts, connected
+Float32 TextLayer/tool/scenes/export/shared transport/persistence and every
+unfinished original professional-editor/device/quality/performance/other roadmap
+requirement remain required. No public model/schema/grant, ordinary appearance,
+source-resolution or REST/browser synchronization contract changes. The complete
+original goal remains active.

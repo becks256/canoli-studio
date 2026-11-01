@@ -1,5 +1,16 @@
 # Architecture
 
+## Private styled source-glyph assembly
+
+`native-svg-styled.ts` selects existing native span items while retaining complete
+line text as shaping context. Original font sources/axis tuples are privately
+captured; shared horizontal/path/vertical helpers consume selected source ranges.
+Whole original DOM chunks remain. Native per-item and complete-line ink checks
+plus synthetic per-color scalar ownership weights guard publication. Source
+linear RGB/alpha stay independent of verification pixels. This remains renderer
+groundwork; full float TextLayer/tool/scene/transport and broader typography
+acceptance are required. [Contract and current limits](FLOAT_TEXT.md#styled-source-glyph-items-private).
+
 ## Private native vertical source-glyph matching
 
 `native-svg-vertical.ts` consumes captured whole-source orientation and resolved

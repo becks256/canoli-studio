@@ -1,5 +1,18 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Styled glyph item and paint authority
+
+Use original font/metric-style ranges with full-line context; extend compatible
+span ranges only when native ink retains a cluster across their paint boundary.
+Do not turn character geometry into a glyph-ID oracle. Whole native/candidate
+union alpha and independent canonical color-weight comparisons guard geometry,
+source paint ownership and occlusion order. Temporary labels never become
+working RGB or coverage. Source/observer/deadline checks must not recursively
+check children whose own check invokes that parent. Validate completed owners
+between steps and retire resources on every terminal path. No public document
+schema/grant, float TextLayer admission or REST/browser synchronization change.
+[Private contract](FLOAT_TEXT.md#styled-source-glyph-items-private).
+
 ## Native vertical itemization and private metric projection
 
 Native orientation and resolved caret direction define source-font shaping

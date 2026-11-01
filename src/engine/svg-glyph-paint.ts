@@ -34,14 +34,18 @@ async function measureSvgGlyphLayout(root:Element,check:()=>void,withAdvances:bo
 
 /** A fixed world-cell native SVG alpha read. Changing viewBox is a work-window
  * projection, never a font-size or source-geometry change. No bitmap survives. */
-export async function renderSvgCellAlpha(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl={}):Promise<Uint8ClampedArray>{
+export async function renderSvgCellAlpha(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl={}):Promise<Uint8ClampedArray>{return await renderSvgCellPlane(root,x,y,cell,gutter,alpha,control,false)as Uint8ClampedArray;}
+/** Canonical black/white paint ownership only. The scalar red-times-alpha
+ * weight is a verification oracle; it never supplies working RGB or coverage. */
+export async function renderSvgCellWeight(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl={}):Promise<Uint16Array>{return await renderSvgCellPlane(root,x,y,cell,gutter,alpha,control,true)as Uint16Array;}
+async function renderSvgCellPlane(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl,weights:boolean):Promise<Uint8ClampedArray|Uint16Array>{
  const options={...control},check=()=>{options.signal?.throwIfAborted();options.check?.();options.signal?.throwIfAborted();},timeout=options.timeoutMs??60000;check();if(!Number.isInteger(timeout)||timeout<=0||timeout>0x7fffffff)throw new Error('Invalid SVG glyph read time budget.');const size=cell+gutter*2;root.setAttribute('width',String(size));root.setAttribute('height',String(size));root.setAttribute('viewBox',`${x-gutter} ${y-gutter} ${size} ${size}`);
- for(const node of root.querySelectorAll('text,tspan')){node.setAttribute('fill','#fff');node.setAttribute('fill-opacity',String(alpha));}
+ for(const node of root.querySelectorAll('text,tspan')){if(!weights&&!root.hasAttribute('data-canoli-verification-palette'))node.setAttribute('fill','#fff');node.setAttribute('fill-opacity',String(alpha));}
  const canvas=createCanvas(size,size,true),image=new Image();let url:string|undefined,timer:ReturnType<typeof setTimeout>|undefined,abort=()=>{};
  try{
   url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(root)],{type:'image/svg+xml'}));
   await new Promise<void>((resolve,reject)=>{let ended=false;const finish=(error?:unknown)=>{if(ended)return;ended=true;error===undefined?resolve():reject(error);};abort=()=>finish(options.signal?.reason??new Error('Native SVG glyph paint cancelled.'));image.onload=()=>{void Promise.resolve().then(()=>image.decode()).then(()=>finish(),finish);};image.onerror=()=>finish(new Error('Cannot load the captured native SVG glyph paint.'));timer=setTimeout(()=>finish(new Error('Native SVG glyph paint exceeded its time budget.')),timeout);options.signal?.addEventListener('abort',abort,{once:true});image.src=url!;if(options.signal?.aborted)abort();});
-  check();const c=canvas.getContext('2d')!;c.drawImage(image,0,0);check();const bytes=c.getImageData(gutter,gutter,cell,cell).data,output=new Uint8ClampedArray(cell*cell);for(let i=0;i<output.length;i++)output[i]=bytes[i*4+3];check();return output;
+  check();const c=canvas.getContext('2d')!;c.drawImage(image,0,0);check();const bytes=c.getImageData(gutter,gutter,cell,cell).data;if(!(bytes instanceof Uint8ClampedArray)||bytes.length!==cell*cell*4)throw new Error('Native SVG glyph pixels are invalid.');const output=weights?new Uint16Array(cell*cell):new Uint8ClampedArray(cell*cell);for(let i=0;i<output.length;i++)output[i]=weights?bytes[i*4]*bytes[i*4+3]:bytes[i*4+3];check();return output;
  }finally{clearTimeout(timer);options.signal?.removeEventListener('abort',abort);image.onload=image.onerror=null;image.src='';if(url)URL.revokeObjectURL(url);release(canvas);}
 }
 
