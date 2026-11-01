@@ -1,7 +1,7 @@
 # Prepared HDR wet document edits
 
-Status: schema 57 prepared raster edits and trusted interactive Smudge/Mixer
-authoring. Raster color preparation reads original native Float32 windows;
+Status: schema 57 prepared raster/PaintLayer edits and trusted interactive
+Smudge/Mixer authoring. Color preparation reads native Float32 windows;
 ordinary mask preparation keeps byte scalar coverage. Isolated code accepts
 completed prepared output and has no simulation, pixel reader, file service or
 network capability.
@@ -10,7 +10,8 @@ network capability.
 
 `new WetPaintStroke({precision:"float32",brush,tiles,nativeTransform?,placement?,
 opacity?,load?,mix?})` creates an immutable prepared HDR value. Apply it using
-`RasterLayer.applyWetPaint(stroke): void` on a float32/linear-sRGB document.
+`RasterLayer.applyWetPaint(stroke): void` or `paint.strokes.add(stroke)` on a
+float32/linear-sRGB document.
 Attached edits use existing layer commands, ancestor locks, transactions,
 revision checks and Undo/Redo. `precision` is a read-only member returning
 `"float32"` for HDR and `undefined` for the existing byte value. DTOs retain the
@@ -68,8 +69,9 @@ pixels. Existing final scene sampling retains its documented transparent/signed
 zero canonicalization. Zero-opacity metadata still validates its sources but
 does not select a different reconstruction path or enlarge visual bounds.
 
-HDR prepared values are raster artwork only. Byte documents, PaintLayer color
-strokes and ordinary/filter mask wet positions reject the HDR flag. Existing
+HDR prepared values support raster and PaintLayer artwork. Byte documents and
+ordinary/filter mask wet positions reject the HDR flag. PaintLayers append via
+`paint.strokes.add(stroke)` and use [local native reconstruction](FLOAT_PAINT.md#native-wet-paint). Existing
 byte wet masks and PNG preparation remain supported through their current paths.
 
 ## Isolated example
@@ -131,11 +133,11 @@ checks. The broader professional-editor goal remains active.
 
 `editor.applyWetPaint(brush, options?)` and the Smudge/Mixer pointer controller
 share one retained authoring job. In a float32 document, a layer target must be
-an existing original RasterLayer, selected or named by `targetId`. Missing,
-paint/vector/group or locked color targets reject. No float PaintLayer is
-created. Choosing a wet tool in the rail or command palette preserves a valid
+an original RasterLayer or PaintLayer, selected or named by `targetId`. No
+selection creates a PaintLayer. Missing explicit targets, vector/group and
+locked color targets reject. Choosing a wet tool in the rail or command palette preserves a valid
 mask target; an incompatible target falls back to Layer only for a selected
-raster. Gesture admission checks the actual current target again.
+raster/PaintLayer or no selection. Gesture admission checks the actual current target again.
 
 Color reads capture the neutral original FloatScene, including earlier ordered
 wet/erase/clear operations, before layer opacity, masks, styles and tone effects.

@@ -7,7 +7,9 @@ native linear color, shared canonical scalar coverage and once-only unquantized
 stroke opacity. Ordered editable strokes, private previews, affine placement,
 masks/appearance, Undo and source-bearing persistence use existing boundaries.
 Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
-Clone and prepared wet operations in float PaintLayers remain unsupported.
+Prepared HDR wet strokes now join dry paint on the content-local native grid
+before current affine placement; inert wet records retain the dry rendering
+path. Clone remains unsupported.
 [Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
 
 
@@ -17,8 +19,7 @@ Clone and prepared wet operations in float PaintLayers remain unsupported.
 `.precision`. In a float32/linear-sRGB document, `RasterLayer.applyWetPaint`
 replays these completed linear TIFF pairs on the original native grid in order
 with erase/clear before current resize/affine/perspective projection. Byte
-constructors keep the omitted flag and PNG contract. HDR masks/PaintLayer/byte
-documents reject. [Exact signature, defaults, errors, limits, isolated example,
+constructors keep the omitted flag and PNG contract. HDR masks and byte documents reject. Float PaintLayer prepared appends use `paint.strokes.add(stroke)`; see [native wet paint](FLOAT_PAINT.md#native-wet-paint). [Exact signature, defaults, errors, limits, isolated example,
 ownership and current verification boundary](HDR_WET_DOCUMENTS.md).
 
 ## Retained-mask preview consistency

@@ -10125,3 +10125,34 @@ spaces, clone/wet PaintLayers, warp/master coverage, photographic/device quality
 sustained F14 and all unfinished professional/AI/workflow/ChatGPT/live identity/
 commercial/specialist/motion gates. No complete F03/F10/F14 or roadmap acceptance
 is inferred.
+
+
+### 2026-10-31 — F03/F10 native wet PaintLayers
+
+Owner: implementation agent; increment from `bc8a302`; classification: progress.
+Explicit prepared HDR pairs now append to float PaintLayers through the shared
+OO/isolated/plugin/independent REST command boundary. Active wet strokes choose
+local native reconstruction for the complete ordered dry/wet/erase/clear content
+before the current owner/ancestor affine, as in byte wet paint; inert records
+validate sources without changing dry reconstruction or bounds. Trusted retained
+authoring and Smudge/Mixer accept PaintLayers and create a layer when no target
+is selected. Existing private preview/source/revision/cancellation, native TIFF
+staging and one-Undo publication remain. [Exact contract](FLOAT_PAINT.md#native-wet-paint).
+
+Verified (completed 2026-11-01): **3,298 unit/API/native tests across 321 files;
+52 accepted source-browser cases across 8 files; 10 final production cases
+across 4 files**. Source acceptance combines 51 matrix passes and one corrected
+explicit-target guard recheck; the original stale expectation stays disclosed.
+Independent native libtiff/NumPy matches every word/profile in complete mixed,
+reflected and reopened production TIFFs. Private prefix/append/cancel, float and
+byte fresh-target Undo/recipe replay, isolated/plugin/independent REST native pair
+validation, source-bearing transport and a complete 64x48 native paint window on
+a genuine 50 MP original pass. Build/typecheck, amended frozen inputs and sealed
+runtime/WASM identities pass. Initial stale-runtime/no-change pilots and the
+fixed detached-layer publication bug remain recorded.
+[Findings and compact evidence](benchmarks/float-wet-paint-2026-10-31.md).
+
+Full original roadmap requirements remain active, including native float clone and other unsupported
+layers/tools/spaces, general warp/master coverage, photographic/device quality,
+sustained F14 and unfinished professional/AI/workflow/ChatGPT/live identity/
+commercial/specialist/motion gates.

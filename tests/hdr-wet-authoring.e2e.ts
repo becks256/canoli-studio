@@ -41,7 +41,7 @@ test('HDR preparation rejects stale original interpretation, human changes and c
   const selected=await editor._beginWetPaint(brush,options);editor.document.selectedLayer=null;const staleSelection=await rejected(()=>selected.commit());await selected.dispose();editor.document.selectedLayer=layer;
   const changed=await rejected(()=>editor.applyWetPaint(brush,{...options,onProgress:()=>{editor.document.name='Human HDR edit';}})),humanPreserved=editor.document.name==='Human HDR edit'&&(layer.toJSON() as import('../src/core/model').RasterLayerData).erasures?.length!==1;
   layer.locked=true;const locked=await rejected(()=>editor.applyWetPaint(brush,options));layer.locked=false;
-  const invalidAlpha=await rejected(()=>editor.applyWetPaint(brush,{...options,load:{color:[4,-2,8,255]}}));editor.document.selectedLayer=null;const missingTarget=await rejected(()=>editor.applyWetPaint(brush,options));
+  const invalidAlpha=await rejected(()=>editor.applyWetPaint(brush,{...options,load:{color:[4,-2,8,255]}}));editor.document.selectedLayer=null;const missingTarget=await rejected(()=>editor.applyWetPaint(brush,{...options,targetId:'missing-explicit-target'}));
   return {noop:noop===null,noopExact,cancelled,cancelExact,staleInterpretation,identityExact,staleSelection,changed,humanPreserved,locked,invalidAlpha,missingTarget,assetsExact:assets===editor.assetStore.values().length,storageClean:db===JSON.stringify(await databases())};
  },[...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')]);await writeFile(info.outputPath('hdr-guards.json'),JSON.stringify(result,null,2));expect(Object.values(result).every(Boolean),JSON.stringify(result)).toBe(true);
 });

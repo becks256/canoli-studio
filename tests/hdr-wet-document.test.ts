@@ -28,7 +28,7 @@ it('retains HDR modifiers on shared OO history and rejects false schema ages eve
  const layer=after.children[0];if(layer.kind!=='raster')throw new Error('No raster');const command={type:'layer.update',id:r.id,patch:{erasures:layer.erasures}};expect(parseCommands([command])).toHaveLength(1);
 });
 
-it('rejects HDR color in byte documents, paint layers and mask positions without partial commands',()=>{
+it('rejects HDR color in byte documents and mask positions without partial commands',()=>{
  const byte=new Document(),r=byte.layers.add(new RasterLayer({assetId:'byte',width:16,height:12})),before=byte.toJSON();expect(()=>r.applyWetPaint(stroke())).toThrow('float32');expect(byte.toJSON()).toEqual(before);
  expect(()=>byte.layers.add(new PaintLayer()).strokes.add(stroke())).toThrow('float32');
  expect(()=>new LayerMask({base:1,strokes:[{mode:'wet',stroke:stroke()}]})).toThrow(/byte|HDR/);
@@ -60,4 +60,11 @@ it('falsely aged HDR redo rejects and unsupported float embedding remains unavai
 it('production fixture retains checked original identities and native prepared sources before any HDR edit',async()=>{
  const base='tests/fixtures/hdr-wet-document/',manifest=JSON.parse(await readFile(base+'manifest.json','utf8')),bytes=await readFile(base+'setup.luma'),hash=(data:Uint8Array)=>createHash('sha256').update(data).digest('hex');expect(bytes.length).toBe(manifest.project.bytes);expect(hash(bytes)).toBe(manifest.project.sha256);expect(hash(await readFile('tests/helpers/hdr-wet-document.ts'))).toBe(manifest.helperSha256);expect(hash(await readFile(manifest.original.file))).toBe(manifest.original.sha256);
  const project=await readProject(new Blob([new Uint8Array(bytes)]));expect(project.document.schemaVersion).toBe(57);expect(project.document.precision).toBe('float32');expect(project.entries).toHaveLength(4);expect(project.entries.every(entry=>entry.tiff?.editingPrecision==='float32')).toBe(true);expect(project.document.children[0].name).toBe('HDR target');expect(project.document.children[0].kind==='raster'&&project.document.children[0].erasures).toBeUndefined();
+});
+
+it('float PaintLayer prepared values share history, strict pair source roles, schema ages and byte rejection',()=>{
+ const d=new Document({precision:'float32'}),paint=d.layers.add(new PaintLayer()),before=d.toJSON();paint.strokes.add(stroke());const after=d.toJSON();expect(Document.fromJSON(after).toJSON()).toEqual(after);d.undo();expect(d.toJSON()).toEqual(before);d.redo();expect(d.toJSON()).toEqual(after);
+ const fake={tiff:{editingPrecision:'float32'},tiffColor:{}},assets={get:()=>fake as never};expect(()=>assertFloatSources(after,assets)).not.toThrow();
+ const bad=structuredClone(after),layer=bad.children[0];if(layer.kind!=='paint'||layer.strokes[0].kind!=='wet')throw new Error('No paint');layer.strokes[0].brush.texture={assetId:'pigment',channel:'alpha',invert:false};expect(()=>assertFloatSources(bad,assets)).toThrow('native byte');
+ bad.schemaVersion=56;expect(()=>validateDocument(bad)).toThrow('57');expect(()=>paint.strokes.add(stroke({precision:undefined,opacity:0}))).toThrow('explicit HDR');expect(d.toJSON()).toEqual(after);
 });

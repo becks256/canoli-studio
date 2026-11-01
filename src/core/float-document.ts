@@ -23,7 +23,8 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='raster'){
         if(layer.erasures?.some(entry=>entry.stroke.kind==='wet'&&entry.stroke.precision!=='float32'))return 'Float raster replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
       }else if(layer.kind==='paint'){
-        if(layer.strokes.some(stroke=>stroke.kind==='clone'||stroke.kind==='wet'))return 'Float paint layers require native integration for clone and prepared wet operations.';
+        if(layer.strokes.some(stroke=>stroke.kind==='clone'))return 'Float paint layers require native integration for clone operations.';
+        if(layer.strokes.some(stroke=>stroke.kind==='wet'&&stroke.precision!=='float32'))return 'Float paint replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
       }else if(layer.kind==='adjustment'){
         if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
@@ -43,6 +44,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
 export function floatWetAssetReferences(layer:LayerData):ReadonlySet<object>{
  const references=new Set<object>();
  if(layer.kind==='raster')for(const entry of layer.erasures??[])if(entry.stroke.kind==='wet'&&entry.stroke.precision==='float32')for(const tile of entry.stroke.tiles){references.add(tile);references.add(tile.coverage);}
+ if(layer.kind==='paint')for(const stroke of layer.strokes)if(stroke.kind==='wet'&&stroke.precision==='float32')for(const tile of stroke.tiles){references.add(tile);references.add(tile.coverage);}
  return references;
 }
 export function assertFloatSources(document:DocumentData,assets:Pick<AssetStore,'get'>):void{

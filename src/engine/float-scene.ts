@@ -1,4 +1,4 @@
-import {replayFloatPaint,type FloatPaintCoverage} from './float-paint';
+import {renderFloatPaint,type FloatPaintCoverage} from './float-paint';
 import{applyFloatStyle}from'./float-style';
 import {activePerspective,perspectiveLocalQuad,perspectiveMatrix,perspectiveRect} from '../core/perspective';
 import {ProjectiveTransform,type ProjectiveQuad} from '../core/projective';
@@ -133,6 +133,12 @@ export class FloatSceneRenderer {
    await validateHdrWetPaintAssets(document,wetBrowserAssets(assets,check));check();
    const prepareWet=async(layers:LayerData[])=>{for(const layer of layers){
     if(layer.kind==='group')await prepareWet(layer.children);
+    else if(layer.kind==='paint'){
+     for(const stroke of layer.strokes)if(stroke.kind==='wet'&&stroke.precision==='float32'&&stroke.opacity>0){
+      const captured=await captureFloatWetReplay(stroke,assets,this.processor,new AffineTransform(),check);
+      try{check();wetCaptures.set(stroke,captured);}catch(error){captured.dispose();throw error;}
+     }
+    }
     else if(layer.kind==='raster')for(const entry of layer.erasures??[])if(entry.stroke.kind==='wet'&&entry.stroke.precision==='float32'&&entry.stroke.opacity>0){
      const original=sources.get(layer.assetId)!.source,captured=await captureFloatWetReplay(entry.stroke,assets,this.processor,AffineTransform.scale(original.width/entry.width,original.height/entry.height),check);
      try{check();wetCaptures.set(entry,captured);}catch(error){captured.dispose();throw error;}
@@ -264,7 +270,7 @@ export class FloatSceneRenderer {
       const readIntrinsic=async(region:FloatSourceWindow):Promise<Float32Array>=>{
        check();validateWindow(region);
        if(layer.kind==='raster')return raster(layer,world,region);
-       if(layer.kind==='paint'){if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');return replayFloatPaint(layer.strokes,region,world,strokeService.paint,this.processor,check);}
+       if(layer.kind==='paint'){if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');return renderFloatPaint(layer.strokes,region,world,strokeService.paint,this.processor,check,(stroke,region)=>wetCaptures.get(stroke)!.read(region));}
        if(layer.kind==='group')return paint(layer.children,new Float32Array(region.width*region.height*4),world,false,region);
        throw new Error('A shadow requires intrinsic artwork pixels.');
       };

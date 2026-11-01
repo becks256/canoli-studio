@@ -1111,3 +1111,12 @@ TIFF raster. Retained raster originals still need their existing precision/sourc
 checks. [Current tool/API/persistence contract](FLOAT_PAINT.md) supersedes earlier
 PaintLayer and color Brush/Pencil exclusions; wider unsupported operations and
 original roadmap gates remain required.
+
+## Native float wet PaintLayers
+
+Prepared schema-57 HDR values now append to float PaintLayers. Active wet edits
+reconstruct ordered dry/wet/eraser/clear content locally before current affine
+placement; inert wet records preserve dry reconstruction. Trusted authoring and
+Smudge/Mixer support paint targets and empty selections through existing private
+preparation and one-Undo publication. Clone and wider roadmap gates remain open.
+[Signatures, defaults, reconstruction and boundaries](FLOAT_PAINT.md#native-wet-paint).

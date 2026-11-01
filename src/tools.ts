@@ -422,7 +422,7 @@ export class ToolController {
     if(this.canUseTool(tool))return true;
     if(this.editor.document.precision!=='float32')return false;
     const document=this.editor.document,selected=document.selectedLayer;
-    if(tool==='smudge'||tool==='mixer')return selected instanceof RasterLayer;
+    if(tool==='smudge'||tool==='mixer')return !selected||selected instanceof RasterLayer||selected instanceof PaintLayer;
     if(!['brush','pencil'].includes(tool))return false;
     return !!selected&&!!findLayer(document._read(),selected.id)?.mask;
   }
@@ -433,7 +433,7 @@ export class ToolController {
     if(tool==='brush'||tool==='pencil')return this.state.settings.paintTarget==='layer'||this.state.settings.paintTarget.startsWith('mask-')&&!!this.editor.document.selectedLayer?.mask;
     if(tool==='smudge'||tool==='mixer'){
       const target=this.state.settings.paintTarget,selected=this.editor.document.selectedLayer;
-      return target==='layer'?selected instanceof RasterLayer:target.startsWith('mask-')&&!!selected?.mask;
+      return target==='layer'?!selected||selected instanceof RasterLayer||selected instanceof PaintLayer:target.startsWith('mask-')&&!!selected?.mask;
     }
     if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer||this.editor.document.selectedLayer instanceof PaintLayer;
     if(tool==='pen')return this.state.settings.penEditTarget==='mask'||this.editor.document.selectedLayer?.mask?.kind==='vector';

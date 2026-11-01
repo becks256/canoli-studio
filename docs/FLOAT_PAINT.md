@@ -2,9 +2,8 @@
 
 Status: native PaintLayer replay in float32/linear-sRGB documents. Existing
 BrushStroke, PencilStroke, EraserStroke and solid PaintFill values remain editable
-commands; no prepared wet simulation substitutes for dry paint. Clone and wet
-operations in a float PaintLayer remain unsupported, including hidden/inert
-metadata. Raster HDR wet replacements keep their separate schema 57 contract.
+commands; no prepared wet simulation substitutes for dry paint. Clone operations remain unsupported, including hidden/inert metadata. Explicit
+HDR wet replacements use the existing schema 57 prepared-pair contract.
 
 ## Color and coverage
 
@@ -84,7 +83,7 @@ preserves existing strokes; it does not replace the destination's contents.
 Created-layer step outputs retain their identity even with colliding names.
 Brush metadata is literal and uses existing limits; this action does not add
 parameter expressions inside the strict stroke DTO. Existing byte operations
-remain supported; float PaintLayers keep the clone/wet rejection above.
+remain supported; float PaintLayers reject clone and byte wet values.
 
 Portable packages collect/remap original brush textures and applicable clone/
 prepared-wet pairs. Trusted asynchronous preparation pins prospective source
@@ -104,3 +103,51 @@ including insertion into a selected group; subsequent appends target the created
 step output. Placement and append still commit atomically in a replay.
 
 [Verification and remaining roadmap scope](../docs/benchmarks/float-paint-2026-10-31.md).
+
+## Native wet paint
+
+`paint.strokes.add(new WetPaintStroke({precision: "float32", brush, tiles,
+...options}))` appends validated prepared linear TIFF pigment/removal pairs.
+Attach the PaintLayer to the float Document before appending HDR values;
+detached paint mutations retain their temporary byte-document validation.
+The existing schema 57 metadata, defaults, finite HDR values, complete native
+pair validation, mapped/perspective placement and source ownership contracts
+apply. Byte wet pairs reject in a float PaintLayer, even when inert; HDR masks
+and byte documents still reject. No new serialized field or permission is added.
+See [prepared HDR values](HDR_WET_DOCUMENTS.md).
+
+An active wet record reconstructs the complete ordered PaintLayer content on
+its local integer pixel lattice, as in the byte wet compositor: dry strokes,
+prepared replacements, erasers, clear fills and subsequent dry strokes all
+replay before the current layer/ancestor affine. This also rerasterizes dry
+stroke edges on that local lattice; transformed dry-only paint uses the earlier
+document-lattice path. Zero-opacity wet records validate their complete sources
+but neither select local reconstruction nor enlarge support. Finite off-layer
+prepared support remains visible. Bounded projection windows retain crop parity
+and do not impose image-size limits.
+
+Trusted `editor.applyWetPaint(brush, options?)` accepts a selected or explicit
+PaintLayer, or creates one when no layer is selected. Its existing local/placed
+controls, load/mix defaults, selection baking, source/revision/cancellation
+guards, private prefix leases and one-Undo commit are unchanged. The Smudge and
+Mixer tools expose these targets through the existing rail/registry; ordinary
+mask targets keep their byte path. Isolated scripts, plugins and independent
+REST sessions consume prepared pairs rather than running host simulation.
+
+<!-- example: float-wet-paint -->
+
+```js
+const paint = document.layers.add(new PaintLayer({name: 'Wet linear paint'}));
+paint.strokes.add(new PaintFill({
+  bounds: {x: 10, y: 10, width: 24, height: 24}, color: '#208040'
+}));
+document.selectedLayer = paint;
+print('Wet paint target ready');
+```
+
+This isolated example creates editable dry content ready for the trusted
+Smudge/Mixer tools; it does not expose simulation or pixel reads to scripts.
+Full photographic/device quality, sustained performance, clone and the wider
+original roadmap remain required.
+
+[Native wet verification and remaining limits](../docs/benchmarks/float-wet-paint-2026-10-31.md).

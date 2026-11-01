@@ -70,7 +70,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
   const document = editor.document, assets = editor.assetStore, snapshot = document.getSnapshot(), selected = [...snapshot.selectedIds];
   const floatDocument=isFloatDocument(snapshot.document),floatColor=floatDocument&&targetKind==='layer';
   const target = requestedId ? document.getLayer(requestedId) : document.selectedLayer;
-  if(floatColor&&!(target instanceof RasterLayer))throw new Error('Float wet painting requires an original raster layer.');
+  if(floatColor&&target&&!(target instanceof RasterLayer)&&!(target instanceof PaintLayer))throw new Error('Float wet painting requires an original raster or paint layer.');
   if (targetKind==='layer' && target && !(target instanceof PaintLayer) && !(target instanceof RasterLayer)) throw new Error('Wet paint requires an image or paint layer.');
   if (requestedId && !target) throw new Error('Wet-paint target does not exist.');
   if (target && isLocked(snapshot.document, target.id)) throw new Error('The wet-paint target or an ancestor is locked.');
@@ -286,7 +286,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
             for (const key of referencedAssets(frame.document)) if (!assets.has(key)) { frame.assets.shareTo(assets, key, key); installed.set(key, assets.get(key)); }
             document.transaction((mode === 'mixer'?'Mixer':'Smudge')+(mask?targetKind==='filter-mask'?' filter mask stroke':' mask stroke':' stroke'), () => {
               if(mask){const next=mask.applyWetPaint(frame.operation);if(targetKind==='filter-mask')(target as SmartObjectLayer).filterMask=next;else target!.mask=next;return;}
-              if (!target) { (layer as PaintLayer).strokes.add(frame.operation); document.layers.add(layer as PaintLayer); }
+              if (!target) document.layers.add(layer as PaintLayer).strokes.add(frame.operation);
               else if (target instanceof RasterLayer) target.applyWetPaint(frame.operation);
               else (target as PaintLayer).strokes.add(frame.operation);
             });

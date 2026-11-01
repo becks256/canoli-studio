@@ -7,7 +7,9 @@ native linear color, shared canonical scalar coverage and once-only unquantized
 stroke opacity. Ordered editable strokes, private previews, affine placement,
 masks/appearance, Undo and source-bearing persistence use existing boundaries.
 Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
-Clone and prepared wet operations in float PaintLayers remain unsupported.
+Prepared HDR wet strokes now join dry paint on the content-local native grid
+before current affine placement; inert wet records retain the dry rendering
+path. Clone remains unsupported.
 [Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
 
 

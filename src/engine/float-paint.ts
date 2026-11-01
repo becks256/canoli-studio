@@ -1,7 +1,7 @@
 import type {PaintOperationData,BrushStrokeData,FillData} from '../core/drawing';
 import {strokeBounds} from '../core/drawing';
 import {srgbToLinear} from '../core/color/spaces';
-import type {AffineTransform} from '../core/affine';
+import {AffineTransform} from '../core/affine';
 import type {AssetStore} from '../core/assets';
 import {validateWindow,type FloatSourceWindow} from '../core/float-source/types';
 import type {PixelProcessor} from './processor';
@@ -11,6 +11,10 @@ import {createCanvas,release,type RenderSpace} from './canvas';
 import {yieldTask} from '../core/task-yield';
 import {validateFloatAlpha} from '../core/float-shadow';
 import {validateFloatWorkerWindow} from './float-pixels';
+import type {WetPaintStrokeData} from '../core/wet-operation';
+import {isActiveWetPaint} from '../core/wet-operation';
+import {unionBounds} from '../core/spatial';
+import {projectFloatWindow} from './float-projection';
 
 export type FloatPaintOperation=BrushStrokeData|FillData;
 export type FloatPaintCoverage=(operation:FloatPaintOperation,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
@@ -38,11 +42,19 @@ export async function renderFloatPaintCoverage(operation:FloatPaintOperation,spa
  check();return output;
 }
 
-/** Ordered editable dry paint in linear RGB; no prepared wet reinterpretation. */
-export async function replayFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'>,check:()=>void):Promise<Float32Array>{
+/** Ordered editable native paint. A wet reader supplies validated, captured
+ * premultiplied pigment/alpha/removal, never display pixels or brush coverage. */
+export async function replayFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'>&Partial<Pick<PixelProcessor,'floatCompositeHdrWet'>>,check:()=>void,wet?:(stroke:WetPaintStrokeData,area:FloatSourceWindow)=>Promise<Float64Array>):Promise<Float32Array>{
  check();area=validateWindow(area);let output:Float32Array=new Float32Array(area.width*area.height*4);
  for(const stroke of strokes){
-  check();if(stroke.kind==='wet'||stroke.kind==='clone')throw new Error('Float paint layers require native integration for clone and prepared wet operations.');
+  check();if(stroke.kind==='clone')throw new Error('Float paint layers require native integration for clone operations.');
+  if(stroke.kind==='wet'){
+   if(stroke.precision!=='float32')throw new Error('Float paint replacements require explicit HDR wet paint.');
+   if(stroke.opacity===0)continue;
+   if(!wet||!processor.floatCompositeHdrWet)throw new Error('Float wet paint replay service is unavailable.');
+   const field=await wet(stroke,area);check();
+   const next=await processor.floatCompositeHdrWet(output,field,stroke.opacity);check();validateFloatWorkerWindow(next);if(next.length!==output.length)throw new Error('Float wet paint composition returned the wrong geometry.');output=next;continue;
+  }
   if(stroke.opacity===0||stroke.kind!=='fill'&&stroke.flow===0)continue;
   const mask=await coverage(stroke,{...area,sx:1,sy:1},world,check);check();validateFloatAlpha(mask,area.width*area.height);
   if(stroke.kind==='eraser'||stroke.kind==='fill'&&stroke.erase){
@@ -55,4 +67,16 @@ export async function replayFloatPaint(strokes:readonly PaintOperationData[],are
   }
  }
  check();return output;
+}
+
+/** Active replacements choose the same content-local reconstruction as byte
+ * PaintLayers: all operations precede the current owner/ancestor affine. Inert
+ * records must not change the established dry document-lattice rasterization. */
+export async function renderFloatPaint(strokes:readonly PaintOperationData[],area:FloatSourceWindow,world:AffineTransform,coverage:FloatPaintCoverage,processor:Pick<PixelProcessor,'floatComposite'|'floatCompositeHdrWet'>,check:()=>void,wet:(stroke:WetPaintStrokeData,area:FloatSourceWindow)=>Promise<Float64Array>):Promise<Float32Array>{
+ check();if(!strokes.some(isActiveWetPaint))return replayFloatPaint(strokes,area,world,coverage,processor,check);
+ const bounds=unionBounds(strokes.filter(stroke=>stroke.kind!=='wet'||isActiveWetPaint(stroke)).map(strokeBounds));
+ if(!bounds)return new Float32Array(validateWindow(area).width*area.height*4);
+ const left=Math.floor(bounds.x)-2,top=Math.floor(bounds.y)-2,right=Math.ceil(bounds.x+bounds.width)+2,bottom=Math.ceil(bounds.y+bounds.height)+2,width=right-left,height=bottom-top;
+ if(![left,top,right,bottom,width,height].every(Number.isSafeInteger)||width<=0||height<=0)throw new Error('Float wet paint content bounds exceed numeric precision.');
+ return projectFloatWindow({width,height,readWindow:region=>replayFloatPaint(strokes,{...region,x:region.x+left,y:region.y+top},new AffineTransform(),coverage,processor,check,wet)},world.multiply(AffineTransform.translation(left,top)),area,{isCancelled:()=>{check();return false;}});
 }

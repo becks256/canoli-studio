@@ -3,7 +3,8 @@
 ## Prepared HDR raster values (schema 57)
 
 Existing `WetPaintStroke` values accept `precision:"float32"` and linear native
-TIFF pairs for float raster artwork. They execute through existing isolated
+TIFF pairs for float raster and PaintLayer artwork. PaintLayer appends use
+`paint.strokes.add(stroke)` and [local native reconstruction](FLOAT_PAINT.md#native-wet-paint). They execute through existing isolated
 commands; installation stays inert. Existing document/source grants, locks,
 revision/Undo and complete host pair validation still apply. There is no new
 permission, pixel/worker/file/network service or host preparation method. HDR
