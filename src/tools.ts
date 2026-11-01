@@ -420,14 +420,20 @@ export class ToolController {
    * Gesture admission still checks the actual current target in canUseTool. */
   canChooseTool(tool:Tool):boolean{
     if(this.canUseTool(tool))return true;
-    if(this.editor.document.precision!=='float32'||!['brush','pencil'].includes(tool))return false;
+    if(this.editor.document.precision!=='float32')return false;
     const document=this.editor.document,selected=document.selectedLayer;
+    if(tool==='smudge'||tool==='mixer')return selected instanceof RasterLayer;
+    if(!['brush','pencil'].includes(tool))return false;
     return !!selected&&!!findLayer(document._read(),selected.id)?.mask;
   }
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
     if(tool==='dodge'||tool==='burn')return true;
+    if(tool==='smudge'||tool==='mixer'){
+      const target=this.state.settings.paintTarget,selected=this.editor.document.selectedLayer;
+      return target==='layer'?selected instanceof RasterLayer:target.startsWith('mask-')&&!!selected?.mask;
+    }
     if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer;
     if(tool==='pen')return this.state.settings.penEditTarget==='mask'||this.editor.document.selectedLayer?.mask?.kind==='vector';
     return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');

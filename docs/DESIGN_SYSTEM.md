@@ -7,7 +7,9 @@ the existing rail and command registry. Choosing either defaults an incompatible
 target to Mask Hide; retain an existing Mask Hide/Reveal choice. Keep the target
 visible in the existing Tool options selector. Reuse the existing B/N bindings,
 cursor, controls, cancellation and one-Undo gesture. Color Brush/Pencil painting
-and float Smudge/Mixer remain unavailable. Vector-mask Pen keeps its existing
+remains unavailable. Float Smudge/Mixer support raster color and ordinary mask
+coverage; preserve a valid mask target and default an incompatible target to
+Layer only for a selected raster. Vector-mask Pen keeps its existing
 Mask paths targeting behavior. No new shortcut or component is introduced.
 
 ## Retained mask-plane increment (schema 56)
@@ -31,7 +33,7 @@ unlinked masks retain their local/document behavior. Hide/Reveal still loads
 coverage rather than foreground RGB. Preview actual private native output;
 pointer release drains accepted samples and commits one Undo. Escape, pointer
 cancellation, revision or ordered-selection changes discard the gesture.
-Native float wet painting retains its explicit unavailable state. No new
+Float raster color uses the same controls with native linear preparation; ordinary float mask coverage retains Hide/Reveal. Unsupported color targets remain unavailable. No new
 shortcut or component library is introduced.
 
 

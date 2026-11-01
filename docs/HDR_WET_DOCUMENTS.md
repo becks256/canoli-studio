@@ -1,9 +1,10 @@
 # Prepared HDR wet document edits
 
-Status: schema 57 prepared raster edits. Trusted interactive float Smudge/Mixer
-authoring and preview/commit remain separate required work; those tools stay
-disabled. This contract accepts completed native output rather than exposing a
-simulation, pixel reader, file service or network capability to isolated code.
+Status: schema 57 prepared raster edits and trusted interactive Smudge/Mixer
+authoring. Raster color preparation reads original native Float32 windows;
+ordinary mask preparation keeps byte scalar coverage. Isolated code accepts
+completed prepared output and has no simulation, pixel reader, file service or
+network capability.
 
 ## Constructor and values
 
@@ -125,3 +126,65 @@ windows; the dated implementation log records complete runs. Do not infer full
 50 MP wet editing, sustained performance, photographic/device quality,
 interactive tools or the remaining roadmap from numerical or bounded-window
 checks. The broader professional-editor goal remains active.
+
+## Trusted native authoring and tools
+
+`editor.applyWetPaint(brush, options?)` and the Smudge/Mixer pointer controller
+share one retained authoring job. In a float32 document, a layer target must be
+an existing original RasterLayer, selected or named by `targetId`. Missing,
+paint/vector/group or locked color targets reject. No float PaintLayer is
+created. Choosing a wet tool in the rail or command palette preserves a valid
+mask target; an incompatible target falls back to Layer only for a selected
+raster. Gesture admission checks the actual current target again.
+
+Color reads capture the neutral original FloatScene, including earlier ordered
+wet/erase/clear operations, before layer opacity, masks, styles and tone effects.
+Logical resize, affine parents, reflection and captured perspective retain their
+existing local/placed mappings. Append and prefix reuse keep the same native
+reservoir, texture leases and private backing. Preview candidates own their
+float TIFF sources; retaining a preview keeps those files readable after job
+retirement. The document and host asset store change only at the validated
+single-transaction commit. Escape, cancellation, revision/ordered-selection,
+source bytes/geometry/interpretation or storage failures discard pending output.
+
+For float artwork, brush hex RGB defaults convert from encoded sRGB to linear
+RGB, alpha 1. Explicit `load.color` accepts finite Float32 signed/HDR RGB and
+alpha 0–1. Smudge defaults load/wetness to 0/0; Mixer to 1/.25. Remaining mix
+flow/pickup defaults are 1/.5. Final selection and brush opacity are applied once
+in native preparation. Lossless straight Float32 TIFF pairs retain completed
+pixels and binary removal support; the operation's outer opacity stays 1.
+No byte canvas supplies color and no RGB clamp is introduced. Float working
+requests and tile encoding use the existing 262,144-pixel allocation budget,
+independently of original image resolution.
+
+Ordinary masks in float documents use the byte wet path and PNG pairs. White
+load RGB and alpha 0/255 describe hidden/revealed coverage; they are not HDR
+color. Filter-mask authoring remains supported in byte documents. Float smart
+objects remain unsupported. No new binding, shortcut, permission, REST simulation
+route or isolated host method is introduced.
+
+This example runs in trusted application code with `editor` and `PencilStroke`
+from the host module. Open a float TIFF and select its raster first. It is not
+an isolated Scripts example:
+
+<!-- example: hdr-wet-authored -->
+
+```js
+const controller = new AbortController();
+const stroke = new PencilStroke({
+  size: 2, pressureSize: false, opacity: 0.64123, flow: 1,
+  points: [{x: 3.5, y: 4.5}]
+});
+const result = await editor.applyWetPaint(stroke, {
+  mode: 'mixer', respectSelection: false, signal: controller.signal,
+  load: {color: [4, -2, 8, 0.375], load: 1},
+  mix: {flow: 1, wetness: 0, pickup: 0}
+});
+```
+
+No changed pixels returns null without assets/history. This finite pigment
+transport does not establish a spectral or physical model, full-image 50 MP wet
+performance, sustained 60fps, photographic/device quality, other float tool
+coverage or completion of the remaining roadmap gates.
+
+[Trusted authoring verification and remaining roadmap gates](../docs/benchmarks/hdr-wet-authoring-2026-10-31.md).

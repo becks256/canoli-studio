@@ -19,6 +19,6 @@ test('production HDR isolated edits retain exact native TIFF delivery, source fi
 test.describe('HDR prepared edit guide',()=>{
  test.use({javaScriptEnabled:false,viewport:{width:390,height:844}});
  test('built signatures and isolation boundary remain readable without JavaScript',async({page})=>{
-  await page.goto('/developer/hdr-wet-documents.html');await expect(page.getByRole('heading',{name:'Prepared HDR wet document edits',exact:true})).toBeVisible();await expect(page.locator('main')).toContainText('schema 57');await expect(page.locator('main')).toContainText('remain separate required work');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await page.goto('/developer/hdr-wet-documents.html');await expect(page.getByRole('heading',{name:'Prepared HDR wet document edits',exact:true})).toBeVisible();await expect(page.locator('main')).toContainText('schema 57');await expect(page.locator('main')).toContainText('trusted interactive Smudge/Mixer');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
  });
 });

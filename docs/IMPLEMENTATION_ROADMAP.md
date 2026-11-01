@@ -10061,3 +10061,35 @@ general warp, photographic/device/sustained F14 performance and every unfinished
 original professional, AI, workflow, ChatGPT/live identity, commercial,
 specialist and motion gate remain required. No full-image HDR wet acceptance,
 continuous-60fps, physical pigment, paid call, upload or browser/REST sync follows.
+
+
+### 2026-10-31 — F03/F10 trusted HDR Smudge/Mixer authoring
+
+Owner: implementation agent; increment from `4070680`; classification: progress.
+The existing retained authoring job now reads a captured neutral original
+FloatScene for float raster color, runs retained Float32 sessions, stages
+lossless TIFF pigment/removal pairs and publishes one validated transaction.
+Private prefix leases, append reuse, cancellation, source interpretation and
+ordered-selection/revision guards retain the shared lifecycle. Actual Smudge
+and Mixer rail/registry tools support float raster color and existing ordinary
+byte mask coverage, with explicit target admission. Hex foreground converts to
+linear color; explicit HDR load remains unclipped. Isolated scripts/plugins and
+independent REST still consume prepared values; no host simulation service or
+new authority is exposed. [Contract and trusted executable example](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools).
+
+Verified: **3,285 unit/API/native tests across 318 files; 80 source-browser cases across 9 files; 14 selected production cases across 5 files**. No failures, skips, retries, flakes or runner errors
+in final acceptance. Independent native TIFF/NumPy checks match every staged
+word/profile and complete committed/reopened 64x48 windows; actual pointer
+previews/commit/cancel/Undo, reflected/projected and resized authoring,
+source-bearing recipes/workspace/projects, interpretation/selection guards and
+byte mask/color regressions pass. A genuine 50 MP original retains its bytes and
+geometry through a disclosed native window edit. Final build/typecheck, frozen
+inputs and tested runtime identities pass. Earlier fixture/React-order pilots
+remain disclosed. [Findings and compact evidence](benchmarks/hdr-wet-authoring-2026-10-31.md).
+
+The full original goal remains active. Wider float tools/layers/working spaces,
+mask/master/nested-projective and general warp coverage, photographic/device
+quality, sustained F14 performance and every unfinished original professional,
+AI, workflow, ChatGPT/live identity, commercial, specialist and motion gate
+remain required. Small native windows on 50 MP sources do not establish
+full-image wet performance, continuous 60fps or a physical pigment model.

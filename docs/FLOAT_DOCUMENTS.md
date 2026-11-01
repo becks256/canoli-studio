@@ -1069,7 +1069,7 @@ these paths, including cancellation after an empty mask read. These are private
 execution optimizations, with unchanged public style/history/transport semantics.
 
 
-## Native float wet-paint dependency; tool integration pending
+## Native float wet-paint dependency and subsequent integration
 
 Private linear Float32 wet load, deposit/pre-deposit pickup and completed-stroke
 selection/opacity primitives now preserve signed/HDR RGB without byte staging.
@@ -1091,3 +1091,14 @@ complete color/coverage pairs and sample Float64 intermediate replacement fields
 before a single native Float32 composition. This is not yet a document wet
 stroke or native history/project transport. Public replay and authoring remain
 required; float Smudge/Mixer stay unavailable. [Contract](HDR_WET_FIELDS.md).
+
+
+## Current trusted wet authoring integration
+
+The dependency notes above record their delivery-stage boundaries. Schema 57
+now connects prepared HDR pairs to native replay and source-bearing transport;
+trusted Float32 sessions, TIFF staging, private previews and atomic commit now
+serve real Smudge/Mixer raster gestures. Ordinary mask preparation remains byte
+coverage. [Current signatures, defaults, ownership and remaining acceptance](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools)
+supersede the earlier unavailable-tool status. Physical/photographic/device,
+sustained performance and the unfinished wider roadmap remain required.

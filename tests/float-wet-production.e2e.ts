@@ -1,6 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {readFile, readdir, writeFile} from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
+import {historyProject,historyPng} from './helpers/history-inspector';
 
 test('production float wet worker retains every independent HDR word without developer globals', async ({page}, info) => {
   const workers=(await readdir('dist/assets')).filter(name=>/^pixels\.worker-.*\.js$/.test(name));
@@ -41,14 +42,23 @@ test('production float wet worker retains every independent HDR word without dev
   await writeFile(info.outputPath('float-wet-production.json'),JSON.stringify({worker:workers[0],debugGlobals:false,rows:rows.map(row=>({name:row.name,bytes:row.bytes.length,exact:true}))},null,2));
 });
 
-test('production float wet tools stay unavailable until trusted authoring and previews are integrated', async ({page}) => {
+test('production HDR Mixer previews, cancels and commits a source-preserving native stroke without developer globals', async ({page},info) => {
   await page.goto('/');
   await page.getByTestId('import-input').setInputFiles('tests/fixtures/tiff-float/rgba-raw-le.tif');
   const dialog=page.getByRole('dialog',{name:'Import TIFF',exact:true});
   await dialog.getByLabel('TIFF editing precision',{exact:true}).selectOption('float32');
   await dialog.getByRole('button',{name:'Import TIFF page',exact:true}).click();await expect(dialog).toHaveCount(0);
   await page.getByRole('button',{name:'Select rgba-raw-le.tif',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Smudge tool',exact:true})).toBeDisabled();
-  await expect(page.getByRole('button',{name:'Mixer brush',exact:true})).toBeDisabled();
-  expect(await page.evaluate(()=>'luma' in window)).toBe(false);
+  await expect(page.getByRole('button',{name:'Smudge tool',exact:true})).toBeEnabled();
+  await page.getByRole('button',{name:'Mixer brush',exact:true}).click();await page.keyboard.press('Control+1');
+  for(const[label,value]of[['Size value','8'],['Hardness value','100'],['Wetness value','0'],['Pickup value','0']]as const){const input=page.getByRole('spinbutton',{name:label,exact:true});await input.fill(value);await input.press('Enter');}
+  await page.getByLabel('Foreground color',{exact:true}).fill('#208040');await page.getByRole('checkbox',{name:'Pressure controls size',exact:true}).uncheck();
+  const before=await historyProject(page,info,'before.luma'),box=(await page.getByTestId('artwork').boundingBox())!,at={x:box.x+24*box.width/131,y:box.y+24*box.height/79};
+  await page.mouse.move(at.x,at.y);await page.mouse.down();await page.mouse.move(at.x+4,at.y,{steps:2});await page.waitForTimeout(300);await page.keyboard.press('Escape');await page.mouse.up();expect((await historyProject(page,info,'cancelled.luma')).value.document).toEqual(before.value.document);
+  await page.mouse.move(at.x,at.y);await page.mouse.down();await page.mouse.move(at.x+4,at.y,{steps:2});await page.mouse.up();await expect(page.getByRole('button',{name:'Save project',exact:true})).toBeEnabled();
+  const after=await historyProject(page,info,'authored-hdr.luma'),target=after.value.document.children[0];if(target.kind!=='raster')throw new Error('No authored raster');expect(target.erasures).toHaveLength(1);const stroke=target.erasures![0].stroke;if(stroke.kind!=='wet')throw new Error('No wet operation');expect(stroke.precision).toBe('float32');expect(stroke.load.color[3]).toBe(1);
+  const original=after.value.entries.find(entry=>entry.id===target.assetId)!;expect(Buffer.from(await original.blob.arrayBuffer())).toEqual(await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif'));for(const tile of stroke.tiles)for(const id of [tile.assetId,tile.coverage.assetId]){const asset=after.value.entries.find(entry=>entry.id===id)!;expect(asset.tiff?.editingPrecision).toBe('float32');expect(asset.blob.type).toBe('image/tiff');}
+  const image=await historyPng(page,info,'hdr-pointer.png');expect(image.bytes.length).toBeGreaterThan(0);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await historyProject(page,info,'undo.luma')).value.document).toEqual(before.value.document);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'redo.luma')).value.document).toEqual(after.value.document);
+  await page.getByTestId('project-input').setInputFiles(after.path);expect((await historyProject(page,info,'reopened.luma')).value.document).toEqual(after.value.document);expect(await page.evaluate(()=>'luma' in window)).toBe(false);
+  await writeFile(info.outputPath('production-hdr-pointer.json'),JSON.stringify({nativePairs:stroke.tiles.length,precision:stroke.precision,load:stroke.load,oneUndo:true,originalExact:true,cancellationExact:true,projectExact:true,debugGlobals:false},null,2));
 });

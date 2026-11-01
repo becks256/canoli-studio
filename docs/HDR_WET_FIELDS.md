@@ -3,7 +3,8 @@
 Status: private F03/F10 numerical/asset foundation. Schema 57 now connects these
 fields to [prepared HDR document edits](HDR_WET_DOCUMENTS.md). The private codec
 and sampling services are not exposed to isolated scripts. Trusted interactive
-float Smudge/Mixer authoring and previews remain required; tools stay disabled.
+float Smudge/Mixer authoring now connects these fields through retained sessions,
+private previews and TIFF staging; see the current [authoring contract](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools).
 
 ## Lossless asset pair
 

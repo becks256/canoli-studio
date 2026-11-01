@@ -1213,3 +1213,15 @@ validation precedes reusable proofs, owned results outlive source closure, and
 disposal releases originals. [Equations and boundaries](HDR_WET_FIELDS.md).
 No public DTO, document precision, host grant or native project contract changes;
 current float wet authoring remains unavailable.
+
+
+## Trusted HDR wet authoring integration
+
+The retained wet-authoring lifecycle now chooses Float32 original-window reads
+and TIFF staging for float raster artwork, retaining byte scalar mask reads and
+PNG staging. Source interpretation references, original bytes/geometry, session,
+ordered selection and revision remain pinned until validated one-command commit.
+Private candidate scenes and retained preview leases own staged files without
+publishing document mutations. Supported float Smudge/Mixer targets use the
+existing rail, registry and ToolController; no isolated simulation or REST
+synchronization boundary changes. [Contract](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools).

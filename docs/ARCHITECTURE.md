@@ -11,8 +11,12 @@ and replays wet/erase/clear in order before current layer projection. A finite
 expanded native source retains off-image paint; zero opacity does not choose it.
 Only actual HDR tile reference objects bypass byte-role checks, never every use
 of their asset ID. Public OO/isolated/REST/history/project/workspace/recipe
-transport reuses existing references and commands. Trusted authoring/tools and
-broader release gates remain required. [Full contract](HDR_WET_DOCUMENTS.md).
+transport reuses existing references and commands. Trusted authoring selects
+Float32 sessions for raster artwork and byte sessions for mask coverage. It owns
+a neutral FloatScene, stages lossless TIFF pairs, shares the existing private
+prefix/lease/commit lifecycle and checks original interpretation references as
+well as bytes/geometry. Tool admission and the UI registry enable supported
+float targets. Broader release gates remain required. [Full contract](HDR_WET_DOCUMENTS.md).
 
 ## Shared HDR wet asset ownership
 

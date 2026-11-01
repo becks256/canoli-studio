@@ -258,3 +258,14 @@ derived intermediates, not a new document precision or public wet DTO.
 [Format, equations, ownership, budgets and remaining integration](HDR_WET_FIELDS.md).
 Public HDR wet assets/commands, FloatScene replay, original-bearing persistence
 and authoring/tools remain required; float Smudge/Mixer stay disabled.
+
+
+## Current trusted wet authoring integration
+
+The dependency notes above record their delivery-stage boundaries. Schema 57
+now connects prepared HDR pairs to native replay and source-bearing transport;
+trusted Float32 sessions, TIFF staging, private previews and atomic commit now
+serve real Smudge/Mixer raster gestures. Ordinary mask preparation remains byte
+coverage. [Current signatures, defaults, ownership and remaining acceptance](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools)
+supersede the earlier unavailable-tool status. Physical/photographic/device,
+sustained performance and the unfinished wider roadmap remain required.

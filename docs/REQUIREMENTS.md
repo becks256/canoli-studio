@@ -10,7 +10,10 @@ current resize/affine/perspective sampling, including finite off-image support.
 Use no display color/alpha, RGB clamp, second pigment mask or arbitrary image
 size tier. Inert metadata keeps existing reconstruction and bounds. HDR values
 are raster artwork only; byte/mask contracts remain. Trusted interactive float
-Smudge/Mixer authoring remains required. [Exact contract and acceptance status](HDR_WET_DOCUMENTS.md).
+Smudge/Mixer authoring now shares original FloatScene reads, retained Float32
+sessions, lossless TIFF staging, private previews and atomic one-Undo commit.
+Source interpretation, revision/selection and cancellation guards apply through
+publication; ordinary mask coverage keeps its byte path. [Exact contract and acceptance status](HDR_WET_DOCUMENTS.md).
 
 ## Retained-mask appearance invalidation
 

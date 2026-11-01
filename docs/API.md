@@ -36,6 +36,11 @@ and embedded documents. Actual PNG dimensions and premasked alpha still validate
 before external results commit. Invalid/null metadata, false schema ages,
 missing sources and finite-artwork horizon crossings reject.
 
+Trusted browser authoring supports native float raster color and byte ordinary
+mask coverage through the same private preview/one-Undo adapter; this does not
+add a REST simulation endpoint or synchronize browser and REST sessions.
+[Trusted HDR contract](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools).
+
 Trusted browser `editor.applyWetPaint` accepts `space:"local"|"placed"`, default
 local. Active projected raster/linked-mask preparation uses placed image pixels;
 unlinked masks keep local behavior. Isolated scripts/plugins submit prepared
