@@ -166,12 +166,14 @@ shorthand. Invalid native font shorthand rejects rather than inheriting a pooled
 canvas's previous font. Frozen source descriptors and axis ranges cannot retarget
 a captured source.
 
-Private source-shaping input accepts optional `css:{weight,width,style,styleAxis?}`
+Private source-shaping input accepts optional `css:{weight,width,style,styleAxis?,opticalSize?}`
 for an already selected native face request. Weight is finite in [1,1000], width
 is a positive percentage and style is normal/italic/oblique. `styleAxis` may be
 ital/slnt/none. Source-range clamps apply to wght/wdth and at most one automatic
 style axis, then the original authored axis tuple overrides them. Unrelated
-axes retain source defaults. An omitted `css` preserves explicit-only shaping.
+axes retain source defaults. `opticalSize`, when supplied, is finite and positive;
+it applies only to an original opsz axis, with source-range clamping before
+explicit settings. An omitted `css` preserves explicit-only shaping.
 The returned run's `settings` records the effective merged coordinates; its
 request, CSS metadata, descriptors and source-axis metadata are immutable.
 
@@ -187,12 +189,49 @@ while recording actual browser results rather than assuming one native mapping.
 The ordinary renderer, font registrations and authored appearance remain.
 
 This resolves the private weight/width/style dependency for verified native
-runs; automatic optical sizing, full CSS/fallback itemization, native registration
+runs; full CSS/fallback itemization, native registration
 behavior for every font/browser, complete collection/legacy cases and missing/intrinsic paint,
 SVG/path/vertical matching and complete float TextLayer integration remain
 required. In particular, this does not repair or promise automatic italic-axis
 selection in the existing ordinary native host. Explicit authored ital remains
 available through the existing variable-axis controls.
+
+## Automatic optical sizing in the private Canvas matcher
+
+The matcher captures the native font size in CSS pixels as `css.opticalSize`.
+The original numeric size is retained before any await, including fractions
+rounded by Canvas shorthand serialization. Source shaping applies it to an
+existing opsz axis, clamps to that source's range and lets the original font's
+avar/gvar/HVAR tables perform interpolation. No opsz axis is invented for fonts
+without one. Omitted optical metadata preserves explicit-only/default behavior.
+Explicit authored opsz wins; an unrelated authored axis keeps automatic opsz.
+
+Affine canvas placement, viewport scale and device pixel ratio do not multiply
+the captured font size. The requested optical coordinate and effective native
+em size are separate. A private 880-byte original geometric font with exactly
+one-em advance reads the latter through native text metadata before shaping;
+it reads no source glyphs, artwork pixels or reference advances. This handles
+platform size quantization without browser-name rules or fitted geometry. Its
+native face and measurement Canvas retire on success, cancellation, timeout,
+invalid metadata or registration tampering. Complete match evidence records
+both original `fontSize` and measured `nativeFontSize`. Source-unit placements
+use the native em size; glyph painting keeps the original native CSS request.
+Private native glyph faces retain the same original automatic optical behavior
+or explicit tuple as their source faces. Complete
+native advance and ink at opacity 1 and 0.5 must still match before placements
+are returned; a different host selection cannot silently publish a default or
+fitted optical instance. Fonts and already returned run metadata remain owned
+and immutable through later size requests, model/history removal and release.
+
+[CSS Fonts 4 optical sizing](https://www.w3.org/TR/css-fonts-4/#font-optical-sizing-def)
+allows hosts to consider other factors and specifies supported-range clamping.
+Using the untransformed requested size matches the verified native Canvas host;
+this is not a universal browser/device selection guarantee. The source-only
+shaper's CSS metadata is internal, not a new authored optical-sizing property,
+constructor, scripting method or plugin/REST grant. Ordinary native registration,
+text appearance, source bytes, model and transport remain unchanged. Native SVG,
+path/vertical matching, bidi/script/fallback, missing/intrinsic paint and full
+float TextLayer authoring/scenes/export/shared transport/persistence remain.
 
 ## Complete compressed font preparation (private)
 
@@ -373,3 +412,23 @@ and [compact receipt](benchmarks/font-decode-2026-11-01.json.gz) retain the fail
 Manrope/precision/ligature trials, isolated diagnosis and corrected hint-table/
 feature-control checks. Full native text/tool, collection/fallback/optical,
 missing/intrinsic paint and remaining original roadmap acceptance stay required.
+
+## Optical and native em-size verification (2026-11-01)
+
+Full build/typecheck and 3,396 unit/API tests across 336 files pass. One complete
+80-case affected native run and nine production checks pass. Sixteen independent
+static FontTools instances verify exact outlines/metrics; 86 complete native
+RGBA/advance pairs match across TTF/WOFF2, device scales 1/2, automatic/clamped/
+fractional sizes, affine placement and explicit overrides. Hard fractional size
+requests now match after independent native em capture, including TTF/CFF fonts
+without optical axes. The emitted production matcher matches twelve complete
+runs with prepared fixture sources. Probe faults cannot leak faces or publish
+invalid metadata, and retry succeeds with Canvas pixel reads forbidden.
+Actual WASM retains HDR/tiny-alpha paint and exact partition words. The ordinary
+50 MP workflow retains its original identity, independent 600 × 200 text-region
+pixels and preceding accepted PNG bytes; this is not full 50 MP/float acceptance.
+
+[Findings and limits](benchmarks/optical-font-2026-11-01.md) and the
+[compact raw-run/source/release/reference receipt](benchmarks/optical-font-2026-11-01.json.gz)
+retain failed/corrected pilots. Full native typography, float TextLayer/tool
+integration and all remaining original roadmap gates stay required.

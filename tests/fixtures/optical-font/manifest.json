@@ -1,0 +1,162 @@
+{
+  "license": "CC0-1.0; original geometric test artwork",
+  "axes": {
+    "opsz": [
+      8,
+      8,
+      72
+    ],
+    "wght": [
+      400,
+      400,
+      800
+    ]
+  },
+  "avar": {
+    "opsz": {
+      "0": 0,
+      "0.5": 0.75,
+      "1": 1
+    }
+  },
+  "references": {
+    "opsz-8-wght-400.ttf": {
+      "opsz": 8,
+      "wght": 400
+    },
+    "opsz-8-wght-600.ttf": {
+      "opsz": 8,
+      "wght": 600
+    },
+    "opsz-12-wght-400.ttf": {
+      "opsz": 12,
+      "wght": 400
+    },
+    "opsz-12-wght-600.ttf": {
+      "opsz": 12,
+      "wght": 600
+    },
+    "opsz-13-wght-400.ttf": {
+      "opsz": 13,
+      "wght": 400
+    },
+    "opsz-13-wght-600.ttf": {
+      "opsz": 13,
+      "wght": 600
+    },
+    "opsz-13.5-wght-400.ttf": {
+      "opsz": 13.5,
+      "wght": 400
+    },
+    "opsz-13.5-wght-600.ttf": {
+      "opsz": 13.5,
+      "wght": 600
+    },
+    "opsz-16-wght-400.ttf": {
+      "opsz": 16,
+      "wght": 400
+    },
+    "opsz-16-wght-600.ttf": {
+      "opsz": 16,
+      "wght": 600
+    },
+    "opsz-24-wght-400.ttf": {
+      "opsz": 24,
+      "wght": 400
+    },
+    "opsz-24-wght-600.ttf": {
+      "opsz": 24,
+      "wght": 600
+    },
+    "opsz-40-wght-400.ttf": {
+      "opsz": 40,
+      "wght": 400
+    },
+    "opsz-40-wght-600.ttf": {
+      "opsz": 40,
+      "wght": 600
+    },
+    "opsz-72-wght-400.ttf": {
+      "opsz": 72,
+      "wght": 400
+    },
+    "opsz-72-wght-600.ttf": {
+      "opsz": 72,
+      "wght": 600
+    }
+  },
+  "files": {
+    "Optical.ttf": {
+      "bytes": 1572,
+      "sha256": "ef19ed976b9fb08304a3caf0405c20e2881297bdd4bc2bdfcf192b3a5e585f2f"
+    },
+    "Optical.woff2": {
+      "bytes": 600,
+      "sha256": "5e0dbabbf5b292b8cdd0da74579c29e22d033b741a0a439708c67069741de695"
+    },
+    "opsz-12-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "0ce5d4bdc4ede27e3a08d22acd7c21ba5a529a55b459cc62ab77e66fab86f2f7"
+    },
+    "opsz-12-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "782f6ee7f230639109a9f681f266b0c4ee727b83c835ece9207191ee46879836"
+    },
+    "opsz-13-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "557d4b0eede397c33ea19b60f2f1e22950adea0113b88da4e989628dc2ab7512"
+    },
+    "opsz-13-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "028fa91f7f1e5836f95637c1806a2e4593d282d3a6a15c8fe855c37b0158ad71"
+    },
+    "opsz-13.5-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "4244459f9169e7e3a48e066b8da75d04b13f43575935d73af097644bf76dead3"
+    },
+    "opsz-13.5-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "299417dffa587afbaf4fbbee0bf4b96fade6adaf6d659767f7f2e0cec5a5b861"
+    },
+    "opsz-16-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "7a0446d0f393ae449fbd31afbcacea5b9b80fde0d42973686370e956514d34ca"
+    },
+    "opsz-16-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "50fa69338ad1b86e0e0170ac4f2398ccd887cf9ca930e2cfdf7598d947957485"
+    },
+    "opsz-24-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "ab0394192e7407074976698f005926da908b079ed6bb5867a25f4a2244695157"
+    },
+    "opsz-24-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "fa540c237e4d1f1f55882dacd636206bdf01d54df5aadb169c5799fb6c6485f9"
+    },
+    "opsz-40-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "252d749326cf6d3441d644dc791120dffa4f8645b9be8d0f3774e2f544bcde94"
+    },
+    "opsz-40-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "6100edc6b187f097954bbd6d338d2aacff41c2a96e8ea08860bd173cfcb0c4df"
+    },
+    "opsz-72-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "b70ae4fc3b2759ebb7ce14cd31b7d683b3c2d133b4836e41372ee33c3b29b847"
+    },
+    "opsz-72-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "3d29f1429f21907dcd2522da28114f516d52ae18c02fe901b970b1110c05cbf6"
+    },
+    "opsz-8-wght-400.ttf": {
+      "bytes": 1200,
+      "sha256": "81fc85ed12c476d81b9b2c23c8897b3b0c98f81a725825ff3cff9e6ffbfbd7f5"
+    },
+    "opsz-8-wght-600.ttf": {
+      "bytes": 1200,
+      "sha256": "f3e2e600eef65138f4b07e937325820e342c1f5d4df329ecb16cf3ee3b3f2159"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {captureNativeFontInstance} from './native-font-instance';
+import {captureNativeTextSize} from './native-text-size';
 import {AffineTransform} from '../core/affine';
 import {characterFormatSchema,DEFAULT_CHARACTER_FORMAT} from '../core/character-format';
 import {applyTextStyle} from '../core/text-style';
@@ -19,6 +20,7 @@ const inputSchema=z.object({
 export type NativeGlyphRunInput=z.input<typeof inputSchema>;
 export type NativeGlyphPlacement=Readonly<Omit<FloatGlyph,'color'>>;
 export interface NativeGlyphMatchEvidence {
+ readonly fontSize:number;readonly nativeFontSize:number;
  readonly nativeAdvance:number;readonly shapedAdvance:number;readonly pixelsCompared:number;
  readonly maxAlphaError:number;readonly opacitySamples:readonly number[];
  readonly bounds:Readonly<{x:number;y:number;width:number;height:number}>;
@@ -41,7 +43,8 @@ export async function matchNativeGlyphRun(font:NativeGlyphFont,input:NativeGlyph
  const native=(c:CanvasRenderingContext2D)=>{applyTextStyle(c,style);c.textAlign='left';c.textBaseline='alphabetic';c.direction=request.direction;c.fillStyle='#ffffff';};
  const glyph=(c:CanvasRenderingContext2D)=>{applyTextStyle(c,{...style,fontFamily:font.family,fontVariationSettings:'normal',fontKerning:'none',fontVariantCaps:'normal',letterSpacing:0,wordSpacing:0});c.textAlign='left';c.textBaseline='alphabetic';c.direction='ltr';c.fillStyle='#ffffff';};
  try{
-  check();context.font='1px monospace';native(context);if(context.font==='1px monospace')throw new Error('Invalid native glyph font request.');const reference=context.measureText(request.text),nativeAdvance=reference.width,css=captureNativeFontInstance(context,style.fontWeight,font.descriptors);
+  check();context.font='1px monospace';native(context);if(context.font==='1px monospace')throw new Error('Invalid native glyph font request.');const reference=context.measureText(request.text),nativeAdvance=reference.width,css=captureNativeFontInstance(context,style.fontWeight,font.descriptors,style.fontSize);
+  const nativeFontSize=await captureNativeTextSize(style.fontSize,{...options,timeoutMs:Math.max(1,Math.ceil(timeout-(performance.now()-started))),check});check();
   const kerns=style.fontKerning==='auto'?[1,0]:[style.fontKerning==='none'?0:1];let last:NativeGlyphMatch|undefined;
   const styleAxes=font.axes.filter(a=>a.tag==='ital'||a.tag==='slnt').map(a=>a.tag as 'ital'|'slnt');
   const cssModes=styleAxes.length?[...styleAxes.map(styleAxis=>({...css,styleAxis})),{...css,styleAxis:'none'as const}]:[css];
@@ -49,7 +52,7 @@ export async function matchNativeGlyphRun(font:NativeGlyphFont,input:NativeGlyph
    const features=[{tag:'kern',value:kern},...(caps[style.fontVariantCaps??'normal']??[]).map(tag=>({tag,value:1})),...(style.letterSpacing?[{tag:'liga',value:0},{tag:'clig',value:0}]:[])];
    check();const run=await font.shapeRun({text:request.text,direction:request.direction,script:request.script,language:request.language,features,css:mode},{...options,timeoutMs:Math.max(1,Math.ceil(timeout-(performance.now()-started))),check});check();
    if(run.glyphs.some(g=>g.glyphId===0))return Object.freeze({status:'unavailable',reason:'The run requires missing-glyph or font-fallback painting.'});
-   const scale=style.fontSize/run.unitsPerEm,placements:NativeGlyphPlacement[]=[],draws:{character:string;transform:AffineTransform;bounds:ReturnType<AffineTransform['bounds']>}[]=[],measures=new Map<number,{character:string;metrics:TextMetrics}>(),sorted=[...new Set(run.glyphs.map(g=>g.cluster))].sort((a,b)=>a-b),ends=new Map(sorted.map((start,i)=>[start,sorted[i+1]??request.text.length]));let penX=0,penY=0;
+   const scale=nativeFontSize/run.unitsPerEm,placements:NativeGlyphPlacement[]=[],draws:{character:string;transform:AffineTransform;bounds:ReturnType<AffineTransform['bounds']>}[]=[],measures=new Map<number,{character:string;metrics:TextMetrics}>(),sorted=[...new Set(run.glyphs.map(g=>g.cluster))].sort((a,b)=>a-b),ends=new Map(sorted.map((start,i)=>[start,sorted[i+1]??request.text.length]));let penX=0,penY=0;
    let left=-reference.actualBoundingBoxLeft,top=-reference.actualBoundingBoxAscent,right=reference.actualBoundingBoxRight,bottom=reference.actualBoundingBoxDescent;
    glyph(context);
    let deadline=performance.now()+2;
@@ -64,8 +67,8 @@ export async function matchNativeGlyphRun(font:NativeGlyphFont,input:NativeGlyph
    if(![nativeAdvance,penX,penY,left,top,right,bottom].every(Number.isFinite))throw new Error('Native glyph matching geometry is nonfinite.');
    const box=transform.bounds({x:left,y:top,width:right-left,height:bottom-top}),x=Math.floor(box.x)-2,y=Math.floor(box.y)-2,width=Math.ceil(box.x+box.width)+2-x,height=Math.ceil(box.y+box.height)+2-y;
    if(![x,y,width,height].every(Number.isSafeInteger)||width<0||height<0)throw new Error('Native glyph matching geometry is outside safe pixel coordinates.');
-   let maxAlphaError=0,pixelsCompared=0;const samples=[1,.5],evidence=()=>Object.freeze({nativeAdvance,shapedAdvance:penX,pixelsCompared,maxAlphaError,opacitySamples:Object.freeze([...samples]),bounds:Object.freeze({x,y,width,height})});
-   const tolerance=run.glyphs.length*style.fontSize/(run.unitsPerEm*128)+Number.EPSILON*Math.max(1,Math.abs(penX))*16;
+   let maxAlphaError=0,pixelsCompared=0;const samples=[1,.5],evidence=()=>Object.freeze({fontSize:style.fontSize,nativeFontSize,nativeAdvance,shapedAdvance:penX,pixelsCompared,maxAlphaError,opacitySamples:Object.freeze([...samples]),bounds:Object.freeze({x,y,width,height})});
+   const tolerance=run.glyphs.length*nativeFontSize/(run.unitsPerEm*128)+Number.EPSILON*Math.max(1,Math.abs(penX))*16;
    if(Math.abs(penX-nativeAdvance)>tolerance||penY!==0){last=Object.freeze({status:'mismatch',reason:'The complete native advance differs from source-font shaping.',evidence:evidence()});continue;}
    const cell=256,gutter=2;
    for(let cy=Math.floor(y/cell)*cell;cy<y+height;cy+=cell)for(let cx=Math.floor(x/cell)*cell;cx<x+width;cx+=cell){

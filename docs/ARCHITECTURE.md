@@ -1,5 +1,14 @@
 # Architecture
 
+## Private automatic optical font instances
+
+The source-font matcher captures original numeric size before asynchronous work
+and projects it onto a declared opsz axis before explicit authored overrides.
+Original range/avar/metric interpolation and complete native advance/ink checks
+apply; affine placement/device scale do not rewrite the request. No shared native
+face or public model changes. Full typography/float integration remains required.
+[Contract and limits](FLOAT_TEXT.md#automatic-optical-sizing-in-the-private-canvas-matcher).
+
 ## Complete private compressed-font preparation
 
 Selected WOFF/WOFF2 glyph sources now use complete private SFNT preparation;

@@ -18,7 +18,10 @@ authored tuples. Clamp descriptor ranges before source axis ranges and apply
 explicit values last. Use only source-supported style/default modes and reject
 complete ink/advance mismatches. Do not derive fractional numeric requests from
 lossy Canvas shorthand serialization, mutate a shared face or approximate a
-native result with changed geometry. Automatic optical size, full fallback and
+native result with changed geometry. Capture original numeric CSS size for a
+declared opsz axis, clamp to original ranges and apply explicit opsz last. Keep
+font avar/metric interpolation and native private-face optics; scene transforms
+and device scale never multiply the optical request. Full fallback and
 complete float text remain required. [Private contract](FLOAT_TEXT.md#css-selected-source-font-instances-private).
 
 ## Private native shaping and paint verification

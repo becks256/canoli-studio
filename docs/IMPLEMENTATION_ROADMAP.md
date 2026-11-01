@@ -10667,3 +10667,57 @@ SVG/path/vertical matching, connected float TextLayer authoring/scenes/export/
 shared transport/persistence and every unfinished original quality/device/
 performance/professional-editor gate remain required. The original roadmap stays
 active; no public source/model/grant or REST/browser synchronization changes.
+
+### 2026-11-01 — F08/F10 automatic optical sizing and native em capture in progress
+
+Previous goal turn: progress, complete WOFF/WOFF2 preparation accepted at ae91f12.
+The original full roadmap stays active. Private source shaping now captures
+numeric CSS size as an optional optical coordinate, clamps to a declared opsz
+range and applies explicit source settings last. Original avar/gvar/HVAR data
+does the interpolation. Affine placement/device scale does not rewrite the
+optical request. A one-em native metadata probe separately captures effective
+platform em size for source-unit placement. Neither input is fitted from artwork
+pixels or requested glyph advances, and unchanged full native matching still
+guards publication. Ordinary sources/registrations/model/history, public schema,
+isolated/plugin grants, REST and persistence remain.
+
+The first independent optical pilot reproduced an actual default-axis mismatch.
+Captured optical size fixed 20 complete native runs. The expanded test exposed
+a harder fractional size mismatch even in independently static fonts. Reading
+the host's effective em size with an original 880-byte measurement font fixes
+that case without changing pixel/advance tolerances or dropping it. Source and
+probe registration/cancellation/deadline cleanup stay required. Full build/unit,
+broader native/production and independent verification follow below.
+
+Full native/legacy fonts, complete collection and CSS/bidi/script/fallback
+selection, missing/intrinsic paint, SVG/path/vertical matching, connected float
+TextLayer authoring/scenes/export/shared transport/persistence and every
+unfinished original professional-editor/device/quality/performance gate remain
+required. [Private contract and limits](FLOAT_TEXT.md#automatic-optical-sizing-in-the-private-canvas-matcher).
+
+### 2026-11-01 — F08/F10 optical sizing and native em capture verified
+
+Full build/typecheck and 3,396 unit/API tests across 336 files pass. One full
+80-case affected native run and nine production checks pass. Sixteen independently
+instanced complete fonts retain exact geometric/metric expectations, and 86 full
+native RGBA/advance pairs match across source formats, device scales, transforms,
+automatic/clamped/fractional sizes and explicit override precedence. Original
+13.64123012345 px and additional hard fractions now match through independent
+one-em metadata capture, including non-optical TTF/CFF fonts. The actual emitted
+production matcher matches twelve complete runs with prepared fixture fonts;
+the emitted shaper matches independent static metrics on first messages. This
+component test is not full admitted float-text authoring. Source ownership,
+fault cleanup/retry, HDR/tiny-alpha Float32 and exact window words pass. The
+ordinary 50 MP workflow preserves original identity, the independent 600 × 200
+reference region and preceding accepted PNG bytes; full 50 MP/float acceptance
+is not established.
+
+[Findings and limits](benchmarks/optical-font-2026-11-01.md) and
+[compact source/release/raw-run/reference receipt](benchmarks/optical-font-2026-11-01.json.gz)
+retain failed/corrected optical, fractional-size and allocation-probe pilots.
+Full native/legacy/font/collection/CSS/bidi/script/fallback selection, missing/
+intrinsic paint, SVG/path/vertical matching, complete float TextLayer authoring/
+scenes/export/shared transport/persistence and every unfinished original
+professional-editor/device/quality/performance gate remain required. The complete
+original roadmap stays active. Public sources/model/grants and ordinary native
+registrations/appearance remain; no REST/browser synchronization is added.

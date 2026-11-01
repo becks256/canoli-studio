@@ -16,6 +16,9 @@ layout, color/missing glyph and device/performance acceptance remain required.
 Retain numeric and relative native weight intent, font width and selected source
 face bounds before shaping. Explicit authored coordinates override implicit
 registered axes; compare complete native ink before publishing any paint poses.
+Retain numeric CSS size for automatic opsz, including fractional requests;
+original range clamps and avar/metric tables apply before explicit overrides.
+Affine scene/device scale does not rewrite the captured optical request.
 Preserve ordinary registrations/appearance, source bytes, commands and Undo.
 This private dependency does not enable float text or establish universal native
 font style/optical/fallback behavior. [Contract and limits](FLOAT_TEXT.md#css-selected-source-font-instances-private).
