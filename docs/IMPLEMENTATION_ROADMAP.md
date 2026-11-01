@@ -11093,3 +11093,44 @@ original professional-editor, photographic, precision/workflow, device/quality/
 performance, provider/installed ChatGPT/live identity/commercial and other roadmap
 gate remain required. The complete original goal remains active. Public model,
 schema, grants, source resolution and REST/browser session contracts are unchanged.
+
+
+### 2026-11-01 — F08/F10 owned native font fallback in progress
+
+Owner: implementation agent; estimate L within T16/T17. Previous goal turn made
+progress; complete styled bidi ordering is now accepted at 4b98d2a. The complete
+original roadmap remains active. The next dependency must assemble owned source
+fonts inside original spans without replacing native shaping chunks or weakening
+complete ink/per-color ownership gates. The current matcher still rejects font
+stacks; no fallback paint or public Float32 TextLayer admission is claimed.
+
+Nine native diagnostic cases retain whole original font stacks and expose actual
+Chromium font usage: a missing combining mark moves the complete base-plus-mark
+cluster to the fallback; Arabic joining and first-supported family order remain;
+an unused trailing generic contributes no glyphs. An unowned leading generic
+uses Liberation Sans, while a missing emoji uses Noto Color Emoji. These are
+source-selection observations on this host, not fallback implementation or
+universal font/host acceptance. CDP is diagnostic-only, not a runtime dependency.
+An initial variable-font input exceeded the primary fixture's range; corrected
+input retains the intended narrower fallback range. Independent fixture metadata
+records requested and effective ranges, original source identities and preserved
+source glyph/layout data.
+
+The existing private Canvas/glyph variation helper separately retains primary
+TEST90/wght750 and clamps the fallback to TEST75/wght700 without changing original
+faces or document styles, persisting aliases, or admitting glyph paint. The SVG
+source path applies native variation style directly; it does not create those
+Canvas aliases. Fallback preparation must use each owner's effective private
+tuple while preserving the original authored stack/primary tuple and original
+SVG source. Reusing primary coordinates as a fallback's virtual primary would
+incorrectly invoke strict primary-range validation.
+
+Complete fallback/cluster/variation/default-ignorable/missing/intrinsic handling,
+vertical/script/native/legacy/optical/layout/extent/host coverage, connected public
+Float32 text authoring/tools/scenes/export/shared transport/persistence and every
+unfinished original professional-editor, photographic/precision/workflow,
+device/quality/performance/provider/installed ChatGPT/live identity/commercial and
+other roadmap requirement remain. Empty normalized text spans are filtered before
+matching; future public paragraph capture must preserve editable empty-line
+geometry while treating those lines as transparent. No public model/schema,
+grants, source-resolution or REST/browser synchronization contract changes.
