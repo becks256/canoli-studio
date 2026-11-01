@@ -1,5 +1,19 @@
 # Architecture
 
+## Prepared HDR wet document replay (schema 57)
+
+`WetPaintStroke.precision:"float32"` versions authoritative linear TIFF pairs.
+The shared model rejects byte-document/mask misuse and false schema ages.
+`validateWetPaintAssets` routes HDR values through complete native original pair
+capture while byte values retain PNG validation. `FloatSceneRenderer` pins every
+HDR source before publishing, captures fields on each modifier's original grid,
+and replays wet/erase/clear in order before current layer projection. A finite
+expanded native source retains off-image paint; zero opacity does not choose it.
+Only actual HDR tile reference objects bypass byte-role checks, never every use
+of their asset ID. Public OO/isolated/REST/history/project/workspace/recipe
+transport reuses existing references and commands. Trusted authoring/tools and
+broader release gates remain required. [Full contract](HDR_WET_DOCUMENTS.md).
+
 ## Shared HDR wet asset ownership
 
 Private `captureHdrWetAssets` pins ordered native references through the shared
@@ -7,8 +21,8 @@ browser/headless `WetAssetProvider`; `captureHdrWetAssetField` connects that own
 to Float64 field reads. Both use complete original TIFF pair validation from
 `float-wet-tile.ts`. Reusable Blob-pair proofs do not bypass geometry, source,
 cancellation or lifetime checks. Byte preparation keeps its native PNG contract;
-HDR uses no thumbnail color/alpha. Public document/command/replay integration is
-still required. [Signatures, ownership and limits](HDR_WET_FIELDS.md#shared-host-asset-capture).
+HDR uses no thumbnail color/alpha. The schema 57 integration above connects these
+owners to document replay. [Signatures, ownership and limits](HDR_WET_FIELDS.md#shared-host-asset-capture).
 
 ## Retained masks in the float appearance cache
 

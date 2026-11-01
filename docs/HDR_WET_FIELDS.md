@@ -1,8 +1,9 @@
 # Prepared HDR wet assets and fields
 
-Status: private F03/F10 dependency. This is not a public scripting service,
-document edit format or enabled float Smudge/Mixer workflow. Public commands,
-schema, authoring, history/project integration and tools remain required.
+Status: private F03/F10 numerical/asset foundation. Schema 57 now connects these
+fields to [prepared HDR document edits](HDR_WET_DOCUMENTS.md). The private codec
+and sampling services are not exposed to isolated scripts. Trusted interactive
+float Smudge/Mixer authoring and previews remain required; tools stay disabled.
 
 ## Lossless asset pair
 
@@ -121,9 +122,9 @@ complete ICC; NumPy replays them and checks exact reopened output. Genuine
 50 MP source acceptance uses a disclosed 64x48 native window, not every-pixel
 full-image wet editing or delivery. Dated findings record complete runs.
 
-Versioned public HDR wet strokes/assets, connecting guarded validation to shared commands,
-FloatScene replay in operation order, projection/resize semantics, original-bearing
-history/project/workspace/recipe transport, independent REST/isolated surfaces
-as scoped, and authoring previews/commit plus tools remain required. Current
-document schema and byte wet constructors remain unchanged. Plugin installation
-stays inert and grants no new source pixels, files, network or document authority.
+Schema 57 now connects versioned public HDR strokes, shared host validation,
+ordered FloatScene replay and source-bearing transport. See
+[the public contract and its acceptance boundary](HDR_WET_DOCUMENTS.md). Trusted
+authoring previews/commit, actual float tools and broader roadmap gates remain
+required. Byte wet constructors keep their existing contract. Installation stays
+inert and grants no new source pixels, files, network or document authority.

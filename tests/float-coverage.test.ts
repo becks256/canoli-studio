@@ -12,5 +12,5 @@ it('float erasure and clear use shared locks, atomic history and captured resize
 });
 
 it('float transactions reject prepared byte-color replacements without publishing preceding alpha or opacity edits',()=>{
- const doc=new Document({precision:'float32'}),layer=doc.layers.add(new RasterLayer({assetId:'original',width:10,height:10})),before=doc.toJSON(),revision=doc.getSnapshot().revision,wet=new WetPaintStroke({brush:new BrushStroke({points:[{x:2,y:2}]}),tiles:[{x:0,y:0,width:1,height:1,assetId:'byte-color',coverage:{assetId:'coverage'}}]});expect(()=>doc.transaction('Unsupported float replacement',()=>{layer.opacity=.5;layer.clear();layer.applyWetPaint(wet);})).toThrow('Prepared wet');expect(doc.toJSON()).toEqual(before);expect(doc.getSnapshot().revision).toBe(revision);
+ const doc=new Document({precision:'float32'}),layer=doc.layers.add(new RasterLayer({assetId:'original',width:10,height:10})),before=doc.toJSON(),revision=doc.getSnapshot().revision,wet=new WetPaintStroke({brush:new BrushStroke({points:[{x:2,y:2}]}),tiles:[{x:0,y:0,width:1,height:1,assetId:'byte-color',coverage:{assetId:'coverage'}}]});expect(()=>doc.transaction('Unsupported float replacement',()=>{layer.opacity=.5;layer.clear();layer.applyWetPaint(wet);})).toThrow('explicit HDR wet paint');expect(doc.toJSON()).toEqual(before);expect(doc.getSnapshot().revision).toBe(revision);
 });

@@ -1,5 +1,13 @@
 # Float document editing
 
+## Prepared HDR raster replacements (schema 57)
+
+Explicit HDR `WetPaintStroke` values retain native linear TIFF pairs through
+shared commands, original-grid ordered replay, resize/affine/perspective and
+source-bearing persistence. Byte prepared values still reject in float raster
+artwork. Trusted interactive color tools remain unavailable.
+[Exact defaults, errors, example and current verification](HDR_WET_DOCUMENTS.md).
+
 ## Retained-mask preview invalidation
 
 The bounded native appearance cache now keys retained mask planes and actual
@@ -236,7 +244,7 @@ changes the accumulated backdrop; pass-through group opacity interpolates
 premultiplied before/after backdrops rather than source-over compositing a second
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
-Other layer types, prepared wet raster replacements,
+Other layer types, byte prepared wet raster replacements,
 frequency separation and adjustment types other than Tone/Curves/Levels reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
@@ -593,7 +601,8 @@ projection, before clipping-stack intrinsic shape, layer mask, fill and opacity.
 Multiple erasures accumulate float alpha rather than a combined byte alpha mask.
 Selection clips, pressure, tips, symmetry and textures retain existing coverage
 semantics. These coverage semantics do not imply a float-color paint engine.
-Prepared wet replacements and other color painting remain unsupported.
+Byte prepared replacements and interactive color painting remain unsupported.
+Prepared HDR raster replacements use the schema 57 contract above.
 
 <!-- example: float-erasure -->
 ```js

@@ -27,7 +27,7 @@ test.describe('prepared HDR dependency guide',()=>{
   test('the built guide is readable without JavaScript and states its private integration boundary',async({page})=>{
     await page.goto('/developer/hdr-wet-fields.html');
     await expect(page.getByRole('heading',{name:'Prepared HDR wet assets and fields',exact:true})).toBeVisible();
-    await expect(page.locator('main')).toContainText('not a public scripting service');
+    await expect(page.locator('main')).toContainText('not exposed to isolated scripts');
     await expect(page.locator('main')).toContainText('FloatScene replay');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
   });

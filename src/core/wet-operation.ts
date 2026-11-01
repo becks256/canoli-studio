@@ -6,6 +6,7 @@ import { affineSchema } from './transform-schema';
 import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadSettings, type WetPaintMixSettings } from './wet-paint';
 import {perspectiveSchema,perspectiveMatrix,perspectiveLocalQuad,perspectiveRect,type PerspectiveData} from './perspective';
 import {ProjectiveTransform} from './projective';
+import {floatWetLoadSchema} from './float-wet';
 
 /** Tile pixels live in a placed authoring plane. Pull them through this captured
  * image mapping before the owner's current affine/perspective placement. */
@@ -15,7 +16,7 @@ const wetPerspectivePlacementSchema=z.object({width:z.number().finite().positive
  try{perspectiveLocalQuad(Math.ceil(value.width),Math.ceil(value.height),value.perspective);}catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}
 });
 export const wetPaintPlacementSchema=z.union([wetPerspectivePlacementSchema,mappedMaskPlacementSchema]);
-export function assertWetPaintVersion(stroke:{kind?:string;placement?:unknown},version:number){if(stroke.kind!=='wet'||stroke.placement===undefined)return;if(version<55)throw new Error('Placed wet paint requires schema version 55.');if(version<56&&stroke.placement&&typeof stroke.placement==='object'&&'geometry'in stroke.placement)throw new Error('Mapped wet paint requires schema version 56.');}
+export function assertWetPaintVersion(stroke:{kind?:string;precision?:unknown;placement?:unknown},version:number){if(stroke.kind!=='wet')return;if(stroke.precision==='float32'&&version<57)throw new Error('HDR wet paint requires schema version 57.');if(stroke.placement===undefined)return;if(version<55)throw new Error('Placed wet paint requires schema version 55.');if(version<56&&stroke.placement&&typeof stroke.placement==='object'&&'geometry'in stroke.placement)throw new Error('Mapped wet paint requires schema version 56.');}
 
 export interface WetPaintTileData extends Rect { assetId: string; coverage: { assetId: string }; }
 /** Inert prepared metadata must not select a different pixel reconstruction. */
@@ -25,6 +26,7 @@ export function isActiveWetPaint(operation: { kind: string; opacity: number }): 
 export interface WetPaintStrokeData {
   id: string;
   kind: 'wet';
+  precision?: 'float32';
   opacity: number;
   clip: null;
   brush: BrushStrokeData;
@@ -42,13 +44,14 @@ export function wetPaintOperationSchema(brush: z.ZodType<BrushStrokeData>) {
   const tile = z.object({ x: integer, y: integer, width: extent, height: extent, assetId: reference.shape.assetId, coverage: reference }).strict().superRefine((value, context) => {
     if (![value.x + value.width, value.y + value.height, value.width * value.height * 4].every(Number.isSafeInteger)) context.addIssue({ code: 'custom', message: 'Wet-paint native tile geometry exceeds numeric precision.' });
   });
-  return z.object({
+  const byte=z.object({
     id: reference.shape.assetId, kind: z.literal('wet'), opacity: z.number().finite().min(0).max(1), clip: z.null(),
     brush: brush.refine(value => (value.kind === 'brush' || value.kind === 'pencil') && value.tiles.length === 0, 'Wet-paint metadata requires a brush or pencil without clone tiles.'),
     load: wetPaintLoadSchema, mix: wetPaintMixSchema, nativeTransform: affineSchema,placement:wetPaintPlacementSchema.optional(),
     // Metadata grows with genuine native output; no image/tile-count tier.
     tiles: z.array(tile).min(1),
   }).strict();
+  return z.discriminatedUnion('precision',[byte.extend({precision:z.undefined().optional()}),byte.extend({precision:z.literal('float32'),load:floatWetLoadSchema})]);
 }
 
 export function wetPaintBounds(stroke: WetPaintStrokeData): Rect {
@@ -65,7 +68,8 @@ export function wetPaintBounds(stroke: WetPaintStrokeData): Rect {
     // Bilinear sampling includes source neighbors outside the stored rectangle.
     // A horizon is genuinely unbounded; mask callers retain streaming coverage,
     // while finite artwork geometry must reject it before publication.
-    const box=matrix?perspectiveRect(matrix,{x:tile.x-1,y:tile.y-1,width:tile.width+2,height:tile.height+2}).bounds:transform.bounds(tile);
+    const halo={x:tile.x-1,y:tile.y-1,width:tile.width+2,height:tile.height+2};
+    const box=matrix?perspectiveRect(matrix,halo).bounds:transform.bounds(stroke.precision==='float32'?halo:tile);
     left = Math.min(left, box.x); top = Math.min(top, box.y); right = Math.max(right, box.x + box.width); bottom = Math.max(bottom, box.y + box.height);
   }
   if (![left, top, right, bottom, right - left, bottom - top].every(Number.isFinite)) throw new Error('Wet-paint bounds exceed working precision.');

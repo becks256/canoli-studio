@@ -1,5 +1,15 @@
 # Plugins and extensions
 
+## Prepared HDR raster values (schema 57)
+
+Existing `WetPaintStroke` values accept `precision:"float32"` and linear native
+TIFF pairs for float raster artwork. They execute through existing isolated
+commands; installation stays inert. Existing document/source grants, locks,
+revision/Undo and complete host pair validation still apply. There is no new
+permission, pixel/worker/file/network service or host preparation method. HDR
+color values do not apply to masks or byte documents. [Signatures, defaults,
+errors, example and current acceptance](HDR_WET_DOCUMENTS.md).
+
 ## Retained mask planes and mapped fields (schema 56)
 
 The isolated constructor set includes immutable `MaskPlane` values. Mask edits,

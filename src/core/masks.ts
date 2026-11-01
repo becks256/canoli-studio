@@ -26,7 +26,7 @@ export const maskStrokeSchema = z
     ) as z.ZodType<BrushStrokeData>,
   })
   .strict();
-export const wetMaskStrokeSchema=z.object({mode:z.literal('wet'),stroke:paintOperationSchema.refine(value=>value.kind==='wet','Wet mask operations require prepared native pixels.') as z.ZodType<WetPaintStrokeData>}).strict();
+export const wetMaskStrokeSchema=z.object({mode:z.literal('wet'),stroke:paintOperationSchema.refine(value=>value.kind==='wet'&&value.precision!=='float32','Wet mask operations require prepared byte native pixels; HDR color strokes are raster artwork only.') as z.ZodType<WetPaintStrokeData>}).strict();
 export const maskOperationSchema=z.discriminatedUnion('mode',[maskStrokeSchema,wetMaskStrokeSchema]);
 export type MaskOperationData=z.infer<typeof maskOperationSchema>;
 /** A captured mapped edit starts native-grid replay. Preserve any preceding

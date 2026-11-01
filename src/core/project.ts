@@ -1,4 +1,5 @@
 import{assertFloatSources,isFloatDocument}from'./float-document';
+import {validateHdrWetPaintAssets} from './wet-assets';
 import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource,type RawSourceMetadata} from "./interchange/raw/source";
 import { freezeOwnedData } from "./immutable";
 import { AssetStore } from "./assets";
@@ -409,6 +410,8 @@ export async function loadProject(
     }
     const documents = retainedDocuments(project.document, project.history);
     for(const document of documents)if(isFloatDocument(document)||assets.hasFloatAssets)assertFloatSources(document,assets);
+    const current=assets.captureLifetime();
+    for(const document of documents)if(isFloatDocument(document))await validateHdrWetPaintAssets(document,{check:current,get(id){const source=assets.get(id);return{blob:source.blob,width:source.width,height:source.height,identity:source};}});
     const linkedIds = new Set(
       documents.flatMap((document) =>
         (document.components ?? []).flatMap((definition) =>

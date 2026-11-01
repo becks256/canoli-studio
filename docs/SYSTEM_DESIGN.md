@@ -1,5 +1,15 @@
 # Canoli Studio System Design & Architecture Specification
 
+## HDR native document composition
+
+Versioned HDR prepared strokes retain original raster geometry independently of
+logical layer size, viewport and finite wet support. First sample ordered
+Float64 replacement/removal into that native grid and compose straight Float32;
+then project the completed original-plus-edit content. Preserve every eraser and
+clear in between wet operations. Host source ownership applies before publication
+and throughout reads. Existing source-bearing history/transport uses ordinary
+asset references; permissions do not expand. [Schema 57 contract](HDR_WET_DOCUMENTS.md).
+
 ## HDR wet host-source invariants
 
 Host capture owns ordered native tile references and complete original TIFF
@@ -8,8 +18,8 @@ establish an HDR pixel proof. Shared complete-pair validation checks replacement
 alpha against removal alpha; reusable proofs remain bound to immutable Blob
 pairs while geometry and host lifetime check on every use. Native field reads
 retain source identity checks, cancellation and independent returned buffers.
-Public HDR document commands, replay and persistence remain separate required
-integration. [Private contract](HDR_WET_FIELDS.md#shared-host-asset-capture).
+Schema 57 connects these owners to prepared document replay and persistence;
+trusted interactive authoring remains separate. [Private contract](HDR_WET_FIELDS.md#shared-host-asset-capture).
 
 ## Completed float appearance dependencies
 

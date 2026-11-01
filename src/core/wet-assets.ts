@@ -2,6 +2,7 @@ import type {EditorCommand} from './commands';
 import type {LayerMaskData} from './masks';
 import type { DocumentData, LayerData } from './model';
 import type { WetPaintStrokeData, WetPaintTileData } from './wet-operation';
+import {captureHdrWetAssets} from './hdr-wet-assets';
 
 export interface WetImageSource { blob: Blob; width: number; height: number; identity?: object; pixels?: object; }
 export interface WetAssetProvider {
@@ -88,5 +89,13 @@ export async function validateWetPaintTile(tile: WetPaintTileData, provider: Wet
   } finally { try { await left.return?.(undefined); } finally { await right.return?.(undefined); } }
 }
 export async function validateWetPaintAssets(document: DocumentData, provider: WetAssetProvider): Promise<void> {
-  for (const stroke of wetDocumentOperations(document)) for (const tile of stroke.tiles) await validateWetPaintTile(tile, provider);
+  for (const stroke of wetDocumentOperations(document)) {
+    if(stroke.precision==='float32'){const captured=await captureHdrWetAssets(stroke.tiles,provider);captured.dispose();}
+    else for (const tile of stroke.tiles) await validateWetPaintTile(tile, provider);
+  }
+}
+/** Original-byte validation also protects project/recovery admission, where no
+ * byte decoder is needed for HDR pairs. Callers validate all retained states. */
+export async function validateHdrWetPaintAssets(document:DocumentData,provider:Pick<WetAssetProvider,'get'|'check'>):Promise<void>{
+  for(const stroke of wetDocumentOperations(document))if(stroke.precision==='float32'){const captured=await captureHdrWetAssets(stroke.tiles,provider);captured.dispose();}
 }

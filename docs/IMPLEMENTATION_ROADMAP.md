@@ -10023,3 +10023,41 @@ photographic/device/sustained F14 performance and every unfinished original
 professional, AI, workflow, ChatGPT/live identity, commercial, specialist and
 motion gate remain required. No full-image HDR wet editing, continuous-60fps,
 physical pigment, paid call, upload or browser/REST sync is inferred.
+
+### 2026-10-31 — F03/F10 schema 57 prepared HDR wet document replay
+
+Owner: implementation agent; bounded increment from `7109eb7`; classification:
+progress. Public `WetPaintStroke.precision:"float32"` now retains strict linear
+TIFF pairs, HDR load metadata and original-grid ordered wet/erase/clear replay
+through shared OO/isolated/plugin/independent REST commands. Native composition
+precedes current resize/affine/perspective projection; finite off-image support
+and once-only opacity remain. Inert metadata skips reconstruction/horizon setup.
+Only actual HDR tile references bypass byte-role checks. Old byte PNG/mask
+contracts remain; HDR masks/byte documents and false ages reject. Project
+admission validates every retained HDR pair before session replacement.
+[Exact public contract and executable example](HDR_WET_DOCUMENTS.md).
+
+Verified: **3,285 unit/API/native tests across 318 files; 107 source-browser cases across 15 files; 13 selected production cases across 7 files**. Final unit/production runs are clean. Source coverage
+combines 106 initial passes and one successful PDF-verifier environment recheck;
+raw reports and the exact accepted-case manifest remain sealed. Independent
+native libtiff/NumPy matches every source/
+reopened/production HDR word; normal production Scripts, Undo/Redo, project reopen
+and native float TIFF delivery need no debug globals. Resized/reflected/current
+perspective and captured mapped/perspective fields match complete native
+references. Recipes, true redo-only history projects/workspace recovery,
+off-image order, inert horizons and atomic invalid-source/permission/revision
+rejection pass. A genuine 50 MP original retains exact sources and public edits
+in a disclosed 64x48 native window; separate complete source/proof delivery tests
+keep their own scopes. Build/typecheck and final tested runtime identities pass.
+Two suite-only stale assertions and an old preview-worker path were corrected;
+product/source-browser inputs stayed fixed and earlier reports remain sealed.
+[Findings and compact evidence](benchmarks/hdr-wet-documents-2026-10-31.md).
+
+The full original goal remains active. Next required work is trusted Float32
+authoring connected to TIFF staging, private preview/source/revision guards,
+cancellation and atomic commit, then actual float Smudge/Mixer tool access.
+Those tools remain disabled. Wider mask/master/nested-projective acceptance,
+general warp, photographic/device/sustained F14 performance and every unfinished
+original professional, AI, workflow, ChatGPT/live identity, commercial,
+specialist and motion gate remain required. No full-image HDR wet acceptance,
+continuous-60fps, physical pigment, paid call, upload or browser/REST sync follows.

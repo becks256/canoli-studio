@@ -41,7 +41,7 @@ test('production float wet worker retains every independent HDR word without dev
   await writeFile(info.outputPath('float-wet-production.json'),JSON.stringify({worker:workers[0],debugGlobals:false,rows:rows.map(row=>({name:row.name,bytes:row.bytes.length,exact:true}))},null,2));
 });
 
-test('production float wet authoring stays unavailable while native session and asset integration is pending', async ({page}) => {
+test('production float wet tools stay unavailable until trusted authoring and previews are integrated', async ({page}) => {
   await page.goto('/');
   await page.getByTestId('import-input').setInputFiles('tests/fixtures/tiff-float/rgba-raw-le.tif');
   const dialog=page.getByRole('dialog',{name:'Import TIFF',exact:true});

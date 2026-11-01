@@ -9,6 +9,7 @@ import {brushTipSchema,type BrushTipData,type PenTiltData} from '../core/brush-t
 import {freeze} from '../core/immutable';
 import type { WetPaintStrokeData, WetPaintTileData } from '../core/wet-operation';
 import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintMixOptions } from '../core/wet-paint';
+import {floatWetLoadSchema,type FloatWetLoadOptions} from '../core/float-wet';
 import { id } from "../core/model";
 import {pressureCurveSchema,PRESSURE_CURVE_PRESETS,type PressureCurveData,type PressureKnot} from '../core/pressure-curve';
 import {
@@ -275,12 +276,13 @@ export class BrushStroke extends PaintOperation {
   }
 }
 export interface WetPaintStrokeOptions {
+  precision?: 'float32';
   brush: BrushStroke | BrushStrokeData;
   tiles: WetPaintTileData[];
   nativeTransform?: AffineTransform | AffineData;
   placement?:(Omit<WetPerspectivePlacementData,'perspective'|'basis'>&{perspective:PerspectiveTransform|WetPerspectivePlacementData['perspective'];basis:AffineTransform|AffineData})|MappedMaskPlacementData|{width:number;height:number;plane:MaskPlane;authoring:AffineTransform};
   opacity?: number;
-  load?: WetPaintLoadOptions;
+  load?: WetPaintLoadOptions | FloatWetLoadOptions;
   mix?: WetPaintMixOptions;
 }
 function mappedWetPlacement(p:{width:number;height:number;plane:MaskPlane;authoring:AffineTransform}){
@@ -290,14 +292,16 @@ function mappedWetPlacement(p:{width:number;height:number;plane:MaskPlane;author
 export class WetPaintStroke extends PaintOperation {
   constructor(options: WetPaintStrokeOptions) {
     super({ id: id(), kind: 'wet', opacity: options.opacity === undefined ? 1 : options.opacity, clip: null,
+      ...(options.precision===undefined?{}:{precision:options.precision}),
       brush: options.brush instanceof BrushStroke ? options.brush.toJSON() : options.brush,
       tiles: options.tiles, nativeTransform: options.nativeTransform instanceof AffineTransform ? options.nativeTransform.toJSON() : options.nativeTransform === undefined ? new AffineTransform().toJSON() : options.nativeTransform,
       ...(options.placement===undefined?{}:{placement:'plane'in options.placement?mappedWetPlacement(options.placement):'geometry'in options.placement?options.placement:{...options.placement,perspective:options.placement?.perspective instanceof PerspectiveTransform?options.placement.perspective.toJSON():options.placement?.perspective,basis:options.placement?.basis instanceof AffineTransform?options.placement.basis.toJSON():options.placement?.basis}}),
-      load: wetPaintLoadSchema.parse(options.load === undefined ? {} : options.load), mix: wetPaintMixSchema.parse(options.mix === undefined ? {} : options.mix),
+      load: (options.precision==='float32'?floatWetLoadSchema:wetPaintLoadSchema).parse(options.load === undefined ? {} : options.load), mix: wetPaintMixSchema.parse(options.mix === undefined ? {} : options.mix),
     });
   }
   override toJSON(): WetPaintStrokeData { return structuredClone(this.data as WetPaintStrokeData); }
   get opacity() { return this.data.opacity; }
+  get precision() { return (this.data as WetPaintStrokeData).precision; }
   get brush() { return PaintOperation.fromJSON((this.data as WetPaintStrokeData).brush) as BrushStroke; }
   get tiles() { return structuredClone((this.data as WetPaintStrokeData).tiles); }
   get nativeTransform() { return AffineTransform.fromJSON((this.data as WetPaintStrokeData).nativeTransform); }

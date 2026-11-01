@@ -1,5 +1,17 @@
 # Canoli Studio editor requirements
 
+## Prepared HDR raster wet edits
+
+Schema 57 retains explicit float32 prepared pigment/removal TIFF pairs through
+shared OO, isolated/plugin and independent REST commands, native scene replay
+and source-bearing persistence. Validate all original samples and identities;
+preserve recorded wet/erase/clear order on the original native grid before
+current resize/affine/perspective sampling, including finite off-image support.
+Use no display color/alpha, RGB clamp, second pigment mask or arbitrary image
+size tier. Inert metadata keeps existing reconstruction and bounds. HDR values
+are raster artwork only; byte/mask contracts remain. Trusted interactive float
+Smudge/Mixer authoring remains required. [Exact contract and acceptance status](HDR_WET_DOCUMENTS.md).
+
 ## Retained-mask appearance invalidation
 
 Cached float previews must match uncached rendering after perspective reset,

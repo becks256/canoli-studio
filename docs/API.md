@@ -1,5 +1,18 @@
 # REST and scripting APIs
 
+## Prepared HDR wet raster edits (schema 57)
+
+Prepared wet DTOs accept `precision:"float32"` for float32/linear-sRGB raster
+artwork. Existing shared commands and source grants retain their authority;
+complete original TIFF pair validation precedes isolated script/plugin and REST
+host commits. Trusted synchronous OO callers provide validated prepared pairs;
+their commands check metadata, source roles, locks and history, and scene capture
+checks complete pairs before rendering. Revision conflicts, invalid external
+pairs and locked targets reject atomically.
+REST sessions remain independent and expose no composed renderer or browser
+synchronization. Byte wet PNGs and byte masks keep their current contract.
+[Exact signature, defaults, limits, examples and verification](HDR_WET_DOCUMENTS.md).
+
 ## Retained mask-plane increment (schema 56)
 
 The current implementation retains native grid/source provenance and editable

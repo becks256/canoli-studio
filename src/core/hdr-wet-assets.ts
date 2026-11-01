@@ -14,11 +14,11 @@ export interface CapturedHdrWetAssets {
   dispose():void;
 }
 
-/** Private shared host boundary, before the public HDR document contract is
- * enabled. Pin all ordered metadata and original identities before the first
+/** Private shared host boundary for the versioned HDR document contract.
+ * Pin all ordered metadata and original identities before the first
  * await, then validate complete TIFF pairs independently of any display decoder. */
-export async function captureHdrWetAssets(input:readonly WetPaintTileData[],provider:WetAssetProvider,control:FloatWetTileControl={}):Promise<CapturedHdrWetAssets>{
-  const signal=control.signal,pins=new Map<string,Readonly<WetImageSource>>();let external=control.check,host:WetAssetProvider|undefined=provider,closed=false;
+export async function captureHdrWetAssets(input:readonly WetPaintTileData[],provider:Pick<WetAssetProvider,'get'|'check'>,control:FloatWetTileControl={}):Promise<CapturedHdrWetAssets>{
+  const signal=control.signal,pins=new Map<string,Readonly<WetImageSource>>();let external=control.check,host:Pick<WetAssetProvider,'get'|'check'>|undefined=provider,closed=false;
   const pin=(id:string)=>{
     let source=pins.get(id);if(!source){source=Object.freeze({...host!.get(id,'float32')});pins.set(id,source);}return source;
   };

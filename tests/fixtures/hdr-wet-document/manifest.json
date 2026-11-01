@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "schemaVersion": 57,
+  "source": "Browser-executed prepareHdrWetDocument fixture and native project encoder before the documented HDR stroke",
+  "project": {
+    "file": "setup.luma",
+    "bytes": 196092,
+    "sha256": "68efcbc5b5a2ce80f5dcb69eb3fa57b71890fcf1f5bc83a7e229ed0ecf0fe22b"
+  },
+  "helperSha256": "622b0c767bf8a17a782e49cfa87e4fb93011ad749ee51e70fe75bcef7ba86cf6",
+  "original": {
+    "file": "tests/fixtures/tiff-float/rgba-raw-le.tif",
+    "sha256": "fd282be083861874bfec3986dccab52ec375bf20250ed3bbf214fbb589c60a5a"
+  },
+  "preparedValues": {
+    "color": [
+      4,
+      -2,
+      8,
+      0.375,
+      16,
+      -8,
+      4,
+      0.125
+    ],
+    "coverage": [
+      0,
+      0,
+      0,
+      0.5,
+      0,
+      0,
+      0,
+      0.75
+    ],
+    "invalidCoverage": [
+      0,
+      0,
+      0,
+      0.125,
+      0,
+      0,
+      0,
+      0.75
+    ]
+  },
+  "instructions": "Recreate by running the documented isolated HDR browser test and copying its pre-edit hdr-setup.luma output. Prepared TIFFs use the strict native linear-sRGB codec; imports use float32 editing."
+}

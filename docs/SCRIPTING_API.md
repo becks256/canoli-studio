@@ -1,5 +1,15 @@
 # Scripting API
 
+## Prepared HDR raster wet edits (schema 57)
+
+`WetPaintStroke` accepts optional `precision:"float32"` and exposes read-only
+`.precision`. In a float32/linear-sRGB document, `RasterLayer.applyWetPaint`
+replays these completed linear TIFF pairs on the original native grid in order
+with erase/clear before current resize/affine/perspective projection. Byte
+constructors keep the omitted flag and PNG contract. HDR masks/PaintLayer/byte
+documents reject. [Exact signature, defaults, errors, limits, isolated example,
+ownership and current verification boundary](HDR_WET_DOCUMENTS.md).
+
 ## Retained-mask preview consistency
 
 Existing `LayerMask.with({plane})`, `MaskPlane` constructors, mask linkage and
@@ -2187,16 +2197,17 @@ coverage.visible = false;
 document.selectedLayer = layer;
 print("Captured wet mask ready");
 ```
-Float-document wet painting still requires its separate integration.
+Prepared float raster strokes use the schema 57 contract above. Trusted float
+Smudge/Mixer authoring and previews remain unavailable.
 
 
-`new WetPaintStroke({brush, tiles, nativeTransform?, placement?, opacity?, load?, mix?})` creates an immutable prepared replacement value. Add it to `PaintLayer.strokes`, or call `RasterLayer.applyWetPaint(stroke): void`. Raster replacements retain their order relative to erase/clear, capture the current logical width/height, and preserve the original image asset. Attached mutations use ordinary commands, ancestor locks, transactions and undo. DTOs use `kind: "wet"` and require schema 33, including retained history and embedded masters. Older valid documents migrate; falsely old wet records reject. Existing project/workspace container versions are unchanged by prepared wet metadata.
+`new WetPaintStroke({brush, tiles, precision?, nativeTransform?, placement?, opacity?, load?, mix?})` creates an immutable prepared replacement value. Add it to `PaintLayer.strokes`, or call `RasterLayer.applyWetPaint(stroke): void`. Raster replacements retain their order relative to erase/clear, capture the current logical width/height, and preserve the original image asset. Attached mutations use ordinary commands, ancestor locks, transactions and undo. DTOs use `kind: "wet"` and require schema 33, including retained history and embedded masters. Older valid documents migrate; falsely old wet records reject. Existing project/workspace container versions are unchanged by prepared wet metadata.
 
 `brush` is a `BrushStroke`/`PencilStroke` value or its complete DTO, without clone tiles. It records the footprint, path, captured selection, opacity, flow, pressure, tilt, symmetry and optional texture. These settings describe preparation: **the supplied pixels are authoritative**, and editing metadata does not rerun the simulation. Eraser/clone/fill footprints reject. `tiles` is a nonempty array of `{x,y,width,height,assetId,coverage:{assetId}}`. Geometry is integral native pixels with positive extents and safe numeric addressing. Without placement, `nativeTransform` maps native tile coordinates into layer-local coordinates and defaults to identity. The captured perspective mapping above defines its placed behavior. Explicit null opacity/nativeTransform rejects; only omitted/undefined values use defaults. Zero operation opacity keeps metadata and asset references but does not select native reconstruction, GPU fallback, expanded visual bounds or SVG prefix baking. Independent operation `opacity` defaults to 1 and blends the complete replacement once, including overlapping tiles. The brush's opacity/selection must already be baked into supplied pixels; outer DTO `clip` is always null.
 
-Both image references must resolve to decoded, noninterlaced RGB8/RGBA8 PNG assets whose actual dimensions match their tile. Output alpha must be at most coverage alpha at every native pixel: output is already masked, coverage removes destination pixels, and output is added once. This permits reducing alpha. Coverage RGB is ignored. Browser/script commits and REST decode/check native alpha before publishing; invalid/missing/replaced sources reject the entire transaction. This derived-output contract does not restrict original-image or brush-texture import formats/resolution. Native tile coordinates, count and original dimensions have no arbitrary image-tier cap; working buffers, storage quota and numeric/format precision can still fail explicitly.
+With precision omitted, both image references must resolve to decoded, noninterlaced RGB8/RGBA8 PNG assets whose actual dimensions match their tile. Output alpha must be at most coverage alpha at every native pixel: output is already masked, coverage removes destination pixels, and output is added once. This permits reducing alpha. Coverage RGB is ignored. Browser/script commits and REST decode/check native alpha before publishing; invalid/missing/replaced sources reject the entire transaction. This derived-output contract does not restrict original-image or brush-texture import formats/resolution. Native tile coordinates, count and original dimensions have no arbitrary image-tier cap; working buffers, storage quota and numeric/format precision can still fail explicitly.
 
-`load` accepts `{color?: [r,g,b,a], load?: number}`; channels are integral 0–255 and load is 0–1, defaulting to opaque black and 0. `mix` accepts `{flow?,wetness?,pickup?}`, each 0–1, defaulting to 1/0/0.5. Unknown keys/nonfinite or out-of-range values reject. These normalized settings are retained metadata on prepared values. Read-only members are `id`, `kind`, `opacity`, `brush`, `tiles`, `nativeTransform`, `placement`, `load`, `mix`, and `toJSON()`; returned arrays/DTOs are owned copies.
+`load` accepts `{color?: [r,g,b,a], load?: number}`; channels are integral 0–255 and load is 0–1, defaulting to opaque black and 0. `mix` accepts `{flow?,wetness?,pickup?}`, each 0–1, defaulting to 1/0/0.5. Unknown keys/nonfinite or out-of-range values reject. These normalized settings are retained metadata on prepared values. Read-only members are `id`, `kind`, `precision`, `opacity`, `brush`, `tiles`, `nativeTransform`, `placement`, `load`, `mix`, and `toJSON()`; returned arrays/DTOs are owned copies.
 
 This isolated example requires two already imported PNG image layers named **Wet output** and **Wet coverage**, with matching original pixel dimensions and valid premasked output. Source layers are kept as imported; use hidden source layers if their images should appear only in the replacement. No files, pixels, native simulation or export service is exposed to the sandbox.
 
