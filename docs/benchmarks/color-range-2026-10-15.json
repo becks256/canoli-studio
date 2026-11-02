@@ -10,25 +10,11 @@
     "heapOrPeakMemoryMeasured": false
   },
   "contract": {
-    "includeColors": [
-      1,
-      32
-    ],
-    "excludeColors": [
-      0,
-      32
-    ],
-    "fuzziness": [
-      0,
-      200
-    ],
+    "includeColors": [1, 32],
+    "excludeColors": [0, 32],
+    "fuzziness": [0, 200],
     "distance": "CIE1976 in D50 CIELAB after sRGB decoding and Bradford D65 to D50 adaptation",
-    "operations": [
-      "replace",
-      "add",
-      "subtract",
-      "intersect"
-    ],
+    "operations": ["replace", "add", "subtract", "intersect"],
     "transparentInverseCoverage": 0,
     "sourceBytesPreserved": true,
     "previewUsedForFinalSelection": false,
@@ -43,20 +29,8 @@
     "mathPixelCount": 105,
     "mathSettingsCases": 8,
     "wasmBytesEqualIndependentReference": true,
-    "pngColorTypes": [
-      0,
-      2,
-      3,
-      4,
-      6
-    ],
-    "pngFilterTypes": [
-      0,
-      1,
-      2,
-      3,
-      4
-    ],
+    "pngColorTypes": [0, 2, 3, 4, 6],
+    "pngFilterTypes": [0, 1, 2, 3, 4],
     "fixtureHashesSha256": {
       "filters-type-0.png": "2dc7e815cc7ba77c58a0448b8996ddde6d575c2e44daea1fe03301e26a3e0c32",
       "filters-type-2.png": "278856b10f77dd73dec403d2bddc07f4eca886e2d4f79807ce5d5721a2af1768",
@@ -73,35 +47,16 @@
   "wasmOracle": {
     "seededPixels": 65536,
     "settingsCases": 8,
-    "fuzziness": [
-      0,
-      0.5,
-      40,
-      200
-    ],
-    "invert": [
-      false,
-      true
-    ],
+    "fuzziness": [0, 0.5, 40, 200],
+    "invert": [false, true],
     "exclusionsAlphaAndMemoryGrowthCovered": true,
     "exactByteAgreement": true,
     "callerOwnershipPassed": true
   },
   "nativeBrowser50Mp": {
     "milliseconds": 1617.5999999940395,
-    "dimensions": [
-      10000,
-      5000
-    ],
-    "samples": [
-      255,
-      255,
-      255,
-      255,
-      0,
-      0,
-      255
-    ],
+    "dimensions": [10000, 5000],
+    "samples": [255, 255, 255, 255, 0, 0, 255],
     "selectionRestored": true,
     "originalUnchanged": true,
     "revisionDelta": 1,
@@ -113,10 +68,7 @@
       "completed": 260,
       "total": 260
     },
-    "coverageSize": [
-      10000,
-      5000
-    ],
+    "coverageSize": [10000, 5000],
     "nativeTiles": 260,
     "maxNativeTilePixels": 204800
   },
@@ -124,12 +76,7 @@
     "width": 10000,
     "height": 5000,
     "elapsedMs": 3527.301285,
-    "nativeCorners": [
-      255,
-      0,
-      0,
-      255
-    ],
+    "nativeCorners": [255, 0, 0, 255],
     "boundedPngStrips": true
   },
   "nativeRestWorkingBuffers": {

@@ -182,7 +182,6 @@ Reserve a budget before submission, reconcile actual usage, identify retry attem
 
 No hosted queue/account/billing system is implemented by these documents. Delivery needs retention/deletion controls, consent records, access auditing without raw sensitive prompts, rate limits and abuse handling. Detailed provider terms and any jurisdiction-specific obligations require review at the implementation gate. Signed provenance is a later standard-conformance project; ordinary generation records must not be branded verified Content Credentials.
 
-
 ## A12 local design checks — delivered deterministic subset (2026-10-16)
 
 Local metadata/geometry preflight now has UI, OO, isolated scripting/plugin and separate REST surfaces. It reports authored bounds, affine original-source sampling and family-reference availability with explicit unknown evidence, snapshot/policy binding, cancellation and report/output budgets. It is not model inference: no provider, paid call, account or upload was added. Browser font evidence stays local to trusted editor inspection; scripts/REST report unverified families. Read [the current API contract](SCRIPTING_API.md#design-checks) and the dated roadmap verification record. Bleed conformance, alignment, text legibility/contrast, export-variant integration, rendered-pixel visibility and inferred design advice remain unimplemented A12 scope; the larger portfolio remains active.

@@ -22,7 +22,6 @@ The strict adjustment value `{kind:"red-eye",threshold:number,strength:number}` 
 
 Mask strokes add the discriminated `{mode:"wet",stroke:WetPaintStrokeData}` variant without altering old Hide/Reveal entries or base/selection/vector/bitmap geometry. Brush metadata contributes to the same point budgets; native tiles retain original output/coverage references and nested texture originals. Asset collection/remapping, history, recipes, project and workspace persistence use the shared reference walker. Zero-opacity records remain serialized. Valid older roots migrate to34 without invented wet operations; falsely old mask wet records reject, including embedded masters/history. Ordinary layer wet records still date from33. Project 3/workspace 2 and brush-preset5/container/database versions remain unchanged.
 
-
 The retained wet workspace is disposable engine state, not a new project/workspace format. Original/carrier/current/projection tiles and pending prefixes are private job databases. Only accepted prepared operation assets enter document persistence. Independently owned snapshots and final results retain their own job lifetime until disposal. Canonical zero-opacity records keep their serialized references and history; inactive render routing does not erase data. Explicit-null constructor rejection changes no valid stored schema33 data or project3/workspace2 versions.
 
 Schema 33 persists distinct prepared wet operations on ordered paint strokes and raster erasure records. Records retain footprint metadata, normalized pigment settings, native-to-local affine transform, envelope opacity and output/coverage PNG references. Traversal/remapping includes both images and nested original textures, including redo snapshots in workspace v2. Prepared pixels are authoritative after reopening; original sources remain unchanged. Project container v3/workspace v2 are unchanged. False v32-or-older wet records reject, including history and embedded roots. See the authored integration evidence for verification; this does not imply completed live tools or storage-quota guarantees.
@@ -227,41 +226,31 @@ Optional `layerComps` stores document-owned presentation snapshots with unique c
 
 Browser workspace checkpoints now encode project manifests and retained history in a module worker. The project/container versions and on-disk representation are unchanged. In-memory history shares immutable subtrees; JSON encoding still repeats historical values, so saved history size depends on document content and retained edits.
 
-
 Schema 18 gradient maps embed 2–32 strictly ordered `{position, color}` stops and `reverse` in the adjustment layer. Colors are six-digit encoded-sRGB hex; alpha belongs to the existing backdrop. Full settings persist in projects, recovery, workspace history and recipe commands without additional assets or external files. Older schema labels cannot contain this new adjustment kind.
-
 
 Schema 19 stores White Balance `{kind:"white-balance", temperature, tint}` in the normal adjustment layer. Both validated values persist without new asset dependencies. Schema-18 and older labels reject this new kind, while valid old projects/history migrate to the current schema. Outer container v3 and workspace v2 remain unchanged.
 
-
 Schema 20 embeds portable LUT records: `{kind:"lut", lut:{title, dimension, size, domainMin, domainMax, data}, amount, interpolation}`. The canonical base64 payload is exactly a red-fastest RGB float32 table in little-endian order. Validators check all decoded values, lengths and domains; source files are not required after import. Tables and redo-only edits persist through project/workspace/history/recipes without new asset references. Current saves use inner schema 24; valid earlier roots upgrade and earlier labels reject LUT records. Project container 3 and workspace snapshot 2 remain unchanged. Standard-format size and actual device allocation/automation limits are distinct from image resolution.
 
-
 Color Range results reuse existing pixel-selection RLE records (introduced in document schema 16). Current document schema is 24, project container 3 and workspace 2. Portable selection/history/recipe records contain final coverage, not a dependency on live source sampling, an external file or a future renderer. Current and redo-only selections survive workspace restoration; source image bytes remain original. Dense color coverage can still require substantial serialized RLE and encounter actual browser/process or automation limits.
-
 
 ## Schema 21: saved alpha channels
 
 Optional document `alphaChannels` stores up to 64 ordered `{id,name,selection}` values with unique channel IDs. Selection uses the existing fractional/affine/RLE representation; there are no new source assets or external references. Omitted means no saved channels. Pre-21 labels containing this field reject, even when empty; valid v1–v20 data otherwise migrates unchanged to 21. Project container 3 and workspace 2 are unchanged, and the same validation applies to current and redo-only history. Crop rebases geometry; image resize scales it; canvas resize keeps it fixed. Dense coverage can exceed script/command/request or process-memory budgets without introducing an image-resolution cap.
 
-
 ## Schema 22: native vector stroke styles
 
 Vector paths optionally store strokeCap (butt/round/square), strokeJoin (miter/round/bevel), strokeMiterLimit (finite ratio ≥1), strokeDashArray (up to 256 nonnegative finite local-unit lengths), and strokeDashOffset (finite signed local-unit displacement). Style magnitudes are bounded by safe integer precision, with fractions allowed. Absent fields preserve legacy round/round/4/solid/0 semantics without rewriting older paths. Odd dash arrays repeat; all-zero arrays are solid. Pre-22 labels containing any new field reject before migration; valid older roots and retained workspace history otherwise upgrade normally. New saves retain styles and original image bytes in container 3; workspace snapshot 2 remains unchanged. No source-size/megapixel cap or precision/print guarantee is introduced.
 
-
 Schema 23 stores optional nullable path `fillGradient` values: strict linear/radial local geometry, ordered hex/opacity stops and optional affine paint transform. Solid fill remains available beneath active gradients. Paths without the field retain their exact legacy records; pre-23 labels containing it reject. Current/redo-only project/workspace history preserves complete values, without new asset references or outer container changes.
-
 
 ### Native compound paths (schema 24)
 
 Optional VectorPath `fillRule` and `subpaths` retain closed additional boundaries with `{id, points, closed:true}`. Primary fields remain backward-shaped. Fill rule defaults nonzero; holes/islands share path paint. All contours together support 20,000 anchors and 128 contours, with scoped unique IDs. Valid v1–v23 roots and retained history upgrade to v24 without injecting fields or changing assets; older version labels containing either new field reject even when validation proofs are cached. Container 3/workspace 2, checksums, binary markers and image bytes are unchanged. Duplication creates independent contour IDs; redo stores final geometry. Recipes can retain full layer-add templates; standalone path edits remain unsupported.
 
-
 ### Completed Boolean geometry
 
 Boolean editing uses existing schema-24 VectorPath/subpath values and canonical nonzero result winding, with no container/workspace version change. The first path ID/style is retained; additional result contour IDs are newly allocated. `paths.replace` commits final geometry atomically and removes other operand paths/empty operand vector layers. Retained history/project/workspace snapshots keep native cubic boundaries, including holes and disconnected areas; reopen and undo do not rerun Paper.js or depend on live source geometry. Pixels and original compressed images remain unchanged. Existing full layer-add recipe templates can carry final compounds; standalone replacement recording remains unsupported.
-
 
 ## Schema-28 pass-through group state
 
@@ -270,7 +259,6 @@ Group `blendMode` adds `pass-through`; all non-group blend enums remain unchange
 ## Schema-29 pressure curves
 
 The current document/history schema is 29. Optional pressureCurve brush metadata retains 2–16 normalized monotonic knots independently of recorded point pressure, including masks/filter masks, erasures, tonal strokes and embedded masters. Valid v1–v28 roots/history migrate; an older label carrying the field rejects. Default response omits it, preserving prior rendering. Project container 3, workspace 2, original source blobs and integrity checks are unchanged. Curve values are metadata, not rendered source replacements or a persistent tool-preset library.
-
 
 ## Independent brush preset preferences
 

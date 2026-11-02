@@ -2,7 +2,7 @@
   "version": 1,
   "reference": "Independent NumPy DLT and bilinear five-channel fields; fixed relative frames for large coordinates.",
   "generatorSha256": "af8159e35ca25f77f8501d6b5b1aae806dd96e06c2cd5996b39aafb896b7d4c9",
-  "absoluteError": 2e-07,
+  "absoluteError": 2e-7,
   "sourceSha256": "0287ce457a3e3c5d9b56f9a7c364a748270439c0698e68c2c5794324989a030a",
   "cases": [
     {

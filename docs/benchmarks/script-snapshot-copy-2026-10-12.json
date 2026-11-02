@@ -442,9 +442,7 @@
               "scriptRuntimeMs": 0
             }
           ],
-          "longTasks": [
-            51
-          ],
+          "longTasks": [51],
           "restored": true,
           "layers": 64
         }
@@ -886,9 +884,7 @@
               "scriptRuntimeMs": 0
             }
           ],
-          "longTasks": [
-            55
-          ],
+          "longTasks": [55],
           "restored": true,
           "layers": 64
         }
@@ -1038,41 +1034,31 @@
           {
             "ms": 381.90000000596046,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 362.69999998807907,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 390.90000000596046,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 379,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 410.30000001192093,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           }
         ]
@@ -1085,41 +1071,31 @@
           {
             "ms": 420.19999998807907,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 360.09999999403954,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 385,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 377.30000001192093,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 397.59999999403954,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           }
         ]
@@ -1572,41 +1548,31 @@
           {
             "ms": 347.2999999821186,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 362.30000001192093,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 338.19999998807907,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 349.60000002384186,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 350.2999999821186,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           }
         ]
@@ -1619,41 +1585,31 @@
           {
             "ms": 352,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 355.80000001192093,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 362.09999999403954,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 331.40000000596046,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           },
           {
             "ms": 330.40000000596046,
             "commands": 0,
-            "logs": [
-              "1"
-            ],
+            "logs": ["1"],
             "revision": 0
           }
         ]

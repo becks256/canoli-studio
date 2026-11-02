@@ -32,10 +32,10 @@ Gaussian shadow placement, and one Undo/Redo. Heavy functional verification
 finishes before these timing runs begin.
 
 | Pair | Baseline p95 | Candidate p95 | Drag long tasks, baseline / candidate |
-| --- | ---: | ---: | ---: |
-| 1 | 50.7 ms | 30.1 ms | 0 / 0 |
-| 2 | 38.5 ms | 28.5 ms | 0 / 0 |
-| 3 | 50.7 ms | 30.3 ms | 0 / 0 |
+| ---- | -----------: | ------------: | ------------------------------------: |
+| 1    |      50.7 ms |       30.1 ms |                                 0 / 0 |
+| 2    |      38.5 ms |       28.5 ms |                                 0 / 0 |
+| 3    |      50.7 ms |       30.3 ms |                                 0 / 0 |
 
 Across 36 inputs per build, nearest-rank p95 changes from **50.7 ms to
 30.1 ms**. The candidate meets the unchanged 33 ms measurement target for this warm fixture.

@@ -10,13 +10,5 @@
   },
   "glyphId": 8,
   "glyphName": "acutecomb",
-  "retainedTables": [
-    "cmap",
-    "hmtx",
-    "GSUB",
-    "GPOS",
-    "GDEF",
-    "vmtx",
-    "vhea"
-  ]
+  "retainedTables": ["cmap", "hmtx", "GSUB", "GPOS", "GDEF", "vmtx", "vhea"]
 }

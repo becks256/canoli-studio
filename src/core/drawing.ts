@@ -1,16 +1,52 @@
-import {brushSymmetrySchema,symmetryBounds,type BrushSymmetryData} from './brush-symmetry';
-import {brushTextureSchema,type BrushTextureData} from './brush-texture';
-import {brushTipSchema,penTiltSchema,brushSupportRadius,type BrushTipData,type PenTiltData} from './brush-tip';
-import {vectorGradientSchema,vectorFillRuleSchema,type VectorFillOptions} from './vector-gradient';
-import {vectorStrokeSchema,vectorStrokeValues,type VectorStrokeOptions} from './vector-stroke';
-import { pixelCoverageSchema, coverageAt, type PixelCoverage } from "./pixel-selection";
+import {
+  brushSymmetrySchema,
+  symmetryBounds,
+  type BrushSymmetryData,
+} from "./brush-symmetry";
+import { brushTextureSchema, type BrushTextureData } from "./brush-texture";
+import {
+  brushTipSchema,
+  penTiltSchema,
+  brushSupportRadius,
+  type BrushTipData,
+  type PenTiltData,
+} from "./brush-tip";
+import {
+  vectorGradientSchema,
+  vectorFillRuleSchema,
+  type VectorFillOptions,
+} from "./vector-gradient";
+import {
+  vectorStrokeSchema,
+  vectorStrokeValues,
+  type VectorStrokeOptions,
+} from "./vector-stroke";
+import {
+  pixelCoverageSchema,
+  coverageAt,
+  type PixelCoverage,
+} from "./pixel-selection";
 import { AffineTransform } from "./affine";
 import type { AffineData } from "./affine";
 import { affineSchema } from "./transform-schema";
 import { z } from "zod";
-import { wetPaintOperationSchema, wetPaintBounds,assertWetPaintVersion, type WetPaintStrokeData } from './wet-operation';
-import {pressureCurveSchema,pressureSizeResponse,type PressureCurveData} from './pressure-curve';
-import {perspectiveSchema,perspectiveMatrix,perspectiveRect,type PerspectiveData} from './perspective';
+import {
+  wetPaintOperationSchema,
+  wetPaintBounds,
+  assertWetPaintVersion,
+  type WetPaintStrokeData,
+} from "./wet-operation";
+import {
+  pressureCurveSchema,
+  pressureSizeResponse,
+  type PressureCurveData,
+} from "./pressure-curve";
+import {
+  perspectiveSchema,
+  perspectiveMatrix,
+  perspectiveRect,
+  type PerspectiveData,
+} from "./perspective";
 
 export interface Point {
   x: number;
@@ -61,7 +97,7 @@ export interface BrushStrokeData {
   id: string;
   kind: "brush" | "pencil" | "clone" | "eraser";
   /** Explicit canonical linear RGBA32 TIFF sources; valid only for clone. */
-  precision?: 'float32';
+  precision?: "float32";
   points: StrokePoint[];
   size: number;
   hardness: number;
@@ -78,12 +114,32 @@ export interface BrushStrokeData {
   clip: SelectionData | null;
   tiles: CloneTile[];
 }
-export function assertBrushVersion(brush:{kind?:string;precision?:unknown;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[]},version:number){
-  if(brush.kind==='clone'&&brush.precision==='float32'&&version<58)throw new Error('HDR clone paint requires schema version 58.');
-  if(version<29&&brush.pressureCurve!==undefined)throw new Error('Brush pressure curves require schema version 29.');
-  if(version<30&&(brush.tip!==undefined||brush.points?.some(point=>point.tilt!==undefined)))throw new Error('Brush tips and pen tilt require schema version 30.');
-  if(version<31&&brush.symmetry!==undefined)throw new Error('Brush symmetry requires schema version 31.');
-  if(version<32&&brush.texture!==undefined)throw new Error('Brush textures require schema version 32.');
+export function assertBrushVersion(
+  brush: {
+    kind?: string;
+    precision?: unknown;
+    pressureCurve?: unknown;
+    tip?: unknown;
+    symmetry?: unknown;
+    texture?: unknown;
+    points?: readonly { tilt?: unknown }[];
+  },
+  version: number,
+) {
+  if (brush.kind === "clone" && brush.precision === "float32" && version < 58)
+    throw new Error("HDR clone paint requires schema version 58.");
+  if (version < 29 && brush.pressureCurve !== undefined)
+    throw new Error("Brush pressure curves require schema version 29.");
+  if (
+    version < 30 &&
+    (brush.tip !== undefined ||
+      brush.points?.some((point) => point.tilt !== undefined))
+  )
+    throw new Error("Brush tips and pen tilt require schema version 30.");
+  if (version < 31 && brush.symmetry !== undefined)
+    throw new Error("Brush symmetry requires schema version 31.");
+  if (version < 32 && brush.texture !== undefined)
+    throw new Error("Brush textures require schema version 32.");
 }
 export interface FillData {
   id: string;
@@ -94,7 +150,8 @@ export interface FillData {
   clip: SelectionData | null;
   erase: boolean;
 }
-export type PaintOperationData = BrushStrokeData | FillData | WetPaintStrokeData;
+export type PaintOperationData =
+  BrushStrokeData | FillData | WetPaintStrokeData;
 export interface PathAnchor extends Point {
   in: Point;
   out: Point;
@@ -116,8 +173,13 @@ export interface VectorPathData extends VectorStrokeOptions, VectorFillOptions {
 }
 
 /** The primary contour retains the legacy path ID; additional contours share paint. */
-export function pathContours(path: Pick<VectorPathData, "points" | "closed" | "subpaths">) {
-  return [{ points: path.points, closed: path.closed }, ...(path.subpaths ?? [])];
+export function pathContours(
+  path: Pick<VectorPathData, "points" | "closed" | "subpaths">,
+) {
+  return [
+    { points: path.points, closed: path.closed },
+    ...(path.subpaths ?? []),
+  ];
 }
 
 const coordinate = z
@@ -137,12 +199,17 @@ export const selectionSchema: z.ZodType<SelectionData> = z
   .object({
     regions: z
       .array(
-        rect.extend({
-          shape: z.enum(["rectangle", "ellipse", "pixels"]),
-          coverage: pixelCoverageSchema.optional(),
-          operation: z.enum(["add", "subtract", "intersect"]),
-          transform: affineSchema.optional(),
-        }).refine(r => (r.shape === "pixels") === !!r.coverage, "Pixel regions require coverage; geometric regions must not contain it."),
+        rect
+          .extend({
+            shape: z.enum(["rectangle", "ellipse", "pixels"]),
+            coverage: pixelCoverageSchema.optional(),
+            operation: z.enum(["add", "subtract", "intersect"]),
+            transform: affineSchema.optional(),
+          })
+          .refine(
+            (r) => (r.shape === "pixels") === !!r.coverage,
+            "Pixel regions require coverage; geometric regions must not contain it.",
+          ),
       )
       .max(128),
   })
@@ -185,41 +252,62 @@ export const styleSchema: z.ZodType<LayerStyleData> = z
   })
   .strict();
 export const brushStrokeSchema = z
-      .object({
-        id: identifier,
-        kind: z.enum(["brush", "pencil", "clone", "eraser"]),
-        precision: z.literal('float32').optional(),
-        points: z
-          .array(point.extend({ pressure: unit, tilt:penTiltSchema.optional() }))
-          .min(1)
-          .max(20000),
-        size: z.number().min(0.1).max(2048),
-        hardness: unit,
-        opacity: unit,
-        flow: unit.optional(),
-        spacing: z.number().min(0.01).max(10).optional(),
-        pressureSize: z.boolean().optional(),
-        pressureOpacity: z.boolean().optional(),
-        pressureCurve: pressureCurveSchema.optional(),
-        tip: brushTipSchema.optional(),
-        symmetry: brushSymmetrySchema.optional(),
-        texture: brushTextureSchema.optional(),
-        color: colorSchema,
-        clip: selectionSchema.nullable(),
-        tiles: z.array(rect.extend({ assetId: identifier })).max(4096),
-      })
-      .strict()
-      .refine(
-        (stroke) => stroke.kind !== "clone" || stroke.tiles.length > 0,
-        "Clone strokes require a source image.",
-      ).superRefine((stroke,context)=>{
-        if(stroke.precision===undefined)return;
-        if(stroke.kind!=='clone')context.addIssue({code:'custom',message:'Float source precision is valid only for clone strokes.'});
-        for(const tile of stroke.tiles)if(![tile.x,tile.y,tile.width,tile.height,tile.x+tile.width,tile.y+tile.height,tile.width*tile.height*4].every(Number.isSafeInteger))context.addIssue({code:'custom',message:'HDR clone tiles require safely representable native integer geometry.'});
+  .object({
+    id: identifier,
+    kind: z.enum(["brush", "pencil", "clone", "eraser"]),
+    precision: z.literal("float32").optional(),
+    points: z
+      .array(point.extend({ pressure: unit, tilt: penTiltSchema.optional() }))
+      .min(1)
+      .max(20000),
+    size: z.number().min(0.1).max(2048),
+    hardness: unit,
+    opacity: unit,
+    flow: unit.optional(),
+    spacing: z.number().min(0.01).max(10).optional(),
+    pressureSize: z.boolean().optional(),
+    pressureOpacity: z.boolean().optional(),
+    pressureCurve: pressureCurveSchema.optional(),
+    tip: brushTipSchema.optional(),
+    symmetry: brushSymmetrySchema.optional(),
+    texture: brushTextureSchema.optional(),
+    color: colorSchema,
+    clip: selectionSchema.nullable(),
+    tiles: z.array(rect.extend({ assetId: identifier })).max(4096),
+  })
+  .strict()
+  .refine(
+    (stroke) => stroke.kind !== "clone" || stroke.tiles.length > 0,
+    "Clone strokes require a source image.",
+  )
+  .superRefine((stroke, context) => {
+    if (stroke.precision === undefined) return;
+    if (stroke.kind !== "clone")
+      context.addIssue({
+        code: "custom",
+        message: "Float source precision is valid only for clone strokes.",
       });
+    for (const tile of stroke.tiles)
+      if (
+        ![
+          tile.x,
+          tile.y,
+          tile.width,
+          tile.height,
+          tile.x + tile.width,
+          tile.y + tile.height,
+          tile.width * tile.height * 4,
+        ].every(Number.isSafeInteger)
+      )
+        context.addIssue({
+          code: "custom",
+          message:
+            "HDR clone tiles require safely representable native integer geometry.",
+        });
+  });
 export const wetStrokeSchema = wetPaintOperationSchema(brushStrokeSchema);
 export const paintOperationSchema: z.ZodType<PaintOperationData> =
-  z.discriminatedUnion('kind', [
+  z.discriminatedUnion("kind", [
     brushStrokeSchema,
     wetStrokeSchema,
     z
@@ -235,10 +323,17 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
       .strict(),
   ]);
 export const PATH_POINT_LIMIT = 20000;
-const anchorsSchema = z.array(point.extend({ in: point, out: point })).min(1).max(PATH_POINT_LIMIT);
-export const vectorContourSchema = z.object({
-  id: identifier, points: anchorsSchema, closed: z.literal(true),
-}).strict();
+const anchorsSchema = z
+  .array(point.extend({ in: point, out: point }))
+  .min(1)
+  .max(PATH_POINT_LIMIT);
+export const vectorContourSchema = z
+  .object({
+    id: identifier,
+    points: anchorsSchema,
+    closed: z.literal(true),
+  })
+  .strict();
 export const pathSchema = z
   .object({
     id: identifier,
@@ -248,21 +343,30 @@ export const pathSchema = z
     stroke: colorSchema.nullable(),
     strokeWidth: z.number().min(0).max(1024),
     ...vectorStrokeSchema.shape,
-    fillGradient:vectorGradientSchema.nullable().optional(),
+    fillGradient: vectorGradientSchema.nullable().optional(),
     fillRule: vectorFillRuleSchema.optional(),
     subpaths: z.array(vectorContourSchema).max(127).optional(),
   })
-  .strict().superRefine((path, context) => {
+  .strict()
+  .superRefine((path, context) => {
     if (path.subpaths?.length && !path.closed)
-      context.addIssue({ code: "custom", message: "Compound paths require a closed primary contour." });
+      context.addIssue({
+        code: "custom",
+        message: "Compound paths require a closed primary contour.",
+      });
     const ids = new Set([path.id]);
     let count = path.points.length;
     for (const contour of path.subpaths ?? []) {
-      if (ids.has(contour.id)) context.addIssue({ code: "custom", message: "Duplicate contour ID." });
-      ids.add(contour.id); count += contour.points.length;
+      if (ids.has(contour.id))
+        context.addIssue({ code: "custom", message: "Duplicate contour ID." });
+      ids.add(contour.id);
+      count += contour.points.length;
     }
     if (count > PATH_POINT_LIMIT)
-      context.addIssue({ code: "custom", message: "A compound path supports up to 20000 total anchors." });
+      context.addIssue({
+        code: "custom",
+        message: "A compound path supports up to 20000 total anchors.",
+      });
   });
 export function defaultStyle(): LayerStyleData {
   return {
@@ -343,15 +447,20 @@ export function containsSelection(
       sy = point.y;
     const hit =
       region.shape === "pixels"
-        ? coverageAt(region.coverage!, (sx-region.x)*region.coverage!.width/region.width, (sy-region.y)*region.coverage!.height/region.height) > 0
+        ? coverageAt(
+            region.coverage!,
+            ((sx - region.x) * region.coverage!.width) / region.width,
+            ((sy - region.y) * region.coverage!.height) / region.height,
+          ) > 0
         : region.shape === "rectangle"
-        ? sx >= region.x &&
-          sx <= region.x + region.width &&
-          sy >= region.y &&
-          sy <= region.y + region.height
-        : ((sx - region.x - region.width / 2) / (region.width / 2)) ** 2 +
-            ((sy - region.y - region.height / 2) / (region.height / 2)) ** 2 <=
-          1;
+          ? sx >= region.x &&
+            sx <= region.x + region.width &&
+            sy >= region.y &&
+            sy <= region.y + region.height
+          : ((sx - region.x - region.width / 2) / (region.width / 2)) ** 2 +
+              ((sy - region.y - region.height / 2) / (region.height / 2)) **
+                2 <=
+            1;
     inside =
       region.operation === "add"
         ? inside || hit
@@ -362,21 +471,30 @@ export function containsSelection(
   return inside;
 }
 export function strokeBounds(stroke: PaintOperationData): Rect {
-  if (stroke.kind === 'wet') return wetPaintBounds(stroke);
+  if (stroke.kind === "wet") return wetPaintBounds(stroke);
   if (stroke.kind === "fill") return { ...stroke.bounds };
   let left = Infinity,
     top = Infinity,
     right = -Infinity,
     bottom = -Infinity;
   for (const p of stroke.points) {
-    const size=stroke.size*(stroke.pressureSize===false?1:pressureSizeResponse(p.pressure,stroke.pressureCurve));
-    const r=brushSupportRadius(size,stroke.kind==='pencil',stroke.tip)+(stroke.kind==='pencil'&&stroke.tip?2:1);
+    const size =
+      stroke.size *
+      (stroke.pressureSize === false
+        ? 1
+        : pressureSizeResponse(p.pressure, stroke.pressureCurve));
+    const r =
+      brushSupportRadius(size, stroke.kind === "pencil", stroke.tip) +
+      (stroke.kind === "pencil" && stroke.tip ? 2 : 1);
     left = Math.min(left, p.x - r);
     top = Math.min(top, p.y - r);
     right = Math.max(right, p.x + r);
     bottom = Math.max(bottom, p.y + r);
   }
-  return symmetryBounds({ x: left, y: top, width: right - left, height: bottom - top },stroke.symmetry);
+  return symmetryBounds(
+    { x: left, y: top, width: right - left, height: bottom - top },
+    stroke.symmetry,
+  );
 }
 export function pathBounds(path: VectorPathData): Rect {
   // The control-point hull contains the entire Bézier curve.
@@ -384,17 +502,23 @@ export function pathBounds(path: VectorPathData): Rect {
     top = Infinity,
     right = -Infinity,
     bottom = -Infinity;
-  for (const contour of pathContours(path)) for (const p of contour.points) {
-    left = Math.min(left, p.x, p.in.x, p.out.x);
-    top = Math.min(top, p.y, p.in.y, p.out.y);
-    right = Math.max(right, p.x, p.in.x, p.out.x);
-    bottom = Math.max(bottom, p.y, p.in.y, p.out.y);
-  }
-  const style=vectorStrokeValues(path);
+  for (const contour of pathContours(path))
+    for (const p of contour.points) {
+      left = Math.min(left, p.x, p.in.x, p.out.x);
+      top = Math.min(top, p.y, p.in.y, p.out.y);
+      right = Math.max(right, p.x, p.in.x, p.out.x);
+      bottom = Math.max(bottom, p.y, p.in.y, p.out.y);
+    }
+  const style = vectorStrokeValues(path);
   // Control hull plus conservative stroke support: square dash caps may occur
   // anywhere on a curve; miter reach is bounded by its explicit limit.
-  const factor=path.stroke?Math.max(style.strokeCap==='square'?Math.SQRT2:1,style.strokeJoin==='miter'?style.strokeMiterLimit:1):1;
-  const r = path.strokeWidth / 2*factor;
+  const factor = path.stroke
+    ? Math.max(
+        style.strokeCap === "square" ? Math.SQRT2 : 1,
+        style.strokeJoin === "miter" ? style.strokeMiterLimit : 1,
+      )
+    : 1;
+  const r = (path.strokeWidth / 2) * factor;
   return {
     x: left - r,
     y: top - r,
@@ -404,23 +528,81 @@ export function pathBounds(path: VectorPathData): Rect {
 }
 
 /** Capture the layer geometry so erasure follows later nonuniform raster resizing. */
-export interface ErasurePlacementData {perspective:PerspectiveData;bounds:Rect}
-export interface RasterErasureData { width: number; height: number; stroke: PaintOperationData;placement?:ErasurePlacementData }
-export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
-  width: dimension, height: dimension,
-  stroke: paintOperationSchema.refine(stroke => stroke.kind === 'wet' || stroke.kind === 'eraser' || (stroke.kind === 'fill' && stroke.erase), 'Raster modifiers require wet paint, an eraser or a clear operation.'),
-  placement:z.object({perspective:perspectiveSchema,bounds:rect}).strict().optional(),
-}).strict().superRefine((entry,context)=>{
-  if(entry.stroke.kind==='wet'&&(entry.stroke.placement||entry.stroke.precision==='float32')&&entry.stroke.opacity>0){try{wetPaintBounds(entry.stroke);}catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}}
-  if(!entry.placement)return;
-  try{
-    if(entry.stroke.kind!=='eraser'&&!(entry.stroke.kind==='fill'&&entry.stroke.erase))throw new Error('Placed coverage requires an eraser or clear operation.');
-    perspectiveRect(perspectiveMatrix(entry.width,entry.height,entry.placement.perspective),entry.placement.bounds);
-  }catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}
-});
-export function assertRasterErasureVersion(entry:RasterErasureData,version:number):void {
-  assertWetPaintVersion(entry.stroke,version);
-  if(!entry.placement)return;
-  const required=entry.stroke.kind==='fill'?52:51;
-  if(version<required)throw new Error(`Placed ${entry.stroke.kind==='fill'?'clears':'erasures'} require document schema version ${required}.`);
+export interface ErasurePlacementData {
+  perspective: PerspectiveData;
+  bounds: Rect;
+}
+export interface RasterErasureData {
+  width: number;
+  height: number;
+  stroke: PaintOperationData;
+  placement?: ErasurePlacementData;
+}
+export const rasterErasureSchema: z.ZodType<RasterErasureData> = z
+  .object({
+    width: dimension,
+    height: dimension,
+    stroke: paintOperationSchema.refine(
+      (stroke) =>
+        stroke.kind === "wet" ||
+        stroke.kind === "eraser" ||
+        (stroke.kind === "fill" && stroke.erase),
+      "Raster modifiers require wet paint, an eraser or a clear operation.",
+    ),
+    placement: z
+      .object({ perspective: perspectiveSchema, bounds: rect })
+      .strict()
+      .optional(),
+  })
+  .strict()
+  .superRefine((entry, context) => {
+    if (
+      entry.stroke.kind === "wet" &&
+      (entry.stroke.placement || entry.stroke.precision === "float32") &&
+      entry.stroke.opacity > 0
+    ) {
+      try {
+        wetPaintBounds(entry.stroke);
+      } catch (error) {
+        context.addIssue({
+          code: "custom",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+    if (!entry.placement) return;
+    try {
+      if (
+        entry.stroke.kind !== "eraser" &&
+        !(entry.stroke.kind === "fill" && entry.stroke.erase)
+      )
+        throw new Error(
+          "Placed coverage requires an eraser or clear operation.",
+        );
+      perspectiveRect(
+        perspectiveMatrix(
+          entry.width,
+          entry.height,
+          entry.placement.perspective,
+        ),
+        entry.placement.bounds,
+      );
+    } catch (error) {
+      context.addIssue({
+        code: "custom",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+export function assertRasterErasureVersion(
+  entry: RasterErasureData,
+  version: number,
+): void {
+  assertWetPaintVersion(entry.stroke, version);
+  if (!entry.placement) return;
+  const required = entry.stroke.kind === "fill" ? 52 : 51;
+  if (version < required)
+    throw new Error(
+      `Placed ${entry.stroke.kind === "fill" ? "clears" : "erasures"} require document schema version ${required}.`,
+    );
 }

@@ -1,35 +1,54 @@
-import {captureRetainedHistory} from '../src/core/history';
-import {historyTargetSchema, historyRegionSchema, historyComparisonChangesSchema} from '../src/core/history';
-import {historyTimeline,inspectHistoryChange} from '../src/core/history-inspection';
-import {validateServerProjectSources} from "./project";
-import {inspectServerRaw} from "./raw";
-import {ServerTiffService} from './tiff';
-import {importServerTiff} from './tiff-document';
-import {tiffDecodeOptionsSchema} from '../src/core/interchange/tiff/types';
-import {validateWindow} from '../src/core/float-source/types';
-import {prepareServerFont} from './fonts';
-import {embedOptionsSchema,relinkOptionsSchema} from '../src/dom/fonts';
-import {importServerRaw,developServerRawComponent} from "./raw-document";
-import {RawDevelopment,SmartObjectLayer} from "../src/dom";
-import {rawDecodeOptionsSchema,type RawImportControl} from "../src/core/interchange/raw/types";
-import {rawSourceMetadata} from "../src/core/interchange/raw/source";
-import {serializeProject} from "../src/core/project";
-import { captureVectorBoolean, vectorBooleanSelectionSchema } from '../src/core/vector-boolean';
-import { prepareServerVectorBoolean } from './vector-boolean';
+import { captureRetainedHistory } from "../src/core/history";
+import {
+  historyTargetSchema,
+  historyRegionSchema,
+  historyComparisonChangesSchema,
+} from "../src/core/history";
+import {
+  historyTimeline,
+  inspectHistoryChange,
+} from "../src/core/history-inspection";
+import { validateServerProjectSources } from "./project";
+import { inspectServerRaw } from "./raw";
+import { ServerTiffService } from "./tiff";
+import { importServerTiff } from "./tiff-document";
+import { tiffDecodeOptionsSchema } from "../src/core/interchange/tiff/types";
+import { validateWindow } from "../src/core/float-source/types";
+import { prepareServerFont } from "./fonts";
+import { embedOptionsSchema, relinkOptionsSchema } from "../src/dom/fonts";
+import { importServerRaw, developServerRawComponent } from "./raw-document";
+import { RawDevelopment, SmartObjectLayer } from "../src/dom";
+import {
+  rawDecodeOptionsSchema,
+  type RawImportControl,
+} from "../src/core/interchange/raw/types";
+import { rawSourceMetadata } from "../src/core/interchange/raw/source";
+import { serializeProject } from "../src/core/project";
+import {
+  captureVectorBoolean,
+  vectorBooleanSelectionSchema,
+} from "../src/core/vector-boolean";
+import { prepareServerVectorBoolean } from "./vector-boolean";
 import { z } from "zod";
-import {prepareServerMatting} from './matting';
-import {refineEdgeOptionsSchema} from '../src/core/matting';
-import {preflightOptionsSchema} from '../src/core/preflight';
-import {prepareServerPreflight} from './preflight';
-import { prepareServerSubject } from './subject-selection';
-import { selectSubjectOptionsSchema, subjectSource } from '../src/core/subject-selection';
-import { transformSelection } from '../src/core/drawing';
-import { AffineTransform } from '../src/core/affine';
-import { prepareServerSelection, prepareServerChannelSelection } from "./selection";
-import { channelLoadSchema } from '../src/core/alpha-channels';
+import { prepareServerMatting } from "./matting";
+import { refineEdgeOptionsSchema } from "../src/core/matting";
+import { preflightOptionsSchema } from "../src/core/preflight";
+import { prepareServerPreflight } from "./preflight";
+import { prepareServerSubject } from "./subject-selection";
+import {
+  selectSubjectOptionsSchema,
+  subjectSource,
+} from "../src/core/subject-selection";
+import { transformSelection } from "../src/core/drawing";
+import { AffineTransform } from "../src/core/affine";
+import {
+  prepareServerSelection,
+  prepareServerChannelSelection,
+} from "./selection";
+import { channelLoadSchema } from "../src/core/alpha-channels";
 import { prepareServerColorRange } from "./color-range";
-import { prepareServerQuickSelection } from './quick-selection';
-import { quickSelectionOptionsSchema } from '../src/core/quick-selection';
+import { prepareServerQuickSelection } from "./quick-selection";
+import { quickSelectionOptionsSchema } from "../src/core/quick-selection";
 import { colorRangeOptionsSchema } from "../src/core/color-range";
 import { selectionModificationSchema } from "../src/core/selection-modification";
 import { tonalSculptSchema } from "../src/core/retouch/tonal-sculpt";
@@ -38,12 +57,22 @@ import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { Document, LayerGroup, RasterLayer, VectorLayer } from "../src/dom";
-import { AssetStore,type ImageAsset } from "../src/core/assets";
-import { BLEND_MODES, id, findLayer, allLayers, type DocumentData } from "../src/core/model";
-import {visitLayerAssets} from '../src/core/asset-references';
-import { validatePreparedPaintAssets, hasPreparedPaint,commandHasPreparedPaint } from '../src/core/prepared-paint-assets';
-import { execute } from '../src/core/commands';
-import { wetServerAssets } from './wet-assets';
+import { AssetStore, type ImageAsset } from "../src/core/assets";
+import {
+  BLEND_MODES,
+  id,
+  findLayer,
+  allLayers,
+  type DocumentData,
+} from "../src/core/model";
+import { visitLayerAssets } from "../src/core/asset-references";
+import {
+  validatePreparedPaintAssets,
+  hasPreparedPaint,
+  commandHasPreparedPaint,
+} from "../src/core/prepared-paint-assets";
+import { execute } from "../src/core/commands";
+import { wetServerAssets } from "./wet-assets";
 import {
   commandRequestSchema,
   createDocumentSchema,
@@ -52,9 +81,21 @@ import {
 } from "../src/core/validation";
 
 /** Legacy raster/clone DTO references remain metadata-only; authored textures and mask grids require a session source. */
-function validateAuthoredSources(document:DocumentData,assets:AssetStore){
-  const trees=[document.children,...(document.components??[]).flatMap(definition=>definition.source.kind==='document'?[definition.source.document.children]:[])];
-  for(const tree of trees)for(const layer of allLayers(tree))visitLayerAssets(layer,(reference,role)=>{if(role==='texture'||role==='geometry')assets.get(reference.assetId);});
+function validateAuthoredSources(document: DocumentData, assets: AssetStore) {
+  const trees = [
+    document.children,
+    ...(document.components ?? []).flatMap((definition) =>
+      definition.source.kind === "document"
+        ? [definition.source.document.children]
+        : [],
+    ),
+  ];
+  for (const tree of trees)
+    for (const layer of allLayers(tree))
+      visitLayerAssets(layer, (reference, role) => {
+        if (role === "texture" || role === "geometry")
+          assets.get(reference.assetId);
+      });
 }
 
 function safeTokenCompare(
@@ -78,7 +119,7 @@ export interface ServerGenerationRequest {
 export interface ApiServerOptions {
   authToken?: string;
   /** Private, disposable native TIFF caches; defaults to the OS temporary directory. */
-  precisionCacheDirectory?:string;
+  precisionCacheDirectory?: string;
   /** Explicit host integration. Returns decoded RGBA; owns provider authorization/billing. */
   executeGeneration?: (
     request: ServerGenerationRequest,
@@ -112,7 +153,7 @@ interface DocumentSession {
 }
 
 export function createApiServer(options: ApiServerOptions = {}) {
-  const tiffSources=new ServerTiffService(options.precisionCacheDirectory);
+  const tiffSources = new ServerTiffService(options.precisionCacheDirectory);
   const configuredToken =
     options.authToken ??
     process.env.LUMA_API_KEY ??
@@ -124,10 +165,21 @@ export function createApiServer(options: ApiServerOptions = {}) {
   const jobSignatures = new Map<string, string>();
   const controllers = new Map<string, AbortController>();
   const selectionControllers = new Map<AbortController, string>();
-  const tiffMetadata=(asset:ImageAsset)=>{
-    if(asset.tiff?.editingPrecision!=='float32')return{};
-    const source=tiffSources.forAsset(asset),d=source.manifest.descriptor;
-    return{tiff:asset.tiff,precisionSource:{format:'rgba-float32-le',colorSpace:'linear-srgb',sourceSha256:d.sourceSha256,orientation:d.orientation,nativeWasmSha256:d.nativeWasmSha256},color:asset.tiffColor};
+  const tiffMetadata = (asset: ImageAsset) => {
+    if (asset.tiff?.editingPrecision !== "float32") return {};
+    const source = tiffSources.forAsset(asset),
+      d = source.manifest.descriptor;
+    return {
+      tiff: asset.tiff,
+      precisionSource: {
+        format: "rgba-float32-le",
+        colorSpace: "linear-srgb",
+        sourceSha256: d.sourceSha256,
+        orientation: d.orientation,
+        nativeWasmSha256: d.nativeWasmSha256,
+      },
+      color: asset.tiffColor,
+    };
   };
 
   const pruneJobs = () => {
@@ -167,13 +219,59 @@ export function createApiServer(options: ApiServerOptions = {}) {
     response.end(JSON.stringify(value));
   };
 
-  async function rawScope<T>(document:Document,assets:AssetStore,control:RawImportControl,work:(control:RawImportControl,check:()=>void,beforeCommit:()=>void)=>Promise<T>,operation='RAW'):Promise<T>{
-    control.signal?.throwIfAborted();const revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-    control.signal?.addEventListener('abort',cancel,{once:true});selectionControllers.set(abort,document.id);
-    const check=()=>{abort.signal.throwIfAborted();alive();const session=sessions.get(document.id);if(!session||session.document!==document||session.assets!==assets||document.getSnapshot().revision!==revision)throw new Error(`Document session changed during ${operation} preparation.`);};
-    const stop=document.subscribe(()=>{try{check();}catch(error){abort.abort(error);}});
-    try{return await work({signal:abort.signal,onProgress:control.onProgress},check,()=>{check();stop();});}
-    finally{stop();control.signal?.removeEventListener('abort',cancel);selectionControllers.delete(abort);}
+  async function rawScope<T>(
+    document: Document,
+    assets: AssetStore,
+    control: RawImportControl,
+    work: (
+      control: RawImportControl,
+      check: () => void,
+      beforeCommit: () => void,
+    ) => Promise<T>,
+    operation = "RAW",
+  ): Promise<T> {
+    control.signal?.throwIfAborted();
+    const revision = document.getSnapshot().revision,
+      alive = assets.captureLifetime(),
+      abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    selectionControllers.set(abort, document.id);
+    const check = () => {
+      abort.signal.throwIfAborted();
+      alive();
+      const session = sessions.get(document.id);
+      if (
+        !session ||
+        session.document !== document ||
+        session.assets !== assets ||
+        document.getSnapshot().revision !== revision
+      )
+        throw new Error(
+          `Document session changed during ${operation} preparation.`,
+        );
+    };
+    const stop = document.subscribe(() => {
+      try {
+        check();
+      } catch (error) {
+        abort.abort(error);
+      }
+    });
+    try {
+      return await work(
+        { signal: abort.signal, onProgress: control.onProgress },
+        check,
+        () => {
+          check();
+          stop();
+        },
+      );
+    } finally {
+      stop();
+      control.signal?.removeEventListener("abort", cancel);
+      selectionControllers.delete(abort);
+    }
   }
 
   const readRawBody = async (
@@ -184,17 +282,23 @@ export function createApiServer(options: ApiServerOptions = {}) {
     let length = 0;
     for await (const chunk of request) {
       length += chunk.length;
-      if (!Number.isSafeInteger(length)||maxBytes!==undefined&&length > maxBytes)
+      if (
+        !Number.isSafeInteger(length) ||
+        (maxBytes !== undefined && length > maxBytes)
+      )
         throw new Error(`Request body exceeds ${maxBytes} bytes.`);
       chunks.push(chunk);
     }
     return Buffer.concat(chunks);
   };
 
-  const body = async (request: IncomingMessage,maxBytes:number|null=1_000_000) => {
+  const body = async (
+    request: IncomingMessage,
+    maxBytes: number | null = 1_000_000,
+  ) => {
     if (!request.headers["content-type"]?.startsWith("application/json"))
       throw new Error("Send application/json.");
-    const buf = await readRawBody(request, maxBytes??undefined);
+    const buf = await readRawBody(request, maxBytes ?? undefined);
     return JSON.parse(buf.toString("utf8")) as unknown;
   };
 
@@ -205,11 +309,17 @@ export function createApiServer(options: ApiServerOptions = {}) {
     canRedo: document.canRedo,
   });
 
-  const navigateHistory = (document:Document,run:()=>void) => {
-    const revision=document.getSnapshot().revision;
-    try {run();} catch(cause) {
-      if(document.getSnapshot().revision===revision)throw cause;
-      return {...snapshot(document),warning:'History moved, but an observer failed. Inspect the document before retrying.'};
+  const navigateHistory = (document: Document, run: () => void) => {
+    const revision = document.getSnapshot().revision;
+    try {
+      run();
+    } catch (cause) {
+      if (document.getSnapshot().revision === revision) throw cause;
+      return {
+        ...snapshot(document),
+        warning:
+          "History moved, but an observer failed. Inspect the document before retrying.",
+      };
     }
     return snapshot(document);
   };
@@ -309,79 +419,282 @@ export function createApiServer(options: ApiServerOptions = {}) {
           const document = new Document(
             createDocumentSchema.parse(await body(request)),
           );
-          document._setDefaultHistoryOrigin({surface:'rest'});
-          document._prepareSelectionModification = async (settings,control) => {
-            const selection = await prepareServerSelection({...settings,selection:document.getSnapshot().document.selection!,width:document.width,height:document.height},control.signal ?? new AbortController().signal);
-            if (!sessions.has(document.id)) throw new Error("Document was deleted.");
+          document._setDefaultHistoryOrigin({ surface: "rest" });
+          document._prepareSelectionModification = async (
+            settings,
+            control,
+          ) => {
+            const selection = await prepareServerSelection(
+              {
+                ...settings,
+                selection: document.getSnapshot().document.selection!,
+                width: document.width,
+                height: document.height,
+              },
+              control.signal ?? new AbortController().signal,
+            );
+            if (!sessions.has(document.id))
+              throw new Error("Document was deleted.");
             return selection;
           };
-          document._prepareVectorBoolean=async(selection,control)=>{
-            const snapshot=document.getSnapshot(),request=captureVectorBoolean(snapshot.document,selection).request,abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
-            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==snapshot.revision)abort.abort(new Error('Document changed during the Boolean operation.'));});
-            try{const result=await prepareServerVectorBoolean(request,{signal:abort.signal,onProgress:control.onProgress});if(!sessions.has(document.id))throw new Error('Document was deleted.');return result;}
-            finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          document._prepareVectorBoolean = async (selection, control) => {
+            const snapshot = document.getSnapshot(),
+              request = captureVectorBoolean(
+                snapshot.document,
+                selection,
+              ).request,
+              abort = new AbortController(),
+              cancel = () => abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();
+            control.signal?.addEventListener("abort", cancel, { once: true });
+            const unsubscribe = document.subscribe(() => {
+              if (document.getSnapshot().revision !== snapshot.revision)
+                abort.abort(
+                  new Error("Document changed during the Boolean operation."),
+                );
+            });
+            try {
+              const result = await prepareServerVectorBoolean(request, {
+                signal: abort.signal,
+                onProgress: control.onProgress,
+              });
+              if (!sessions.has(document.id))
+                throw new Error("Document was deleted.");
+              return result;
+            } finally {
+              unsubscribe();
+              control.signal?.removeEventListener("abort", cancel);
+            }
           };
-          document._prepareChannelLoad=async(settings,control)=>{
-            const snapshot=document.getSnapshot(),channel=snapshot.document.alphaChannels?.find(entry=>entry.id===settings.id);
-            if(!channel)throw new Error('Alpha channel not found.');
-            const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
-            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==snapshot.revision)abort.abort(new Error('Document changed while loading its alpha channel.'));});
-            try{
-              const selection=await prepareServerChannelSelection({operation:settings.operation,invert:settings.invert,selection:channel.selection,base:snapshot.document.selection??null,width:document.width,height:document.height},abort.signal);
-              if(!sessions.has(document.id))throw new Error('Document was deleted.');return selection;
-            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
-          };
-          const assets = new AssetStore({fontSources:{nativeSet:null,prepare:prepareServerFont}});document.assetStore=assets;
-          document._prepareRawDevelopment=(layerId,development,control)=>rawScope(document,assets,control,(native,current,beforeCommit)=>developServerRawComponent(document,assets,layerId,{development,allowPrecisionLoss:control.allowPrecisionLoss??false},native,current,beforeCommit));
-          document._preflight=async(options,control)=>{
-            const snapshot=document.getSnapshot(),originals=assets.values(),alive=assets.captureLifetime();
-            const report=await prepareServerPreflight(snapshot.document,snapshot.revision,options,originals.map(asset=>[asset.id,{width:asset.width,height:asset.height}]),control.signal??new AbortController().signal);
-            alive();if(!sessions.has(document.id))throw new Error('Document was deleted during design checks.');for(const asset of originals)if(assets.get(asset.id)!==asset)throw new Error('Source assets changed during design checks.');return report;
-          };
-          document._prepareMatting=async(request,control)=>{
-            const snapshot=document.getSnapshot(),alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
-            const source=findLayer(snapshot.document,request.layerId),keys=new Set<string>();if(source?.kind==='raster')keys.add(source.assetId);if(source?.mask?.kind==='bitmap')keys.add(source.mask.assetId);if(request.options.trimapAssetId)keys.add(request.options.trimapAssetId);
-            const originals=new Map([...keys].map(key=>[key,assets.get(key)]));
-            const check=()=>{abort.signal.throwIfAborted();alive();if(!sessions.has(document.id)||document.getSnapshot().revision!==snapshot.revision)throw new Error('Document changed during matting.');for(const [key,asset] of originals)if(assets.get(key)!==asset)throw new Error('Matting source changed.');};
-            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==snapshot.revision)abort.abort(new Error('Document changed during matting.'));});
-            try{return await prepareServerMatting(snapshot.document,assets,request,abort.signal,check,()=>document.getSnapshot().revision!==snapshot.revision);}
-            finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
-          };
-          document._prepareSubject=async(settings,control)=>{
-            const source=subjectSource(document.getSnapshot().document,settings,id=>assets.get(id)),asset=assets.get(source.assetId),revision=document.getSnapshot().revision;
-            const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
-            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during Select Subject.'));});
-            try{
-              const selection=await prepareServerSubject(settings,asset,abort.signal);
-              if(!sessions.has(document.id)||assets.get(asset.id)!==asset)throw new Error('Select Subject source session changed.');
-              return transformSelection(selection,AffineTransform.fromJSON(source.transform))!;
-            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
-          };
-          document._prepareQuickSelection=async(settings,control)=>{
-            if(settings.source.kind!=='asset')throw new Error('Headless Quick Selection requires an explicit PNG asset source.');
-            const asset=assets.get(settings.source.assetId),revision=document.getSnapshot().revision,abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
-            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during Quick Selection.'));});
-            try{
-              const selection=await prepareServerQuickSelection(settings,asset,document.width,document.height,abort.signal);
-              if(!sessions.has(document.id)||assets.get(asset.id)!==asset)throw new Error('Quick Selection source session changed.');return selection;
-            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
-          };
-          document._prepareColorRange=async(settings,control)=>{
-            if(settings.source.kind!=='asset')throw new Error('Headless Color Range requires source.kind asset; browser composite/layer rendering is unavailable.');
-            const asset=assets.get(settings.source.assetId);
-            const revision=document.getSnapshot().revision,abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
-            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during Color Range sampling.'));});
-            try{
-              const selection=await prepareServerColorRange(settings,asset,document.width,document.height,abort.signal);
-              if(!sessions.has(document.id)||assets.get(asset.id)!==asset)throw new Error('Color Range source session changed.');
+          document._prepareChannelLoad = async (settings, control) => {
+            const snapshot = document.getSnapshot(),
+              channel = snapshot.document.alphaChannels?.find(
+                (entry) => entry.id === settings.id,
+              );
+            if (!channel) throw new Error("Alpha channel not found.");
+            const abort = new AbortController(),
+              cancel = () => abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();
+            control.signal?.addEventListener("abort", cancel, { once: true });
+            const unsubscribe = document.subscribe(() => {
+              if (document.getSnapshot().revision !== snapshot.revision)
+                abort.abort(
+                  new Error(
+                    "Document changed while loading its alpha channel.",
+                  ),
+                );
+            });
+            try {
+              const selection = await prepareServerChannelSelection(
+                {
+                  operation: settings.operation,
+                  invert: settings.invert,
+                  selection: channel.selection,
+                  base: snapshot.document.selection ?? null,
+                  width: document.width,
+                  height: document.height,
+                },
+                abort.signal,
+              );
+              if (!sessions.has(document.id))
+                throw new Error("Document was deleted.");
               return selection;
-            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+            } finally {
+              unsubscribe();
+              control.signal?.removeEventListener("abort", cancel);
+            }
+          };
+          const assets = new AssetStore({
+            fontSources: { nativeSet: null, prepare: prepareServerFont },
+          });
+          document.assetStore = assets;
+          document._prepareRawDevelopment = (layerId, development, control) =>
+            rawScope(
+              document,
+              assets,
+              control,
+              (native, current, beforeCommit) =>
+                developServerRawComponent(
+                  document,
+                  assets,
+                  layerId,
+                  {
+                    development,
+                    allowPrecisionLoss: control.allowPrecisionLoss ?? false,
+                  },
+                  native,
+                  current,
+                  beforeCommit,
+                ),
+            );
+          document._preflight = async (options, control) => {
+            const snapshot = document.getSnapshot(),
+              originals = assets.values(),
+              alive = assets.captureLifetime();
+            const report = await prepareServerPreflight(
+              snapshot.document,
+              snapshot.revision,
+              options,
+              originals.map((asset) => [
+                asset.id,
+                { width: asset.width, height: asset.height },
+              ]),
+              control.signal ?? new AbortController().signal,
+            );
+            alive();
+            if (!sessions.has(document.id))
+              throw new Error("Document was deleted during design checks.");
+            for (const asset of originals)
+              if (assets.get(asset.id) !== asset)
+                throw new Error("Source assets changed during design checks.");
+            return report;
+          };
+          document._prepareMatting = async (request, control) => {
+            const snapshot = document.getSnapshot(),
+              alive = assets.captureLifetime(),
+              abort = new AbortController(),
+              cancel = () => abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();
+            control.signal?.addEventListener("abort", cancel, { once: true });
+            const source = findLayer(snapshot.document, request.layerId),
+              keys = new Set<string>();
+            if (source?.kind === "raster") keys.add(source.assetId);
+            if (source?.mask?.kind === "bitmap") keys.add(source.mask.assetId);
+            if (request.options.trimapAssetId)
+              keys.add(request.options.trimapAssetId);
+            const originals = new Map(
+              [...keys].map((key) => [key, assets.get(key)]),
+            );
+            const check = () => {
+              abort.signal.throwIfAborted();
+              alive();
+              if (
+                !sessions.has(document.id) ||
+                document.getSnapshot().revision !== snapshot.revision
+              )
+                throw new Error("Document changed during matting.");
+              for (const [key, asset] of originals)
+                if (assets.get(key) !== asset)
+                  throw new Error("Matting source changed.");
+            };
+            const unsubscribe = document.subscribe(() => {
+              if (document.getSnapshot().revision !== snapshot.revision)
+                abort.abort(new Error("Document changed during matting."));
+            });
+            try {
+              return await prepareServerMatting(
+                snapshot.document,
+                assets,
+                request,
+                abort.signal,
+                check,
+                () => document.getSnapshot().revision !== snapshot.revision,
+              );
+            } finally {
+              unsubscribe();
+              control.signal?.removeEventListener("abort", cancel);
+            }
+          };
+          document._prepareSubject = async (settings, control) => {
+            const source = subjectSource(
+                document.getSnapshot().document,
+                settings,
+                (id) => assets.get(id),
+              ),
+              asset = assets.get(source.assetId),
+              revision = document.getSnapshot().revision;
+            const abort = new AbortController(),
+              cancel = () => abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();
+            control.signal?.addEventListener("abort", cancel, { once: true });
+            const unsubscribe = document.subscribe(() => {
+              if (document.getSnapshot().revision !== revision)
+                abort.abort(
+                  new Error("Document changed during Select Subject."),
+                );
+            });
+            try {
+              const selection = await prepareServerSubject(
+                settings,
+                asset,
+                abort.signal,
+              );
+              if (!sessions.has(document.id) || assets.get(asset.id) !== asset)
+                throw new Error("Select Subject source session changed.");
+              return transformSelection(
+                selection,
+                AffineTransform.fromJSON(source.transform),
+              )!;
+            } finally {
+              unsubscribe();
+              control.signal?.removeEventListener("abort", cancel);
+            }
+          };
+          document._prepareQuickSelection = async (settings, control) => {
+            if (settings.source.kind !== "asset")
+              throw new Error(
+                "Headless Quick Selection requires an explicit PNG asset source.",
+              );
+            const asset = assets.get(settings.source.assetId),
+              revision = document.getSnapshot().revision,
+              abort = new AbortController(),
+              cancel = () => abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();
+            control.signal?.addEventListener("abort", cancel, { once: true });
+            const unsubscribe = document.subscribe(() => {
+              if (document.getSnapshot().revision !== revision)
+                abort.abort(
+                  new Error("Document changed during Quick Selection."),
+                );
+            });
+            try {
+              const selection = await prepareServerQuickSelection(
+                settings,
+                asset,
+                document.width,
+                document.height,
+                abort.signal,
+              );
+              if (!sessions.has(document.id) || assets.get(asset.id) !== asset)
+                throw new Error("Quick Selection source session changed.");
+              return selection;
+            } finally {
+              unsubscribe();
+              control.signal?.removeEventListener("abort", cancel);
+            }
+          };
+          document._prepareColorRange = async (settings, control) => {
+            if (settings.source.kind !== "asset")
+              throw new Error(
+                "Headless Color Range requires source.kind asset; browser composite/layer rendering is unavailable.",
+              );
+            const asset = assets.get(settings.source.assetId);
+            const revision = document.getSnapshot().revision,
+              abort = new AbortController(),
+              cancel = () => abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();
+            control.signal?.addEventListener("abort", cancel, { once: true });
+            const unsubscribe = document.subscribe(() => {
+              if (document.getSnapshot().revision !== revision)
+                abort.abort(
+                  new Error("Document changed during Color Range sampling."),
+                );
+            });
+            try {
+              const selection = await prepareServerColorRange(
+                settings,
+                asset,
+                document.width,
+                document.height,
+                abort.signal,
+              );
+              if (!sessions.has(document.id) || assets.get(asset.id) !== asset)
+                throw new Error("Color Range source session changed.");
+              return selection;
+            } finally {
+              unsubscribe();
+              control.signal?.removeEventListener("abort", cancel);
+            }
           };
           sessions.set(document.id, { document, assets });
           send(response, 201, snapshot(document));
@@ -420,8 +733,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
       }
 
       // Document scoped endpoints: /api/v1/documents/:id/...
-      const floatWindow=/^\/api\/v1\/documents\/[^/]+\/assets\/[^/]+\/float-window$/.test(path);
-      const docMatch = (floatWindow?path.slice(0,-'/float-window'.length):path).match(
+      const floatWindow =
+        /^\/api\/v1\/documents\/[^/]+\/assets\/[^/]+\/float-window$/.test(path);
+      const docMatch = (
+        floatWindow ? path.slice(0, -"/float-window".length) : path
+      ).match(
         /^\/api\/v1\/documents\/([^/]+)(?:\/(fonts|commands|undo|redo|history|history-branches|history-comparisons|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|tiff-import|tiff-inspect|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
@@ -433,197 +749,941 @@ export function createApiServer(options: ApiServerOptions = {}) {
       const document = session.document;
       const subresource = docMatch[2];
       const subresourceId = docMatch[3];
-      if(floatWindow){
-        if(method!=='GET'){send(response,405,{error:'Use GET for a native TIFF source window.'});return;}
-        const revision=document.getSnapshot().revision,parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined});
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(!session.assets.has(subresourceId)){send(response,404,{error:'Source asset not found.'});return;}
-        const bounds=validateWindow({x:url.searchParams.has('x')?Number(url.searchParams.get('x')):0,y:url.searchParams.has('y')?Number(url.searchParams.get('y')):0,width:Number(url.searchParams.get('width')),height:Number(url.searchParams.get('height'))}),asset=session.assets.get(subresourceId),source=tiffSources.forAsset(asset),abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Native TIFF read disconnected.'));};response.on('close',close);
-        try{
-          const pixels=await rawScope(document,session.assets,{signal:abort.signal},async(control,current)=>{const result=await source.readWindow(bounds,{signal:control.signal,onProgress:current});current();if(session.assets.get(asset.id)!==asset)throw new Error('Native TIFF source asset changed.');return result;},'TIFF');
-          let bytes=new Uint8Array(pixels.buffer,pixels.byteOffset,pixels.byteLength);
-          if(new Uint8Array(new Uint16Array([1]).buffer)[0]!==1){bytes=new Uint8Array(pixels.byteLength);const view=new DataView(bytes.buffer);for(let index=0;index<pixels.length;index++)view.setFloat32(index*4,pixels[index],true);}
-          response.writeHead(200,{'Content-Type':'application/octet-stream','Content-Length':bytes.byteLength,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Canoli-Pixel-Format':'rgba-float32-le','X-Canoli-Color-Space':'linear-srgb','X-Canoli-Document-Revision':String(revision),'X-Canoli-Source-Sha256':source.manifest.descriptor.sourceSha256,'X-Canoli-Source-Orientation':String(source.manifest.descriptor.orientation),'Access-Control-Expose-Headers':'X-Canoli-Pixel-Format, X-Canoli-Color-Space, X-Canoli-Document-Revision, X-Canoli-Source-Sha256, X-Canoli-Source-Orientation'});response.end(Buffer.from(bytes));
-        }catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during native TIFF reading.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during native TIFF reading.',revision:document.getSnapshot().revision});else throw error;}
-        finally{response.off('close',close);}return;
+      if (floatWindow) {
+        if (method !== "GET") {
+          send(response, 405, {
+            error: "Use GET for a native TIFF source window.",
+          });
+          return;
+        }
+        const revision = document.getSnapshot().revision,
+          parsed = revisionSchema.parse({
+            expectedRevision: url.searchParams.has("expectedRevision")
+              ? Number(url.searchParams.get("expectedRevision"))
+              : undefined,
+          });
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (!session.assets.has(subresourceId)) {
+          send(response, 404, { error: "Source asset not found." });
+          return;
+        }
+        const bounds = validateWindow({
+            x: url.searchParams.has("x")
+              ? Number(url.searchParams.get("x"))
+              : 0,
+            y: url.searchParams.has("y")
+              ? Number(url.searchParams.get("y"))
+              : 0,
+            width: Number(url.searchParams.get("width")),
+            height: Number(url.searchParams.get("height")),
+          }),
+          asset = session.assets.get(subresourceId),
+          source = tiffSources.forAsset(asset),
+          abort = new AbortController(),
+          close = () => {
+            if (!response.writableEnded)
+              abort.abort(new Error("Native TIFF read disconnected."));
+          };
+        response.on("close", close);
+        try {
+          const pixels = await rawScope(
+            document,
+            session.assets,
+            { signal: abort.signal },
+            async (control, current) => {
+              const result = await source.readWindow(bounds, {
+                signal: control.signal,
+                onProgress: current,
+              });
+              current();
+              if (session.assets.get(asset.id) !== asset)
+                throw new Error("Native TIFF source asset changed.");
+              return result;
+            },
+            "TIFF",
+          );
+          let bytes = new Uint8Array(
+            pixels.buffer,
+            pixels.byteOffset,
+            pixels.byteLength,
+          );
+          if (new Uint8Array(new Uint16Array([1]).buffer)[0] !== 1) {
+            bytes = new Uint8Array(pixels.byteLength);
+            const view = new DataView(bytes.buffer);
+            for (let index = 0; index < pixels.length; index++)
+              view.setFloat32(index * 4, pixels[index], true);
+          }
+          response.writeHead(200, {
+            "Content-Type": "application/octet-stream",
+            "Content-Length": bytes.byteLength,
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "X-Canoli-Pixel-Format": "rgba-float32-le",
+            "X-Canoli-Color-Space": "linear-srgb",
+            "X-Canoli-Document-Revision": String(revision),
+            "X-Canoli-Source-Sha256": source.manifest.descriptor.sourceSha256,
+            "X-Canoli-Source-Orientation": String(
+              source.manifest.descriptor.orientation,
+            ),
+            "Access-Control-Expose-Headers":
+              "X-Canoli-Pixel-Format, X-Canoli-Color-Space, X-Canoli-Document-Revision, X-Canoli-Source-Sha256, X-Canoli-Source-Orientation",
+          });
+          response.end(Buffer.from(bytes));
+        } catch (error) {
+          if (!sessions.has(document.id))
+            send(response, 404, {
+              error: "Document was deleted during native TIFF reading.",
+            });
+          else if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Document changed during native TIFF reading.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          response.off("close", close);
+        }
+        return;
       }
-      if((subresource==='tiff-import'||subresource==='tiff-inspect')&&!subresourceId&&method==='POST'){
-        const revision=document.getSnapshot().revision,parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined});
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        const header=request.headers['x-tiff-options'];if(header!==undefined&&typeof header!=='string')throw new Error('Invalid TIFF options header.');const options=tiffDecodeOptionsSchema.parse(JSON.parse(header??'{}'));
-        if(subresource==='tiff-import'&&options.editingPrecision!=='float32')throw new Error('Native TIFF import requires explicit editingPrecision float32.');
-        const mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();if(!['image/tiff','application/octet-stream'].includes(mime))throw new Error('Send binary TIFF original bytes.');
-        const name=z.string().min(1).max(240).parse(url.searchParams.get('name')??request.headers['x-asset-name']??'TIFF image'),abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Native TIFF import disconnected.'));};response.on('close',close);
-        try{
-          const result=await rawScope(document,session.assets,{signal:abort.signal},async(control,current,beforeCommit)=>{
-            const bytes=await readRawBody(request);current();const blob=new Blob([new Uint8Array(bytes)],{type:'image/tiff'});
-            if(subresource==='tiff-inspect'){const report=await tiffSources.inspect(blob,{signal:control.signal,onProgress:current});current();return{report};}
-            return importServerTiff(document,session.assets,tiffSources,blob,name,options,{signal:control.signal,onProgress:current},current,beforeCommit);
-          },'TIFF');send(response,subresource==='tiff-inspect'?200:201,{...snapshot(document),...result});
-        }catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during native TIFF import.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during native TIFF import.',revision:document.getSnapshot().revision});else throw error;}
-        finally{response.off('close',close);}return;
+      if (
+        (subresource === "tiff-import" || subresource === "tiff-inspect") &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const revision = document.getSnapshot().revision,
+          parsed = revisionSchema.parse({
+            expectedRevision: url.searchParams.has("expectedRevision")
+              ? Number(url.searchParams.get("expectedRevision"))
+              : undefined,
+          });
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        const header = request.headers["x-tiff-options"];
+        if (header !== undefined && typeof header !== "string")
+          throw new Error("Invalid TIFF options header.");
+        const options = tiffDecodeOptionsSchema.parse(
+          JSON.parse(header ?? "{}"),
+        );
+        if (
+          subresource === "tiff-import" &&
+          options.editingPrecision !== "float32"
+        )
+          throw new Error(
+            "Native TIFF import requires explicit editingPrecision float32.",
+          );
+        const mime = (
+          request.headers["content-type"] ?? "application/octet-stream"
+        )
+          .split(";")[0]
+          .trim();
+        if (!["image/tiff", "application/octet-stream"].includes(mime))
+          throw new Error("Send binary TIFF original bytes.");
+        const name = z
+            .string()
+            .min(1)
+            .max(240)
+            .parse(
+              url.searchParams.get("name") ??
+                request.headers["x-asset-name"] ??
+                "TIFF image",
+            ),
+          abort = new AbortController(),
+          close = () => {
+            if (!response.writableEnded)
+              abort.abort(new Error("Native TIFF import disconnected."));
+          };
+        response.on("close", close);
+        try {
+          const result = await rawScope(
+            document,
+            session.assets,
+            { signal: abort.signal },
+            async (control, current, beforeCommit) => {
+              const bytes = await readRawBody(request);
+              current();
+              const blob = new Blob([new Uint8Array(bytes)], {
+                type: "image/tiff",
+              });
+              if (subresource === "tiff-inspect") {
+                const report = await tiffSources.inspect(blob, {
+                  signal: control.signal,
+                  onProgress: current,
+                });
+                current();
+                return { report };
+              }
+              return importServerTiff(
+                document,
+                session.assets,
+                tiffSources,
+                blob,
+                name,
+                options,
+                { signal: control.signal, onProgress: current },
+                current,
+                beforeCommit,
+              );
+            },
+            "TIFF",
+          );
+          send(response, subresource === "tiff-inspect" ? 200 : 201, {
+            ...snapshot(document),
+            ...result,
+          });
+        } catch (error) {
+          if (!sessions.has(document.id))
+            send(response, 404, {
+              error: "Document was deleted during native TIFF import.",
+            });
+          else if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Document changed during native TIFF import.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          response.off("close", close);
+        }
+        return;
       }
-      if(subresource==='fonts'&&!subresourceId&&method==='GET'){send(response,200,{id:document.id,revision:document.getSnapshot().revision,fonts:document.fonts.items,files:document.fonts.files.items.map(file=>file.toJSON())});return;}
-      if(subresource==='fonts'&&subresourceId&&method==='GET'){
-        const file=document.fonts.files.getById(subresourceId);if(!file){send(response,404,{error:'Font file not found.'});return;}
-        const source=url.searchParams.get('source');
-        if(source===null){send(response,200,{id:document.id,revision:document.getSnapshot().revision,file:file.toJSON()});return;}
-        if(source!=='original'&&source!=='render')throw new Error('Choose original or render font source bytes.');
-        const resource=session.assets.fonts.get(file.id),blob=source==='original'?resource.original:resource.renderBlob,bytes=Buffer.from(await blob.arrayBuffer());
-        const extension=source==='original'?resource.descriptor.report.format:resource.descriptor.render.format;
-        response.writeHead(200,{'Content-Type':source==='original'?'application/octet-stream':blob.type,'Content-Disposition':`attachment; filename="font-${source}.${extension}"`,'X-Content-Type-Options':'nosniff','Content-Length':bytes.length,'Cache-Control':'no-store'});response.end(bytes);return;
+      if (subresource === "fonts" && !subresourceId && method === "GET") {
+        send(response, 200, {
+          id: document.id,
+          revision: document.getSnapshot().revision,
+          fonts: document.fonts.items,
+          files: document.fonts.files.items.map((file) => file.toJSON()),
+        });
+        return;
       }
-      if(subresource==='fonts'&&method==='POST'){
-        const revision=document.getSnapshot().revision,parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined});
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        const header=request.headers['x-font-options'];if(header!==undefined&&typeof header!=='string')throw new Error('Invalid font options header.');
-        const options=(subresourceId?relinkOptionsSchema:embedOptionsSchema).parse(JSON.parse(header??'{}')),mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();
-        const relink=subresourceId?document.fonts.files.getById(subresourceId):null;
-        if(subresourceId&&!relink){send(response,404,{error:'Font file not found.'});return;}
-        if(mime==='application/json')throw new Error('Send binary font source bytes.');
-        const abort=new AbortController(),closed=()=>{if(!response.writableEnded)abort.abort(new Error('Font request disconnected.'));};response.on('close',closed);
-        try{
-          const file=await rawScope(document,session.assets,{signal:abort.signal},async(control,current,beforeCommit)=>{
-            const bytes=await readRawBody(request);current();const source=new Blob([new Uint8Array(bytes)],{type:mime}),controls={signal:control.signal,beforeCommit};
-            const file=relink?await relink.relink(source,options,controls):await document.fonts.embed(source,options,controls);return file.toJSON();
-          });send(response,relink?200:201,{...snapshot(document),file,metrics:'estimated'});
-        }catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during font preparation.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during font preparation.',revision:document.getSnapshot().revision});else throw error;}
-        finally{response.off('close',closed);}return;
+      if (subresource === "fonts" && subresourceId && method === "GET") {
+        const file = document.fonts.files.getById(subresourceId);
+        if (!file) {
+          send(response, 404, { error: "Font file not found." });
+          return;
+        }
+        const source = url.searchParams.get("source");
+        if (source === null) {
+          send(response, 200, {
+            id: document.id,
+            revision: document.getSnapshot().revision,
+            file: file.toJSON(),
+          });
+          return;
+        }
+        if (source !== "original" && source !== "render")
+          throw new Error("Choose original or render font source bytes.");
+        const resource = session.assets.fonts.get(file.id),
+          blob =
+            source === "original" ? resource.original : resource.renderBlob,
+          bytes = Buffer.from(await blob.arrayBuffer());
+        const extension =
+          source === "original"
+            ? resource.descriptor.report.format
+            : resource.descriptor.render.format;
+        response.writeHead(200, {
+          "Content-Type":
+            source === "original" ? "application/octet-stream" : blob.type,
+          "Content-Disposition": `attachment; filename="font-${source}.${extension}"`,
+          "X-Content-Type-Options": "nosniff",
+          "Content-Length": bytes.length,
+          "Cache-Control": "no-store",
+        });
+        response.end(bytes);
+        return;
+      }
+      if (subresource === "fonts" && method === "POST") {
+        const revision = document.getSnapshot().revision,
+          parsed = revisionSchema.parse({
+            expectedRevision: url.searchParams.has("expectedRevision")
+              ? Number(url.searchParams.get("expectedRevision"))
+              : undefined,
+          });
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        const header = request.headers["x-font-options"];
+        if (header !== undefined && typeof header !== "string")
+          throw new Error("Invalid font options header.");
+        const options = (
+            subresourceId ? relinkOptionsSchema : embedOptionsSchema
+          ).parse(JSON.parse(header ?? "{}")),
+          mime = (request.headers["content-type"] ?? "application/octet-stream")
+            .split(";")[0]
+            .trim();
+        const relink = subresourceId
+          ? document.fonts.files.getById(subresourceId)
+          : null;
+        if (subresourceId && !relink) {
+          send(response, 404, { error: "Font file not found." });
+          return;
+        }
+        if (mime === "application/json")
+          throw new Error("Send binary font source bytes.");
+        const abort = new AbortController(),
+          closed = () => {
+            if (!response.writableEnded)
+              abort.abort(new Error("Font request disconnected."));
+          };
+        response.on("close", closed);
+        try {
+          const file = await rawScope(
+            document,
+            session.assets,
+            { signal: abort.signal },
+            async (control, current, beforeCommit) => {
+              const bytes = await readRawBody(request);
+              current();
+              const source = new Blob([new Uint8Array(bytes)], { type: mime }),
+                controls = { signal: control.signal, beforeCommit };
+              const file = relink
+                ? await relink.relink(source, options, controls)
+                : await document.fonts.embed(source, options, controls);
+              return file.toJSON();
+            },
+          );
+          send(response, relink ? 200 : 201, {
+            ...snapshot(document),
+            file,
+            metrics: "estimated",
+          });
+        } catch (error) {
+          if (!sessions.has(document.id))
+            send(response, 404, {
+              error: "Document was deleted during font preparation.",
+            });
+          else if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Document changed during font preparation.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          response.off("close", closed);
+        }
+        return;
       }
 
-      if((subresource==='raw-import'||subresource==='raw-inspect')&&!subresourceId&&method==='POST'){
-        const parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined}),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        const header=request.headers['x-raw-options'];if(header!==undefined&&typeof header!=='string')throw new Error('Invalid RAW options header.');
-        const options=rawDecodeOptionsSchema.parse(JSON.parse(header??'{}'));if(subresource==='raw-import'&&!options.allowPrecisionLoss)throw new Error('RAW working output requires explicit 8-bit precision-loss consent.');
-        const name=z.string().min(1).parse(url.searchParams.get('name')??request.headers['x-asset-name']??'Camera RAW'),mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();
-        if(mime==='application/json')throw new Error('Send binary RAW file bytes.');
-        const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('RAW request disconnected.'));};response.on('close',close);
-        try{
-          const result=await rawScope(document,session.assets,{signal:abort.signal},async(control,current,beforeCommit)=>{
-            const bytes=await readRawBody(request);current();const blob=new Blob([new Uint8Array(bytes)],{type:mime});
-            if(subresource==='raw-inspect'){const report=await inspectServerRaw(blob,options.development.image,control);current();return{report};}
-            return importServerRaw(document,session.assets,blob,name,options,control,current,beforeCommit);
-          });send(response,subresource==='raw-inspect'?200:201,{...snapshot(document),...result});
-        }catch(error){if(!sessions.has(document.id)){send(response,404,{error:'Document was deleted during RAW import.'});}else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during RAW import.',revision:document.getSnapshot().revision});else throw error;}
-        finally{response.off('close',close);}return;
-      }
-      if(subresource==='raw-develop'&&!subresourceId&&method==='POST'){
-        const parsed=z.object({...revisionSchema.shape,layerId:z.string().min(1).max(240),options:rawDecodeOptionsSchema}).strict().parse(await body(request,16_000_000)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        const layer=document.getLayer(parsed.layerId);if(!(layer instanceof SmartObjectLayer))throw new Error('Choose an attached RAW smart object.');
-        const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('RAW request disconnected.'));};response.on('close',close);
-        try{const report=await layer.developRaw(new RawDevelopment(parsed.options.development),{signal:abort.signal,allowPrecisionLoss:parsed.options.allowPrecisionLoss});send(response,200,{...snapshot(document),report});}
-        catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during RAW development.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during RAW development.',revision:document.getSnapshot().revision});else throw error;}
-        finally{response.off('close',close);}return;
-      }
-      if(subresource==='project'&&!subresourceId&&method==='GET'){
-        const state=document.getSnapshot(),history=url.searchParams.get('history')==='true'?captureRetainedHistory(state):undefined;
-        const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Project download disconnected.'));};response.on('close',close);selectionControllers.set(abort,document.id);
-        try{
-          await validateServerProjectSources(state.document,session.assets,history,abort.signal,asset=>{tiffSources.forAsset(asset);});
-          const file=await serializeProject(state.document,session.assets,history),bytes=await file.arrayBuffer();abort.signal.throwIfAborted();
-          if(sessions.get(document.id)!==session)throw new Error('Document was deleted during project encoding.');
-          response.writeHead(200,{'Content-Type':'application/x-luma','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));
-        }finally{response.off('close',close);selectionControllers.delete(abort);}return;
-      }
-      if(subresource==='preflight'&&!subresourceId&&method==='POST'){
-        const parsed=z.object({...revisionSchema.shape,options:preflightOptionsSchema.optional()}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(selectionControllers.size>=4){send(response,409,{error:'Inspection workers are busy. Retry after an active operation finishes.'});return;}
-        const abort=new AbortController();selectionControllers.set(abort,document.id);const cancel=()=>{if(!response.writableEnded)abort.abort(new Error('Design-check request disconnected.'));};response.on('close',cancel);
-        const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during design checks.'));});
-        try{send(response,200,{report:await document.preflight(parsed.options,{signal:abort.signal})});}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during design checks.',revision:document.getSnapshot().revision});else throw error;}
-        finally{unsubscribe();selectionControllers.delete(abort);response.off('close',cancel);}return;
-      }
-      if(subresource==='refine-edge'&&!subresourceId&&method==='POST'){
-        const parsed=z.object({...revisionSchema.shape,layerId:z.string().min(1).max(240),options:z.unknown().optional()}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        const options=refineEdgeOptionsSchema.parse(parsed.options??{}),layer=document.getLayer(parsed.layerId);if(!(layer instanceof RasterLayer))throw new Error('Refine Edge requires a raster layer.');
-        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
-        const abort=new AbortController();selectionControllers.set(abort,document.id);const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
-        try{await layer.refineEdge(options,{signal:abort.signal});send(response,200,snapshot(document));}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
-        finally{selectionControllers.delete(abort);response.off('close',close);}return;
-      }
-      if(subresource==='select-subject'&&!subresourceId&&method==='POST'){
-        const parsed=selectSubjectOptionsSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
-        const {expectedRevision,...settings}=parsed,abort=new AbortController();selectionControllers.set(abort,document.id);
-        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
-        try{await document.selectSubject(settings,{signal:abort.signal});send(response,200,snapshot(document));}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
-        finally{selectionControllers.delete(abort);response.off('close',close);}return;
-      }
-      if(subresource==='quick-selection'&&!subresourceId&&method==='POST'){
-        const parsed=quickSelectionOptionsSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
-        const {expectedRevision,...settings}=parsed,abort=new AbortController();selectionControllers.set(abort,document.id);
-        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
-        try{await document.selectQuickSelection(settings,{signal:abort.signal});send(response,200,snapshot(document));}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
-        finally{selectionControllers.delete(abort);response.off('close',close);}return;
-      }
-      if(subresource==='alpha-channel-load'&&!subresourceId&&method==='POST'){
-        const parsed=channelLoadSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
-        const {expectedRevision,id,...settings}=parsed,channel=document.alphaChannels.getById(id);
-        if(!channel)throw new Error('Alpha channel not found.');
-        const abort=new AbortController();selectionControllers.set(abort,document.id);
-        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
-        try{await channel.load(settings,{signal:abort.signal});send(response,200,snapshot(document));}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
-        finally{selectionControllers.delete(abort);response.off('close',close);}return;
-      }
-      if(subresource==='color-range'&&!subresourceId&&method==='POST'){
-        const parsed=colorRangeOptionsSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
-        const {expectedRevision,...settings}=parsed,abort=new AbortController();selectionControllers.set(abort,document.id);
-        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
-        try{await document.selectColorRange(settings,{signal:abort.signal});send(response,200,snapshot(document));}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
-        finally{selectionControllers.delete(abort);response.off('close',close);}return;
-      }
-      if(subresource==='vector-boolean'&&!subresourceId&&method==='POST'){
-        const parsed=vectorBooleanSelectionSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
-        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
-        if(selectionControllers.size>=4){send(response,409,{error:'Native workers are busy. Retry after an active operation finishes.'});return;}
-        const paths=parsed.operands.map(ref=>{const layer=document.getLayer(ref.layerId);if(!(layer instanceof VectorLayer))throw new Error('Select vector layers.');const path=layer.paths.get(ref.pathId);if(!path)throw new Error('Boolean operand path not found.');return path;});
-        const abort=new AbortController();selectionControllers.set(abort,document.id);const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
-        try{const path=await document.combinePaths(parsed.operation,paths,{signal:abort.signal});send(response,200,{...snapshot(document),result:path?{layerId:parsed.operands[0].layerId,pathId:path.id}:null});}
-        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
-        finally{selectionControllers.delete(abort);response.off('close',close);}return;
-      }
-      if (subresource === "selection-modify" && !subresourceId && method === "POST") {
-        const parsed = selectionModificationSchema.extend(revisionSchema.shape).parse(await body(request));
-        const revision = document.getSnapshot().revision;
+      if (
+        (subresource === "raw-import" || subresource === "raw-inspect") &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = revisionSchema.parse({
+            expectedRevision: url.searchParams.has("expectedRevision")
+              ? Number(url.searchParams.get("expectedRevision"))
+              : undefined,
+          }),
+          revision = document.getSnapshot().revision;
         if (parsed.expectedRevision !== revision) {
-          send(response,409,{error:"Revision conflict. Read the document and retry.",revision});
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        const header = request.headers["x-raw-options"];
+        if (header !== undefined && typeof header !== "string")
+          throw new Error("Invalid RAW options header.");
+        const options = rawDecodeOptionsSchema.parse(
+          JSON.parse(header ?? "{}"),
+        );
+        if (subresource === "raw-import" && !options.allowPrecisionLoss)
+          throw new Error(
+            "RAW working output requires explicit 8-bit precision-loss consent.",
+          );
+        const name = z
+            .string()
+            .min(1)
+            .parse(
+              url.searchParams.get("name") ??
+                request.headers["x-asset-name"] ??
+                "Camera RAW",
+            ),
+          mime = (request.headers["content-type"] ?? "application/octet-stream")
+            .split(";")[0]
+            .trim();
+        if (mime === "application/json")
+          throw new Error("Send binary RAW file bytes.");
+        const abort = new AbortController(),
+          close = () => {
+            if (!response.writableEnded)
+              abort.abort(new Error("RAW request disconnected."));
+          };
+        response.on("close", close);
+        try {
+          const result = await rawScope(
+            document,
+            session.assets,
+            { signal: abort.signal },
+            async (control, current, beforeCommit) => {
+              const bytes = await readRawBody(request);
+              current();
+              const blob = new Blob([new Uint8Array(bytes)], { type: mime });
+              if (subresource === "raw-inspect") {
+                const report = await inspectServerRaw(
+                  blob,
+                  options.development.image,
+                  control,
+                );
+                current();
+                return { report };
+              }
+              return importServerRaw(
+                document,
+                session.assets,
+                blob,
+                name,
+                options,
+                control,
+                current,
+                beforeCommit,
+              );
+            },
+          );
+          send(response, subresource === "raw-inspect" ? 200 : 201, {
+            ...snapshot(document),
+            ...result,
+          });
+        } catch (error) {
+          if (!sessions.has(document.id)) {
+            send(response, 404, {
+              error: "Document was deleted during RAW import.",
+            });
+          } else if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Document changed during RAW import.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "raw-develop" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = z
+            .object({
+              ...revisionSchema.shape,
+              layerId: z.string().min(1).max(240),
+              options: rawDecodeOptionsSchema,
+            })
+            .strict()
+            .parse(await body(request, 16_000_000)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        const layer = document.getLayer(parsed.layerId);
+        if (!(layer instanceof SmartObjectLayer))
+          throw new Error("Choose an attached RAW smart object.");
+        const abort = new AbortController(),
+          close = () => {
+            if (!response.writableEnded)
+              abort.abort(new Error("RAW request disconnected."));
+          };
+        response.on("close", close);
+        try {
+          const report = await layer.developRaw(
+            new RawDevelopment(parsed.options.development),
+            {
+              signal: abort.signal,
+              allowPrecisionLoss: parsed.options.allowPrecisionLoss,
+            },
+          );
+          send(response, 200, { ...snapshot(document), report });
+        } catch (error) {
+          if (!sessions.has(document.id))
+            send(response, 404, {
+              error: "Document was deleted during RAW development.",
+            });
+          else if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Document changed during RAW development.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          response.off("close", close);
+        }
+        return;
+      }
+      if (subresource === "project" && !subresourceId && method === "GET") {
+        const state = document.getSnapshot(),
+          history =
+            url.searchParams.get("history") === "true"
+              ? captureRetainedHistory(state)
+              : undefined;
+        const abort = new AbortController(),
+          close = () => {
+            if (!response.writableEnded)
+              abort.abort(new Error("Project download disconnected."));
+          };
+        response.on("close", close);
+        selectionControllers.set(abort, document.id);
+        try {
+          await validateServerProjectSources(
+            state.document,
+            session.assets,
+            history,
+            abort.signal,
+            (asset) => {
+              tiffSources.forAsset(asset);
+            },
+          );
+          const file = await serializeProject(
+              state.document,
+              session.assets,
+              history,
+            ),
+            bytes = await file.arrayBuffer();
+          abort.signal.throwIfAborted();
+          if (sessions.get(document.id) !== session)
+            throw new Error("Document was deleted during project encoding.");
+          response.writeHead(200, {
+            "Content-Type": "application/x-luma",
+            "Content-Length": String(bytes.byteLength),
+            "Cache-Control": "no-store",
+          });
+          response.end(Buffer.from(bytes));
+        } finally {
+          response.off("close", close);
+          selectionControllers.delete(abort);
+        }
+        return;
+      }
+      if (subresource === "preflight" && !subresourceId && method === "POST") {
+        const parsed = z
+            .object({
+              ...revisionSchema.shape,
+              options: preflightOptionsSchema.optional(),
+            })
+            .strict()
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
           return;
         }
         if (selectionControllers.size >= 4) {
-          send(response,409,{error:"Selection workers are busy. Retry after an active operation finishes."});
+          send(response, 409, {
+            error:
+              "Inspection workers are busy. Retry after an active operation finishes.",
+          });
           return;
         }
         const abort = new AbortController();
-        selectionControllers.set(abort,document.id);
-        const close = () => { if (!response.writableEnded) abort.abort(new Error("Client disconnected.")); };
-        response.on("close",close);
+        selectionControllers.set(abort, document.id);
+        const cancel = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Design-check request disconnected."));
+        };
+        response.on("close", cancel);
+        const unsubscribe = document.subscribe(() => {
+          if (document.getSnapshot().revision !== revision)
+            abort.abort(new Error("Document changed during design checks."));
+        });
         try {
-          await document.modifySelection({operation:parsed.operation,radius:parsed.radius},{signal:abort.signal});
-          if (!sessions.has(document.id)) throw new Error("Document was deleted.");
-          send(response,200,snapshot(document));
+          send(response, 200, {
+            report: await document.preflight(parsed.options, {
+              signal: abort.signal,
+            }),
+          });
         } catch (error) {
-          if (document.getSnapshot().revision !== revision) send(response,409,{error:"Revision conflict. Read the document and retry.",revision:document.getSnapshot().revision});
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Document changed during design checks.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          unsubscribe();
+          selectionControllers.delete(abort);
+          response.off("close", cancel);
+        }
+        return;
+      }
+      if (
+        subresource === "refine-edge" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = z
+            .object({
+              ...revisionSchema.shape,
+              layerId: z.string().min(1).max(240),
+              options: z.unknown().optional(),
+            })
+            .strict()
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        const options = refineEdgeOptionsSchema.parse(parsed.options ?? {}),
+          layer = document.getLayer(parsed.layerId);
+        if (!(layer instanceof RasterLayer))
+          throw new Error("Refine Edge requires a raster layer.");
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Selection workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          await layer.refineEdge(options, { signal: abort.signal });
+          send(response, 200, snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
           else throw error;
         } finally {
           selectionControllers.delete(abort);
-          response.off("close",close);
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "select-subject" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = selectSubjectOptionsSchema
+            .extend(revisionSchema.shape)
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Selection workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const { expectedRevision, ...settings } = parsed,
+          abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          await document.selectSubject(settings, { signal: abort.signal });
+          send(response, 200, snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "quick-selection" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = quickSelectionOptionsSchema
+            .extend(revisionSchema.shape)
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Selection workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const { expectedRevision, ...settings } = parsed,
+          abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          await document.selectQuickSelection(settings, {
+            signal: abort.signal,
+          });
+          send(response, 200, snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "alpha-channel-load" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = channelLoadSchema
+            .extend(revisionSchema.shape)
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Selection workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const { expectedRevision, id, ...settings } = parsed,
+          channel = document.alphaChannels.getById(id);
+        if (!channel) throw new Error("Alpha channel not found.");
+        const abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          await channel.load(settings, { signal: abort.signal });
+          send(response, 200, snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "color-range" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = colorRangeOptionsSchema
+            .extend(revisionSchema.shape)
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Selection workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const { expectedRevision, ...settings } = parsed,
+          abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          await document.selectColorRange(settings, { signal: abort.signal });
+          send(response, 200, snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "vector-boolean" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = vectorBooleanSelectionSchema
+            .extend(revisionSchema.shape)
+            .parse(await body(request)),
+          revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Native workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const paths = parsed.operands.map((ref) => {
+          const layer = document.getLayer(ref.layerId);
+          if (!(layer instanceof VectorLayer))
+            throw new Error("Select vector layers.");
+          const path = layer.paths.get(ref.pathId);
+          if (!path) throw new Error("Boolean operand path not found.");
+          return path;
+        });
+        const abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          const path = await document.combinePaths(parsed.operation, paths, {
+            signal: abort.signal,
+          });
+          send(response, 200, {
+            ...snapshot(document),
+            result: path
+              ? { layerId: parsed.operands[0].layerId, pathId: path.id }
+              : null,
+          });
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close", close);
+        }
+        return;
+      }
+      if (
+        subresource === "selection-modify" &&
+        !subresourceId &&
+        method === "POST"
+      ) {
+        const parsed = selectionModificationSchema
+          .extend(revisionSchema.shape)
+          .parse(await body(request));
+        const revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision,
+          });
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response, 409, {
+            error:
+              "Selection workers are busy. Retry after an active operation finishes.",
+          });
+          return;
+        }
+        const abort = new AbortController();
+        selectionControllers.set(abort, document.id);
+        const close = () => {
+          if (!response.writableEnded)
+            abort.abort(new Error("Client disconnected."));
+        };
+        response.on("close", close);
+        try {
+          await document.modifySelection(
+            { operation: parsed.operation, radius: parsed.radius },
+            { signal: abort.signal },
+          );
+          if (!sessions.has(document.id))
+            throw new Error("Document was deleted.");
+          send(response, 200, snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision)
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close", close);
         }
         return;
       }
@@ -656,9 +1716,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
           }
         }
         sessions.delete(document.id);
-        for (const [controller,documentId] of selectionControllers)
-          if (documentId === document.id) controller.abort(new Error("Document was deleted."));
-        session.assets.dispose();await tiffSources.releaseDocument(document.id);
+        for (const [controller, documentId] of selectionControllers)
+          if (documentId === document.id)
+            controller.abort(new Error("Document was deleted."));
+        session.assets.dispose();
+        await tiffSources.releaseDocument(document.id);
         send(response, 200, { deleted: document.id });
         return;
       }
@@ -679,10 +1741,16 @@ export function createApiServer(options: ApiServerOptions = {}) {
           });
           return;
         }
-        let layer!:ReturnType<Document['applyTonalSculpt']>;
-        document.transaction('Tonal sculpt',()=>{
-          layer = document.applyTonalSculpt(parsed.path,parsed.mode,parsed.range,parsed.exposure,parsed.options);
-          validateAuthoredSources(document._read(),session.assets);
+        let layer!: ReturnType<Document["applyTonalSculpt"]>;
+        document.transaction("Tonal sculpt", () => {
+          layer = document.applyTonalSculpt(
+            parsed.path,
+            parsed.mode,
+            parsed.range,
+            parsed.exposure,
+            parsed.options,
+          );
+          validateAuthoredSources(document._read(), session.assets);
         });
         send(response, 200, { ...snapshot(document), layerId: layer.id });
         return;
@@ -699,95 +1767,301 @@ export function createApiServer(options: ApiServerOptions = {}) {
           return;
         }
         const commands = parseCommands(parsed.commands);
-        if (commands.some(commandHasPreparedPaint) || hasPreparedPaint(document._read())) {
-          const candidate = execute(document._read(), { type: 'transaction', label: parsed.label ?? 'REST transaction', commands });
+        if (
+          commands.some(commandHasPreparedPaint) ||
+          hasPreparedPaint(document._read())
+        ) {
+          const candidate = execute(document._read(), {
+            type: "transaction",
+            label: parsed.label ?? "REST transaction",
+            commands,
+          });
           try {
-            await validatePreparedPaintAssets(candidate, wetServerAssets(session.assets, () => {
-              if (sessions.get(document.id) !== session || document.getSnapshot().revision !== parsed.expectedRevision) throw new Error('Document changed during prepared-paint validation.');
-            }));
+            await validatePreparedPaintAssets(
+              candidate,
+              wetServerAssets(session.assets, () => {
+                if (
+                  sessions.get(document.id) !== session ||
+                  document.getSnapshot().revision !== parsed.expectedRevision
+                )
+                  throw new Error(
+                    "Document changed during prepared-paint validation.",
+                  );
+              }),
+            );
           } catch (error) {
-            if (document.getSnapshot().revision !== parsed.expectedRevision) { send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision}); return; }
+            if (document.getSnapshot().revision !== parsed.expectedRevision) {
+              send(response, 409, {
+                error: "Revision conflict. Read the document and retry.",
+                revision: document.getSnapshot().revision,
+              });
+              return;
+            }
             throw error;
           }
-          if (sessions.get(document.id) !== session) { send(response,404,{error:'Document not found.'}); return; }
-          if (document.getSnapshot().revision !== parsed.expectedRevision) { send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision}); return; }
+          if (sessions.get(document.id) !== session) {
+            send(response, 404, { error: "Document not found." });
+            return;
+          }
+          if (document.getSnapshot().revision !== parsed.expectedRevision) {
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+            return;
+          }
         }
-        const result=navigateHistory(document,()=>document.transaction(parsed.label ?? "REST transaction", () => {
-          commands.forEach((command) => document._dispatch(command));
-          validateAuthoredSources(document._read(),session.assets);
-        }));
+        const result = navigateHistory(document, () =>
+          document.transaction(parsed.label ?? "REST transaction", () => {
+            commands.forEach((command) => document._dispatch(command));
+            validateAuthoredSources(document._read(), session.assets);
+          }),
+        );
         send(response, 200, result);
         return;
       }
 
       // History navigation shares the ordinary retained-state/recipe boundary.
-      if (subresource === 'history-comparisons') {
-        const metadata = () => document.getSnapshot().comparisons.map(value => ({id: value.id, name: value.name, beforeLabel: value.beforeLabel, afterLabel: value.afterLabel, region: value.region,
-          beforeSize: {width: value.before.width, height: value.before.height}, afterSize: {width: value.after.width, height: value.after.height}}));
-        if (method === 'GET') {
+      if (subresource === "history-comparisons") {
+        const metadata = () =>
+          document
+            .getSnapshot()
+            .comparisons.map((value) => ({
+              id: value.id,
+              name: value.name,
+              beforeLabel: value.beforeLabel,
+              afterLabel: value.afterLabel,
+              region: value.region,
+              beforeSize: {
+                width: value.before.width,
+                height: value.before.height,
+              },
+              afterSize: {
+                width: value.after.width,
+                height: value.after.height,
+              },
+            }));
+        if (method === "GET") {
           const id = docMatch[3];
           if (id) {
-            z.uuid().parse(id); const value = document.getSnapshot().comparisons.find(value => value.id === id);
-            if (!value) throw new Error('History comparison not found.');
-            send(response, 200, {revision: document.getSnapshot().revision, comparison: metadata().find(value => value.id === id), change: inspectHistoryChange(value.before, value.after)});
-          } else send(response, 200, {revision: document.getSnapshot().revision, comparisons: metadata()});
+            z.uuid().parse(id);
+            const value = document
+              .getSnapshot()
+              .comparisons.find((value) => value.id === id);
+            if (!value) throw new Error("History comparison not found.");
+            send(response, 200, {
+              revision: document.getSnapshot().revision,
+              comparison: metadata().find((value) => value.id === id),
+              change: inspectHistoryChange(value.before, value.after),
+            });
+          } else
+            send(response, 200, {
+              revision: document.getSnapshot().revision,
+              comparisons: metadata(),
+            });
           return;
         }
-        if (method === 'POST' && !docMatch[3]) {
-          const common = {...revisionSchema.shape, comparisonId: z.uuid()};
-          const input = z.discriminatedUnion('action', [
-            z.object({...revisionSchema.shape, action: z.literal('create'), name: z.string().trim().min(1).max(120), before: historyTargetSchema, after: historyTargetSchema, region: historyRegionSchema.optional()}).strict(),
-            z.object({...common, action: z.literal('update'), changes: historyComparisonChangesSchema}).strict(),
-            z.object({...common, action: z.literal('delete')}).strict(),
-            z.object({...common, action: z.literal('branch'), side: z.enum(['before','after']), name: z.string().trim().min(1).max(120)}).strict(),
-          ]).parse(await body(request));
-          if (input.expectedRevision !== document.getSnapshot().revision) {send(response, 409, {error: 'Revision conflict. Read the document and retry.', revision: document.getSnapshot().revision}); return;}
+        if (method === "POST" && !docMatch[3]) {
+          const common = { ...revisionSchema.shape, comparisonId: z.uuid() };
+          const input = z
+            .discriminatedUnion("action", [
+              z
+                .object({
+                  ...revisionSchema.shape,
+                  action: z.literal("create"),
+                  name: z.string().trim().min(1).max(120),
+                  before: historyTargetSchema,
+                  after: historyTargetSchema,
+                  region: historyRegionSchema.optional(),
+                })
+                .strict(),
+              z
+                .object({
+                  ...common,
+                  action: z.literal("update"),
+                  changes: historyComparisonChangesSchema,
+                })
+                .strict(),
+              z.object({ ...common, action: z.literal("delete") }).strict(),
+              z
+                .object({
+                  ...common,
+                  action: z.literal("branch"),
+                  side: z.enum(["before", "after"]),
+                  name: z.string().trim().min(1).max(120),
+                })
+                .strict(),
+            ])
+            .parse(await body(request));
+          if (input.expectedRevision !== document.getSnapshot().revision) {
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+            return;
+          }
           const result = navigateHistory(document, () => {
-            if (input.action === 'create') document.createHistoryComparison(input.name, input.before, input.after, input.region);
-            else if (input.action === 'update') document.updateHistoryComparison(input.comparisonId, input.changes);
-            else if (input.action === 'delete') document.deleteHistoryComparison(input.comparisonId);
-            else document.createHistoryBranchFromComparison(input.comparisonId, input.side, input.name);
+            if (input.action === "create")
+              document.createHistoryComparison(
+                input.name,
+                input.before,
+                input.after,
+                input.region,
+              );
+            else if (input.action === "update")
+              document.updateHistoryComparison(
+                input.comparisonId,
+                input.changes,
+              );
+            else if (input.action === "delete")
+              document.deleteHistoryComparison(input.comparisonId);
+            else
+              document.createHistoryBranchFromComparison(
+                input.comparisonId,
+                input.side,
+                input.name,
+              );
           });
-          send(response, 200, {...result, activeBranchId: document.getSnapshot().activeBranchId, comparisons: metadata()}); return;
+          send(response, 200, {
+            ...result,
+            activeBranchId: document.getSnapshot().activeBranchId,
+            comparisons: metadata(),
+          });
+          return;
         }
       }
-      if (subresource === 'history-branches' && !docMatch[3]) {
+      if (subresource === "history-branches" && !docMatch[3]) {
         const branches = () => {
           const state = document.getSnapshot();
-          return {activeBranchId: state.activeBranchId, branches: state.branches.map(branch => ({id: branch.id, name: branch.name, parentId: branch.parentId, retainedTransitions: branch.tip.past.length}))};
+          return {
+            activeBranchId: state.activeBranchId,
+            branches: state.branches.map((branch) => ({
+              id: branch.id,
+              name: branch.name,
+              parentId: branch.parentId,
+              retainedTransitions: branch.tip.past.length,
+            })),
+          };
         };
-        if (method === 'GET') {send(response, 200, {revision: document.getSnapshot().revision, ...branches()}); return;}
-        if (method === 'POST') {
-          const common = {...revisionSchema.shape, branchId: z.uuid()};
-          const input = z.discriminatedUnion('action', [
-            z.object({...revisionSchema.shape, action: z.literal('create'), name: z.string().trim().min(1).max(120)}).strict(),
-            z.object({...common, action: z.literal('checkout')}).strict(),
-            z.object({...common, action: z.literal('rename'), name: z.string().trim().min(1).max(120)}).strict(),
-            z.object({...common, action: z.literal('delete')}).strict(),
-          ]).parse(await body(request));
-          if (input.expectedRevision !== document.getSnapshot().revision) {send(response, 409, {error: 'Revision conflict. Read the document and retry.', revision: document.getSnapshot().revision}); return;}
+        if (method === "GET") {
+          send(response, 200, {
+            revision: document.getSnapshot().revision,
+            ...branches(),
+          });
+          return;
+        }
+        if (method === "POST") {
+          const common = { ...revisionSchema.shape, branchId: z.uuid() };
+          const input = z
+            .discriminatedUnion("action", [
+              z
+                .object({
+                  ...revisionSchema.shape,
+                  action: z.literal("create"),
+                  name: z.string().trim().min(1).max(120),
+                })
+                .strict(),
+              z.object({ ...common, action: z.literal("checkout") }).strict(),
+              z
+                .object({
+                  ...common,
+                  action: z.literal("rename"),
+                  name: z.string().trim().min(1).max(120),
+                })
+                .strict(),
+              z.object({ ...common, action: z.literal("delete") }).strict(),
+            ])
+            .parse(await body(request));
+          if (input.expectedRevision !== document.getSnapshot().revision) {
+            send(response, 409, {
+              error: "Revision conflict. Read the document and retry.",
+              revision: document.getSnapshot().revision,
+            });
+            return;
+          }
           const result = navigateHistory(document, () => {
-            if (input.action === 'create') document.createHistoryBranch(input.name);
-            else if (input.action === 'checkout') document.checkoutHistoryBranch(input.branchId);
-            else if (input.action === 'rename') document.renameHistoryBranch(input.branchId, input.name);
+            if (input.action === "create")
+              document.createHistoryBranch(input.name);
+            else if (input.action === "checkout")
+              document.checkoutHistoryBranch(input.branchId);
+            else if (input.action === "rename")
+              document.renameHistoryBranch(input.branchId, input.name);
             else document.deleteHistoryBranch(input.branchId);
           });
-          send(response, 200, {...result, ...branches()}); return;
+          send(response, 200, { ...result, ...branches() });
+          return;
         }
       }
-      if (subresource === 'history' && !docMatch[3] && method === 'GET') {
-        const state=document.getSnapshot(),timeline=historyTimeline(state);
-        const provenance=(operation:import('../src/core/history-provenance').HistoryOperation|null)=>operation?{operation,observation:document._isHistoryOperationObserved(operation)?'observed-in-session':'stored-unverified'}:null;
-        const position=url.searchParams.has('position')?z.coerce.number().int().min(0).max(timeline.length-1).parse(url.searchParams.get('position')):null;
-        send(response,200,{revision:state.revision,position:state.past.length,length:timeline.length,
-          states:timeline.map(item=>({position:item.position,label:item.label,labelTruncated:item.labelTruncated,provenance:provenance(item.operation)})),
-          provenance:provenance(timeline[position??state.past.length].operation),
-          ...(position===null?{}:{change:inspectHistoryChange(position?timeline[position-1].document:null,timeline[position].document)})});return;
+      if (subresource === "history" && !docMatch[3] && method === "GET") {
+        const state = document.getSnapshot(),
+          timeline = historyTimeline(state);
+        const provenance = (
+          operation:
+            import("../src/core/history-provenance").HistoryOperation | null,
+        ) =>
+          operation
+            ? {
+                operation,
+                observation: document._isHistoryOperationObserved(operation)
+                  ? "observed-in-session"
+                  : "stored-unverified",
+              }
+            : null;
+        const position = url.searchParams.has("position")
+          ? z.coerce
+              .number()
+              .int()
+              .min(0)
+              .max(timeline.length - 1)
+              .parse(url.searchParams.get("position"))
+          : null;
+        send(response, 200, {
+          revision: state.revision,
+          position: state.past.length,
+          length: timeline.length,
+          states: timeline.map((item) => ({
+            position: item.position,
+            label: item.label,
+            labelTruncated: item.labelTruncated,
+            provenance: provenance(item.operation),
+          })),
+          provenance: provenance(
+            timeline[position ?? state.past.length].operation,
+          ),
+          ...(position === null
+            ? {}
+            : {
+                change: inspectHistoryChange(
+                  position ? timeline[position - 1].document : null,
+                  timeline[position].document,
+                ),
+              }),
+        });
+        return;
       }
-      if (subresource === 'history' && !docMatch[3] && method === 'POST') {
-        const parsed=z.object({...revisionSchema.shape,position:z.number().int().nonnegative().safe()}).strict().parse(await body(request));
-        if(parsed.expectedRevision!==document.getSnapshot().revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});return;}
-        send(response,200,navigateHistory(document,()=>document.navigateHistory(parsed.position)));return;
+      if (subresource === "history" && !docMatch[3] && method === "POST") {
+        const parsed = z
+          .object({
+            ...revisionSchema.shape,
+            position: z.number().int().nonnegative().safe(),
+          })
+          .strict()
+          .parse(await body(request));
+        if (parsed.expectedRevision !== document.getSnapshot().revision) {
+          send(response, 409, {
+            error: "Revision conflict. Read the document and retry.",
+            revision: document.getSnapshot().revision,
+          });
+          return;
+        }
+        send(
+          response,
+          200,
+          navigateHistory(document, () =>
+            document.navigateHistory(parsed.position),
+          ),
+        );
+        return;
       }
 
       // POST /api/v1/documents/:id/undo or redo
@@ -804,7 +2078,14 @@ export function createApiServer(options: ApiServerOptions = {}) {
           });
           return;
         }
-        send(response, 200, navigateHistory(document,()=>{if (subresource === "undo") document.undo();else document.redo();}));
+        send(
+          response,
+          200,
+          navigateHistory(document, () => {
+            if (subresource === "undo") document.undo();
+            else document.redo();
+          }),
+        );
         return;
       }
 
@@ -821,7 +2102,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
               width: a.width,
               height: a.height,
               ...tiffMetadata(a),
-              ...(a.raw?{raw:rawSourceMetadata(a.raw)}:{}),
+              ...(a.raw ? { raw: rawSourceMetadata(a.raw) } : {}),
             })),
           });
           return;
@@ -833,13 +2114,40 @@ export function createApiServer(options: ApiServerOptions = {}) {
             return;
           }
           const asset = session.assets.get(subresourceId);
-          if(url.searchParams.get('preview')==='true'){
-            const source=tiffSources.forAsset(asset),bytes=await source.preview.arrayBuffer();response.writeHead(200,{'Content-Type':'image/png','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Canoli-Preview-Only':'true'});response.end(Buffer.from(bytes));return;
+          if (url.searchParams.get("preview") === "true") {
+            const source = tiffSources.forAsset(asset),
+              bytes = await source.preview.arrayBuffer();
+            response.writeHead(200, {
+              "Content-Type": "image/png",
+              "Content-Length": String(bytes.byteLength),
+              "Cache-Control": "no-store",
+              "X-Content-Type-Options": "nosniff",
+              "X-Canoli-Preview-Only": "true",
+            });
+            response.end(Buffer.from(bytes));
+            return;
           }
-          if(url.searchParams.get('original')==='true'){
-            const blob=asset.raw?.originalBlob??(asset.tiff?.editingPrecision==='float32'?tiffSources.forAsset(asset).original:undefined);
-            if(!blob){send(response,404,{error:'No retained RAW or verified TIFF original for this asset.'});return;}
-            const bytes=await blob.arrayBuffer();response.writeHead(200,{'Content-Type':blob.type||'application/octet-stream','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));return;
+          if (url.searchParams.get("original") === "true") {
+            const blob =
+              asset.raw?.originalBlob ??
+              (asset.tiff?.editingPrecision === "float32"
+                ? tiffSources.forAsset(asset).original
+                : undefined);
+            if (!blob) {
+              send(response, 404, {
+                error:
+                  "No retained RAW or verified TIFF original for this asset.",
+              });
+              return;
+            }
+            const bytes = await blob.arrayBuffer();
+            response.writeHead(200, {
+              "Content-Type": blob.type || "application/octet-stream",
+              "Content-Length": String(bytes.byteLength),
+              "Cache-Control": "no-store",
+            });
+            response.end(Buffer.from(bytes));
+            return;
           }
           const accept = request.headers.accept ?? "";
           const isRaw =
@@ -865,7 +2173,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
               mimeType: asset.blob.type || "image/png",
               byteLength: asset.blob.size,
               ...tiffMetadata(asset),
-              ...(asset.raw?{raw:rawSourceMetadata(asset.raw)}:{}),
+              ...(asset.raw ? { raw: rawSourceMetadata(asset.raw) } : {}),
             },
           });
           return;
@@ -881,7 +2189,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
           let buffer: Buffer;
 
           if (contentType.startsWith("application/json")) {
-            const jsonBody = (await body(request,null)) as {
+            const jsonBody = (await body(request, null)) as {
               name?: string;
               data?: string;
               width?: number;
@@ -1159,13 +2467,15 @@ export function createApiServer(options: ApiServerOptions = {}) {
         }
 
         // Find candidate across jobs belonging to this document
-        let targetCandidate: ServerJob["candidate"] | undefined;let targetJobId:string|undefined;
+        let targetCandidate: ServerJob["candidate"] | undefined;
+        let targetJobId: string | undefined;
         for (const job of allJobs.values()) {
           if (
             job.documentId === document.id &&
             job.candidate?.id === input.candidateId
           ) {
-            targetCandidate = job.candidate;targetJobId=job.id;
+            targetCandidate = job.candidate;
+            targetJobId = job.id;
             break;
           }
         }
@@ -1202,10 +2512,16 @@ export function createApiServer(options: ApiServerOptions = {}) {
           blendMode: input.blendMode ?? "normal",
         });
 
-        const result=navigateHistory(document,()=>document._withHistoryOrigin({candidate:{id:targetCandidate!.id,jobId:targetJobId!}},()=>document.transaction("Apply generated candidate", () => {
-          if (parent instanceof LayerGroup) parent.layers.add(layer);
-          else document.layers.add(layer);
-        })));
+        const result = navigateHistory(document, () =>
+          document._withHistoryOrigin(
+            { candidate: { id: targetCandidate!.id, jobId: targetJobId! } },
+            () =>
+              document.transaction("Apply generated candidate", () => {
+                if (parent instanceof LayerGroup) parent.layers.add(layer);
+                else document.layers.add(layer);
+              }),
+          ),
+        );
 
         targetCandidate.reviewState = "accepted";
 
@@ -1224,13 +2540,19 @@ export function createApiServer(options: ApiServerOptions = {}) {
     }
   });
   server.on("close", () => {
-    for (const controller of selectionControllers.keys()) controller.abort(new Error("Server closed"));
+    for (const controller of selectionControllers.keys())
+      controller.abort(new Error("Server closed"));
     selectionControllers.clear();
-    for(const session of sessions.values())session.assets.dispose();sessions.clear();
+    for (const session of sessions.values()) session.assets.dispose();
+    sessions.clear();
     for (const controller of controllers.values())
       controller.abort(new Error("Server closed"));
     controllers.clear();
-    void tiffSources.dispose().catch(error=>console.error('Native TIFF cache cleanup failed:',error));
+    void tiffSources
+      .dispose()
+      .catch((error) =>
+        console.error("Native TIFF cache cleanup failed:", error),
+      );
   });
   return server;
 }

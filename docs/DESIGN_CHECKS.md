@@ -8,13 +8,13 @@ Existing font-family, authored-bounds and original raster sampling checks retain
 
 `alignments?: PreflightAlignmentInput[]` accepts at most 32 rules:
 
-| Field | Contract |
-| --- | --- |
-| `name?` | Optional trimmed label, 1–80 characters. Missing labels display Alignment rule N. |
-| `layerIds` | 1–64 distinct root-document layer IDs, including nested group children; no selected parent/descendant pairs. |
-| `alignment` | `left`, `center`, `right`, `top`, `middle` or `bottom`; center means horizontal center and middle means vertical center. |
-| `target` | `{type: "canvas"}` or `{type: "layer", id}`. A key must exist in this document, differ from every checked layer and be outside their ancestor/descendant relationships. |
-| `tolerance` | Optional nonnegative finite document-pixel tolerance up to Number.MAX_SAFE_INTEGER; default 0.5. |
+| Field       | Contract                                                                                                                                                                |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name?`     | Optional trimmed label, 1–80 characters. Missing labels display Alignment rule N.                                                                                       |
+| `layerIds`  | 1–64 distinct root-document layer IDs, including nested group children; no selected parent/descendant pairs.                                                            |
+| `alignment` | `left`, `center`, `right`, `top`, `middle` or `bottom`; center means horizontal center and middle means vertical center.                                                |
+| `target`    | `{type: "canvas"}` or `{type: "layer", id}`. A key must exist in this document, differ from every checked layer and be outside their ancestor/descendant relationships. |
+| `tolerance` | Optional nonnegative finite document-pixel tolerance up to Number.MAX_SAFE_INTEGER; default 0.5.                                                                        |
 
 Unknown fields, unsupported values, duplicate/missing targets, nonexistent keys or related target graphs reject the entire inspection. Selection membership does not retarget a saved rule: rules carry explicit IDs. These IDs refer only to the current root document; embedded-master IDs belong to independent scopes. Locked layers can be inspected and used as stationary references.
 
@@ -37,19 +37,22 @@ Browser geometry work runs in a disposable worker. Alignment-only payloads retai
 `await document.preflight(options = {}, control = {}): Promise<PreflightReport>` and trusted `editor.preflight(...)` retain their signatures. Run outside synchronous transactions. Trusted code may pass `control.signal`; isolated scripts use panel cancellation and the existing five-second deadline. Installation remains inert. Plugins need current `document:read` and `assets:read`, including when the document has no raster source, because the shared inspection service reads source metadata. No source bytes, native font availability, network, inference or new plugin capability is exposed.
 
 <!-- example: alignment-checks -->
+
 ```js
 const targets = document.layerSelection.rootLayers;
 if (!targets.length) throw new Error("Select layers to check first.");
 const report = await document.preflight({
   checkBounds: false,
   checkFonts: false,
-  alignments: [{
-    name: "Canvas left edge",
-    layerIds: targets.map(layer => layer.id),
-    alignment: "left",
-    target: {type: "canvas"},
-    tolerance: 0.5
-  }]
+  alignments: [
+    {
+      name: "Canvas left edge",
+      layerIds: targets.map((layer) => layer.id),
+      alignment: "left",
+      target: { type: "canvas" },
+      tolerance: 0.5,
+    },
+  ],
 });
 print("Alignment checks ready", report.alignment);
 ```

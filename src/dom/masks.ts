@@ -1,5 +1,5 @@
-import {PerspectiveTransform} from './perspective';
-import {MaskPlane} from './mask-plane';
+import { PerspectiveTransform } from "./perspective";
+import { MaskPlane } from "./mask-plane";
 import { AffineTransform } from "../core/affine";
 import { layerMaskSchema } from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
@@ -15,37 +15,137 @@ import {
 import { VectorPath } from "./index";
 import { pathContours } from "../core/drawing";
 
-export type MaskPaintPlacement = {width:number;height:number;perspective:PerspectiveTransform;basis:AffineTransform}|{width:number;height:number;plane:MaskPlane;authoring:AffineTransform};
-export type MaskPaint = {stroke:BrushStroke|PencilStroke;mode:"hide"|"reveal";placement?:MaskPaintPlacement}|{stroke:WetPaintStroke;mode:"wet"};
-function placementData(value:MaskPaintPlacement):import('../core/masks').MaskPlacementData {
- if('plane'in value){
-  if(!(value.plane instanceof MaskPlane)||!(value.authoring instanceof AffineTransform))throw new Error('Mapped mask values require MaskPlane and AffineTransform constructors.');
-  const p=value.plane.toJSON();return{kind:'mapped',width:value.width,height:value.height,geometry:{basis:p.basis,pose:p.pose,steps:p.steps},authoring:value.authoring.toJSON()};
- }
- if(!(value.perspective instanceof PerspectiveTransform)||!(value.basis instanceof AffineTransform))throw new Error('Placed mask values require PerspectiveTransform and AffineTransform.');
- return{width:value.width,height:value.height,perspective:value.perspective.toJSON(),basis:value.basis.toJSON()};
+export type MaskPaintPlacement =
+  | {
+      width: number;
+      height: number;
+      perspective: PerspectiveTransform;
+      basis: AffineTransform;
+    }
+  | {
+      width: number;
+      height: number;
+      plane: MaskPlane;
+      authoring: AffineTransform;
+    };
+export type MaskPaint =
+  | {
+      stroke: BrushStroke | PencilStroke;
+      mode: "hide" | "reveal";
+      placement?: MaskPaintPlacement;
+    }
+  | { stroke: WetPaintStroke; mode: "wet" };
+function placementData(
+  value: MaskPaintPlacement,
+): import("../core/masks").MaskPlacementData {
+  if ("plane" in value) {
+    if (
+      !(value.plane instanceof MaskPlane) ||
+      !(value.authoring instanceof AffineTransform)
+    )
+      throw new Error(
+        "Mapped mask values require MaskPlane and AffineTransform constructors.",
+      );
+    const p = value.plane.toJSON();
+    return {
+      kind: "mapped",
+      width: value.width,
+      height: value.height,
+      geometry: { basis: p.basis, pose: p.pose, steps: p.steps },
+      authoring: value.authoring.toJSON(),
+    };
+  }
+  if (
+    !(value.perspective instanceof PerspectiveTransform) ||
+    !(value.basis instanceof AffineTransform)
+  )
+    throw new Error(
+      "Placed mask values require PerspectiveTransform and AffineTransform.",
+    );
+  return {
+    width: value.width,
+    height: value.height,
+    perspective: value.perspective.toJSON(),
+    basis: value.basis.toJSON(),
+  };
 }
 /** @internal Restore constructor values for an owned serialized placement. */
-export function maskPaintPlacementValue(value:import('../core/masks').MaskPlacementData):MaskPaintPlacement {
- if('geometry'in value){const g=value.geometry;return{width:value.width,height:value.height,plane:MaskPlane._fromJSON({...g,reference:{kind:'pixels',width:g.pose.width,height:g.pose.height},phase:'document'}),authoring:AffineTransform.fromJSON(value.authoring)};}
- return{width:value.width,height:value.height,perspective:new PerspectiveTransform(value.perspective),basis:AffineTransform.fromJSON(value.basis)};
+export function maskPaintPlacementValue(
+  value: import("../core/masks").MaskPlacementData,
+): MaskPaintPlacement {
+  if ("geometry" in value) {
+    const g = value.geometry;
+    return {
+      width: value.width,
+      height: value.height,
+      plane: MaskPlane._fromJSON({
+        ...g,
+        reference: {
+          kind: "pixels",
+          width: g.pose.width,
+          height: g.pose.height,
+        },
+        phase: "document",
+      }),
+      authoring: AffineTransform.fromJSON(value.authoring),
+    };
+  }
+  return {
+    width: value.width,
+    height: value.height,
+    perspective: new PerspectiveTransform(value.perspective),
+    basis: AffineTransform.fromJSON(value.basis),
+  };
 }
-function paintData(entry:MaskPaint){
- const placement='placement'in entry?entry.placement:undefined;
- if(placement!==undefined&&(entry.mode==='wet'||!placement))throw new Error('Placed mask values require BrushStroke/PencilStroke.');
- return{stroke:entry.stroke.toJSON(),mode:entry.mode,...(placement?{placement:placementData(placement)}:{})};
+function paintData(entry: MaskPaint) {
+  const placement = "placement" in entry ? entry.placement : undefined;
+  if (placement !== undefined && (entry.mode === "wet" || !placement))
+    throw new Error("Placed mask values require BrushStroke/PencilStroke.");
+  return {
+    stroke: entry.stroke.toJSON(),
+    mode: entry.mode,
+    ...(placement ? { placement: placementData(placement) } : {}),
+  };
 }
-function paintValue(entry:import('../core/masks').MaskOperationData):MaskPaint{return entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke,...(entry.placement?{placement:maskPaintPlacementValue(entry.placement)}:{})};}
-export interface RasterErasureMaskSource {width:number;height:number;operations:readonly {width:number;height:number;stroke:EraserStroke|PaintFill;placement?:{perspective:PerspectiveTransform;bounds:import('../core/drawing').Rect}}[]}
+function paintValue(
+  entry: import("../core/masks").MaskOperationData,
+): MaskPaint {
+  return entry.mode === "wet"
+    ? {
+        mode: "wet",
+        stroke: PaintOperation.fromJSON(entry.stroke) as WetPaintStroke,
+      }
+    : {
+        mode: entry.mode,
+        stroke: PaintOperation.fromJSON(entry.stroke) as
+          BrushStroke | PencilStroke,
+        ...(entry.placement
+          ? { placement: maskPaintPlacementValue(entry.placement) }
+          : {}),
+      };
+}
+export interface RasterErasureMaskSource {
+  width: number;
+  height: number;
+  operations: readonly {
+    width: number;
+    height: number;
+    stroke: EraserStroke | PaintFill;
+    placement?: {
+      perspective: PerspectiveTransform;
+      bounds: import("../core/drawing").Rect;
+    };
+  }[];
+}
 interface MaskSettings {
-  plane?:MaskPlane|null;
+  plane?: MaskPlane | null;
   rasterErasures?: RasterErasureMaskSource;
   basis?: AffineTransform;
   strokes?: MaskPaint[];
   x?: number;
   y?: number;
-  placedX?:number;
-  placedY?:number;
+  placedX?: number;
+  placedY?: number;
   linked?: boolean;
   feather?: number;
   enabled?: boolean;
@@ -54,7 +154,14 @@ interface MaskSettings {
 }
 export type LayerMaskOptions = MaskSettings &
   (
-    | { rasterErasures: RasterErasureMaskSource; selection?:never; paths?:never; fillRule?:never; base?:never; assetId?:never }
+    | {
+        rasterErasures: RasterErasureMaskSource;
+        selection?: never;
+        paths?: never;
+        fillRule?: never;
+        base?: never;
+        assetId?: never;
+      }
     | {
         selection: MarqueeSelection;
         paths?: never;
@@ -89,7 +196,12 @@ export type LayerMaskOptions = MaskSettings &
 export class LayerMask {
   private readonly data: LayerMaskData;
   constructor(options: LayerMaskOptions) {
-    if(options.plane!==undefined&&options.plane!==null&&!(options.plane instanceof MaskPlane))throw new Error('Use a MaskPlane constructor or null.');
+    if (
+      options.plane !== undefined &&
+      options.plane !== null &&
+      !(options.plane instanceof MaskPlane)
+    )
+      throw new Error("Use a MaskPlane constructor or null.");
     const {
       enabled = true,
       inverted = false,
@@ -99,8 +211,9 @@ export class LayerMask {
       y = 0,
       linked = true,
     } = options;
-    const native=options.rasterErasures;
-    if(native&&options.fillRule!==undefined)throw new Error("Fill rule applies only to vector masks.");
+    const native = options.rasterErasures;
+    if (native && options.fillRule !== undefined)
+      throw new Error("Fill rule applies only to vector masks.");
     const sources = [
       !!native,
       options.base !== undefined,
@@ -115,18 +228,53 @@ export class LayerMask {
       throw new Error("Fill rule applies only to vector masks.");
     if (options.assetId && options.fillRule !== undefined)
       throw new Error("Fill rule applies only to vector masks.");
-    const placed={...(options.plane?{plane:options.plane.toJSON()}:{}),...(options.placedX!==undefined?{placedX:options.placedX}:{}),...(options.placedY!==undefined?{placedY:options.placedY}:{})};
-    const strokeSettings = {...placed,...(options.strokes===undefined?{}:{strokes:options.strokes.map(paintData)})};
+    const placed = {
+      ...(options.plane ? { plane: options.plane.toJSON() } : {}),
+      ...(options.placedX !== undefined ? { placedX: options.placedX } : {}),
+      ...(options.placedY !== undefined ? { placedY: options.placedY } : {}),
+    };
+    const strokeSettings = {
+      ...placed,
+      ...(options.strokes === undefined
+        ? {}
+        : { strokes: options.strokes.map(paintData) }),
+    };
     if (native) {
-      this.data=layerMaskSchema.parse({kind:'raster-erasures',width:native.width,height:native.height,
-        erasures:native.operations.map(entry=>({width:entry.width,height:entry.height,stroke:entry.stroke.toJSON(),...(entry.placement?{placement:{perspective:entry.placement.perspective.toJSON(),bounds:{...entry.placement.bounds}}}:{})})),...strokeSettings,enabled,inverted,density,feather,x,y,linked,
-        ...(options.basis?{basis:options.basis.toJSON()}:{})});
+      this.data = layerMaskSchema.parse({
+        kind: "raster-erasures",
+        width: native.width,
+        height: native.height,
+        erasures: native.operations.map((entry) => ({
+          width: entry.width,
+          height: entry.height,
+          stroke: entry.stroke.toJSON(),
+          ...(entry.placement
+            ? {
+                placement: {
+                  perspective: entry.placement.perspective.toJSON(),
+                  bounds: { ...entry.placement.bounds },
+                },
+              }
+            : {}),
+        })),
+        ...strokeSettings,
+        enabled,
+        inverted,
+        density,
+        feather,
+        x,
+        y,
+        linked,
+        ...(options.basis ? { basis: options.basis.toJSON() } : {}),
+      });
     } else if (options.base !== undefined) {
       this.data = layerMaskSchema.parse({
         kind: "paint",
         ...placed,
         base: options.base,
-        strokes: (options.strokes === undefined ? [] : options.strokes).map(paintData),
+        strokes: (options.strokes === undefined ? [] : options.strokes).map(
+          paintData,
+        ),
         enabled,
         inverted,
         density,
@@ -139,7 +287,9 @@ export class LayerMask {
     } else if (options.paths) {
       const paths = options.paths.flatMap((path) => {
         if (!path.closed) throw new Error("Vector masks require closed paths.");
-        return pathContours(path.toJSON()).map(contour => ({ points: contour.points }));
+        return pathContours(path.toJSON()).map((contour) => ({
+          points: contour.points,
+        }));
       });
       this.data = layerMaskSchema.parse({
         kind: "vector",
@@ -186,7 +336,28 @@ export class LayerMask {
     }
   }
   get rasterErasures(): RasterErasureMaskSource | null {
-    return this.data.kind==='raster-erasures'?{width:this.data.width,height:this.data.height,operations:this.data.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill,...(entry.placement?{placement:{perspective:new PerspectiveTransform(entry.placement.perspective),bounds:{...entry.placement.bounds}}}:{})}))}:null;
+    return this.data.kind === "raster-erasures"
+      ? {
+          width: this.data.width,
+          height: this.data.height,
+          operations: this.data.erasures.map((entry) => ({
+            width: entry.width,
+            height: entry.height,
+            stroke: PaintOperation.fromJSON(entry.stroke) as
+              EraserStroke | PaintFill,
+            ...(entry.placement
+              ? {
+                  placement: {
+                    perspective: new PerspectiveTransform(
+                      entry.placement.perspective,
+                    ),
+                    bounds: { ...entry.placement.bounds },
+                  },
+                }
+              : {}),
+          })),
+        }
+      : null;
   }
   get base() {
     return this.data.kind === "paint" ? this.data.base : null;
@@ -197,30 +368,61 @@ export class LayerMask {
   get strokes(): MaskPaint[] {
     return (this.data.strokes ?? []).map(paintValue);
   }
-  paint(stroke: BrushStroke | PencilStroke, mode: "hide" | "reveal" = "hide", options:{placement?:MaskPaintPlacement}={}) {
-    if(!(stroke instanceof BrushStroke)||!['hide','reveal'].includes(mode))throw new Error('Use a BrushStroke or PencilStroke with Hide/Reveal.');
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='placement'))throw new Error('Invalid mask paint options.');
-    if(options.placement!==undefined){if(!options.placement)throw new Error('Use mask placement constructor values.');placementData(options.placement);}
-    return this.with({ strokes: [...this.strokes, { stroke, mode,...(options.placement?{placement:options.placement}:{}) }] });
+  paint(
+    stroke: BrushStroke | PencilStroke,
+    mode: "hide" | "reveal" = "hide",
+    options: { placement?: MaskPaintPlacement } = {},
+  ) {
+    if (!(stroke instanceof BrushStroke) || !["hide", "reveal"].includes(mode))
+      throw new Error("Use a BrushStroke or PencilStroke with Hide/Reveal.");
+    if (
+      !options ||
+      typeof options !== "object" ||
+      Array.isArray(options) ||
+      Object.keys(options).some((key) => key !== "placement")
+    )
+      throw new Error("Invalid mask paint options.");
+    if (options.placement !== undefined) {
+      if (!options.placement)
+        throw new Error("Use mask placement constructor values.");
+      placementData(options.placement);
+    }
+    return this.with({
+      strokes: [
+        ...this.strokes,
+        {
+          stroke,
+          mode,
+          ...(options.placement ? { placement: options.placement } : {}),
+        },
+      ],
+    });
   }
-  applyWetPaint(stroke:WetPaintStroke):LayerMask {
-    if(!(stroke instanceof WetPaintStroke))throw new Error('Use a WetPaintStroke value for prepared mask coverage.');
-    return this.with({strokes:[...this.strokes,{mode:'wet',stroke}]});
+  applyWetPaint(stroke: WetPaintStroke): LayerMask {
+    if (!(stroke instanceof WetPaintStroke))
+      throw new Error("Use a WetPaintStroke value for prepared mask coverage.");
+    return this.with({ strokes: [...this.strokes, { mode: "wet", stroke }] });
   }
   get basis() {
     return this.data.basis
       ? AffineTransform.fromJSON(this.data.basis)
       : new AffineTransform();
   }
-  get plane():MaskPlane|null{return this.data.plane?MaskPlane._fromJSON(this.data.plane):null;}
+  get plane(): MaskPlane | null {
+    return this.data.plane ? MaskPlane._fromJSON(this.data.plane) : null;
+  }
   get x() {
     return this.data.x ?? 0;
   }
   get y() {
     return this.data.y ?? 0;
   }
-  get placedX(){return this.data.placedX??0;}
-  get placedY(){return this.data.placedY??0;}
+  get placedX() {
+    return this.data.placedX ?? 0;
+  }
+  get placedY() {
+    return this.data.placedY ?? 0;
+  }
   get linked() {
     return this.data.linked ?? true;
   }
@@ -265,7 +467,16 @@ export class LayerMask {
     return this.data.density;
   }
   with(values: Partial<LayerMaskOptions>) {
-    if([values.base!==undefined,!!values.selection,!!values.paths,!!values.assetId,!!values.rasterErasures].filter(Boolean).length>1)throw new Error("Choose one mask geometry source.");
+    if (
+      [
+        values.base !== undefined,
+        !!values.selection,
+        !!values.paths,
+        !!values.assetId,
+        !!values.rasterErasures,
+      ].filter(Boolean).length > 1
+    )
+      throw new Error("Choose one mask geometry source.");
     if (values.base !== undefined && (values.selection || values.paths))
       throw new Error("Choose one mask geometry source.");
     if (values.selection && values.paths)
@@ -282,9 +493,23 @@ export class LayerMask {
     const strokes =
       values.strokes === undefined ? this.strokes : values.strokes;
     const settings = {
-      ...(values.plane!==undefined?{plane:values.plane}:this.data.plane?{plane:this.plane}:{}),
-      ...(values.placedX!==undefined||this.data.placedX!==undefined?{placedX:values.placedX===undefined?this.placedX:values.placedX}:{}),
-      ...(values.placedY!==undefined||this.data.placedY!==undefined?{placedY:values.placedY===undefined?this.placedY:values.placedY}:{}),
+      ...(values.plane !== undefined
+        ? { plane: values.plane }
+        : this.data.plane
+          ? { plane: this.plane }
+          : {}),
+      ...(values.placedX !== undefined || this.data.placedX !== undefined
+        ? {
+            placedX:
+              values.placedX === undefined ? this.placedX : values.placedX,
+          }
+        : {}),
+      ...(values.placedY !== undefined || this.data.placedY !== undefined
+        ? {
+            placedY:
+              values.placedY === undefined ? this.placedY : values.placedY,
+          }
+        : {}),
       basis: values.basis ?? (this.data.basis ? this.basis : undefined),
       enabled,
       inverted,
@@ -297,9 +522,20 @@ export class LayerMask {
         ? { strokes }
         : {}),
     };
-    if(values.rasterErasures || (this.data.kind==='raster-erasures'&&values.base===undefined&&values.selection===undefined&&values.paths===undefined&&values.assetId===undefined)){
-      if(values.fillRule!==undefined)throw new Error('Fill rule applies only to vector masks.');
-      return new LayerMask({...settings,rasterErasures:values.rasterErasures??this.rasterErasures!});
+    if (
+      values.rasterErasures ||
+      (this.data.kind === "raster-erasures" &&
+        values.base === undefined &&
+        values.selection === undefined &&
+        values.paths === undefined &&
+        values.assetId === undefined)
+    ) {
+      if (values.fillRule !== undefined)
+        throw new Error("Fill rule applies only to vector masks.");
+      return new LayerMask({
+        ...settings,
+        rasterErasures: values.rasterErasures ?? this.rasterErasures!,
+      });
     }
     if (
       values.base !== undefined ||
@@ -359,12 +595,38 @@ export class LayerMask {
   /** @internal */
   static _fromJSON(data: LayerMaskData) {
     const value = layerMaskSchema.parse(data);
-    const plane=value.plane?MaskPlane._fromJSON(value.plane):undefined;
+    const plane = value.plane ? MaskPlane._fromJSON(value.plane) : undefined;
     const basis = value.basis
       ? AffineTransform.fromJSON(value.basis)
       : undefined;
-    const strokes:MaskPaint[]|undefined = value.strokes?.map(paintValue);
-    if(value.kind==='raster-erasures')return new LayerMask({...value,plane,basis,strokes,rasterErasures:{width:value.width,height:value.height,operations:value.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill,...(entry.placement?{placement:{perspective:new PerspectiveTransform(entry.placement.perspective),bounds:{...entry.placement.bounds}}}:{})}))}});
+    const strokes: MaskPaint[] | undefined = value.strokes?.map(paintValue);
+    if (value.kind === "raster-erasures")
+      return new LayerMask({
+        ...value,
+        plane,
+        basis,
+        strokes,
+        rasterErasures: {
+          width: value.width,
+          height: value.height,
+          operations: value.erasures.map((entry) => ({
+            width: entry.width,
+            height: entry.height,
+            stroke: PaintOperation.fromJSON(entry.stroke) as
+              EraserStroke | PaintFill,
+            ...(entry.placement
+              ? {
+                  placement: {
+                    perspective: new PerspectiveTransform(
+                      entry.placement.perspective,
+                    ),
+                    bounds: { ...entry.placement.bounds },
+                  },
+                }
+              : {}),
+          })),
+        },
+      });
     if (value.kind === "paint")
       return new LayerMask({ ...value, plane, basis, strokes });
     if (value.kind === "bitmap")

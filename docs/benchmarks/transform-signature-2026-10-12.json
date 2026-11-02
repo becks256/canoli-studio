@@ -438,11 +438,7 @@
           "scriptRuntimeMs": 0
         }
       ],
-      "longTasks": [
-        50,
-        61,
-        64
-      ],
+      "longTasks": [50, 61, 64],
       "restored": true,
       "layers": 64
     }

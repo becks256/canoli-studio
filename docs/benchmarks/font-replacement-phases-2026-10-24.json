@@ -3150,14 +3150,10 @@
     "original-control": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 16,
-          "longTasks": [
-            53
-          ],
+          "longTasks": [53],
           "phases": {
             "commitMs": {
               "median": 1.600000023841858,
@@ -3182,16 +3178,10 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 64,
-          "longTasks": [
-            173,
-            51,
-            52
-          ],
+          "longTasks": [173, 51, 52],
           "phases": {
             "commitMs": {
               "median": 4.400000095367432,
@@ -3228,9 +3218,7 @@
     "rejected-message-channel": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 16,
           "longTasks": [],
@@ -3258,15 +3246,10 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 64,
-          "longTasks": [
-            166,
-            54
-          ],
+          "longTasks": [166, 54],
           "phases": {
             "commitMs": {
               "median": 3.6499999165534973,
@@ -3303,14 +3286,10 @@
     "rejected-prioritized-task": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 16,
-          "longTasks": [
-            51
-          ],
+          "longTasks": [51],
           "phases": {
             "commitMs": {
               "median": 1.6500000357627869,
@@ -3335,16 +3314,10 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 64,
-          "longTasks": [
-            183,
-            56,
-            55
-          ],
+          "longTasks": [183, 56, 55],
           "phases": {
             "commitMs": {
               "median": 4.800000011920929,
@@ -3381,14 +3354,10 @@
     "retained-original-scheduler": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 16,
-          "longTasks": [
-            59
-          ],
+          "longTasks": [59],
           "phases": {
             "commitMs": {
               "median": 1.7000000476837158,
@@ -3413,15 +3382,10 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "iterations": 12,
           "layers": 64,
-          "longTasks": [
-            187,
-            64
-          ],
+          "longTasks": [187, 64],
           "phases": {
             "commitMs": {
               "median": 4.300000011920929,
@@ -3464,10 +3428,7 @@
     "presentation": "Canvas-copy proxy behind the open dialog, not physical display",
     "profileAndTrace": "Separate diagnostic runs with instrumentation overhead; not substituted for unprofiled acceptance",
     "quantiles": "Nearest-rank p95; no filtering or pooling",
-    "viewport": [
-      1440,
-      1000
-    ],
+    "viewport": [1440, 1000],
     "workers": 1
   },
   "parentCommit": "33e935c",
@@ -3933,109 +3894,73 @@
           "group": "reference",
           "path": "/tmp/canoli-font-phases-accepted-fonts-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-after.png",
           "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "original",
           "path": "/tmp/canoli-font-phases-accepted-fonts-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-before.png",
           "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "reference",
           "path": "/tmp/canoli-font-phases-accepted-fonts-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-reference.png",
           "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "reference",
           "path": "/tmp/canoli-font-phases-accepted-fonts-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-reopened.png",
           "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "original",
           "path": "/tmp/canoli-font-phases-accepted-fonts-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-scripted.png",
           "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "original",
           "path": "/tmp/canoli-font-phases-accepted-fonts-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-undone.png",
           "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "reference",
           "path": "/tmp/canoli-text-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-after.png",
           "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "original",
           "path": "/tmp/canoli-text-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-before.png",
           "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "reference",
           "path": "/tmp/canoli-text-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-reference.png",
           "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "reference",
           "path": "/tmp/canoli-text-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-reopened.png",
           "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "original",
           "path": "/tmp/canoli-text-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-scripted.png",
           "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         },
         {
           "group": "original",
           "path": "/tmp/canoli-text-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-undone.png",
           "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-          "size": [
-            400,
-            300
-          ]
+          "size": [400, 300]
         }
       ]
     },

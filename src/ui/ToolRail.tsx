@@ -41,7 +41,7 @@ export interface ToolRailProps {
   tool: Tool;
   spacePan: boolean;
   busy: boolean;
-  canUseTool?(tool:Tool):boolean;
+  canUseTool?(tool: Tool): boolean;
   onChooseTool(tool: Tool): void;
   onImport(): void;
   onNewDocument(): void;
@@ -61,7 +61,7 @@ export function ToolRail({
   tool,
   spacePan,
   busy,
-  canUseTool=()=>true,
+  canUseTool = () => true,
   onChooseTool,
   onImport,
   onNewDocument,
@@ -111,7 +111,11 @@ export function ToolRail({
             ["marquee", "Marquee tool (M)", Scan],
             ["lasso", "Lasso tool (L)", Lasso],
             ["wand", "Magic wand tool (W)", WandSparkles],
-            ["quick-select", "Quick selection (Shift+W)", MousePointerSquareDashed],
+            [
+              "quick-select",
+              "Quick selection (Shift+W)",
+              MousePointerSquareDashed,
+            ],
             ["fill", "Paint bucket (G)", PaintBucket],
             ["brush", "Brush tool (B)", Paintbrush],
             ["smudge", "Smudge tool", Fingerprint],
@@ -135,7 +139,7 @@ export function ToolRail({
             label={label}
             aria-pressed={tool === key}
             className={`tool-button ${tool === key ? "active" : ""}`}
-            disabled={busy||!canUseTool(key)}
+            disabled={busy || !canUseTool(key)}
             onClick={() => onChooseTool(key)}
           >
             <Icon size={19} />
@@ -159,8 +163,24 @@ export function ToolRail({
         >
           <FilePlus2 size={19} />
         </IconButton>
-        <IconButton shortcutId="color-palettes" label="Color palettes" className="tool-button" disabled={busy} onClick={onOpenColorPalettes}><Palette size={19}/></IconButton>
-        <IconButton shortcutId="artwork-library" label="Artwork library" className="tool-button" disabled={busy} onClick={onOpenArtworkLibrary}><LibraryBig size={19}/></IconButton>
+        <IconButton
+          shortcutId="color-palettes"
+          label="Color palettes"
+          className="tool-button"
+          disabled={busy}
+          onClick={onOpenColorPalettes}
+        >
+          <Palette size={19} />
+        </IconButton>
+        <IconButton
+          shortcutId="artwork-library"
+          label="Artwork library"
+          className="tool-button"
+          disabled={busy}
+          onClick={onOpenArtworkLibrary}
+        >
+          <LibraryBig size={19} />
+        </IconButton>
         <IconButton
           shortcutId="scripts"
           label="Scripts (Mod+Shift+K)"
@@ -181,8 +201,23 @@ export function ToolRail({
         </IconButton>
       </div>
       <div className="rail-bottom">
-        <IconButton shortcutId="workspace-layout" label="Workspace layout" className="tool-button" onClick={onOpenWorkspace} disabled={busy}><PanelsTopLeft size={18}/></IconButton>
-        <IconButton label="Design checks" className="tool-button" onClick={onOpenPreflight} disabled={busy}><ClipboardCheck size={18}/></IconButton>
+        <IconButton
+          shortcutId="workspace-layout"
+          label="Workspace layout"
+          className="tool-button"
+          onClick={onOpenWorkspace}
+          disabled={busy}
+        >
+          <PanelsTopLeft size={18} />
+        </IconButton>
+        <IconButton
+          label="Design checks"
+          className="tool-button"
+          onClick={onOpenPreflight}
+          disabled={busy}
+        >
+          <ClipboardCheck size={18} />
+        </IconButton>
         <IconButton
           label="Recover work"
           className="tool-button"

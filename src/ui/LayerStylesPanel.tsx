@@ -181,11 +181,18 @@ export function LayerStylesPanel({
         ))}
         <p className="section-description">
           Top handles set cutoffs. Lower handles feather the transition. Pixels
-          outside the range become transparent. {float&&'Selectors use continuous sRGB values; original float colors stay intact.'}
+          outside the range become transparent.{" "}
+          {float &&
+            "Selectors use continuous sRGB values; original float colors stay intact."}
         </p>
       </InspectorSection>
       <InspectorSection title="Color overlay">
-        {float&&<p className="section-description">The selected sRGB color mixes in linear working RGB without reducing sample precision.</p>}
+        {float && (
+          <p className="section-description">
+            The selected sRGB color mixes in linear working RGB without reducing
+            sample precision.
+          </p>
+        )}
         <div className="style-color-row">
           <label className="check-field">
             <input
@@ -209,8 +216,18 @@ export function LayerStylesPanel({
             label="Overlay color"
             value={value.colorOverlay.color}
             disabled={disabled || !value.colorOverlay.enabled}
-            onPreview={color => onPreview({ ...value, colorOverlay: { ...value.colorOverlay, color } })}
-            onCommit={color => onCommit({ ...value, colorOverlay: { ...value.colorOverlay, color } })}
+            onPreview={(color) =>
+              onPreview({
+                ...value,
+                colorOverlay: { ...value.colorOverlay, color },
+              })
+            }
+            onCommit={(color) =>
+              onCommit({
+                ...value,
+                colorOverlay: { ...value.colorOverlay, color },
+              })
+            }
             onCancel={onCancel}
           />
         </div>
@@ -236,7 +253,13 @@ export function LayerStylesPanel({
         />
       </InspectorSection>
       <InspectorSection title="Drop shadow">
-        {float&&<p className="section-description">{shadowUnavailable?'Apply a shadow to an isolated artwork group containing this adjustment.':'Shadow blur and offsets use document pixels. Fill changes the artwork; layer opacity changes artwork and shadow.'}</p>}
+        {float && (
+          <p className="section-description">
+            {shadowUnavailable
+              ? "Apply a shadow to an isolated artwork group containing this adjustment."
+              : "Shadow blur and offsets use document pixels. Fill changes the artwork; layer opacity changes artwork and shadow."}
+          </p>
+        )}
         <div className="style-color-row">
           <label className="check-field">
             <input
@@ -259,9 +282,18 @@ export function LayerStylesPanel({
           <ColorInput
             label="Shadow color"
             value={value.dropShadow.color}
-            disabled={disabled || shadowUnavailable || !value.dropShadow.enabled}
-            onPreview={color => onPreview({ ...value, dropShadow: { ...value.dropShadow, color } })}
-            onCommit={color => onCommit({ ...value, dropShadow: { ...value.dropShadow, color } })}
+            disabled={
+              disabled || shadowUnavailable || !value.dropShadow.enabled
+            }
+            onPreview={(color) =>
+              onPreview({
+                ...value,
+                dropShadow: { ...value.dropShadow, color },
+              })
+            }
+            onCommit={(color) =>
+              onCommit({ ...value, dropShadow: { ...value.dropShadow, color } })
+            }
             onCancel={onCancel}
           />
         </div>
@@ -273,7 +305,9 @@ export function LayerStylesPanel({
               min={key === "blur" ? 0 : -256}
               max={key === "blur" ? 128 : 256}
               value={value.dropShadow[key]}
-              disabled={disabled || shadowUnavailable || !value.dropShadow.enabled}
+              disabled={
+                disabled || shadowUnavailable || !value.dropShadow.enabled
+              }
               onPreview={(next) =>
                 onPreview({
                   ...value,

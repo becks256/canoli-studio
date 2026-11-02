@@ -132,7 +132,9 @@ test("warm layers and old active segments are not repainted", async ({
   await page.goto("/");
   const result = await page.evaluate(async () => {
     await document.fonts.ready;
-    const { CanvasRenderer } = await import(/* @vite-ignore */ String('/src/engine/renderer.ts'));
+    const { CanvasRenderer } = await import(
+      /* @vite-ignore */ String("/src/engine/renderer.ts")
+    );
     const renderer = new CanvasRenderer();
     const { editor, Document, PaintLayer, BrushStroke } = window.luma;
     const doc = new Document({ width: 320, height: 240 });
@@ -239,7 +241,8 @@ test("pointer bursts publish once per frame, retain all samples and cancel clean
     if (!(layer instanceof PaintLayer))
       throw new Error("Missing committed paint");
     const stroke = layer.strokes.at(0)!.toJSON();
-    if ((stroke.kind === "fill" || stroke.kind === 'wet')) throw new Error("Expected brush");
+    if (stroke.kind === "fill" || stroke.kind === "wet")
+      throw new Error("Expected brush");
     const committed = history();
     editor.document.undo();
     const undoLayers = editor.document.layers.length;
@@ -289,8 +292,12 @@ test("visible brush preview commits without a pixel jump and Escape discards it"
     window.luma.editor.newDocument({ width: 400, height: 300 }),
   );
   await page.keyboard.press("Control+1");
-  await page.getByRole("button", { name: "Brush tool (B)", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Brush tool (B)", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page
+    .getByRole("button", { name: "Brush tool (B)", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Brush tool (B)", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await page.evaluate(() =>
     window.luma.editor.tools.configure({
       size: 31,

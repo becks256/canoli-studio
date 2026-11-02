@@ -1,11 +1,15 @@
 import { prepareSmartRaster } from "../engine/smart-raster";
-import {prepareMatting} from '../engine/prepare-matting';
-import {mattingRequestSchema} from '../core/matting';
-import { AssetStore,captureAssetSource } from "../core/assets";
-import {Document} from '../dom';
-import {ComponentRegistry} from '../core/smart/manager';
-import {rawDevelopmentRequestSchema,rawDevelopmentPlanSchema,rawComponentSource} from '../core/interchange/raw/commands';
-import {developRawComponent} from '../engine/raw-import';
+import { prepareMatting } from "../engine/prepare-matting";
+import { mattingRequestSchema } from "../core/matting";
+import { AssetStore, captureAssetSource } from "../core/assets";
+import { Document } from "../dom";
+import { ComponentRegistry } from "../core/smart/manager";
+import {
+  rawDevelopmentRequestSchema,
+  rawDevelopmentPlanSchema,
+  rawComponentSource,
+} from "../core/interchange/raw/commands";
+import { developRawComponent } from "../engine/raw-import";
 import { execute } from "../core/commands";
 import {
   createAdjustmentLayer,
@@ -32,23 +36,38 @@ export class ScriptRetouch {
   private readonly owned = new Set<string>();
   private readonly abort = new AbortController();
   private busy = false;
-  private rawOrigins=new Set<string>();
-  private nativeOriginPins=new Map<string,ReturnType<typeof captureAssetSource>>();
-  private nativeOrigins=new Set<string>();
+  private rawOrigins = new Set<string>();
+  private nativeOriginPins = new Map<
+    string,
+    ReturnType<typeof captureAssetSource>
+  >();
+  private nativeOrigins = new Set<string>();
   constructor(
     private readonly snapshot: DocumentData,
     private readonly renderer: DocumentRenderer,
     assets: AssetStore,
     private readonly check: () => void,
-    private readonly checkRawOrigin:(assetId:string)=>void=()=>{},
+    private readonly checkRawOrigin: (assetId: string) => void = () => {},
   ) {
-    try { for (const asset of assets.values()){if(asset.tiff)this.nativeOriginPins.set(asset.id,captureAssetSource(assets,asset.id));assets.shareTo(this.view,asset.id,asset.id);} }
-    catch(error){this.view.dispose();throw error;}
+    try {
+      for (const asset of assets.values()) {
+        if (asset.tiff)
+          this.nativeOriginPins.set(
+            asset.id,
+            captureAssetSource(assets, asset.id),
+          );
+        assets.shareTo(this.view, asset.id, asset.id);
+      }
+    } catch (error) {
+      this.view.dispose();
+      throw error;
+    }
   }
   async prepare(
     commands: unknown,
     request: unknown,
-    method: "patch" | "heal" | "rasterize" | 'matting' | 'raw-develop' = "patch",
+    method:
+      "patch" | "heal" | "rasterize" | "matting" | "raw-develop" = "patch",
   ) {
     this.assertActive();
     if (this.busy)
@@ -64,7 +83,11 @@ export class ScriptRetouch {
       label: "Prepare script repair",
       commands: parseCommands(commands),
     });
-    for (const assetId of referencedAssets(document)){this.view.get(assetId);if(!this.owned.has(assetId)&&this.nativeOriginPins.has(assetId))this.nativeOrigins.add(assetId);}
+    for (const assetId of referencedAssets(document)) {
+      this.view.get(assetId);
+      if (!this.owned.has(assetId) && this.nativeOriginPins.has(assetId))
+        this.nativeOrigins.add(assetId);
+    }
     this.assertActive();
     if (
       heal &&
@@ -72,31 +95,70 @@ export class ScriptRetouch {
     )
       throw new Error("Healing requires an attached unlocked layer.");
     this.busy = true;
-    if(method==='raw-develop'){
-      const previous=new Set(this.view.values().map(asset=>asset.id));
-      try{
-        const parsed=rawDevelopmentRequestSchema.parse(request),input=rawComponentSource(document,parsed.layerId,this.view);
-        if(!this.owned.has(input.source.assetId)){this.checkRawOrigin(input.source.assetId);this.rawOrigins.add(input.source.assetId);}
-        const current=()=>{this.assertActive();for(const key of this.rawOrigins)this.checkRawOrigin(key);};
-        const detached=Document.fromJSON(document);detached.assetStore=this.view;
-        const report=await developRawComponent(detached,this.view,parsed.layerId,parsed.options,{signal:this.abort.signal},current);current();
-        const definition=new ComponentRegistry(detached._read().components).get(input.layer.componentId);
-        for(const asset of this.view.values())if(!previous.has(asset.id))this.owned.add(asset.id);
-        return rawDevelopmentPlanSchema.parse({definition,report});
-      }catch(error){for(const asset of this.view.values())if(!previous.has(asset.id)){this.owned.delete(asset.id);this.view.remove(asset.id);}throw error;}
-      finally{this.busy=false;}
+    if (method === "raw-develop") {
+      const previous = new Set(this.view.values().map((asset) => asset.id));
+      try {
+        const parsed = rawDevelopmentRequestSchema.parse(request),
+          input = rawComponentSource(document, parsed.layerId, this.view);
+        if (!this.owned.has(input.source.assetId)) {
+          this.checkRawOrigin(input.source.assetId);
+          this.rawOrigins.add(input.source.assetId);
+        }
+        const current = () => {
+          this.assertActive();
+          for (const key of this.rawOrigins) this.checkRawOrigin(key);
+        };
+        const detached = Document.fromJSON(document);
+        detached.assetStore = this.view;
+        const report = await developRawComponent(
+          detached,
+          this.view,
+          parsed.layerId,
+          parsed.options,
+          { signal: this.abort.signal },
+          current,
+        );
+        current();
+        const definition = new ComponentRegistry(
+          detached._read().components,
+        ).get(input.layer.componentId);
+        for (const asset of this.view.values())
+          if (!previous.has(asset.id)) this.owned.add(asset.id);
+        return rawDevelopmentPlanSchema.parse({ definition, report });
+      } catch (error) {
+        for (const asset of this.view.values())
+          if (!previous.has(asset.id)) {
+            this.owned.delete(asset.id);
+            this.view.remove(asset.id);
+          }
+        throw error;
+      } finally {
+        this.busy = false;
+      }
     }
-    if(method==='matting'){
-      const previous=new Set(this.view.values().map(asset=>asset.id));
-      let prepared:Awaited<ReturnType<typeof prepareMatting>>|undefined;
-      try{
-        const parsed=mattingRequestSchema.parse(request);
-        if(this.owned.size+(parsed.options.decontaminate?2:1)>32)throw new Error('A script can prepare at most 32 repair assets.');
-        prepared=await prepareMatting(document,this.view,parsed,{signal:this.abort.signal},()=>this.assertActive());
-        this.assertActive();prepared.commit!(()=>{});
-        for(const asset of this.view.values())if(!previous.has(asset.id))this.owned.add(asset.id);
+    if (method === "matting") {
+      const previous = new Set(this.view.values().map((asset) => asset.id));
+      let prepared: Awaited<ReturnType<typeof prepareMatting>> | undefined;
+      try {
+        const parsed = mattingRequestSchema.parse(request);
+        if (this.owned.size + (parsed.options.decontaminate ? 2 : 1) > 32)
+          throw new Error("A script can prepare at most 32 repair assets.");
+        prepared = await prepareMatting(
+          document,
+          this.view,
+          parsed,
+          { signal: this.abort.signal },
+          () => this.assertActive(),
+        );
+        this.assertActive();
+        prepared.commit!(() => {});
+        for (const asset of this.view.values())
+          if (!previous.has(asset.id)) this.owned.add(asset.id);
         return prepared.plan;
-      }finally{prepared?.dispose?.();this.busy=false;}
+      } finally {
+        prepared?.dispose?.();
+        this.busy = false;
+      }
     }
     if (method === "rasterize") {
       let installed: string | undefined;
@@ -165,7 +227,7 @@ export class ScriptRetouch {
               options,
               searchRadius,
               signal,
-              ()=>this.assertActive(),
+              () => this.assertActive(),
             );
           })()
         : await (() => {
@@ -184,18 +246,27 @@ export class ScriptRetouch {
               { mode: sampling, layerId },
               options,
               signal,
-              ()=>this.assertActive(),
+              () => this.assertActive(),
             );
           })();
       this.assertActive();
-      const blob=await encodeRetouchAsset(patch,{signal,check:()=>this.assertActive()});
+      const blob = await encodeRetouchAsset(patch, {
+        signal,
+        check: () => this.assertActive(),
+      });
       this.assertActive();
       const asset = await this.view.add(
         blob,
         heal ? "Script healing" : "Script patch",
         id(),
         false,
-        patch.precision==='float32'?{tiff:{editingPrecision:'float32'},signal,onProgress:()=>this.assertActive()}:undefined,
+        patch.precision === "float32"
+          ? {
+              tiff: { editingPrecision: "float32" },
+              signal,
+              onProgress: () => this.assertActive(),
+            }
+          : undefined,
       );
       assetId = asset.id;
       this.assertActive();
@@ -206,7 +277,9 @@ export class ScriptRetouch {
           assetId: asset.id,
           width: patch.bounds.width,
           height: patch.bounds.height,
-          ...(patch.precision==='float32'?{precision:'float32' as const}:{}),
+          ...(patch.precision === "float32"
+            ? { precision: "float32" as const }
+            : {}),
         }),
         x: patch.bounds.x,
         y: patch.bounds.y,
@@ -223,15 +296,25 @@ export class ScriptRetouch {
   private assertActive() {
     this.abort.signal.throwIfAborted();
     this.check();
-    for(const key of this.rawOrigins)this.checkRawOrigin(key);
-    for(const key of this.nativeOrigins)this.nativeOriginPins.get(key)!.check();
+    for (const key of this.rawOrigins) this.checkRawOrigin(key);
+    for (const key of this.nativeOrigins)
+      this.nativeOriginPins.get(key)!.check();
   }
-  rawSettings(document:DocumentData,layerId:string){
-    this.assertActive();const layer=findLayer(document,layerId);if(layer?.kind!=='smart-object')throw new Error('Choose an attached smart object.');
-    const source=new ComponentRegistry(document.components).get(layer.componentId).source;
-    if(source.kind!=='asset')return null;const asset=this.view.get(source.assetId);
-    if(!asset.raw)return null;
-    if(!this.owned.has(source.assetId)){this.checkRawOrigin(source.assetId);this.rawOrigins.add(source.assetId);}
+  rawSettings(document: DocumentData, layerId: string) {
+    this.assertActive();
+    const layer = findLayer(document, layerId);
+    if (layer?.kind !== "smart-object")
+      throw new Error("Choose an attached smart object.");
+    const source = new ComponentRegistry(document.components).get(
+      layer.componentId,
+    ).source;
+    if (source.kind !== "asset") return null;
+    const asset = this.view.get(source.assetId);
+    if (!asset.raw) return null;
+    if (!this.owned.has(source.assetId)) {
+      this.checkRawOrigin(source.assetId);
+      this.rawOrigins.add(source.assetId);
+    }
     return structuredClone(asset.raw.settings.development);
   }
   installReferenced(document: DocumentData, destination: AssetStore): string[] {
@@ -240,7 +323,7 @@ export class ScriptRetouch {
     try {
       for (const assetId of referencedAssets(document)) {
         if (this.owned.has(assetId)) {
-          this.view.shareTo(destination,assetId,assetId);
+          this.view.shareTo(destination, assetId, assetId);
           installed.push(assetId);
         } else destination.get(assetId);
       }
@@ -255,17 +338,36 @@ export class ScriptRetouch {
     }
   }
   /** Host-only read access before any prepared asset is installed globally. */
-  validationSources(destination: AssetStore): Pick<AssetStore, 'get' | 'captureLifetime'> {
-    const viewAlive = this.view.captureLifetime(), destinationAlive = destination.captureLifetime();
-    const check = () => { this.assertActive(); viewAlive(); destinationAlive(); };
+  validationSources(
+    destination: AssetStore,
+  ): Pick<AssetStore, "get" | "captureLifetime"> {
+    const viewAlive = this.view.captureLifetime(),
+      destinationAlive = destination.captureLifetime();
+    const check = () => {
+      this.assertActive();
+      viewAlive();
+      destinationAlive();
+    };
     return {
-      get: id => { check(); if (this.owned.has(id)) { if (destination.has(id)) throw new Error('Prepared repair asset ID collided with another source.'); return this.view.get(id); } return destination.get(id); },
+      get: (id) => {
+        check();
+        if (this.owned.has(id)) {
+          if (destination.has(id))
+            throw new Error(
+              "Prepared repair asset ID collided with another source.",
+            );
+          return this.view.get(id);
+        }
+        return destination.get(id);
+      },
       captureLifetime: () => check,
     };
   }
   dispose() {
     this.abort.abort(new Error("Script retouch stopped."));
-    this.owned.clear();this.nativeOrigins.clear();this.nativeOriginPins.clear();
+    this.owned.clear();
+    this.nativeOrigins.clear();
+    this.nativeOriginPins.clear();
     this.view.dispose();
   }
 }

@@ -27,7 +27,7 @@ export class ByteReader {
   }
 
   seek(pos: number): void {
-    if (!Number.isSafeInteger(pos)||pos < 0 || pos > this.buffer.byteLength) {
+    if (!Number.isSafeInteger(pos) || pos < 0 || pos > this.buffer.byteLength) {
       throw new RangeError(
         `ByteReader seek out of bounds: ${pos} (max: ${this.buffer.byteLength})`,
       );
@@ -73,8 +73,9 @@ export class ByteReader {
     const high = this.view.getUint32(this.offset, false);
     const low = this.view.getUint32(this.offset + 4, false);
     this.offset += 8;
-    const value=high * 0x100000000 + low;
-    if(!Number.isSafeInteger(value))throw new Error('Photoshop length exceeds exact browser addressing.');
+    const value = high * 0x100000000 + low;
+    if (!Number.isSafeInteger(value))
+      throw new Error("Photoshop length exceeds exact browser addressing.");
     return value;
   }
 
@@ -118,7 +119,11 @@ export class ByteReader {
   }
 
   readBytes(len: number): Uint8Array {
-    if (!Number.isSafeInteger(len)||len<0||this.offset + len > this.buffer.byteLength) {
+    if (
+      !Number.isSafeInteger(len) ||
+      len < 0 ||
+      this.offset + len > this.buffer.byteLength
+    ) {
       throw new RangeError(
         `ByteReader readBytes out of bounds: requested ${len}, remaining ${this.remaining()}`,
       );
@@ -199,7 +204,8 @@ export class ByteWriter {
   }
 
   writeUint64(val: number): void {
-    if(!Number.isSafeInteger(val)||val<0)throw new Error('Photoshop length exceeds exact browser addressing.');
+    if (!Number.isSafeInteger(val) || val < 0)
+      throw new Error("Photoshop length exceeds exact browser addressing.");
     this.ensureCapacity(8);
     const high = Math.floor(val / 0x100000000);
     const low = val >>> 0;

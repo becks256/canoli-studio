@@ -6,19 +6,19 @@ It retains complete native matching before paint publication. Full float
 TextLayer authoring and the original roadmap remain unfinished.
 [Contract and remaining scope](../FLOAT_TEXT.md#automatic-optical-sizing-in-the-private-canvas-matcher).
 
-| Verification | Result |
-| --- | --- |
-| Full build / TypeScript | Pass |
-| Complete unit/API suite | 3,396 pass across 336 files |
-| One full affected native-browser run | 80 pass across eight files |
-| Production emitted worker/matcher and existing typography | Nine pass |
-| Independent static FontTools references | 16 complete instances pass exact geometric, metric and identity checks |
-| Complete compressed optical source | Original avar/gvar/HVAR and untransformed tables, cmap, metrics and all three glyphs match independent FontTools decoding |
-| Independent native RGBA/advance comparisons | 86 exact complete-run pairs across TTF/WOFF2, device scales 1/2, affine/identity placement, automatic sizes, range clamps and overrides |
-| Emitted complete production matcher | 12 complete native matches, including hard fractional sizes, with prepared source/glyph fixture fonts and the actual emitted shaping worker |
-| Actual Float32 WASM paint | Exact independently computed ordered alpha, signed HDR RGB, alpha 1e-8 and window words |
-| Probe faults and lifecycle | Abort, timeout, descriptor tampering, removal and nonfinite metadata clean up and permit retry; reads of Canvas pixels are forbidden throughout these checks |
-| Existing 50 MP RAW/variable-font regression | Original identity/dimensions retained; all 480,000 RGBA samples in the independent 600 × 200 text region match; full PNG bytes match the accepted parent |
+| Verification                                              | Result                                                                                                                                                       |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Full build / TypeScript                                   | Pass                                                                                                                                                         |
+| Complete unit/API suite                                   | 3,396 pass across 336 files                                                                                                                                  |
+| One full affected native-browser run                      | 80 pass across eight files                                                                                                                                   |
+| Production emitted worker/matcher and existing typography | Nine pass                                                                                                                                                    |
+| Independent static FontTools references                   | 16 complete instances pass exact geometric, metric and identity checks                                                                                       |
+| Complete compressed optical source                        | Original avar/gvar/HVAR and untransformed tables, cmap, metrics and all three glyphs match independent FontTools decoding                                    |
+| Independent native RGBA/advance comparisons               | 86 exact complete-run pairs across TTF/WOFF2, device scales 1/2, affine/identity placement, automatic sizes, range clamps and overrides                      |
+| Emitted complete production matcher                       | 12 complete native matches, including hard fractional sizes, with prepared source/glyph fixture fonts and the actual emitted shaping worker                  |
+| Actual Float32 WASM paint                                 | Exact independently computed ordered alpha, signed HDR RGB, alpha 1e-8 and window words                                                                      |
+| Probe faults and lifecycle                                | Abort, timeout, descriptor tampering, removal and nonfinite metadata clean up and permit retry; reads of Canvas pixels are forbidden throughout these checks |
+| Existing 50 MP RAW/variable-font regression               | Original identity/dimensions retained; all 480,000 RGBA samples in the independent 600 × 200 text region match; full PNG bytes match the accepted parent     |
 
 The original geometric fixture has opsz/wght axes, nonidentity optical avar,
 outline deltas and HVAR metrics. Complete static instances retain an exact

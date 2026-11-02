@@ -33,18 +33,18 @@ Chromium 153.0.8010.12, Node 24.0.1, AssemblyScript 0.28.20, Playwright 1.63.0,
 NumPy 1.26.4 and native Linux Little CMS 2.19.1 on Linux x64. Timings are local
 observations, not hardware-wide guarantees or a statistically powered study.
 
-| Measurement | Committed baseline | Optimized candidate |
-| --- | ---: | ---: |
-| Native-profile import | 120.433 s | 120.716 s |
-| Cold 2 MP scan | 36.571 s | 10.564 s |
-| Original reads, cold scan | 1024 | 108 |
-| Cumulative awaited original reads | 32.564 s | 8.689 s |
-| Retained scan | 2.528 s | 0.927 s |
-| Original reads, retained scan | 256 | 0 |
-| Full 50 MP shadow workflow | 595.189 s | 226.145 s |
-| Production pointer-to-matching-pixels p50 | 176.7 ms | 68.4 ms |
-| Production pointer-to-matching-pixels p95 | 203.6 ms | 84.2 ms |
-| Drag-period main-thread tasks at least 50 ms | 0 | 0 |
+| Measurement                                  | Committed baseline | Optimized candidate |
+| -------------------------------------------- | -----------------: | ------------------: |
+| Native-profile import                        |          120.433 s |           120.716 s |
+| Cold 2 MP scan                               |           36.571 s |            10.564 s |
+| Original reads, cold scan                    |               1024 |                 108 |
+| Cumulative awaited original reads            |           32.564 s |             8.689 s |
+| Retained scan                                |            2.528 s |             0.927 s |
+| Original reads, retained scan                |                256 |                   0 |
+| Full 50 MP shadow workflow                   |          595.189 s |           226.145 s |
+| Production pointer-to-matching-pixels p50    |           176.7 ms |             68.4 ms |
+| Production pointer-to-matching-pixels p95    |           203.6 ms |             84.2 ms |
+| Drag-period main-thread tasks at least 50 ms |                  0 |                   0 |
 
 The native scan covers 256 fixed 128 by 64 windows with both visible and empty
 shadow regions, then repeats against the same capture. Every round compares all

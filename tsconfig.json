@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
@@ -16,11 +12,7 @@
     "allowImportingTsExtensions": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": [
-      "vite/client",
-      "node",
-      "@webgpu/types"
-    ]
+    "types": ["vite/client", "node", "@webgpu/types"]
   },
   "include": [
     "src",
@@ -34,7 +26,5 @@
     "scripts/build-chatgpt-plugin.ts",
     "scripts/build-site.ts"
   ],
-  "exclude": [
-    "assembly"
-  ]
+  "exclude": ["assembly"]
 }

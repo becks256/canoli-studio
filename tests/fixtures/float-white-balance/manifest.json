@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "colorTolerance": 9.5367431640625e-07,
+  "colorTolerance": 9.5367431640625e-7,
   "toleranceScale": "max(1, abs(source RGB), abs(reference RGB)) per pixel",
   "alphaTolerance": 0,
   "integerColorTolerance": 1,
@@ -714,12 +714,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              10,
-              110,
-              55
-            ],
+            "rect": [5, 10, 110, 55],
             "density": 0.5
           },
           "children": [
@@ -737,12 +732,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -765,12 +755,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           },
           "children": [
@@ -788,12 +773,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -816,12 +796,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           }
         },
@@ -835,12 +810,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "clipped": true
@@ -858,12 +828,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           },
           "children": [
@@ -881,12 +846,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -902,12 +862,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "clipped": true
@@ -953,12 +908,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1452,12 +1402,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              10,
-              110,
-              55
-            ],
+            "rect": [5, 10, 110, 55],
             "density": 0.5
           },
           "children": [
@@ -1475,12 +1420,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -1503,12 +1443,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           },
           "children": [
@@ -1526,12 +1461,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -1554,12 +1484,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           }
         },
@@ -1573,12 +1498,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "clipped": true
@@ -1596,12 +1516,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           },
           "children": [
@@ -1619,12 +1534,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -1640,12 +1550,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "clipped": true
@@ -1691,12 +1596,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2190,12 +2090,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              10,
-              110,
-              55
-            ],
+            "rect": [5, 10, 110, 55],
             "density": 0.5
           },
           "children": [
@@ -2213,12 +2108,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -2241,12 +2131,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           },
           "children": [
@@ -2264,12 +2149,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -2292,12 +2172,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           }
         },
@@ -2311,12 +2186,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "clipped": true
@@ -2334,12 +2204,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              5,
-              115,
-              65
-            ],
+            "rect": [5, 5, 115, 65],
             "density": 0.5
           },
           "children": [
@@ -2357,12 +2222,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             }
@@ -2378,12 +2238,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "clipped": true
@@ -2429,12 +2284,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2471,12 +2321,7 @@
       "opacity": 0.75,
       "fillOpacity": 0.625,
       "mask": {
-        "rect": [
-          1000,
-          0,
-          8500,
-          5000
-        ],
+        "rect": [1000, 0, 8500, 5000],
         "density": 0.5
       },
       "children": [
@@ -2487,12 +2332,7 @@
           "kind": "adjustment",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              2000,
-              0,
-              7000,
-              5000
-            ],
+            "rect": [2000, 0, 7000, 5000],
             "density": 0.5
           },
           "adjustment": {
@@ -2508,12 +2348,7 @@
       "clipped": true,
       "opacity": 0.625,
       "mask": {
-        "rect": [
-          3000,
-          0,
-          6000,
-          5000
-        ],
+        "rect": [3000, 0, 6000, 5000],
         "density": 0.5
       },
       "adjustment": {

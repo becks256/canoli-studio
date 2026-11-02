@@ -34,21 +34,29 @@ interface DocumentFontUsage {
 ## Executable isolated example
 
 <!-- example: document-font-management -->
+
 ```js
-const body = document.paragraphStyles.add(new ParagraphStyle({
-  name: 'Font management study',
-  format: { fontFamily: 'serif', fontSize: 30, color: '#315b2a' },
-}));
-const caption = document.layers.add(new TextLayer({
-  name: 'Font management caption', text: 'Canoli Studio — é العربية',
-  x: 32, y: 32,
-}));
+const body = document.paragraphStyles.add(
+  new ParagraphStyle({
+    name: "Font management study",
+    format: { fontFamily: "serif", fontSize: 30, color: "#315b2a" },
+  }),
+);
+const caption = document.layers.add(
+  new TextLayer({
+    name: "Font management caption",
+    text: "Canoli Studio — é العربية",
+    x: 32,
+    y: 32,
+  }),
+);
 caption.paragraphStyle = body;
 document.selectedLayer = caption;
 const before = document.fonts.items;
-document.fonts.replace('serif', 'sans-serif');
-if (caption.fontFamily !== 'sans-serif') throw new Error('Font replacement failed');
-print('Document font replacement ready');
+document.fonts.replace("serif", "sans-serif");
+if (caption.fontFamily !== "sans-serif")
+  throw new Error("Font replacement failed");
+print("Document font replacement ready");
 ```
 
 The provided `document` shares the ordinary isolated command boundary. All edits in one successful script commit together. Internal plugins need granted `document:read` to inspect and `document:write` to replace, with host permission/revision checks before commit. Installation stays inert; no font/file/network privilege is added. Original sources and already accepted undo history retain their normal ownership.

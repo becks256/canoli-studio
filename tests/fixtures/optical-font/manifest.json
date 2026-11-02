@@ -1,16 +1,8 @@
 {
   "license": "CC0-1.0; original geometric test artwork",
   "axes": {
-    "opsz": [
-      8,
-      8,
-      72
-    ],
-    "wght": [
-      400,
-      400,
-      800
-    ]
+    "opsz": [8, 8, 72],
+    "wght": [400, 400, 800]
   },
   "avar": {
     "opsz": {

@@ -218,26 +218,26 @@ When exporting:
 
 The table below is the historical prototype capability matrix, not the current acceptance matrix. The current rendered PSD/PSB boundary is specified in SCRIPTING_API.md; wider color/editability claims in this table remain unverified.
 
-| Feature Category    | PSD Feature                                           | Import Support               | Export Support        | Preflight Classification              |
-| :------------------ | :---------------------------------------------------- | :--------------------------- | :-------------------- | :------------------------------------ |
-| **Document Specs**  | Version 1 (PSD, $\le 30\text{k}\times 30\text{k}$)    | Full                         | Full                  | Preserved                             |
-|                     | Version 2 (PSB, $\le 300\text{k}\times 300\text{k}$)  | RGB8 subset; memory dependent | Rendered RGB8 subset | PSB-compatible reader required       |
-|                     | Resolution (DPI / 0x03ED)                             | Full                         | Full (72 DPI default) | Preserved                             |
-|                     | Embedded ICC Profile (0x040F)                         | Full (Extracted & Inspected) | Full (Embedded)       | Preserved                             |
-| **Color Modes**     | RGB (8-bit per channel)                               | Full                         | Full                  | Preserved                             |
-|                     | RGB (16-bit per channel)                              | Downsampled to 8-bit         | Planned Phase 5       | Degraded (16-bit to 8-bit)            |
-|                     | CMYK (8-bit)                                          | Composite flattened / Sim    | Planned Phase 5       | Warning (DeviceCMYK converted to RGB) |
-|                     | Grayscale (8-bit)                                     | Full (Expanded to RGB)       | Planned Phase 5       | Preserved (as RGB)                    |
-|                     | Indexed / Duotone / Lab                               | Flattened Composite only     | Unsupported           | Omitted (Composite used)              |
-| **Layer Structure** | Raster Pixel Layers                                   | Full                         | Full                  | Preserved                             |
-|                     | Blend Modes (Normal, Multiply, Screen, Overlay, etc.) | Full (Mapped to DOM)         | Full                  | Preserved                             |
-|                     | Opacity (0–100%)                                      | Full                         | Full                  | Preserved                             |
-|                     | User Layer Masks (Raster)                             | Full (Selection mask)        | Planned Phase 3       | Preserved / Flattened                 |
-|                     | Layer Groups / Hierarchy                              | Full (Group boundaries)      | Planned Phase 3       | Flattened in prototype                |
-|                     | Text Layers (Type Tool)                               | Rendered Pixels              | Planned Phase 5       | Degraded (Rasterized)                 |
-|                     | Vector / Shape Layers                                 | Rendered Pixels              | Planned Phase 5       | Degraded (Rasterized)                 |
-|                     | Adjustment Layers (Curves/Levels)                     | Rendered Pixels              | Planned Phase 5       | Degraded (Baked into Pixels)          |
-|                     | Smart Objects / Filters                               | Rendered Pixels              | Unsupported           | Degraded (Baked into Pixels)          |
+| Feature Category    | PSD Feature                                           | Import Support                | Export Support        | Preflight Classification              |
+| :------------------ | :---------------------------------------------------- | :---------------------------- | :-------------------- | :------------------------------------ |
+| **Document Specs**  | Version 1 (PSD, $\le 30\text{k}\times 30\text{k}$)    | Full                          | Full                  | Preserved                             |
+|                     | Version 2 (PSB, $\le 300\text{k}\times 300\text{k}$)  | RGB8 subset; memory dependent | Rendered RGB8 subset  | PSB-compatible reader required        |
+|                     | Resolution (DPI / 0x03ED)                             | Full                          | Full (72 DPI default) | Preserved                             |
+|                     | Embedded ICC Profile (0x040F)                         | Full (Extracted & Inspected)  | Full (Embedded)       | Preserved                             |
+| **Color Modes**     | RGB (8-bit per channel)                               | Full                          | Full                  | Preserved                             |
+|                     | RGB (16-bit per channel)                              | Downsampled to 8-bit          | Planned Phase 5       | Degraded (16-bit to 8-bit)            |
+|                     | CMYK (8-bit)                                          | Composite flattened / Sim     | Planned Phase 5       | Warning (DeviceCMYK converted to RGB) |
+|                     | Grayscale (8-bit)                                     | Full (Expanded to RGB)        | Planned Phase 5       | Preserved (as RGB)                    |
+|                     | Indexed / Duotone / Lab                               | Flattened Composite only      | Unsupported           | Omitted (Composite used)              |
+| **Layer Structure** | Raster Pixel Layers                                   | Full                          | Full                  | Preserved                             |
+|                     | Blend Modes (Normal, Multiply, Screen, Overlay, etc.) | Full (Mapped to DOM)          | Full                  | Preserved                             |
+|                     | Opacity (0–100%)                                      | Full                          | Full                  | Preserved                             |
+|                     | User Layer Masks (Raster)                             | Full (Selection mask)         | Planned Phase 3       | Preserved / Flattened                 |
+|                     | Layer Groups / Hierarchy                              | Full (Group boundaries)       | Planned Phase 3       | Flattened in prototype                |
+|                     | Text Layers (Type Tool)                               | Rendered Pixels               | Planned Phase 5       | Degraded (Rasterized)                 |
+|                     | Vector / Shape Layers                                 | Rendered Pixels               | Planned Phase 5       | Degraded (Rasterized)                 |
+|                     | Adjustment Layers (Curves/Levels)                     | Rendered Pixels               | Planned Phase 5       | Degraded (Baked into Pixels)          |
+|                     | Smart Objects / Filters                               | Rendered Pixels               | Unsupported           | Degraded (Baked into Pixels)          |
 
 ---
 
@@ -249,7 +249,7 @@ Prior to building the in-tree prototype, candidate third-party libraries were ev
 
 | Library      | License | Size / Footprint    | Strengths                                     | Disqualifying Limitations                                                                                                            |
 | :----------- | :------ | :------------------ | :-------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| `ag-psd`     | MIT     | ~280 KB minified    | High feature coverage (effects, text, shapes) | Large bundle weight; couples canvas DOM to browser globals; complex internal data structures diverge from Canoli Studio's OOP model.          |
+| `ag-psd`     | MIT     | ~280 KB minified    | High feature coverage (effects, text, shapes) | Large bundle weight; couples canvas DOM to browser globals; complex internal data structures diverge from Canoli Studio's OOP model. |
 | `psd.js`     | MIT     | ~180 KB             | Node / Browser support                        | Abandoned (no updates in 7+ years); lacks 16-bit support, PSB support, and modern ICC embedding.                                     |
 | `lcms2-wasm` | MIT     | ~1.8 MB WASM binary | Gold-standard LittleCMS color engine          | Heavy binary download; high initialization overhead; overkill for standard RGB/Display P3/Adobe RGB gamut mapping and soft-proofing. |
 | `colorjs.io` | MIT     | ~85 KB              | Comprehensive color math                      | General-purpose library; lacks binary ICC profile parsing, PackBits codecs, and high-performance typed array batch transforms.       |
@@ -293,24 +293,19 @@ The feasibility prototype is validated by comprehensive unit, integration, and e
 - **Export Engine Tests (`tests/export.test.ts`)**: Verifying PSD export format, capability report generation, and valid MIME type output.
 - **End-to-End Browser Tests (`tests/color-interchange.e2e.ts`)**: Verifying the UI Color Profile dialog, ICC tag inspection, soft-proofing toggles, PSD preflight inspection dialog, and canvas import.
 
-
 ### Current PSB verification boundary
 
 The browser rendered writer extends the [Adobe Photoshop file format](https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/) version-2 length/RLE rules. Independent tests use released psd-tools 1.10.9 in a temporary environment, not an application dependency. The newer 1.24.0 reader rejects axes beyond 30,000 even for version 2; this reader limitation is recorded rather than treating failure as an editor dimension cap. Independent external RLE fixtures exercise 30,001 and 100,000 pixel axes, including rows larger than 65,535 compressed bytes. Small layered cases force independent recomposition; large flattened cases compare native decoded layer/merged samples to PNG. These are encoded RGB8 tests with reader ICC conversion disabled, not Photoshop desktop, complete color/editability, real multi-GiB, physical-device or peak-memory acceptance.
-
 
 ### Current Photoshop input execution boundary
 
 The browser now performs full parse and PNG staging in cancellable private workers, returning only metadata for preflight. It still materializes input/decoded planes and does not reconstruct full Photoshop group/mask/color/precision semantics. Reports now identify inspected-but-unapplied/unretained ICC data, prototype unverified CMYK interpretation, rectangular mask coverage and omitted group appearance; these are explicit remaining fidelity gates, not completed color work. Low-level synchronous helpers remain separate. See SCRIPTING_API.md for host signatures, legacy buffer/result ownership, errors and memory boundaries.
 
-
 ### Eight-bit Photoshop ZIP input
 
 The trusted worker path now decodes native zlib ZIP and byte-predicted ZIP in 8-bit RGB/Gray PSD/PSB layer and merged channels. The shared parser preserves unsupported ZIP reports for synchronous adapters and higher precision. Independent psd-tools fixtures cover RGB/Gray alpha, prediction/channel/row boundaries, 100,000-pixel PSB rows and native 50 MP ZIP source pixels. No claim of high-precision/CMYK/HDR, ICC application, full editable mask/group semantics, whole-file streaming, original-container retention or independent Photoshop desktop acceptance follows from codec support. Adobe defines compression codes and planar merged ordering in its [file-format specification](https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/); predictor fixtures use released psd-tools without the app codec.
 
-
 Supported eight-bit Photoshop user-mask channels now retain independent pixel coverage through the existing native bitmap-mask and asset transport. Original-resolution source grids, bounds, black/white outside coverage, inversion, disabled state, density and coordinate planes are retained. Nonzero Photoshop feather and extended/combined/rendered/vector masks remain explicit unsupported layered paths; a supplied merged image can still import. Separate UI linkage metadata, full desktop/color/precision semantics and whole-process memory acceptance are not established by independent codec/source-grid tests.
-
 
 ### Current hierarchy increment (2026-10-17)
 

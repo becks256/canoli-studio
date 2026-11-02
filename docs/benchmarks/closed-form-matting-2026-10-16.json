@@ -5,16 +5,13 @@
   "fullRoadmapComplete": false,
   "formulation": {
     "primarySource": "https://www.cs.jhu.edu/~misha/ReadingSeminar/Papers/Levin06.pdf",
-    "equations": [
-      12,
-      13
-    ],
+    "equations": [12, 13],
     "implementation": "Original float64 sparse matting Laplacian and hard-constraint elimination, solved once globally through Jacobi-preconditioned conjugate gradients",
     "windows": "Overlapping native 3x3 windows centered at every source pixel, clipped at image boundaries; zero-alpha RGB omitted",
     "colorSpace": "Decoded encoded-sRGB RGB divided by 255",
-    "epsilon": 1e-07,
+    "epsilon": 1e-7,
     "maximumIterations": 2000,
-    "relativeResidualGate": 1e-07,
+    "relativeResidualGate": 1e-7,
     "residual": "Actual ||Ax-b|| / max(1,||b||), recomputed before success",
     "postprocessing": "Clip/round coverage to bytes, then explicit smoothing/contrast/WASM fractional feather; RGB decontamination remains a separate corrected foreground",
     "crossTileConnectionsRetained": true,
@@ -31,10 +28,7 @@
     "estimatedBytesPerReservedUnknownRow": 444,
     "unknownRowsOnly": true,
     "fullImageOutputPlaneOrCanvas": false,
-    "nativeCaptureCore": [
-      512,
-      64
-    ],
+    "nativeCaptureCore": [512, 64],
     "capture": "Disjoint row-major cores plus label/postprocessing halo, followed by native recapture for encoding",
     "limits": [
       "Graph estimate includes typed work arrays and a Map overhead estimate; actual heap/peak process memory was not measured",
@@ -63,7 +57,7 @@
         "independentReferenceSyntheticQuality": {
           "unknownPixels": 25,
           "meanAbsoluteError": 0.0007843137254901933,
-          "meanSquaredError": 1.1534025374855742e-06,
+          "meanSquaredError": 1.1534025374855742e-6,
           "maximumAbsoluteError": 0.0019607843137254832
         }
       },
@@ -85,7 +79,7 @@
         "independentReferenceSyntheticQuality": {
           "unknownPixels": 7,
           "meanAbsoluteError": 0.0014005602240896309,
-          "meanSquaredError": 2.608886691931656e-06,
+          "meanSquaredError": 2.608886691931656e-6,
           "maximumAbsoluteError": 0.002450980392156854
         }
       },
@@ -102,7 +96,7 @@
         "independentReferenceSyntheticQuality": {
           "unknownPixels": 710,
           "meanAbsoluteError": 0.006886953508786998,
-          "meanSquaredError": 7.392128828414795e-05,
+          "meanSquaredError": 7.392128828414795e-5,
           "maximumAbsoluteError": 0.032467812823801845
         }
       },
@@ -113,7 +107,7 @@
         "independentReferenceSyntheticQuality": {
           "unknownPixels": 539,
           "meanAbsoluteError": 0.001504283871034443,
-          "meanSquaredError": 3.4840064627658274e-06,
+          "meanSquaredError": 3.4840064627658274e-6,
           "maximumAbsoluteError": 0.004399479445077015
         }
       },
@@ -124,7 +118,7 @@
         "independentReferenceSyntheticQuality": {
           "unknownPixels": 5355,
           "meanAbsoluteError": 0.002974789915966372,
-          "meanSquaredError": 1.3004855921607271e-05,
+          "meanSquaredError": 1.3004855921607271e-5,
           "maximumAbsoluteError": 0.008823529411764619
         }
       }
@@ -174,7 +168,7 @@
       "total": 3161,
       "phase": "solve",
       "iteration": 1700,
-      "relativeResidual": 3.307373600630786e-08
+      "relativeResidual": 3.307373600630786e-8
     },
     "longTasks": [
       {

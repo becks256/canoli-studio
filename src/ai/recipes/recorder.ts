@@ -2,8 +2,12 @@ import { TONE_LIMITS } from "../../core/tone";
 import type { DocumentData, LayerData } from "../../core/model";
 import { allLayers, findLayer, id } from "../../core/model";
 import { execute } from "../../core/commands";
-import {paragraphStyleSchema,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS} from '../../core/paragraph-styles';
-import type {RecipeParagraphStyleTarget} from './types';
+import {
+  paragraphStyleSchema,
+  paragraphTextLayers,
+  PARAGRAPH_FORMAT_KEYS,
+} from "../../core/paragraph-styles";
+import type { RecipeParagraphStyleTarget } from "./types";
 import type { EditorCommand } from "../../core/commands";
 import type {
   Recipe,
@@ -12,8 +16,8 @@ import type {
   SemanticTarget,
 } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
-import {documentFontFiles,type FontFileData} from '../../core/font-files';
-import {recipeFontIds} from './fonts';
+import { documentFontFiles, type FontFileData } from "../../core/font-files";
+import { recipeFontIds } from "./fonts";
 
 export interface RecorderOptions {
   name?: string;
@@ -25,8 +29,8 @@ interface RecordingState {
   steps: RecipeStep[];
   unsupported: Set<string>;
   outputs: Map<string, SemanticTarget>;
-  styles:Map<string,RecipeParagraphStyleTarget>;
-  fonts:Map<string,FontFileData>;
+  styles: Map<string, RecipeParagraphStyleTarget>;
+  fonts: Map<string, FontFileData>;
   lastTarget: string | null;
 }
 
@@ -52,8 +56,8 @@ export class RecipeRecorder {
       steps: this.steps,
       unsupported: this.unsupported,
       outputs: this.createdLayerOutputs,
-      styles:this.styleOutputs,
-      fonts:this.fontFiles,
+      styles: this.styleOutputs,
+      fonts: this.fontFiles,
       lastTarget: this.lastCommandTargetLayerId,
     });
   }
@@ -62,7 +66,8 @@ export class RecipeRecorder {
     this.steps = state.steps;
     this.unsupported = state.unsupported;
     this.createdLayerOutputs = state.outputs;
-    this.styleOutputs=state.styles;this.fontFiles=state.fonts;
+    this.styleOutputs = state.styles;
+    this.fontFiles = state.fonts;
     this.lastCommandTargetLayerId = state.lastTarget;
     this.notify();
   }
@@ -88,29 +93,69 @@ export class RecipeRecorder {
     this.restore(state);
   }
   private createdLayerOutputs = new Map<string, SemanticTarget>(); // creation-time identity for roots and descendants
-  private styleOutputs=new Map<string,RecipeParagraphStyleTarget>();
-  private fontFiles=new Map<string,FontFileData>();
+  private styleOutputs = new Map<string, RecipeParagraphStyleTarget>();
+  private fontFiles = new Map<string, FontFileData>();
 
-  private captureFonts(value:unknown,before:DocumentData,after?:DocumentData):void{
-    const ids=recipeFontIds(value);if(!ids.size)return;
-    const available=[...documentFontFiles(before),...(after?documentFontFiles(after):[])];
-    for(const id of ids)if(!this.fontFiles.has(id)){const file=available.find(file=>file.id===id);if(file)this.fontFiles.set(id,structuredClone(file));}
+  private captureFonts(
+    value: unknown,
+    before: DocumentData,
+    after?: DocumentData,
+  ): void {
+    const ids = recipeFontIds(value);
+    if (!ids.size) return;
+    const available = [
+      ...documentFontFiles(before),
+      ...(after ? documentFontFiles(after) : []),
+    ];
+    for (const id of ids)
+      if (!this.fontFiles.has(id)) {
+        const file = available.find((file) => file.id === id);
+        if (file) this.fontFiles.set(id, structuredClone(file));
+      }
   }
-  private captureStyle(styleId:string,document:DocumentData):RecipeParagraphStyleTarget {
-    const existing=this.styleOutputs.get(styleId);if(existing)return structuredClone(existing);
-    const style=document.paragraphStyles?.find(value=>value.id===styleId);
-    if(!style)throw new Error('Recorded paragraph style is missing from its document.');
-    const parsed=paragraphStyleSchema.parse(style),stepId=`step-${id()}`;this.captureFonts(parsed.format,document);
-    const basedOn=parsed.basedOn?{style:this.captureStyle(parsed.basedOn.id,document),overrides:structuredClone(parsed.basedOn.overrides)}:undefined;
-    this.steps.push({id:stepId,name:`Use paragraph style ${parsed.name}`,action:{type:'paragraphStyle.ensure',name:parsed.name,format:parsed.format,...(basedOn?{basedOn}:{})}});
-    const reference:RecipeParagraphStyleTarget={by:'stepResult',stepId};
-    this.styleOutputs.set(styleId,reference);return structuredClone(reference);
+  private captureStyle(
+    styleId: string,
+    document: DocumentData,
+  ): RecipeParagraphStyleTarget {
+    const existing = this.styleOutputs.get(styleId);
+    if (existing) return structuredClone(existing);
+    const style = document.paragraphStyles?.find(
+      (value) => value.id === styleId,
+    );
+    if (!style)
+      throw new Error("Recorded paragraph style is missing from its document.");
+    const parsed = paragraphStyleSchema.parse(style),
+      stepId = `step-${id()}`;
+    this.captureFonts(parsed.format, document);
+    const basedOn = parsed.basedOn
+      ? {
+          style: this.captureStyle(parsed.basedOn.id, document),
+          overrides: structuredClone(parsed.basedOn.overrides),
+        }
+      : undefined;
+    this.steps.push({
+      id: stepId,
+      name: `Use paragraph style ${parsed.name}`,
+      action: {
+        type: "paragraphStyle.ensure",
+        name: parsed.name,
+        format: parsed.format,
+        ...(basedOn ? { basedOn } : {}),
+      },
+    });
+    const reference: RecipeParagraphStyleTarget = { by: "stepResult", stepId };
+    this.styleOutputs.set(styleId, reference);
+    return structuredClone(reference);
   }
   private initialSelectedId: string | null = null;
   private lastCommandTargetLayerId: string | null = null;
   private listeners = new Set<() => void>();
 
-  constructor(private readonly assetSource?:(id:string)=>Pick<import('../../core/assets').ImageAsset,'raw'>) {}
+  constructor(
+    private readonly assetSource?: (
+      id: string,
+    ) => Pick<import("../../core/assets").ImageAsset, "raw">,
+  ) {}
 
   isRecording(): boolean {
     return this.active && !this.paused;
@@ -148,7 +193,8 @@ export class RecipeRecorder {
     this.historyError = undefined;
     this.unsupported.clear();
     this.createdLayerOutputs.clear();
-    this.styleOutputs.clear();this.fontFiles.clear();
+    this.styleOutputs.clear();
+    this.fontFiles.clear();
     this.initialSelectedId = selectedId;
     this.lastCommandTargetLayerId = null;
     this.notify();
@@ -223,7 +269,7 @@ export class RecipeRecorder {
       return;
     }
 
-    this.captureFonts(command,beforeDoc,afterDoc);
+    this.captureFonts(command, beforeDoc, afterDoc);
 
     const targetFromLayer = (layer: LayerData): SemanticTarget => {
       const priorStepResult = this.createdLayerOutputs.get(layer.id);
@@ -237,96 +283,259 @@ export class RecipeRecorder {
     };
 
     switch (command.type) {
-      case 'layer.align': {
-        const reference=(layerId:string):SemanticTarget=>{
-          const layer=findLayer(beforeDoc,layerId);if(!layer)throw new Error('Missing recorded alignment layer.');
-          return this.createdLayerOutputs.has(layerId)?structuredClone(this.createdLayerOutputs.get(layerId)!):{by:'name',pattern:layer.name,literal:true,ambiguityStrategy:'fail'};
+      case "layer.align": {
+        const reference = (layerId: string): SemanticTarget => {
+          const layer = findLayer(beforeDoc, layerId);
+          if (!layer) throw new Error("Missing recorded alignment layer.");
+          return this.createdLayerOutputs.has(layerId)
+            ? structuredClone(this.createdLayerOutputs.get(layerId)!)
+            : {
+                by: "name",
+                pattern: layer.name,
+                literal: true,
+                ambiguityStrategy: "fail",
+              };
         };
-        this.steps.push({id:`step-${id()}`,name:'Align layers',action:{type:'layer.align',targets:command.ids.map(reference),alignment:command.alignment,
-          reference:command.target?.type==='layer'?{type:'layer',layer:reference(command.target.id)}:command.target??{type:'selection'}}});
-        this.lastCommandTargetLayerId=null;this.notify();break;
+        this.steps.push({
+          id: `step-${id()}`,
+          name: "Align layers",
+          action: {
+            type: "layer.align",
+            targets: command.ids.map(reference),
+            alignment: command.alignment,
+            reference:
+              command.target?.type === "layer"
+                ? { type: "layer", layer: reference(command.target.id) }
+                : (command.target ?? { type: "selection" }),
+          },
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
-      case 'font.file.add':
-      case 'font.file.rename':
-      case 'font.file.remove': {
-        const action=command.type==='font.file.add'?{type:command.type,id:command.file.id}:structuredClone(command);
-        this.steps.push({id:`step-${id()}`,name:'Update embedded font file',action});this.lastCommandTargetLayerId=null;this.notify();break;
+      case "font.file.add":
+      case "font.file.rename":
+      case "font.file.remove": {
+        const action =
+          command.type === "font.file.add"
+            ? { type: command.type, id: command.file.id }
+            : structuredClone(command);
+        this.steps.push({
+          id: `step-${id()}`,
+          name: "Update embedded font file",
+          action,
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
-      case 'component.set': {
-        const previous=beforeDoc.components?.find(value=>value.id===command.definition.id),source=command.definition.source;
-        const layer=allLayers(beforeDoc.children).filter(value=>value.kind==='smart-object'&&value.componentId===command.definition.id)
-          .sort((a,b)=>Number(b.id===this.initialSelectedId)-Number(a.id===this.initialSelectedId))[0];
-        let recorded=false;
-        if(previous?.source.kind==='asset'&&source.kind==='asset'&&layer&&this.assetSource){
-          try{
-            const before=this.assetSource(previous.source.assetId).raw,after=this.assetSource(source.assetId).raw;
-            if(before&&after&&before.original.sha256===after.original.sha256&&before.original.byteLength===after.original.byteLength&&before.original.type===after.original.type&&
-              JSON.stringify({...previous,source:null})===JSON.stringify({...command.definition,source:null})){
-              this.steps.push({id:`step-${id()}`,name:`Develop RAW ${layer.name}`,target:targetFromLayer(layer),action:{type:'raw.develop',development:structuredClone(after.settings.development),allowPrecisionLoss:true}});recorded=true;
+      case "component.set": {
+        const previous = beforeDoc.components?.find(
+            (value) => value.id === command.definition.id,
+          ),
+          source = command.definition.source;
+        const layer = allLayers(beforeDoc.children)
+          .filter(
+            (value) =>
+              value.kind === "smart-object" &&
+              value.componentId === command.definition.id,
+          )
+          .sort(
+            (a, b) =>
+              Number(b.id === this.initialSelectedId) -
+              Number(a.id === this.initialSelectedId),
+          )[0];
+        let recorded = false;
+        if (
+          previous?.source.kind === "asset" &&
+          source.kind === "asset" &&
+          layer &&
+          this.assetSource
+        ) {
+          try {
+            const before = this.assetSource(previous.source.assetId).raw,
+              after = this.assetSource(source.assetId).raw;
+            if (
+              before &&
+              after &&
+              before.original.sha256 === after.original.sha256 &&
+              before.original.byteLength === after.original.byteLength &&
+              before.original.type === after.original.type &&
+              JSON.stringify({ ...previous, source: null }) ===
+                JSON.stringify({ ...command.definition, source: null })
+            ) {
+              this.steps.push({
+                id: `step-${id()}`,
+                name: `Develop RAW ${layer.name}`,
+                target: targetFromLayer(layer),
+                action: {
+                  type: "raw.develop",
+                  development: structuredClone(after.settings.development),
+                  allowPrecisionLoss: true,
+                },
+              });
+              recorded = true;
             }
-          }catch{/* Unavailable provenance cannot become a semantic recording. */}
+          } catch {
+            /* Unavailable provenance cannot become a semantic recording. */
+          }
         }
-        if(!recorded)this.unsupported.add(command.type);
-        this.lastCommandTargetLayerId=null;this.notify();break;
+        if (!recorded) this.unsupported.add(command.type);
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
-      case 'paragraphStyle.set': {
-        const previous=beforeDoc.paragraphStyles?.find(style=>style.id===command.style.id);
-        const style=paragraphStyleSchema.parse(command.style);
-        if(previous){
-          const reference=this.captureStyle(previous.id,beforeDoc);
-          const stepId=`step-${id()}`;
-          const basedOn=style.basedOn?{style:this.captureStyle(style.basedOn.id,beforeDoc),overrides:structuredClone(style.basedOn.overrides)}:undefined;
-          this.steps.push({id:stepId,name:`Update paragraph style ${style.name}`,action:{type:'paragraphStyle.update',style:reference,name:style.name,format:style.format,...(basedOn?{basedOn}:{})}});
-          this.styleOutputs.set(style.id,{by:'stepResult',stepId});
-        }else{
-          this.styleOutputs.delete(style.id);this.captureStyle(style.id,afterDoc);
+      case "paragraphStyle.set": {
+        const previous = beforeDoc.paragraphStyles?.find(
+          (style) => style.id === command.style.id,
+        );
+        const style = paragraphStyleSchema.parse(command.style);
+        if (previous) {
+          const reference = this.captureStyle(previous.id, beforeDoc);
+          const stepId = `step-${id()}`;
+          const basedOn = style.basedOn
+            ? {
+                style: this.captureStyle(style.basedOn.id, beforeDoc),
+                overrides: structuredClone(style.basedOn.overrides),
+              }
+            : undefined;
+          this.steps.push({
+            id: stepId,
+            name: `Update paragraph style ${style.name}`,
+            action: {
+              type: "paragraphStyle.update",
+              style: reference,
+              name: style.name,
+              format: style.format,
+              ...(basedOn ? { basedOn } : {}),
+            },
+          });
+          this.styleOutputs.set(style.id, { by: "stepResult", stepId });
+        } else {
+          this.styleOutputs.delete(style.id);
+          this.captureStyle(style.id, afterDoc);
         }
-        this.lastCommandTargetLayerId=null;this.notify();break;
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
-      case 'paragraphStyle.remove': {
-        const reference=this.captureStyle(command.id,beforeDoc);
-        this.steps.push({id:`step-${id()}`,name:'Remove paragraph style',action:{type:'paragraphStyle.remove',style:reference}});
-        this.styleOutputs.delete(command.id);this.lastCommandTargetLayerId=null;this.notify();break;
+      case "paragraphStyle.remove": {
+        const reference = this.captureStyle(command.id, beforeDoc);
+        this.steps.push({
+          id: `step-${id()}`,
+          name: "Remove paragraph style",
+          action: { type: "paragraphStyle.remove", style: reference },
+        });
+        this.styleOutputs.delete(command.id);
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
-      case 'text.paragraphStyle':
-      case 'text.paragraphOverrides.clear': {
-        const layer=findLayer(beforeDoc,command.id);if(!layer)return;
-        const style=command.type==='text.paragraphStyle'&&command.styleId!==null?this.captureStyle(command.styleId,beforeDoc):null;
-        this.steps.push({id:`step-${id()}`,name:`${command.type==='text.paragraphStyle'?'Apply or detach paragraph style':'Reset paragraph overrides'} on ${layer.name}`,
-          target:targetFromLayer(layer),action:command.type==='text.paragraphStyle'
-            ?{type:'text.paragraphStyle',style,keepOverrides:command.keepOverrides}
-            :{type:'text.paragraphOverrides.clear',keys:command.keys?structuredClone(command.keys):undefined}});
-        this.lastCommandTargetLayerId=null;this.notify();break;
+      case "text.paragraphStyle":
+      case "text.paragraphOverrides.clear": {
+        const layer = findLayer(beforeDoc, command.id);
+        if (!layer) return;
+        const style =
+          command.type === "text.paragraphStyle" && command.styleId !== null
+            ? this.captureStyle(command.styleId, beforeDoc)
+            : null;
+        this.steps.push({
+          id: `step-${id()}`,
+          name: `${command.type === "text.paragraphStyle" ? "Apply or detach paragraph style" : "Reset paragraph overrides"} on ${layer.name}`,
+          target: targetFromLayer(layer),
+          action:
+            command.type === "text.paragraphStyle"
+              ? {
+                  type: "text.paragraphStyle",
+                  style,
+                  keepOverrides: command.keepOverrides,
+                }
+              : {
+                  type: "text.paragraphOverrides.clear",
+                  keys: command.keys
+                    ? structuredClone(command.keys)
+                    : undefined,
+                },
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
       case "layer.place": {
-        const layer=findLayer(beforeDoc,command.id),reference=command.targetId?findLayer(beforeDoc,command.targetId):null;if(!layer)return;
-        this.steps.push({id:`step-${id()}`,name:`Place ${layer.name}`,target:targetFromLayer(layer),action:{type:'layer.place',reference:reference?targetFromLayer(reference):null,placement:command.placement,preservePosition:command.preservePosition}});
-        this.lastCommandTargetLayerId=null;this.notify();break;
+        const layer = findLayer(beforeDoc, command.id),
+          reference = command.targetId
+            ? findLayer(beforeDoc, command.targetId)
+            : null;
+        if (!layer) return;
+        this.steps.push({
+          id: `step-${id()}`,
+          name: `Place ${layer.name}`,
+          target: targetFromLayer(layer),
+          action: {
+            type: "layer.place",
+            reference: reference ? targetFromLayer(reference) : null,
+            placement: command.placement,
+            preservePosition: command.preservePosition,
+          },
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
       case "paint.add": {
-        const layer=findLayer(beforeDoc,command.id);if(!layer)return;
-        this.steps.push({id:`step-${id()}`,name:`Add ${command.stroke.kind} stroke to ${layer.name}`,target:targetFromLayer(layer),action:{type:'paint.add',stroke:structuredClone(command.stroke)}});
-        this.lastCommandTargetLayerId=null;this.notify();break;
+        const layer = findLayer(beforeDoc, command.id);
+        if (!layer) return;
+        this.steps.push({
+          id: `step-${id()}`,
+          name: `Add ${command.stroke.kind} stroke to ${layer.name}`,
+          target: targetFromLayer(layer),
+          action: {
+            type: "paint.add",
+            stroke: structuredClone(command.stroke),
+          },
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
       case "path.add": {
-        const layer=findLayer(beforeDoc,command.id);if(!layer)return;
-        this.steps.push({id:`step-${id()}`,name:`Add path to ${layer.name}`,target:targetFromLayer(layer),action:{type:'path.add',path:structuredClone(command.path)}});
-        this.lastCommandTargetLayerId=null;this.notify();break;
+        const layer = findLayer(beforeDoc, command.id);
+        if (!layer) return;
+        this.steps.push({
+          id: `step-${id()}`,
+          name: `Add path to ${layer.name}`,
+          target: targetFromLayer(layer),
+          action: { type: "path.add", path: structuredClone(command.path) },
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
       case "layer.update": {
         const layer = findLayer(beforeDoc, command.id);
         if (!layer) return;
         const target = targetFromLayer(layer);
-        const patch={...command.patch};
+        const patch = { ...command.patch };
         // JSON has no undefined value. Preserve explicit inheritance resets as commands.
-        const resetKeys=layer.kind==='text'&&layer.paragraphStyle
-          ?PARAGRAPH_FORMAT_KEYS.filter(key=>key in patch&&patch[key]===undefined):[];
-        if(resetKeys.length){
-          for(const key of resetKeys)delete patch[key];
-          this.steps.push({id:`step-${id()}`,name:`Reset paragraph overrides on ${layer.name}`,target,
-            action:{type:'text.paragraphOverrides.clear',keys:resetKeys}});
-          this.lastCommandTargetLayerId=null;
-          if(!Object.keys(patch).length){this.notify();return;}
+        const resetKeys =
+          layer.kind === "text" && layer.paragraphStyle
+            ? PARAGRAPH_FORMAT_KEYS.filter(
+                (key) => key in patch && patch[key] === undefined,
+              )
+            : [];
+        if (resetKeys.length) {
+          for (const key of resetKeys) delete patch[key];
+          this.steps.push({
+            id: `step-${id()}`,
+            name: `Reset paragraph overrides on ${layer.name}`,
+            target,
+            action: { type: "text.paragraphOverrides.clear", keys: resetKeys },
+          });
+          this.lastCommandTargetLayerId = null;
+          if (!Object.keys(patch).length) {
+            this.notify();
+            return;
+          }
         }
 
         // Check if we can coalesce into previous layer.update on the SAME layer
@@ -511,12 +720,17 @@ export class RecipeRecorder {
         }
         const cleanTemplate = structuredClone(command.layer) as any;
         delete cleanTemplate.id;
-        const paragraphStyles:Record<string,RecipeParagraphStyleTarget>={};
-        for(const text of paragraphTextLayers([cleanTemplate]))if(text.paragraphStyle){
-          const reference=this.captureStyle(text.paragraphStyle.id,beforeDoc);
-          const key=`style-${Object.keys(paragraphStyles).length}`;
-          paragraphStyles[key]=reference;text.paragraphStyle.id=key;
-        }
+        const paragraphStyles: Record<string, RecipeParagraphStyleTarget> = {};
+        for (const text of paragraphTextLayers([cleanTemplate]))
+          if (text.paragraphStyle) {
+            const reference = this.captureStyle(
+              text.paragraphStyle.id,
+              beforeDoc,
+            );
+            const key = `style-${Object.keys(paragraphStyles).length}`;
+            paragraphStyles[key] = reference;
+            text.paragraphStyle.id = key;
+          }
 
         const stepId = `step-${id()}`;
         const outputVar = `output_${stepId}`;
@@ -531,7 +745,7 @@ export class RecipeRecorder {
             type: "layer.add",
             layerTemplate: cleanTemplate,
             parentTarget,
-            ...(Object.keys(paragraphStyles).length?{paragraphStyles}:{}),
+            ...(Object.keys(paragraphStyles).length ? { paragraphStyles } : {}),
           },
           outputVar,
         });
@@ -539,13 +753,31 @@ export class RecipeRecorder {
         break;
       }
 
-      case 'document.font.replace': {
-        this.steps.push({id:`step-${id()}`,name:'Replace document font',action:{type:command.type,from:command.from,to:command.to}});
-        this.lastCommandTargetLayerId=null;this.notify();break;
+      case "document.font.replace": {
+        this.steps.push({
+          id: `step-${id()}`,
+          name: "Replace document font",
+          action: { type: command.type, from: command.from, to: command.to },
+        });
+        this.lastCommandTargetLayerId = null;
+        this.notify();
+        break;
       }
-      case 'document.precision.float':{
-        if(command.sources?.length){this.unsupported.add('document.precision.float with prepared source replacements');this.notify();break;}
-        this.steps.push({id:`step-${id()}`,name:'Use 32-bit linear editing',action:{type:'document.precision.float'}});this.notify();break;
+      case "document.precision.float": {
+        if (command.sources?.length) {
+          this.unsupported.add(
+            "document.precision.float with prepared source replacements",
+          );
+          this.notify();
+          break;
+        }
+        this.steps.push({
+          id: `step-${id()}`,
+          name: "Use 32-bit linear editing",
+          action: { type: "document.precision.float" },
+        });
+        this.notify();
+        break;
       }
       case "document.rename": {
         this.steps.push({
@@ -561,7 +793,10 @@ export class RecipeRecorder {
       case "document.resize": {
         this.steps.push({
           id: `step-${id()}`,
-          name: command.type === "document.resizeImage" ? "Resize Image" : "Resize Artboard",
+          name:
+            command.type === "document.resizeImage"
+              ? "Resize Image"
+              : "Resize Artboard",
           action: {
             type: command.type,
             width: command.width,
@@ -587,15 +822,16 @@ export class RecipeRecorder {
 
       case "selection.polygon":
       case "selection.set": {
-        const selection = command.type === "selection.polygon" ? afterDoc.selection : command.selection;
+        const selection =
+          command.type === "selection.polygon"
+            ? afterDoc.selection
+            : command.selection;
         this.steps.push({
           id: `step-${id()}`,
           name: selection ? "Set Selection" : "Clear Selection",
           action: {
             type: "selection.set",
-            selection: selection
-              ? structuredClone(selection)
-              : null,
+            selection: selection ? structuredClone(selection) : null,
           },
         });
         this.notify();
@@ -701,12 +937,19 @@ export class RecipeRecorder {
       }
     }
 
-    const fonts=[...recipeFontIds(steps.map(step=>step.action))].map(id=>{
-      const file=this.fontFiles.get(id);if(!file)throw new Error(`Recorded embedded font declaration is unavailable: ${id}. Embed the source before recording.`);return structuredClone(file);
-    });
+    const fonts = [...recipeFontIds(steps.map((step) => step.action))].map(
+      (id) => {
+        const file = this.fontFiles.get(id);
+        if (!file)
+          throw new Error(
+            `Recorded embedded font declaration is unavailable: ${id}. Embed the source before recording.`,
+          );
+        return structuredClone(file);
+      },
+    );
     const recipe: Recipe = {
-      schemaVersion: fonts.length?2:RECIPE_SCHEMA_VERSION,
-      ...(fonts.length?{fontFiles:fonts}:{}),
+      schemaVersion: fonts.length ? 2 : RECIPE_SCHEMA_VERSION,
+      ...(fonts.length ? { fontFiles: fonts } : {}),
       id: `recipe-${id()}`,
       name: options.name?.trim() || "Recorded Action",
       description:
@@ -723,7 +966,8 @@ export class RecipeRecorder {
     this.steps = [];
     this.unsupported.clear();
     this.createdLayerOutputs.clear();
-    this.styleOutputs.clear();this.fontFiles.clear();
+    this.styleOutputs.clear();
+    this.fontFiles.clear();
     this.notify();
     return recipe;
   }

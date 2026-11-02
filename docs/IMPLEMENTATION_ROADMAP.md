@@ -115,7 +115,6 @@ Review found a captured document reference outliving a gesture. Pre-cleanup nati
 
 This delivers local spacing feedback and equal-gap movement, not full F03/F14 or the original roadmap. Broader constraints/warp/artboards, professional/color/photographic/typographic quality, sustained all-tool performance, provider/installed ChatGPT/live identity/commercial and every other unfinished original gate remain active. These are authored geometric measurements, not visibility/occlusion, print quality or inferred design intent. No public model/API/schema/permission, account, upload or paid operation is added.
 
-
 ### 2026-10-26 — A12 declared alignment inspection connected and verified
 
 Explicit canvas/key alignment policies now use shared authored geometry, version-2 report evidence/coverage, the custom Design checks dialog, isolated Scripts/plugins and independent REST. Omitted policies retain strict version 1. Compact payloads preserve active wet replacement extents and scope geometry to requested targets/keys when canvas bounds are disabled; geometry is cached per report. Actual document-instance binding clears stale policies/results even for identical persistent IDs and revision. [Exact signatures, defaults, errors, executable example and limits](DESIGN_CHECKS.md).
@@ -133,7 +132,6 @@ Verified on unchanged captured inputs with Chromium 153.0.8010.12, Node 24.0.1 a
 Raw pilots retain corrected harness/validator assertions. The final build caught a missing version narrowing in a new browser assertion; the corrected build and full runs pass. An independent auditor initially assumed a fill-only rectangle; saved points and its authored 2px stroke establish the correct 42×22 frame without changing source, reports or tolerances. [Sealed source reconstruction, complete raw reports, pilots, original-bearing artifacts and independent validators](benchmarks/declared-alignment-checks-2026-10-26.zip).
 
 This delivers explicit declared alignment inspection, not full A12 or the original roadmap. Inferred intent, bleed, rendered visibility, contrast/legibility and broader delivery/quality/device/performance/provider/installed ChatGPT/live identity/commercial gates remain required. Headless REST frames are estimated and do not synchronize with browser sessions. Document schema 47, existing project/workspace formats and plugin permissions are unchanged. No paid call, account, upload or arbitrary original-resolution limit is introduced.
-
 
 ### 2026-10-26 — F08 public vertical authoring connected and verified
 
@@ -443,9 +441,9 @@ Owner: implementation agent; investigation following `33e935c`. The retained ben
 Final unchanged-scheduler results, 12 real swaps per case and nearest-rank p95 without filtering:
 
 | Text layers | Total median / p95 | Click-to-prepare median / p95 | Preparation median / p95 | Copy median / p95 | Long tasks |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 16 | 57.10 / 64.30 ms | 53.60 / 62.30 ms | 2.20 / 13.40 ms | 0.10 / 0.20 ms | 1 |
-| 64 | 56.35 / 66.20 ms | 50.70 / 61.80 ms | 4.55 / 43.60 ms | 0.40 / 0.70 ms | 2 |
+| ----------- | -----------------: | ----------------------------: | -----------------------: | ----------------: | ---------: |
+| 16          |   57.10 / 64.30 ms |              53.60 / 62.30 ms |          2.20 / 13.40 ms |    0.10 / 0.20 ms |          1 |
+| 64          |   56.35 / 66.20 ms |              50.70 / 61.80 ms |          4.55 / 43.60 ms |    0.40 / 0.70 ms |          2 |
 
 Every captured font frame uses Canvas2D. A CPU profile and separate timeline show short warm preparation but a substantial earlier wait; this is not evidence of its root cause. A task-boundary experiment passed deterministic coalescing/Undo/supersession checks but did not improve real clicks and made typing controls slower. Its trace also records delayed MessageChannel delivery. A feature-detected prioritized-task experiment likewise did not improve font clicks. Both were fully reverted, including their proposed requirements and experimental tests. Their exact source preimages, bundles, raw reports and traces remain in the evidence. No scheduling optimization or new browser requirement is shipped.
 
@@ -462,9 +460,9 @@ A fresh diagnostic selects Canvas2D for both blank and dense documents in this e
 The same real Replace-font workflow measures 12 swaps per case, approximately 1,000 characters per layer, from click through a prepared matching-state frame to its canvas copy. Availability preparation is excluded; long-task observation includes surrounding UI work. Nearest-rank p95 and all samples are retained without filtering or pooling:
 
 | Text layers | Frozen baseline median / p95 | Candidate median / p95 | Baseline control after candidate median / p95 | Long tasks: baseline / candidate / later control |
-| --- | ---: | ---: | ---: | ---: |
-| 16 | 77.80 / 94.80 ms | 57.30 / 64.90 ms | 75.60 / 92.10 ms | 1 / 1 / 1 |
-| 64 | 150.55 / 175.10 ms | 58.40 / 110.00 ms | 145.15 / 158.40 ms | 25 / 3 / 21 |
+| ----------- | ---------------------------: | ---------------------: | --------------------------------------------: | -----------------------------------------------: |
+| 16          |             77.80 / 94.80 ms |       57.30 / 64.90 ms |                              75.60 / 92.10 ms |                                        1 / 1 / 1 |
+| 64          |           150.55 / 175.10 ms |      58.40 / 110.00 ms |                            145.15 / 158.40 ms |                                      25 / 3 / 21 |
 
 Every captured font-swap frame uses Canvas2D. Typing and vector controls pass in both releases, with mixed small differences: candidate 64-layer plain/overlay/shadow typing p95 is 16.1/17.4/19.5 ms versus 17.1/15.7/16.1 ms in the later frozen control. This establishes a cold-font replacement improvement, not a blanket speedup. Font-swap p95 still exceeds 33 ms and retains long tasks; physical display, sustained editor-wide latency, hardware GPU/tablet and process-peak memory gates remain open.
 
@@ -495,9 +493,9 @@ Verification:
 The new stress fixture measures real Replace-font clicks through a prepared frame containing the requested family to the canvas copy. Each case uses 12 swaps and approximately 1,000 characters per layer. Final unprofiled results:
 
 | Text layers | Command median / p95 | Matching-canvas median / p95 | Observed long tasks |
-| --- | ---: | ---: | ---: |
-| 16 | 1.90 / 4.30 ms | 78.85 / 86.80 ms | 1 |
-| 64 | 4.05 / 7.20 ms | 153.35 / 169.00 ms | 23 |
+| ----------- | -------------------: | ---------------------------: | ------------------: |
+| 16          |       1.90 / 4.30 ms |             78.85 / 86.80 ms |                   1 |
+| 64          |       4.05 / 7.20 ms |           153.35 / 169.00 ms |                  23 |
 
 These do **not** meet the 33 ms or sustained all-tool F14 targets. Timing excludes the deliberate availability-preparation wait and records a canvas-copy proxy behind the still-open modal, not physical display. Long tasks include the observed interaction window, not just the synchronous model command. A separate pre-polish CPU diagnostic samples `render`/`prepareFallback` and native Canvas state/drawing work; its UI source preimages match the recorded input hashes. Earlier unprofiled/profiled timings remain separate, without pooling or attributing variation to the visual changes. The renderer path remains an actionable next F14 investigation; no editor-wide speedup, hardware/GPU, peak-memory or universal 60fps claim is made.
 
@@ -518,10 +516,10 @@ Real-browser regressions cover changed callback versions and transparency eligib
 Three final alternating production pairs use frozen baseline/final releases, the unchanged matching-text/vector, document-operation and routine-interaction fixtures, one worker and identical per-run inputs: **72 cases**, including **840 matching-text presentation samples with zero observed long tasks**. Median per-run p95:
 
 | 64-layer fixture | Baseline | Retained rows |
-| --- | ---: | ---: |
-| Plain text | 17.5 ms | 15.8 ms |
-| Color overlay | 18.8 ms | 18.4 ms |
-| Drop shadow | 18.2 ms | 17.7 ms |
+| ---------------- | -------: | ------------: |
+| Plain text       |  17.5 ms |       15.8 ms |
+| Color overlay    |  18.8 ms |       18.4 ms |
+| Drop shadow      |  18.2 ms |       17.7 ms |
 
 Broader results remain mixed: 64-layer resize/script median presentation moves from 26.5/170.0 to 25.9/159.9 ms, crop stays at 22.5 ms, and routine redo p95 rises from 16.2 to 19.9 ms. Source-build plain/overlay/shadow p95 worsens from 92.5/97.6/98.3 to 99.6/111.2/108.8 ms, with 5/3/4 versus 12/8/8 long tasks. In the plain 64-layer CPU profile, inclusive LayersPanel/renderLayers sampling falls from 140.81/125.46 to 83.54/61.50 ms across 20 edits. Less panel work does not establish editor-wide latency acceptance; source typing still exceeds 33 ms. Earlier preliminary production pairs and source measurements are preserved separately, not pooled with the final comparisons.
 
@@ -545,10 +543,10 @@ Five new invariant checks cover live handles, nested locks, moves/removal, histo
 Three alternating production pairs run the unchanged typing/vector, crop/resize/isolated-script and routine keyboard/layer fixtures: **72 cases**, one worker, frozen releases and identical per-run inputs. Dense-text median per-run p95 improves:
 
 | 64-layer fixture | Baseline p95 | Indexed p95 |
-| --- | ---: | ---: |
-| Plain | 19.6 ms | 16.6 ms |
-| Color overlay | 19.2 ms | 18.0 ms |
-| Drop shadow | 22.0 ms | 19.5 ms |
+| ---------------- | -----------: | ----------: |
+| Plain            |      19.6 ms |     16.6 ms |
+| Color overlay    |      19.2 ms |     18.0 ms |
+| Drop shadow      |      22.0 ms |     19.5 ms |
 
 All **840 matching-text presentation samples** have no observed long tasks. Broader results remain mixed. The 64-layer image-resize median presentation improves from 27.2 to 25.2 ms, while isolated-script median presentation rises from 157.8 to 167.8 ms. Twenty-path vector p95 rises from 14.3 to 17.2 ms; 200-path p95 falls from 16.9 to 15.2 ms. Routine and one-layer measurements also vary. These observations do not establish an editor-wide improvement or assign a cause to every difference.
 
@@ -571,11 +569,11 @@ Owner: implementation agent; estimate M within F14. Starting from `3ae5034`, CPU
 
 The unchanged seven matching-text presentation fixtures run against frozen production bundles using the existing benchmark API exposure; its only source-code branch exposes the same editor/constructors on window. Three alternating baseline/candidate pairs, one worker and 20 edits per fixture produce **840 actual matching-frame samples**. Median per-run p95 for the 64-layer fixtures improves:
 
-| Fixture | Baseline p95 | Candidate p95 |
-| --- | ---: | ---: |
-| Plain text | 19.0 ms | 16.2 ms |
-| Color overlay | 21.7 ms | 16.7 ms |
-| Drop shadow | 23.1 ms | 17.6 ms |
+| Fixture       | Baseline p95 | Candidate p95 |
+| ------------- | -----------: | ------------: |
+| Plain text    |      19.0 ms |       16.2 ms |
+| Color overlay |      21.7 ms |       16.7 ms |
+| Drop shadow   |      23.1 ms |       17.6 ms |
 
 No long tasks are observed in those paired runs. One-layer results remain mixed; candidate per-run p95 ranges from 13.7 to 18.1 ms. A separate profiled source-browser pair reduces 64-layer p95 from 142.1–151.9 to 90.8–96.4 ms; sampled time under icon code falls from approximately 389–410 to 129–141 ms across 20 edits. Development typing still misses the 33 ms target and retains long tasks. These short local headless-Chromium canvas-presentation proxies do not establish sustained editor-wide, physical-display/device/GPU, process-memory or universal 60fps acceptance.
 
@@ -864,7 +862,6 @@ Owner: implementation agent; T16/T17/F12. Previous goal turn is progress: `5c9bc
 
 Current work adds an immutable LensCorrection value and optional versioned RAW settings, radial distortion, linear-light chromatic scales/vignette attenuation, exact cubic fold/attenuation validation and bounded native RGB16 region sampling before sRGB8 conversion. The existing import/development/batch review, isolated constructors, separate REST worker, semantic recipes and original/accepted persistence share those settings. Source coverage produces transparent borders; source geometry remains native. Independent NumPy fixtures cover each operation and a nontrivial 50 MP combination; an inverse-distorted target tests actual line straightening. Build/full unit/native/production/50 MP acceptance is pending. This manual foundation does not replace the remaining calibrated camera/profile matching, broader lens models/quality evaluation, lens database workflows, merges, F10/F14 or any other unfinished original-roadmap requirement. No paid operation, cloud upload, new isolated file privilege or arbitrary original-image cap is introduced.
 
-
 ### 2026-10-22 — F12 direct RAW batch workflow verified
 
 Owner: implementation agent; T14/T15/T16/T17/F12. Previous goal turn is progress: `a0aa0d8` committed semantic RAW recipes. Direct batch inputs now use actual native inspection, exact development review and explicit sRGB8 consent, preserving complete originals/settings before atomic run/source publication. Workers prepare independent OO smart-object documents and native semantic/portable recipes, then atomically persist checksummed editable projects before the first delivery. Retry/reload verifies original/project/input/delivery identities, reuses accepted scenes without the RAW decoder and retains completed variant identities. Corruption, changed parameters, cancellation/disposal and quota failures cannot silently redevelop accepted work or publish partial outputs. Database v2 preserves legacy data and protects prepared references during reclamation/deletion; blocked older tabs report a recovery instruction. Local ZIPs include verified editable RAW projects and a checksummed preparation index beside existing delivery manifests. Zero-provider-cost deterministic work needs no spending approval; positive-cost work keeps the existing budget gate. The visible editor and its history/assets remain unchanged.
@@ -895,7 +892,6 @@ Current work connects pure RawDevelopment values and awaited metadata/developmen
 
 Focused Node/codec/source checks and four real REST pilot checks pass, including a genuine >100 MB, 50 MP original and every working RGBA sample. Build/full unit, isolated plugin/runtime and browser/production acceptance remain pending. Semantic RAW recipes/direct-file batch, camera/profile/color/quality, lens/merge work, F10/F14 and all other unfinished original-roadmap requirements remain active; this is not a narrowed completion target.
 
-
 ### 2026-10-22 — F12 native RAW host workflow accepted; automation and camera-quality gates remain
 
 Owner: implementation agent; XL within T16/T17/F12. This turn is progress from `a38987a`: trusted `openRaw` now develops real sensor data into a clean native-resolution smart-object document. `RawDevelopment` and attached `developRaw` retain parameters, prepare pixels privately and commit one shared master command with ordinary locks/history. The custom import/development dialog supplies explicit sRGB8 consent, actual native previews, WB/custom multipliers, demosaicing and exposure/highlight controls, inspector/command-search access and recent-file review. Original RAW bytes and accepted PNGs have independent checksummed identities and frozen provenance/settings records. Project v4 deduplicates originals across history; ordinary projects stay v3, document/workspace schemas stay 41/2. Workspace redo, recovery, source-document closure/copy, recipe package v2 and brush preset/pack v6 retain source data and accepted pixels. Saved reopening and undo/redo need no RAW decoder.
@@ -906,7 +902,6 @@ Diagnostic history is preserved. A history test was corrected to restore a works
 
 The full connected F12 target remains active. Required next surfaces include isolated Scripts/plugin and separate headless REST development, semantic RAW recipe actions and direct RAW batch inputs. Physical camera/profile/color/quality evaluation, broader RAW/DNG codecs, lens correction, panorama/HDR/focus merges, F10 precision and F14 resource/performance gates remain open, as do every other unfinished professional-editor, AI/provider/evaluation, collaboration/commercial and specialist requirement in the original roadmap. No paid operation, upload, new isolated file privilege or arbitrary original-image MP/file limit was introduced. This accepts the native host increment, not full F12 or the roadmap.
 
-
 ### 2026-10-22 — F12 connected RAW host workflow in implementation
 
 Owner: implementation agent. Estimate: XL within T16/T17/F12; the full connected RAW workflow remains the target. Previous turn is progress: `a38987a` committed native RAW inspection/development and independent fixtures; all 1,678 unit/API checks passed with two workers after the default concurrent run timed out. The earlier frozen codec browser pilot passed 35 native checks (including real 50 MP RGB16/working pixels) and two production worker checks. Those are dependency evidence, not full RAW application acceptance.
@@ -914,7 +909,6 @@ Owner: implementation agent. Estimate: XL within T16/T17/F12; the full connected
 The current increment connects trusted native opening and editable OO RawDevelopment/master commands to original/accepted asset ownership, clean document installation, exact settings, shared-instance undo/redo, custom import/preview/development controls and recent-file review. Original Blobs live in immutable asset derivation records; accepted PNGs remain actual renderable images. Project v4 deduplicates retained originals across history; earlier projects remain readable and no-RAW writes stay v3. Workspace/recovery/source copies, recipe packages v2 and brush packs/presets v6 retain both byte streams and settings. Source persistence tests now pass; build/full suite and actual native/application/production/browser gates are pending.
 
 Remaining connected requirements include isolated Scripts/plugin and separate headless REST development, semantic RAW recipes and direct RAW batch input, complete application 50 MP/persistence/error acceptance and camera/color validation. All broader unfinished F12/F10/F14, merge, professional-editor, AI/provider/evaluation, collaboration/commercial and specialist requirements remain active. No narrower completion target, paid operation, cloud upload or new isolated permission is introduced.
-
 
 ### 2026-10-22 — F12 original RAW development workflow in implementation
 
@@ -982,32 +976,32 @@ Critical path for protected batch generation: asset durability → masks/transfo
 
 Effort bands are rough engineering estimates, not commitments: S 8–20 hours, M 20–50, L 50–120, XL 120–240+. They exclude ongoing support and customer discovery; split any XL ticket before execution. Owner role defaults to founder/engineer; evaluation requires target users and domain reviewers.
 
-| Ticket | Concrete implementation and touched boundaries                                                              | Dependencies                       | Size        | Done evidence                                                                                                                       |
-| ------ | ----------------------------------------------------------------------------------------------------------- | ---------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| T01    | Baseline corpus and performance harness; fixture manifests, timing/resource diagnostics                     | None                               | M           | Import/edit/export timings, device/browser identity, source hashes; include 50 MP and complex-layer cases.                          |
-| T02    | Project schema migration and binary/blob asset repository; evolve `core/assets`, `core/project`, validators | T01                                | XL          | Open v1, save new format, reopen; interrupted writes leave last valid manifest; no dangling asset refs.                             |
-| T03    | Recovery journal with checkpoints and quota handling; UI recovery status                                    | T02                                | L           | Kill/reopen after acknowledged revision; corrupt tail recovery; quota failure preserves prior checkpoint and prompts external save. |
-| T04    | Metadata records and local parser worker; immutable raw declarations plus command-based overrides           | T01, version decision from T02     | L           | A01 fixture extraction, byte identity, timeout/error containment and orientation correctness.                                       |
-| T05    | Asset-info inspector, field origins/review, local tags and JSON sidecar export                              | T04                                | M           | Keyboard review, undo authored changes, project round-trip, private-field exclusion and approved attribution.                       |
-| T06    | Raster/vector mask model and commands; render/cache/export support                                          | T02                                | XL          | Parent/local coordinates, feather/holes, locks, GPU fallback, tile seams and save/reopen.                                           |
-| T07    | Transform matrix, crop/rotate and guides; migrate current x/y/size semantics                                | T06 design, T01                    | XL          | Nested transforms, consistent hit testing, mask coordinates, source-preserving crop, scripting/REST conformance.                    |
-| T08    | Adjustment-layer primitives, curves/levels and histogram                                                    | T06/T07 coordinate contract        | L–XL        | Masked stack ordering, processing-space docs and GPU/reference/export tests.                                                        |
-| T09    | Local/remote analysis adapter evaluation; OCR/tags/segmentation candidates                                  | T04/T05; T06 for masks             | L           | Held-out quality report, model/license/data review, download/memory costs, correction burden.                                       |
-| T10    | Provider bake-off and cost/retention capability report; no production integration yet                       | T01, reference corpus              | M           | Score alpha, target sizes, reference drift, latency, terms and accepted-output cost. Human-approved budget before paid evaluation.  |
-| T11    | Async job service, budget/consent controls and staging lifecycle                                            | T02, T10                           | XL          | Cancellation/race/idempotency/failure suite, credentials isolated, stale results cannot auto-commit.                                |
-| T12    | Generate-as-layer UI, candidate review and apply operation                                                  | T11, initial A03 scope             | L           | Real-provider evaluation plus control-flow tests, one undo entry, offline redo and project portability.                             |
-| T13    | Protected masked edit with result-diff inspector                                                            | T06/T07/T12                        | L–XL        | A06 exact-region invariant and adversarial tile/alpha/effect fixtures; transparent failure on incompatible edits.                   |
-| T14    | Recipe schema and deterministic recorder/dry-run                                                            | T07, chosen commands               | L           | Stable parameter binding, invalid plan rejection, reusable targets and one-item rollback.                                           |
-| T15    | Resumable batch runner and delivery manifest                                                                | T03/T11/T13/T14 for AI batch       | XL          | Restart/retry without duplicate jobs or exports; clear per-item cost/failure/review state.                                          |
-| T16    | Professional foundation increments: richer brushes/text/vectors/basic export                                | Relevant F06–F08/F11 contracts     | L per slice | Tool-specific corpus, real tablet/font checks, format warnings and export equivalence.                                              |
-| T17    | Color/interchange feasibility and prototype                                                                 | T01/T02; precedes F10/F11 claims   | XL          | Independent PSD fixtures and ICC reference results; supported matrix and migration recommendation.                                  |
-| T18    | Versioned host scripting/job bridge, authenticated REST assets/jobs and plugin permissions                  | T11/T12; explicit deployment scope | XL          | Separate surface conformance, permission revocation, no sandbox credentials, jobs exceed 5 seconds without blocking scripts.        |
-| T19    | Object selection and background removal with interactive matting; Select Subject and cutout generation      | T06/T07/T09                        | L           | Reusable soft mask, hair/transparency edge matting fixtures, non-destructive layer mask attachment, one-step undo.                  |
-| T20    | Retouching engine: spot healing, patch tool, and dodge/burn; Poisson blending and non-destructive layering  | T06/T16                            | L           | Non-destructive retouch layers, Poisson gradient blending, source preservation, tablet pressure, one-step undo.                     |
-| T21    | Reusable components and smart objects: embedded/linked instances, non-destructive transforms and filters    | T02/T06/T07/T08                    | XL          | Instance update propagation, lossless scaling round-trips, independent masks/transforms, portable project container round-trip.     |
-| T22    | Workspace productivity: command palette, layer search/filtering, multi-selection and multi-document tabs    | T01/T02/T07                        | L           | Keyboard navigation (`Mod+K`), multi-layer canvas manipulation, cross-tab layer cloning without dangling asset references.          |
-| T23    | Develop a Canoli Studio plugin for ChatGPT using [OpenAI Plugins](https://developers.openai.com/plugins), with skills and an MCP server | T18; explicit document connection | L–XL | Install and test in ChatGPT; inspect/edit documents through shared validation and undo, with permission checks and end-to-end tool verification. |
-| T24    | Integrate [Sign in with ChatGPT](https://developers.openai.com/siwc) into Canoli Studio | W08 identity/session design; OpenAI eligibility and client registration | L | Continue with ChatGPT using OpenID Connect Authorization Code with S256 PKCE; validate state, nonce and ID tokens, support explicit account linking, secure application sessions, cancellation and sign-out. Verify the complete flow against OpenAI with an eligible registered client and exact registered callback URL before launch. Follow the [website sign-in guide](https://developers.openai.com/siwc/website); any T23 plugin sign-in must keep its connector authorization transaction separate, as described in the [plugin sign-in guide](https://developers.openai.com/siwc/chatgpt-plugin). Sign-in grants no document/plugin permissions or optional ChatGPT plan usage; local editing remains available without an account. |
+| Ticket | Concrete implementation and touched boundaries                                                                                          | Dependencies                                                            | Size        | Done evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T01    | Baseline corpus and performance harness; fixture manifests, timing/resource diagnostics                                                 | None                                                                    | M           | Import/edit/export timings, device/browser identity, source hashes; include 50 MP and complex-layer cases.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| T02    | Project schema migration and binary/blob asset repository; evolve `core/assets`, `core/project`, validators                             | T01                                                                     | XL          | Open v1, save new format, reopen; interrupted writes leave last valid manifest; no dangling asset refs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| T03    | Recovery journal with checkpoints and quota handling; UI recovery status                                                                | T02                                                                     | L           | Kill/reopen after acknowledged revision; corrupt tail recovery; quota failure preserves prior checkpoint and prompts external save.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| T04    | Metadata records and local parser worker; immutable raw declarations plus command-based overrides                                       | T01, version decision from T02                                          | L           | A01 fixture extraction, byte identity, timeout/error containment and orientation correctness.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| T05    | Asset-info inspector, field origins/review, local tags and JSON sidecar export                                                          | T04                                                                     | M           | Keyboard review, undo authored changes, project round-trip, private-field exclusion and approved attribution.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| T06    | Raster/vector mask model and commands; render/cache/export support                                                                      | T02                                                                     | XL          | Parent/local coordinates, feather/holes, locks, GPU fallback, tile seams and save/reopen.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| T07    | Transform matrix, crop/rotate and guides; migrate current x/y/size semantics                                                            | T06 design, T01                                                         | XL          | Nested transforms, consistent hit testing, mask coordinates, source-preserving crop, scripting/REST conformance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| T08    | Adjustment-layer primitives, curves/levels and histogram                                                                                | T06/T07 coordinate contract                                             | L–XL        | Masked stack ordering, processing-space docs and GPU/reference/export tests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| T09    | Local/remote analysis adapter evaluation; OCR/tags/segmentation candidates                                                              | T04/T05; T06 for masks                                                  | L           | Held-out quality report, model/license/data review, download/memory costs, correction burden.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| T10    | Provider bake-off and cost/retention capability report; no production integration yet                                                   | T01, reference corpus                                                   | M           | Score alpha, target sizes, reference drift, latency, terms and accepted-output cost. Human-approved budget before paid evaluation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| T11    | Async job service, budget/consent controls and staging lifecycle                                                                        | T02, T10                                                                | XL          | Cancellation/race/idempotency/failure suite, credentials isolated, stale results cannot auto-commit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| T12    | Generate-as-layer UI, candidate review and apply operation                                                                              | T11, initial A03 scope                                                  | L           | Real-provider evaluation plus control-flow tests, one undo entry, offline redo and project portability.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| T13    | Protected masked edit with result-diff inspector                                                                                        | T06/T07/T12                                                             | L–XL        | A06 exact-region invariant and adversarial tile/alpha/effect fixtures; transparent failure on incompatible edits.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| T14    | Recipe schema and deterministic recorder/dry-run                                                                                        | T07, chosen commands                                                    | L           | Stable parameter binding, invalid plan rejection, reusable targets and one-item rollback.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| T15    | Resumable batch runner and delivery manifest                                                                                            | T03/T11/T13/T14 for AI batch                                            | XL          | Restart/retry without duplicate jobs or exports; clear per-item cost/failure/review state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| T16    | Professional foundation increments: richer brushes/text/vectors/basic export                                                            | Relevant F06–F08/F11 contracts                                          | L per slice | Tool-specific corpus, real tablet/font checks, format warnings and export equivalence.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| T17    | Color/interchange feasibility and prototype                                                                                             | T01/T02; precedes F10/F11 claims                                        | XL          | Independent PSD fixtures and ICC reference results; supported matrix and migration recommendation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| T18    | Versioned host scripting/job bridge, authenticated REST assets/jobs and plugin permissions                                              | T11/T12; explicit deployment scope                                      | XL          | Separate surface conformance, permission revocation, no sandbox credentials, jobs exceed 5 seconds without blocking scripts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| T19    | Object selection and background removal with interactive matting; Select Subject and cutout generation                                  | T06/T07/T09                                                             | L           | Reusable soft mask, hair/transparency edge matting fixtures, non-destructive layer mask attachment, one-step undo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| T20    | Retouching engine: spot healing, patch tool, and dodge/burn; Poisson blending and non-destructive layering                              | T06/T16                                                                 | L           | Non-destructive retouch layers, Poisson gradient blending, source preservation, tablet pressure, one-step undo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| T21    | Reusable components and smart objects: embedded/linked instances, non-destructive transforms and filters                                | T02/T06/T07/T08                                                         | XL          | Instance update propagation, lossless scaling round-trips, independent masks/transforms, portable project container round-trip.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| T22    | Workspace productivity: command palette, layer search/filtering, multi-selection and multi-document tabs                                | T01/T02/T07                                                             | L           | Keyboard navigation (`Mod+K`), multi-layer canvas manipulation, cross-tab layer cloning without dangling asset references.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| T23    | Develop a Canoli Studio plugin for ChatGPT using [OpenAI Plugins](https://developers.openai.com/plugins), with skills and an MCP server | T18; explicit document connection                                       | L–XL        | Install and test in ChatGPT; inspect/edit documents through shared validation and undo, with permission checks and end-to-end tool verification.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| T24    | Integrate [Sign in with ChatGPT](https://developers.openai.com/siwc) into Canoli Studio                                                 | W08 identity/session design; OpenAI eligibility and client registration | L           | Continue with ChatGPT using OpenID Connect Authorization Code with S256 PKCE; validate state, nonce and ID tokens, support explicit account linking, secure application sessions, cancellation and sign-out. Verify the complete flow against OpenAI with an eligible registered client and exact registered callback URL before launch. Follow the [website sign-in guide](https://developers.openai.com/siwc/website); any T23 plugin sign-in must keep its connector authorization transaction separate, as described in the [plugin sign-in guide](https://developers.openai.com/siwc/chatgpt-plugin). Sign-in grants no document/plugin permissions or optional ChatGPT plan usage; local editing remains available without an account. |
 
 T24 status: the local identity workflow is fixture-verified; live **Sign in with ChatGPT** remains planned alongside the T23 ChatGPT plugin. Launch prerequisite: confirm eligibility for OpenAI’s current limited commercial trial and obtain the registered client configuration before live sign-in acceptance. Official [Sign in with ChatGPT availability and registration requirements](https://developers.openai.com/siwc/website) were rechecked on 2026-10-26; recheck them again when scheduling this work. Local fixture verification does not satisfy this release gate.
 
@@ -2908,13 +2902,11 @@ Fixed the reviewed budget ownership defect. All public ledger methods returning 
 
 Verification: production build, all 659 unit/API tests, and eleven generation/journal Chromium checks pass. New regression tests attempt consent restoration, ceiling inflation, reservation reduction and charge redirection through every relevant returned object. Existing accounting assertions now fetch fresh snapshots, and expiry tests use explicit restoration or invalid approval creation instead of mutating getters. Three browser fixtures required corrected 16×16 test-only provider capabilities to reach their dispatch/settlement checks. The literal recipe recording defect remains outstanding, along with live provider evaluation, asynchronous AI recipe/batch orchestration and other roadmap gates. The full implementation goal remains active.
 
-
 ### Brush/pencil redundant frame wait — 2026-10-03
 
 Investigated reported brush and pencil lag. ToolController already batches stroke preview publication with requestAnimationFrame, but useCanvasRenderer waited for another frame before preparing the preview. Live paint previews now bypass that second wait. Non-paint updates retain frame coalescing; render serialization and stale revision/view/gesture protection remain intact. Smoothing defaults to zero and was not changed.
 
 Verification: production build, all sixteen hook tests and twenty-three tool/GPU Chromium checks pass. A new scheduling regression proves that a frame-batched preview starts preparing and presents without requesting another animation frame. Browser checks cover brush/pencil input, clipping, undo/reopen, GPU stroke preview/commit parity, fallback and device loss. These checks do not measure hardware input-to-photon latency or establish the broader performance gate. The interrupted recipe verification also completed: its prior browser log reports all twenty-one recipe/batch tests passed, including persisted literal expression replay. The broad implementation goal remains active.
-
 
 ### Direct live-stroke rendering and isolated cursor updates — 2026-10-03
 
@@ -3616,7 +3608,6 @@ Retained cooperative yielding between strokes after approximately 12 ms, using a
 
 Final 12 ms-budget live checks: all 11 paint/sustained-paint production cases passed, with input p95 5.3–7.9 ms and sustained release-to-presentation p95 18.4 ms. The interaction test and exact-pixel oracle pass on the retained implementation.
 
-
 ### Yielding within cold paint strokes — 2026-10-12
 
 A 1200-point soft-brush stress fixture reproduced the remaining single-stroke input block: the actual Pencil control updated only after replay completed, about 1189 ms after render began. Extracted the unchanged stamp interpolation into a shared iterator so cold replay can yield every 32 stamps when its time slice expires. Active incremental previews remain synchronous. The private scratch surface, exact stamp order, pressure/spacing, clipping and final-frame presentation remain intact.
@@ -3875,7 +3866,6 @@ With CPU profiling enabled in both runs, accumulated-mask median/p95 moved from 
 
 Final unprofiled repeat median/p95: small 12/15.3 ms, empty 3 MP 30.5/44 ms, accumulated 3 MP 32.9/65.4 ms; no long tasks, 24 presentations in the accumulated case. All 729 unit/API tests, 29 affected browser cases (including the corrected oracle rerun), final build/typecheck and three production cases pass. Evidence: `benchmarks/filter-mask-finished-cache-2026-10-12.json`. Tail latency and the broad editor-wide goal remain unresolved.
 
-
 ### 2026-10-12 — Readback-oriented retained filter-mask coverage
 
 Retained smart filter-mask prefix hits now allocate their output with the existing readback canvas hint. These outputs immediately feed pixel reads for worker blending. Prefix misses, cache bypass and ordinary masks retain existing allocation behavior. No native tile geometry, downsampling, blend math or cache budget changes.
@@ -3884,7 +3874,6 @@ Two production trials support retaining this narrow change: empty 3 MP median/p9
 
 All 729 unit/API tests and final production build/typecheck pass. The initial sandboxed unit run could not bind localhost for API suites; the authorized rerun passed all tests. Exact filter-mask/cache browser regressions passed 10 cases. Evidence and raw samples: `benchmarks/filter-mask-readback-2026-10-12.json`. The remaining 19 mask/smart-filter browser regressions also pass (29 affected cases total). Editor-wide responsiveness and large-case tail latency remain open.
 
-
 ### 2026-10-12 — Remove intermediate active mask-stroke canvases
 
 A production CPU profile after the readback change still showed 89.5 ms self-time in getImageData, 76.5 ms in the two largest retained-filter read-copy nodes, and substantial drawImage work. Inspection found an extra full-tile surface between retained active stroke coverage and mask output. Unclipped retained strokes now composite directly; clipped and oversized strokes retain the isolated path. Opacity still applies once, retained coverage is not modified, and memory budgets stay unchanged.
@@ -3892,7 +3881,6 @@ A production CPU profile after the readback change still showed 89.5 ms self-tim
 Expanded the existing cached-versus-uncached pixel oracle to eight combinations: clipped/unclipped, hide/reveal, and zero/fractional feather, using a soft partially opaque stroke. It verifies exact pixels after append and after editing an earlier point, as well as incremental reuse and cache release. The standalone expanded oracle passes.
 
 Production first/repeat median/p95: small 13/19.4 and 12.1/16.7 ms; empty 3 MP 27.8/37.2 and 22.6/33.2 ms; accumulated 3 MP 29.8/51.8 and 32.7/56.4 ms. No observed long tasks. Against preceding accumulated 32.9/50.1 ms, median benefit is not consistent and tail latency has not improved. Retain the reduced surface/copy work without claiming a universal timing win. Raw evidence: `benchmarks/mask-direct-composite-2026-10-12.json`. All 729 unit/API tests, 29 affected browser cases, and final production build/typecheck pass. Large-case latency and broad responsiveness remain unresolved.
-
 
 ### 2026-10-12 — Dense text coverage exposes cache thrashing
 
@@ -3904,7 +3892,6 @@ Immutable text retention now crops cached pixels to actual glyph ink bounds, mea
 
 Added exact cached-versus-uncached browser pixels for six alignment/direction combinations with italic/bold text, negative spacing, combining marks, mixed scripts/emoji, fractional affine placement and opacity. All six combinations preserve pixels and retain less than half a full surface. Existing font-load cache invalidation, undo, permission handling and manual-entry checks pass; real local font enumeration remains skipped because this browser returns no font list. Final repeat: 64-layer median/p95 15.15/20.2 ms, no long tasks; single-layer p95 14.1–15.4 ms. All 729 unit/API tests, 27 browser cases, seven production text/vector cases and final build/typecheck pass. One native font enumeration test remains explicitly skipped. Evidence: `benchmarks/text-ink-cache-2026-10-12.json`. Styled/dense text variants, cross-device measurements and the broad responsiveness goal remain open.
 
-
 ### 2026-10-12 — Compact finished text effects and retain overlays
 
 Added 64-layer text fixtures for overlays and shadows (73 production performance cases total). Before this change, overlay typing median/p95 was 122.15/133 ms, and shadow typing 1016.25/1062.5 ms. Each case produced 20 long tasks. Finished shadow surfaces still occupied the full document rectangle, while overlays were only promoted during gestures and otherwise rebuilt for every keystroke.
@@ -3912,7 +3899,6 @@ Added 64-layer text fixtures for overlays and shadows (73 production performance
 Finished text retention now reuses copied raw-cache geometry, rebases it from padded to output coordinates, and expands conservatively for shadow offset/blur. Text overlays also promote during ordinary immutable edits. Ordinary paint/raster behavior remains gesture-only so raw stroke prefixes are preserved. Cache-owned canvases never escape; the shared memory budget and original drawing/effect grids are unchanged.
 
 First production result: overlay median/p95 15.6/23.4 ms; shadow 28.75/33.7 ms; no observed long tasks. Expanded the exact text oracle to 24 combinations covering alignment, direction, overlays, shadows, masks and fill opacity, including changes from warmed raw text. Pixel comparisons passed immediately. Its original single-surface memory assertion was unsuitable for the new fixtures, which also retain an earlier unpadded entry and independent mask coverage; it now accounts for those surfaces while still requiring compact retention. The corrected full oracle passes. All 729 unit/API tests and 12 affected browser cases pass; one existing native font enumeration case remains skipped. Final production build/typecheck, all nine text/vector production cases and 16 mask regressions pass (28 browser cases total; one native font case skipped). Repeat median/p95: plain 64-layer 14.85/19.7 ms, overlay 17/21.2 ms, shadow 30.75/47.2 ms. No observed long tasks. Shadow tail latency varies and remains above 33 ms despite eliminating the previous one-second stalls. Evidence: `benchmarks/styled-text-cache-2026-10-12.json`. Broader workloads and device coverage remain open.
-
 
 ### 2026-10-12 — Production audit after compact text/effect retention
 
@@ -3978,7 +3964,6 @@ The first production run exposed a pre-existing frame-readiness gap in the paint
 
 Remaining F04 work includes white balance, gradient maps and user LUT import, plus broader color/fidelity/device evaluation. Color-range/quick-selection/channel tools, deeper painting/type/vector/color/interchange/RAW workflows, AI evaluation/production gates, collaboration/commercial work and all other uncompleted portfolio items remain in the active full implementation goal.
 
-
 ### 2026-10-15 — F04 editable Gradient Map workflow
 
 Owner: implementation agent. Estimate: M (20–50 engineering hours) within F04/T08. The preceding goal turn verified an already-complete rebrand without advancing roadmap implementation; this turn revalidated the worktree and delivered a missing adjustment family. The full roadmap objective stays active and is not redefined around this slice.
@@ -3994,7 +3979,6 @@ A new regression exposed a pre-existing isolated-plugin commit gap: revoking doc
 Validation: final production build passes, including actual WASM/runtime/docs generation, TypeScript and Vite. The full unit/API suite passes 758 tests across 106 files with `npm test -- --maxWorkers=2`; the additional v17 migration assertion subsequently passes its focused suite. Thirty-eight distinct development browser tests and all 14 production tests pass (52 distinct browser checks). Coverage includes color preview/Escape/single commits, maximum-stop controls, masked forward/reverse/faded PNG pixels, immutable original bytes, native tile seams, ordering/undo, documented isolated code, invalid-script rollback, plugin revocation/removal, current/redo-only workspace settings, shared GPU/compositing/device-loss regressions and production controls/export with no developer globals. The real existing 50 MP import/edit/save/reopen/export case passes (export 3,622 ms). A separate new 50 MP Gradient Map PNG export preserves 10000×5000 dimensions and sampled colors at native tile boundaries and the far canvas corner (5,150.2 ms). These individual timings are not input-latency percentiles; heap/peak memory and hardware GPU performance were not measured. Evidence summary: `benchmarks/gradient-map-2026-10-15.json`. Inspected `/tmp/canoli-gradient-map-inspector.png`; whitespace checks pass.
 
 Remaining: white balance and user LUT import, wider F04 color/device evaluation and the rest of the full portfolio. A source audit also confirms a separate F11 gap: current PSD export routes only top-level raster layers to its builder, while its capability text claims adjustment flattening and vector/text rasterization. That report is not evidence those visual effects are preserved; actual PSD rendering/preservation needs correction and independent reader verification. Color-range/quick-selection/channel tools, deeper painting/type/vector/color/interchange/RAW, AI evaluation/production gates and collaboration/commercial work remain outstanding. The full implementation goal is not complete.
-
 
 ### 2026-10-15 — F11 rendered PSD composition and independent interchange checks
 
@@ -4016,7 +4000,6 @@ The initial large-image instrumentation included an unrelated concurrent viewpor
 
 Remaining: native editable Photoshop masks/type/adjustments/groups, deeper PSB/PSD/TIFF/PDF/AVIF and color-management fidelity, hardware/independent-editor evaluation and broader performance gates. Existing empty-thumbnail `src` React warnings on PSD import remain a separate UI cleanup item. White balance/LUT import and all other unfinished editing, AI evaluation/production, workflow, collaboration/commercial and specialist portfolio work remain in the original active roadmap goal. The full implementation objective is not complete.
 
-
 ### 2026-10-15 — F04 editable White Balance and independent color-math conformance
 
 Owner: implementation agent. Estimate: M (20–50 engineering hours) within F04/T08. The preceding goal turn verified existing branding without advancing implementation; this turn revalidated the unfinished White Balance work and completed its browser/export verification and current contracts. The full roadmap goal remains active; this slice does not complete F04 or redefine the professional-editor objective.
@@ -4030,7 +4013,6 @@ Production pixels execute in an AssemblyScript/WASM worker using float64 matrice
 Validation: all 769 unit/API tests across 108 files pass; 33 distinct development browser checks and all 16 production checks pass (49 distinct browser tests). Coverage includes actual documented isolated code, atomic invalid scripts, inert plugin installation and pending write revocation, UI preview/validation/locks, masked PNG and layered/flattened PSD pixels, ordering/undo, immutable original bytes, project reopening and workspace redo-only restoration. The production check uses bundled controls/WASM with no developer globals. The existing real 50 MP import/edit/save/reopen/export test passes (export 3,514 ms). New 50 MP White Balance PNG checks retain 10000×5000 dimensions and exact expected samples at tile boundaries and the far corner: initial 8,651.5 ms, repeat 9,484.2 ms. The repeat overlapped production browser checks; these are individual completion times, not controlled speed comparisons or input-latency percentiles. Heap/peak memory, tablet/hardware GPU behavior and broad interactive latency were not measured. Build/WASM/runtime/docs/TypeScript/Vite and whitespace checks pass. Inspected `/tmp/canoli-white-balance-inspector.png`. Evidence: `benchmarks/white-balance-2026-10-15.json`.
 
 Remaining: user LUT import and wider F04 color/fidelity/device evaluation; color-range/quick-selection/channel tools; deeper painting, text, vector, color, interchange and RAW workflows; AI quality/production gates; workflow, collaboration/commercial and specialist portfolio requirements. The complete implementation roadmap remains unfinished and active.
-
 
 ### 2026-10-15 — F04 portable Color Lookup tables and real import responsiveness
 
@@ -4088,7 +4070,6 @@ The native 50 MP channel fixture retains a genuine 10000×5000 PNG, disconnected
 
 Remaining: quick selection, RGB/CMYK component editing, spot colors, direct grayscale channel painting and PSD channel interchange; broader F02 fidelity/device gates; deeper painting, text, vector, color, interchange and RAW workflows; AI quality/production, workflow, collaboration/commercial and specialist requirements throughout the original portfolio. Dense RLE/command complexity, extreme scanline widths and real browser/process memory remain limits. The full implementation goal remains active and unfinished.
 
-
 ### 2026-10-15 — F02 native Quick Selection brush and T19 fidelity audit
 
 Owner: implementation agent. Estimate: M (20–50 engineering hours) within F02/T06, with separate T19 follow-up. Prior implementation work made progress on Quick Selection but lacked final validation; the intervening rebrand verification did not advance roadmap implementation. Revalidated the current dirty worktree, completed the native selection slice and production coverage, and preserved earlier deliveries. This does not complete F02, T19 or the full roadmap objective.
@@ -4108,7 +4089,6 @@ Validation: npm run build passes actual WASM/runtime/developer-doc generation, T
 The T19 audit found that legacy Document.selectSubject discards the computed segmentation mask through maskToSelectionData, returning a rectangle, and substitutes a white image when no raster is selected. The saliency implementation adds a positive spatial baseline and can fabricate a central fallback. These are confirmed unfinished fidelity defects. Corrected the historical T19 completion/accuracy claim, current A04 status and scripting/architecture limitations; the original strategy baseline is now explicitly dated so its old limitations are not mistaken for the current inventory. Quick Selection does not call that path. Next priority is to replace the mask-loss/fabricated-fallback behavior with genuine source-derived coverage, shared isolated/native preparation and exact transformed/transparent/empty-source tests, then evaluate actual hair/transparency matting quality. No subject-detection accuracy is claimed by the current green presence tests.
 
 Remaining: the T19 corrections/quality gates above; RGB/CMYK components, spot colors, direct channel painting and PSD channel interchange; mature painting, text/vector, color/interchange/RAW workflows; broader fidelity, memory, device and responsiveness gates; AI quality/production, workflow, collaboration/commercial and specialist work throughout the original portfolio. The full implementation goal remains active and incomplete.
-
 
 ### 2026-10-15 — T19 source-native subject masks, isolation and genuine empty results
 
@@ -4132,7 +4112,6 @@ Updated current requirements, architecture, scripting signatures/defaults/exampl
 
 Next: migrate that refinement/background-removal path to source/coordinate-safe asynchronous preparation with cancellation and one validated asset/history commit; implement actual corrected-foreground output where requested; then evaluate held-out hair/transparency/real-scene quality and semantic selection. RGB/CMYK/spot/channel interchange, mature painting/text/vector, broader color/interchange/RAW, responsiveness/device gates and all unfinished AI production, workflow, collaboration/commercial and specialist portfolio work remain in the original objective. The full roadmap goal stays active and incomplete.
 
-
 ### 2026-10-16 — T19 native Refine Edge, manual trimaps and applied corrected foreground RGB
 
 Owner: implementation agent. Estimate: M (20–50 engineering hours) within T19/A04. The intervening rebrand audit verified existing branding and made no roadmap implementation changes. Resumed the unfinished refinement work against the current worktree, completed actual native integration and its API/documentation/verification, and retained the full professional-editor objective. This is partial T19 delivery; T19 and the complete roadmap remain active and incomplete.
@@ -4155,7 +4134,6 @@ The genuine 10000×5000 matting fixture retains the thin strip, native hole, dis
 
 Remaining T19 requirements include the specified closed-form/KNN solver, held-out hair/fur/foliage/glass/translucency quality evaluation, semantic selection quality and broader device/responsiveness evidence. The complete roadmap also retains its deeper selection/channel, painting, text/vector, precision/color/interchange/RAW, AI evaluation/production, workflow, collaboration/commercial and specialist requirements. Those requirements are not redefined around this integration slice.
 
-
 ### 2026-10-16 — T19 global closed-form matting with independent numerical and native seam evidence
 
 Owner: implementation agent. Estimate: M (20–50 engineering hours) within T19/A04. The preceding goal turn delivered source-safe native refinement/trimaps/corrected RGB and identified the missing specified solver. Revalidated that code and delivered the real global closed-form Laplacian, retaining the full professional-editor objective. T19's algorithm requirement advances; T19's held-out quality/device gates and the complete roadmap remain active and incomplete.
@@ -4177,7 +4155,6 @@ Validation: final npm run build passes actual WASM/runtime/developer-doc generat
 The genuine 10000×5000 global fixture has a distant 601×9 opaque region with 5,355 unknown pixels spanning horizontal 512-column and vertical 64-row capture seams. Sampled output matches the independent reference exactly (maximum/mean alpha byte error zero), with one revision increment, source-byte identity and project restoration. Final native capture/solve/PNG preparation is 14425.1 ms; the actual global solve converges in 1,700 iterations at relative residual 3.30737e-8. A queued Hand callback during real solver iterations responds in 1.1 ms. Final-run long tasks of 114/85 ms remain recorded. This proves a global solve on a real 50 MP source, not a dense 50 MP unknown graph or a universal hair/latency result. Individual overlapping-suite timings are not controlled speed comparisons, p95/input-to-photon measurements, hardware GPU/tablet evidence or peak-memory measurements. Full formulas, source links, fixture hashes, measurements and limitations: [benchmarks/closed-form-matting-2026-10-16.json](benchmarks/closed-form-matting-2026-10-16.json).
 
 Remaining T19 work includes held-out natural hair/fur/foliage/glass/translucency evaluation, semantic selection quality, wider device/responsiveness evidence and any corrections those gates expose. Deeper selection/channel, painting, text/vector, precision/color/interchange/RAW, AI evaluation/production, workflow, collaboration/commercial and specialist requirements remain in the original full roadmap. This solver delivery does not redefine or complete that objective.
-
 
 ### 2026-10-16 — T19 photographed matting evaluation, stronger convergence and proportional Smooth
 
@@ -4205,7 +4182,6 @@ The new report generator verifies complete split membership, unique cases, manif
 
 Remaining: GT13 nonconvergence, large-unknown latency and the connectivity tradeoff; broader natural hair/fur/foliage/glass/translucency and corrected-RGB quality/acceptance; semantic selection; wider device/responsiveness/memory evidence. The full portfolio still includes deeper selection/channel, painting, text/vector, precision/color/interchange/RAW, AI evaluation/production, workflow, collaboration/commercial and specialist requirements. The complete implementation goal remains active and incomplete.
 
-
 ### 2026-10-16 — T19/F14 packed sparse matting iterations and allocation recovery
 
 Owner: implementation agent. Estimate: S (4–12 engineering hours) within T19/F14. Prior goal work made concrete progress on photographed matting evaluation and established the remaining foliage/nonconvergence and latency gaps. Revalidated the frozen source/data and actual process handles, then delivered a measured sparse-iteration optimization. T19, F14 and the complete professional-editor roadmap remain active and incomplete.
@@ -4227,7 +4203,6 @@ Validation: final npm run build passes actual WASM/runtime/developer-doc generat
 All three photographed browser mattes exactly match their current numerical pipeline, retain original compressed source bytes and support one-step undo/redo. Observed preparation times are 2.83/46.25/6.43 seconds; a single queued Hand callback responds in 1.0/1.9/1.3 ms. Long tasks remain, up to 129 ms. These browser runs overlap other work and are not treated as a controlled timing comparison. The larger isolated photographed script still times out atomically at its existing five-second limit, with unchanged document and assets 2 before/2 after. The native 10000×5000 seam fixture takes 15.59 seconds, converging in 209 iterations at 4.37919e-8 residual, with exact sampled reference alpha, one revision, original bytes/project restoration and 1.4 ms queued callback response. Its 50/102/112 ms long tasks remain recorded. It has a 601×9 patch with 5,355 unknowns, not a dense 50 MP graph. The separate real-image 50 MP import/WASM-edit/save/reopen/full-resolution export gate passes, with PNG export 4,062 ms. No universal responsiveness or memory claim follows.
 
 Full source/input/output hashes, all case scores/errors, paired samples and reproduction code, independent direct diagnostics, byte comparisons, browser observations and verification provenance: [benchmarks/matting-sparse-2026-10-16.json](benchmarks/matting-sparse-2026-10-16.json), [paired timing plot](benchmarks/matting-sparse-performance-2026-10-16.png), and [quality/availability plot](benchmarks/matting-sparse-quality-2026-10-16.png). git diff --check passes. Remaining T19/F14 work includes actual foliage nonconvergence, large-unknown latency/long tasks, connectivity and broader hair/glass/translucency/corrected-RGB quality, semantic selection and device/memory gates. Deeper selection/channel, painting, text/vector, precision/color/interchange/RAW, AI evaluation/production, workflow, collaboration/commercial and specialist requirements remain in the full roadmap; this optimization does not redefine or complete it.
-
 
 ### 2026-10-16 — T19 RGB-aware Galerkin correction resolves the photographed foliage nonconvergence
 
@@ -4257,7 +4232,6 @@ Updated requirements, architecture, API/scripting numerical/default/limit/evalua
 
 Remaining: broader convergence/latency/long-task/device/memory coverage; natural hair/fur/foliage/glass/translucency, connectivity and corrected-RGB acceptance; semantic object selection. Deeper selection/channel, mature painting and text/vector, precision/color/interchange/RAW, AI evaluation/production, workflow, collaboration/commercial and specialist requirements remain throughout the full roadmap. This delivery closes the identified corpus failure without redefining or completing the user's full implementation objective.
 
-
 ### 2026-10-16 — T19/F14 private WASM sparse matting iterations
 
 Owner: implementation agent. Estimate: S (4–12 engineering hours) within T19/F14. The previous turn verified the existing rebrand and made no progress on pending roadmap implementation. Revalidated the current solver and completed the unfinished profile before choosing this optimization. T19/F14 and the full professional-editor objective remain active and incomplete.
@@ -4281,7 +4255,6 @@ The genuine 10000×5000 seam fixture converges in 18 iterations at 5.87684e-10, 
 Updated requirements, architecture, API/scripting numerical/backend/limit guidance, plugin isolation notes, system design and F14 status. Source photographs, reference/output arrays and screenshots remain outside the repository. Full numerical/provenance/direct-reference/browser/validation records, all eligible and excluded timing runs, baseline reproduction source and harnesses are in [benchmarks/matting-wasm-2026-10-16.json](benchmarks/matting-wasm-2026-10-16.json), with [paired throughput](benchmarks/matting-wasm-performance-2026-10-16.png) and [unchanged-quality evidence](benchmarks/matting-wasm-quality-2026-10-16.png).
 
 Remaining: large-unknown latency/long tasks, broader convergence and real device/peak-memory evidence; natural hair/fur/foliage/glass/translucent-fabric, connectivity and foreground-RGB correction acceptance; semantic object selection. Deeper selection/channel, mature painting and text/vector, precision/color/interchange/RAW, AI evaluation/production, workflow, collaboration/commercial and specialist requirements remain throughout the full roadmap. This verified performance slice does not redefine or complete the user's implementation objective.
-
 
 ### 2026-10-16 — A12 local design preflight across UI, OO, scripts/plugins and REST
 
@@ -4309,7 +4282,6 @@ Updated the scripting signatures/defaults/example/errors/limits/environment dist
 
 Remaining A12 work includes bleed conformance, alignment, text legibility/contrast, rendered-pixel visibility, export-variant integration, inferred advice and real-user acceptance. Broader latency/device/peak-memory evidence is still required. Matting/semantic quality and performance, deeper selection/channel, painting/text/vector, precision/color/interchange/RAW, AI/provider evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. This read-only inspection delivery does not redefine or complete the user's full implementation objective.
 
-
 ### 2026-10-16 — F07/F11 hierarchical SVG extraction, precision and cooperative encoding
 
 Owner: implementation agent. Estimate: S–M within T16/F07/F11, with F14 scheduling constraints. The preceding turn verified the existing rebrand without delivering additional roadmap behavior. Revalidated the current worktree, export contract and open roadmap, then repaired a concrete SVG geometry defect before extending export-aware A12 checks. This is a delivered interchange slice; neither F07/F11 nor the full professional-editor objective is complete.
@@ -4329,7 +4301,6 @@ An independent analytic quadrilateral oracle verifies the exact composed world m
 The final 20,000-anchor browser trial receives a queued abort and exposes no partial result, preserving revision and a successful subsequent 169,249-byte SVG. Observed end-to-end cancellation is **170.3 ms**, including queued UI work; the run overlapped unit validation and is not an isolated encoder benchmark, input-to-photon, p95, long-task or peak-memory measurement. The native 10000×5000 import/WASM-edit/save/reopen/full-resolution PNG gate passes, with observed PNG export **3,478 ms**. No general speedup or universal responsiveness gate is claimed. Source hashes, independent diagnostics, every blend comparison, exact validation stages and local log hashes are in [benchmarks/svg-extraction-2026-10-16.json](benchmarks/svg-extraction-2026-10-16.json).
 
 Remaining: SVG masks/effects and general document import/round-trip; deeper editable interchange and PSB/TIFF/PDF/AVIF output; broader latency/device/heap gates; A12 bleed/alignment/legibility/contrast/rendered visibility/export-variant integration and user acceptance. Matting/semantic quality/performance, deeper selection/channel, painting/type/vector, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. This repaired export surface does not redefine or complete the original objective.
-
 
 ### 2026-10-16 — F02/F07/F11 SVG masks preserve editable geometry and native coverage
 
@@ -4357,7 +4328,6 @@ Source/runtime/WASM hashes, full fixture diagnostics, lifecycle outcomes, native
 
 Remaining: editable/scalable raster-mask geometry, SVG Blend If/color overlays/drop shadows, general SVG document import/round-trip, omitted raster/paint/text/adjustment/smart contents and wider PSB/TIFF/PDF/AVIF interoperability; larger-output latency/decoder/peak-memory and real-viewer/device gates. A12 bleed/alignment/legibility/contrast/export integration and human acceptance, matting/semantic quality/performance, deeper editing/type/vector, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. This mask-preserving export delivery does not redefine or complete the original goal.
 
-
 ### 2026-10-16 — F07/F11 SVG overlays and document-space shadows
 
 Owner: implementation agent. Estimate: M within T16/F07/F11, with F02/F14 mask/support constraints. The preceding goal turn delivered mask-preserving SVG progress. Revalidated the current roadmap, native renderer and export/constructor contracts, then implemented the remaining overlay/drop-shadow appearance path. This advances editable interchange; Blend If and the complete professional-editor roadmap remain active and incomplete.
@@ -4384,7 +4354,6 @@ Updated current scripting behavior/defaults/examples/errors/limits, API, archite
 
 Remaining: SVG Blend If, general SVG document import/round-trip, omitted raster/paint/text/adjustment/smart content, editable/scalable raster-mask geometry, broader viewer/device/precision/heap and PSB/TIFF/PDF/AVIF gates. A12 bleed/alignment/legibility/contrast/export integration and human acceptance, deeper editing/type/vector, matting/semantic quality/performance, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. This effect-preserving export slice does not redefine or complete the original goal.
 
-
 ### 2026-10-16 — F07/F11 SVG raster imagery, metadata exclusion and shared source lifetime
 
 Owner: implementation agent. Estimate: M within T16/F07/F11, with F14 scheduling constraints. The preceding goal turn only verified existing branding and made no roadmap implementation progress. Revalidated the pending raster-image implementation and recovered its authoritative terminal browser result before continuing. This turn completes a verified image-export slice; F07/F11 and the full professional-editor objective remain active and incomplete.
@@ -4405,7 +4374,6 @@ The production addition uses bundled code with no developer globals, actual isol
 
 Remaining: SVG paint/text/adjustment/smart-object contents, Blend If, general SVG document import/round-trip, editable/scalable raster masks, broader viewer/device/precision/heap and PSB/TIFF/PDF/AVIF gates. A12 bleed/alignment/legibility/contrast/export integration and human acceptance, deeper editing/type/vector, matting/semantic quality/performance, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. This raster-image export delivery does not redefine or complete the original objective.
 
-
 ### 2026-10-16 — F08/F11 editable SVG text, native baselines and font lifetime
 
 Owner: implementation agent. Estimate: M within T16/F08/F11, with F14 scheduling constraints. The preceding goal turn delivered verified SVG raster-image progress. Revalidated the current worktree and remaining omissions, then replaced text omission with editable SVG text rather than rasterizing glyphs. F08/F11 and the complete professional-editor roadmap remain active and incomplete.
@@ -4425,7 +4393,6 @@ Nine lifecycle cases verify real cancellation, pending local font loading, refer
 The production addition executes the exact documented constructor example inside the isolated Scripts panel with no developer globals, checks the real font-portability capability report, downloads SVG and PNG, retains editable Canoli/Studio lines without embedded images, and compares their decoded pixels exactly. Coverage totals 213,482 alpha-byte units. One undo still removes the script's edits. A final prose-only masked-text clarification regenerated docs and the production build; all 19 previously tested JS/CSS/worker/WASM assets are independently hash-identical, and the production docs/text smoke cases pass again. Updated scripting defaults/example/errors/limits, API, requirements, architecture, system/design rules, plugin boundary, README and F11 catalog state. Final source/runtime/font-fixture hashes, exact validation stages, all pixel/geometry/lifecycle/portability diagnostics and raw log hashes are in [benchmarks/svg-text-2026-10-16.json](benchmarks/svg-text-2026-10-16.json).
 
 Remaining: SVG paint/adjustment/smart contents, Blend If, general SVG document import/round-trip, richer typography/layout/font packaging/outlining, editable/scalable raster masks, broader viewer/device/color/precision/heap and PSB/TIFF/PDF/AVIF gates. A12 bleed/alignment/legibility/contrast/export integration and human acceptance, deeper editing/type/vector, matting/semantic quality/performance, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. No input-to-photon/p95/long-task, peak-memory or universal speed/fidelity claim is made. This editable-text export slice does not redefine or complete the original goal.
-
 
 ### 2026-10-16 — F09/F11 smart-master SVG contents and native raster-master erasures
 
@@ -4521,7 +4488,6 @@ Current contracts, UI rules and limits are updated in the scripting/API guide, r
 
 Remaining: broader SVG stroke/gradient/type/CSS/clip/mask/filter/blend graphs, original XML/shared symbol/master identity, deeper editable round-trip, richer brush/vector/type/font editing, viewer/device/color/precision/heap/performance and PSB/TIFF/PDF/AVIF gates. A12 bleed/alignment/legibility/contrast/export integration and human acceptance, deeper editing/retouching, matting/semantic quality/performance, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the roadmap. This local SVG-import delivery advances that objective without redefining or completing it.
 
-
 ### 2026-10-16 — F07/F11 editable vector stroke styles and degenerate cap artwork
 
 Owner: implementation agent. Estimate: M within T16/F07/F11, with F14 scheduling constraints. Revalidated the pending stroke implementation against the current worktree after an unrelated branding verification turn. This advances native vector editing and SVG interchange; F07/F11 and the complete roadmap remain active and incomplete.
@@ -4543,7 +4509,6 @@ The genuine 10000×5000 stroke test retains the original 50 MP source bytes acro
 Initial exact-dash failures led to the actual line-rendering correction. An inspector key collision, optional GPU readback typing, and a double-premultiplied test reference were corrected. An earlier broad run was intentionally interrupted after 281 passes to fix missing zero-cap artwork; it is not counted as final coverage. The first zero-point parity assumption was replaced with measured phase/closed-contour behavior and independently constrained viewer residuals. Final source/runtime/WASM/build hashes, fixture/lifecycle/GPU/production reports, exact commands and local validation log hashes are sealed in [benchmarks/vector-strokes-2026-10-16.json](benchmarks/vector-strokes-2026-10-16.json). Prior SVG evidence is unchanged.
 
 Remaining: Boolean operations and gradient fills; richer brushes/type/font/vector editing; broader SVG gradients/type/CSS/clip/mask/filter/blend graphs, original XML/shared symbol/master identity and deeper editable round trips; viewer/device/color/precision/heap/responsiveness and PSB/TIFF/PDF/AVIF gates. A12 bleed/alignment/legibility/contrast/export integration and human acceptance, deeper retouching/matting/semantic quality, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the roadmap. This stroke delivery does not redefine or complete the full objective.
-
 
 ### 2026-10-16 — F07/F11 editable vector gradient fills and inert SVG paint-server conversion
 
@@ -4571,7 +4536,6 @@ Initial paint-transform/color/inheritance failures led to actual renderer and im
 
 Remaining: Boolean operations, richer brush/type/font/vector editing, broader gradient/color spaces and spread/stroke/paint-server/CSS/clip/mask/filter/identity graphs, original XML/shared definition identity, viewer/device/precision/heap/responsiveness and PSB/TIFF/PDF/AVIF gates. A12 deeper design checks/human acceptance, retouching/matting/semantic quality, precision/color/RAW, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the full roadmap. This gradient-fill delivery advances that objective without redefining or completing it.
 
-
 ### 2026-10-16 — F07 native compound-path foundation for Boolean editing
 
 Owner: implementation agent. Estimate: M prerequisite within T16/F07/F11, with F14 scheduling/latency work still required. Revalidated the active full roadmap against the current schema-23 source after the prior branding audit; this turn makes implementation progress without narrowing the objective. Boolean results need holes and disconnected editable boundaries. Native compounds now supply that prerequisite; union/subtract/intersect/exclude calculation and its worker/host/command integration remain next. F07/F11 and the complete professional-editor objective remain incomplete.
@@ -4595,7 +4559,6 @@ An initial broad 326-case run had 323 passes and three failed new fixtures; it i
 Final source/build/doc hashes, raw fixture/50 MP/GPU/UI reports, exact commands and validation log hashes are sealed in [benchmarks/vector-compounds-2026-10-16.json](benchmarks/vector-compounds-2026-10-16.json). Prior gradient/stroke/SVG benchmark artifacts remain unchanged.
 
 Remaining: curve-preserving Boolean operations with off-main-thread calculation, shared atomic replacement/history, cancellation/staleness and OO/UI/scripting/REST parity; broader vector/type/effect/XML/master identity round trips and editing; brush/type/precision/color/RAW, matting/retouch/semantic quality, AI/provider/evaluation/production, A12 bleed/alignment/contrast/legibility/export/human acceptance, responsiveness/heap/device, workflow/collaboration/commercial/specialist and additional format gates throughout the roadmap. This prerequisite does not redefine or complete that objective.
-
 
 ### 2026-10-16 — F07 editable curve Boolean operations across native surfaces
 
@@ -4623,7 +4586,6 @@ Initial analytical XOR results exposed opposite island winding, fixed by canonic
 
 Remaining: deeper brush/type/font/vector and XML/shared-master/effect/paint identity editing/round trips; precision/color/RAW and PSB/TIFF/PDF/AVIF; retouch/matting/semantic quality; A12 bleed/alignment/legibility/contrast/export/human acceptance; AI/provider/evaluation/production; latency/heap/device; workflow/collaboration/commercial/specialist requirements. The recorded dependency audit also flags an existing Vite/PostCSS source-map-js 1.2.1 advisory requiring separate remediation; Paper is not implicated. This delivery advances the full objective without redefining or completing it.
 
-
 ### 2026-10-16 — Dependency security: bounded indexed source-map processing
 
 Owner: implementation agent. Estimate: S within the cross-cutting reliability/security gates. After completing the Boolean delivery record, addressed its recorded Vite/PostCSS dependency advisory rather than leaving that actionable issue pending. The [reviewed advisory](https://github.com/advisories/GHSA-68fv-2mgg-jv7q) identifies source-map-js versions before 1.2.2 as affected by indexed-map offset amplification; the [upstream patch](https://github.com/7rulnik/source-map-js/commit/cf7658058ceeaa8619d5ae0ec90be6905209d016) adds offset validation and bounded copying. Used the already cached 1.2.2 release with lifecycle scripts disabled. Comparison against the exact pre-update lock proves that **only** the source-map-js package entry changed, within PostCSS's existing version range. No direct dependency, override or package.json change was needed; prior uncommitted work is retained.
@@ -4633,7 +4595,6 @@ Four regression cases exercise the real installed source-map engine and PostCSS 
 The complete rebuilt suite passes **1,028 unit/API tests across 137 files**, all **41 production browser cases**, TypeScript, five SEO/generated-doc tests and whitespace validation. All **45 release files remain byte-identical** to the final Boolean build, and the 710-file post-patch source/WASM/dependency/test manifest stays unchanged through final verification. The preceding 177 development browser checks remain evidence for the unchanged application implementation, separately dated from the dependency update; they were not rerun or counted twice. A fresh npm audit reports **zero known vulnerabilities** for this installed dependency tree at the recorded time. This is an advisory-database result, not proof of complete application security or hosted/plugin/collaboration acceptance.
 
 The earlier Boolean evidence and its audit snapshot remain immutable historical records. Before/after lock and rejection evidence, bounded-test source hashes, current audit, exact commands/logs, inherited source/build proof and verification limits are sealed in [benchmarks/source-map-security-2026-10-16.json](benchmarks/source-map-security-2026-10-16.json). No document schema, image import budget, editor operation, plugin permission, paid service or source-image handling changed. The broader professional-editor roadmap, including responsiveness, remains active and incomplete.
-
 
 ### 2026-10-16 — F08 native kerning/word spacing and F11 whole-line SVG positioning
 
@@ -4663,7 +4624,6 @@ Current defaults/signatures/errors/examples, isolation, storage, UI and architec
 
 Remaining typography work includes automatic wrapping, paragraph styles, variable axes, path text, manual/optical pair kerning, deeper OpenType/RTL/glyph coverage, font embedding and broader device/human acceptance. Richer brush/vector/retouch/matting/semantic editing, precision/color/RAW, editable interchange/XML/shared-master identity and additional formats, A12 deeper design checks, AI/provider/evaluation/production, F14 latency/heap/device, collaboration/workflow/commercial and specialist requirements remain throughout the full roadmap. This delivery advances that objective without redefining or completing it.
 
-
 ### 2026-10-16 — F14 bounded native text-shadow work and production typing evidence
 
 Owner: implementation agent. Estimate: M within F14/T01/T16. The preceding goal turn verified the existing product rebrand. This turn revalidated the active roadmap and delivers measured rendering work without narrowing the full professional-editor objective. F14 and the complete roadmap remain incomplete.
@@ -4672,11 +4632,11 @@ Normal production profiling found that compact retained glyph caches still incur
 
 The reproducible `scripts/benchmark-text-input.mjs` harness uses isolated Scripts in a normal release without developer globals. Ten fixtures cover short, repeated/unique multiline, long-line and 64-layer plain/overlay/shadow text, including larger blur/type and a long shadowed line. Twenty paced keys edit the first visible line; native Canvas hooks follow the matching glyph through the final connected canvas copy and require exact text, twenty presentations, changed pixels and no page errors. Three alternating baseline/candidate pairs retain 1,200 raw samples (600 per build), browser/CPU identity, entry URLs and release/source hashes. This is an input-event-to-matching-canvas-copy proxy, not physical input-to-photon or continuous-typing throughput.
 
-| Shadow fixture | Baseline median p95 | Candidate median p95 | Reduction |
-| --- | --- | --- | --- |
-| shadow-64 | 32.8 ms | 19.2 ms | 41.5% |
-| shadow-64-large | 35.1 ms | 22.0 ms | 37.3% |
-| shadow-64-long | 33.6 ms | 22.7 ms | 32.4% |
+| Shadow fixture  | Baseline median p95 | Candidate median p95 | Reduction |
+| --------------- | ------------------- | -------------------- | --------- |
+| shadow-64       | 32.8 ms             | 19.2 ms              | 41.5%     |
+| shadow-64-large | 35.1 ms             | 22.0 ms              | 37.3%     |
+| shadow-64-long  | 33.6 ms             | 22.7 ms              | 32.4%     |
 
 Across the corrected candidate runs, fixture p95 values range from 15.4 to 22.8 ms and the largest individual sample is 26.0 ms. No native long tasks are observed in the measured fixture intervals, with overlapping boundary tasks included. These are local observations, not broad hardware or F14 acceptance. Non-shadow cases retain their raw run-to-run variation rather than a claimed general speedup.
 
@@ -4690,7 +4650,6 @@ Source/build hashes, baseline implementation snapshots, the complete final and s
 
 Remaining F14 gates include the complete production all-tool matrix, continuous/sustained interactions and degradation, dense vector/selection/filter/retouch workflows, memory pressure and physical browser/device/input-to-photon acceptance. Richer typography/brush/vector editing, precision/color/RAW, deeper editable interchange and formats, matting/retouch/semantic quality, A12 design/human checks, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the original roadmap. This delivery advances that objective and does not complete or redefine it.
 
-
 ### 2026-10-16 — F14 shared Pen translation and matched production geometry evidence
 
 Owner: implementation agent. Estimate: M within F14/T01/T16. Following the bounded text-shadow work, revalidated the pending Pen implementation, frozen builds and finished browser evidence. The intervening branding verification required no product changes. Measured native vector interaction separately in Move and Pen modes. Ordinary Move cases measured below 25 ms p95, while Pen-layer nudges with visible handles reached roughly 117 ms for 1,000 paths and 500 ms for 20,000 curved anchors. CPU profiling identified substantial SVG attribute/React commit work. These exploratory measurements are distinct from the final controlled corpus. The full professional-editor objective remains active and incomplete.
@@ -4702,12 +4661,12 @@ Review found a real native SVG precision regression in the initial shared-transl
 The new constructor-based corpus generator and normal-production harness import the same native project bytes into each build, avoiding the separate existing automation payload-complexity gate. The initial 1,000-path Scripts setup was correctly rejected at that gate; its failed setup contributes no editing evidence, and no trust limit was raised. The final probe follows a distinctive vector point through actual Canvas/image-bitmap copies and additionally requires the displayed SVG anchor center at the expected position. It verifies final coordinates/path count through read-only isolated Scripts, unchanged developer-global exposure, changed native pixels, no page errors and exact undo.
 
 | Native fixture with Pen controls | Baseline median p95 | Candidate median p95 |
-| --- | --- | --- |
-| paths-20 | 16.5 ms | 17.5 ms |
-| paths-200 | 32.2 ms | 18.8 ms |
-| paths-1000 | 113.0 ms | 28.4 ms |
-| paths-200-layers-64 | 43.9 ms | 25.0 ms |
-| curves-200 | 537.4 ms | 37.1 ms |
+| -------------------------------- | ------------------- | -------------------- |
+| paths-20                         | 16.5 ms             | 17.5 ms              |
+| paths-200                        | 32.2 ms             | 18.8 ms              |
+| paths-1000                       | 113.0 ms            | 28.4 ms              |
+| paths-200-layers-64              | 43.9 ms             | 25.0 ms              |
+| curves-200                       | 537.4 ms            | 37.1 ms              |
 
 Three alternating matched pairs retain 600 measured key/frame samples across five fixtures, file hashes/bytes, all native task intervals and overlapping long tasks, browser/CPU/backend/build identity and native positive controls. The ordinary 1,000-path candidate runs have no recorded routine long tasks. The 20,000-anchor case remains variable (32.7–99.3 ms per-run p95) and records native long tasks, so its <=33 ms/<50 ms gate is not achieved. Trace evidence retains browser PrePaint, paint and layerization costs separately from JavaScript; profiler/trace timings add overhead and are not speedup baselines.
 
@@ -4718,7 +4677,6 @@ Verification passes the production/WASM/runtime/docs/TypeScript build, **1,037 u
 The complete raw final/short-repeat/diagnostic/exploratory reports, independent pixels/positions/mutations, exact generated native fixtures in compressed form, source/release hashes, baseline overlay snapshot, reproducible harness/generator/controller and failure history are sealed in [benchmarks/pen-translation-performance-2026-10-16.json](benchmarks/pen-translation-performance-2026-10-16.json). Earlier text-shadow/typography/Boolean/security evidence remains unchanged. No paid provider, account, upload, new shortcut, image/file import cap or alternate public DTO mutation API was added.
 
 Remaining: very dense native handle construction/paint/layerization and long tasks; pointer anchor/handle performance and the complete all-tool/sustained-use/heap/device F14 matrix. Richer brush/type/vector editing, precision/color/RAW and deeper interchange/formats, retouch/matting/semantic quality, A12 human/design checks, AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements remain throughout the original roadmap. This work advances that objective without completing or redefining it.
-
 
 ### 2026-10-16 — F14 memoized Pen anchor controls and production drag evidence
 
@@ -4731,10 +4689,10 @@ The constructor-based native corpus and normal-production pointer harness cover 
 After moving the capture timestamp ahead of viewport bounds reads, three alternating unprofiled matched pairs on the final local-slice build retain all 360 movement samples and six independent native long-task controls. Earlier measurements are separately labeled and never pooled. Median per-run p95 observations are:
 
 | Native anchor-drag fixture | Baseline median p95 | Candidate median p95 |
-| --- | --- | --- |
-| 20 four-anchor paths | 10.9 ms | 10.3 ms |
-| 2,000 four-anchor paths | 28.7 ms | 27.3 ms |
-| One 8,000-anchor path | 25.9 ms | 22.5 ms |
+| -------------------------- | ------------------- | -------------------- |
+| 20 four-anchor paths       | 10.9 ms             | 10.3 ms              |
+| 2,000 four-anchor paths    | 28.7 ms             | 27.3 ms              |
+| One 8,000-anchor path      | 25.9 ms             | 22.5 ms              |
 
 The 8,000-anchor candidate spans 19.6–23.7 ms p95 and records one native long task per run, versus baseline 25.3–28.3 ms and 3/2/6 tasks. The many-path candidate spans 26.2–32.5 ms and retains 6/12/3 long tasks, versus baseline 25.8–30.9 ms and 11/3/8 tasks. Its second candidate trial regresses. These modest local improvements do not establish a general Pen speedup or the <=33 ms/<50 ms F14 gate. Native paint/layerization remains substantial. Both baseline and intermediate candidate development profiles pass the same real drag/model checks; sampled exports.jsxDEV self time falls from 2,838.9 to 1,143.3 ms, while native/program time remains high. That intermediate profile precedes the final local-slice retention correction. CDP and development overhead make those diagnostic samples unsuitable as production speedup baselines. The earlier profiled production baseline, initial all-path-block pilot and pre-correction pairs remain separate.
 
@@ -4764,12 +4722,12 @@ Seven independent whole-line native references (Latin, Arabic/RTL, CJK punctuati
 
 The 8999-character near-full-width constructor diagnostic originally performed 1801 native measurements over 8,111,694 cumulative characters in 756.2 ms. The frozen implementation performs four measurements over 18,002 characters, taking 17.2 ms in the broad run (13.4 ms in an earlier exploratory run), with identical source/frame width. These single constructor observations are separate from input latency. Three unprofiled ordinary-production runs cover all fourteen typing fixtures, including point/shadow regressions and four paragraph cases. Every case records twenty real paced keys through matching newly shaped glyphs copied to the connected Canvas viewport, then restores exact source/pixels with twenty document undos outside timing. All three native 75 ms observer controls pass; backend is Standard rendering and developer globals are absent.
 
-| Paragraph fixture | Per-run p95 (ms) | Median p95 (ms) | Maximum sample (ms) |
-| --- | --- | --- | --- |
-| paragraph-240 | 16.8 / 16.3 / 16.7 | 16.7 | 17.1 |
-| paragraph-9900 | 17.3 / 17.1 / 17.0 | 17.1 | 21.9 |
-| paragraph-64 | 21.5 / 18.0 / 18.3 | 18.3 | 24.4 |
-| paragraph-wide | 15.7 / 17.2 / 16.2 | 16.2 | 21.1 |
+| Paragraph fixture | Per-run p95 (ms)   | Median p95 (ms) | Maximum sample (ms) |
+| ----------------- | ------------------ | --------------- | ------------------- |
+| paragraph-240     | 16.8 / 16.3 / 16.7 | 16.7            | 17.1                |
+| paragraph-9900    | 17.3 / 17.1 / 17.0 | 17.1            | 21.9                |
+| paragraph-64      | 21.5 / 18.0 / 18.3 | 18.3            | 24.4                |
+| paragraph-wide    | 15.7 / 17.2 / 16.2 | 16.2            | 21.1                |
 
 Across all fourteen fixtures, the largest observed p95 is 25.5 ms; 0 overlapping native long tasks were observed. The largest paragraph p95 is 21.5 ms. These are local input-event-to-canvas-copy proxies; composition/physical display can follow. They do not prove continuous throughput, peak memory, all-tool or device-independent F14 acceptance, and no before/after input-speedup claim is made.
 
@@ -4801,12 +4759,12 @@ Final build verification executes actual WASM, isolated runtime generation, deve
 
 Three unprofiled normal-production runs extend the existing corpus to **eighteen** fixtures. Every fixture verifies twenty new matching glyph presentations and exact twenty-entry document/text/pixel undo outside timing. Justified cases additionally verify the actual UI mode and positive native word-spacing on a matching newly drawn line, rather than inferring it from a fixture name. All three deliberate native 75 ms overlapping-task observer controls pass, with Standard rendering and no development global.
 
-| Justified fixture | Per-run p95 (ms) | Median p95 (ms) | Maximum sample (ms) |
-| --- | --- | --- | --- |
-| justify-240 | 17.2 / 15.7 / 15.3 | 15.7 | 23.1 |
-| justify-9900 | 18.4 / 17.5 / 18.4 | 18.4 | 18.7 |
-| justify-64 | 19.0 / 20.8 / 21.9 | 20.8 | 23.9 |
-| justify-wide | 18.9 / 20.4 / 18.7 | 18.9 | 21.1 |
+| Justified fixture | Per-run p95 (ms)   | Median p95 (ms) | Maximum sample (ms) |
+| ----------------- | ------------------ | --------------- | ------------------- |
+| justify-240       | 17.2 / 15.7 / 15.3 | 15.7            | 23.1                |
+| justify-9900      | 18.4 / 17.5 / 18.4 | 18.4            | 18.7                |
+| justify-64        | 19.0 / 20.8 / 21.9 | 20.8            | 23.9                |
+| justify-wide      | 18.9 / 20.4 / 18.7 | 18.9            | 21.1                |
 
 Across all eighteen fixtures, the largest p95 is 29.7 ms; 0 overlapping native long tasks were observed. The largest justified p95 is 21.9 ms. These are local input-event-to-connected-canvas-copy proxies; native composition/display can follow. Setup, snapshots and undo are outside timing. There is no before/after speedup, continuous-throughput, peak-memory, physical-device or full F14 claim. Initial partial pilots and the rejected wide setup remain separate historical observations.
 
@@ -4831,10 +4789,10 @@ That production probe also exposed a **737 ms** main-thread task while many nati
 Three serial, unprofiled normal-production runs use the same 9,000-character source. Timing is captured from the actual export click to the native download-anchor call; source/pixel checks are outside timing. Each run verifies an actual deliberate 75 ms native long-task observer control, Standard rendering, absent developer globals, one editable text chunk, 1,000 whitespace spans and no image replacement.
 
 | Run | Export-ready proxy (ms) | Observed browser frames | Overlapping native long tasks (ms) |
-| --- | --- | --- | --- |
-| 1 | 2039.6 | 82 | none observed |
-| 2 | 2028.8 | 81 | none observed |
-| 3 | 2005.0 | 83 | none observed |
+| --- | ----------------------- | ----------------------- | ---------------------------------- |
+| 1   | 2039.6                  | 82                      | none observed                      |
+| 2   | 2028.8                  | 81                      | none observed                      |
+| 3   | 2005.0                  | 83                      | none observed                      |
 
 These measurements describe the named local Chromium/system-font environment, not physical display, continuous input throughput, heap/peak memory, hardware GPU/tablet/device performance or complete F14 acceptance. There is no controlled before/after total-speedup claim. The long-line pixel residual and broader font/glyph gaps remain explicit.
 
@@ -4843,7 +4801,6 @@ Final verification passes the actual WASM/runtime/developer-doc/TypeScript/produ
 All **810 source** and **50 release-file** hashes remain frozen through final runtime/timing checks. Final documentation verification preserves all application/worker/WASM assets; source/release/document hashes, native observer controls, complete probes/controllers, baseline and failed experiments are sealed in [benchmarks/svg-whitespace-2026-10-16.json](benchmarks/svg-whitespace-2026-10-16.json). Published developer pages were finalized before the frozen build; this dated roadmap entry is not an input page in the explicit developer-doc build list. Prior paragraph/justification/Pen evidence remains immutable.
 
 Remaining: native combining-mark Auto/None justification support; measured combining-mark/font/kerning/tracking/signed/fractional/affine and cross-viewer SVG placement; native paragraph reflow/source-separator identity and font embedding; full paragraph styles, variable axes, path text and broader language/OpenType composition. Richer brush/vector/retouch/matting/semantic editing, precision/color/RAW, deeper editable formats/interchange, A12 human checks, AI/provider/evaluation/production, sustained/heap/device F14, workflow/collaboration/commercial and specialist requirements remain throughout the original roadmap. This delivery advances that full objective without redefining or completing it.
-
 
 ### 2026-10-17 — F11 native TIFF/BigTIFF output and F14 export scheduling evidence
 
@@ -4905,7 +4862,6 @@ Updated the F11 catalog, requirements, architecture/system design, API/scripting
 
 Remaining: editable/searchable/imported PDF, multipage delivery/prepress/conformance, real multi-GiB files and broader reader/device/color/heap gates; PSB/AVIF and deeper PSD/TIFF/SVG interchange; high precision/CMYK/HDR/RAW and full profile fidelity; broader brush/vector/type/font/retouch/matting/semantic tools; A12 human/design checks; AI/provider/evaluation/production, sustained editor-wide F14, workflow/collaboration/commercial and specialist requirements throughout the original roadmap. This delivers a PDF output increment and a genuine color-profile repair without redefining or completing F10/F11/F14 or the full objective.
 
-
 ### 2026-10-17 — F11 rendered PSB delivery and large Photoshop input repair
 
 Owner: implementation agent. Estimate: M–L within T17/F11, with F14 scheduling/heap/device gates still open. The intervening architecture-answer turn made no roadmap implementation progress. Revalidated the pending PSB work and its terminal build failure, fixed the missing browser-test type annotation and completed connected runtime verification. Prior TIFF/recovery and PDF/output-profile work and sealed evidence remain intact. The full professional-editor objective remains active and incomplete.
@@ -4932,7 +4888,6 @@ Requirements, architecture/system design, API/scripting signatures/defaults/erro
 
 Remaining: full editable Photoshop type/masks/effects/groups/channels/precision/color, synchronous parser and whole-process/reader memory constraints, actual multi-GiB files and broader independent-editor/device acceptance; deeper TIFF/SVG/PDF/AVIF interchange and high precision/CMYK/HDR/RAW; richer brush/vector/type/font/retouch/matting/semantic tools; A12 human/design checks; real AI/provider/evaluation/production, sustained editor-wide F14, workflow/collaboration/commercial and specialist requirements throughout the original roadmap. This delivers PSB output and a genuine large-input repair without redefining or completing F11/F14 or the full objective.
 
-
 ### 2026-10-17 — F14 private Photoshop encoding and F11 byte-preserving export scheduling
 
 Owner: implementation agent. Estimate: M within F14/T01 and the existing F11 Photoshop delivery boundary. The preceding goal turn made verified progress on PSB output and large-axis input, while recording remaining export stalls. Revalidated that dirty worktree and preserved its exact release, then profiled actual normal-production export rather than assuming a cause. The complete professional-editor objective remains active and incomplete.
@@ -4947,11 +4902,11 @@ Final verification passes the actual WASM/runtime/developer-doc/TypeScript/relea
 
 Final timing uses three **alternating, unprofiled release pairs**, each with three serial real downloads. Both variants reopen the exact saved project, use Standard rendering and export the same 4096-square paint/text composition in default layered PSB mode. Each of the eighteen trials independently observes a deliberate **75 ms** native long-task control. No tests/builds run alongside the paired measurements. Setup, original PNG delivery and independent decoding are outside the timed click-to-real-Blob-download-dispatch interval. Fresh contexts do not flush OS/browser-driver caches or certify sustained throughput.
 
-| Pair | Baseline exports (ms) | Worker exports (ms) |
-| --- | --- | --- |
-| 1 | 3603.3 / 3948.1 / 3550.0 | 1887.4 / 1905.7 / 1886.4 |
-| 2 | 3433.9 / 3668.8 / 3372.0 | 1890.5 / 1802.9 / 1836.3 |
-| 3 | 3653.2 / 3694.4 / 3542.9 | 1963.5 / 1745.9 / 1810.5 |
+| Pair | Baseline exports (ms)    | Worker exports (ms)      |
+| ---- | ------------------------ | ------------------------ |
+| 1    | 3603.3 / 3948.1 / 3550.0 | 1887.4 / 1905.7 / 1886.4 |
+| 2    | 3433.9 / 3668.8 / 3372.0 | 1890.5 / 1802.9 / 1836.3 |
+| 3    | 3653.2 / 3694.4 / 3542.9 | 1963.5 / 1745.9 / 1810.5 |
 
 Median across nine exports changes from **3,603.3 to 1,886.4 ms**, a **47.6% local reduction**. All **18 PSB files are byte identical**, with identical input-project/native-PNG hashes and independent preview/layer recomposition. Baseline paired captures contain six overlapping native long tasks (**74 / 104 / 54 / 104 / 57 / 87 ms**); none are observed in the nine candidate exports. Maximum frame gaps remain **160.2 ms baseline / 108.9 ms candidate**. The separate full-production suite observes **1,702.4 / 1,660.3 / 1,684.7 ms** and no overlapping tasks for its three PSB trials, with maximum gaps **80.0 / 83.6 / 81.8 ms**; these samples are not pooled into the paired comparison. These are named local Linux/HeadlessChrome scheduling/host-readiness results, not physical display, hardware/tablet/GPU/device, <=33 ms input, general 60fps, heap or complete editor-wide F14 acceptance. Remaining frame delays are not causally attributed by this increment.
 
@@ -4960,7 +4915,6 @@ Updated architecture/system invariants, requirements, trusted API/scripting canc
 [Sealed evidence](benchmarks/photoshop-encoding-2026-10-17.json) retains raw profile/paired measurements/native controls, independent file/pixel results, final unit/browser/production reports, failure history, new sources and exact incremental patch. Previous source is reconstructed from the earlier sealed PSB patch and hash-verified for all **11 modified inputs**, alongside **6 new inputs**. All **905 current inputs / 52 release files** and the three earlier TIFF/PDF/PSB evidence artifacts remain unchanged through final checks; the preserved baseline matches all **51** prior release hashes. This dated entry and the performance record are appended afterward, outside developer-doc build inputs.
 
 Remaining: observed frame delays, synchronous Photoshop parsing and process/reader memory; sustained editor-wide latency/long-task/heap/device F14; full editable/color/precision/large-file Photoshop and deeper TIFF/SVG/PDF/AVIF interchange; high precision/CMYK/HDR/RAW; richer brush/vector/type/font/retouch/matting/semantic work; A12 human/design checks; real AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements throughout the original roadmap. This advances the full objective without redefining or completing F11/F14 or the roadmap.
-
 
 ### 2026-10-17 — F11/F14 cancellable Photoshop input and honest decoder boundaries
 
@@ -4981,10 +4935,10 @@ Independent released psd-tools **1.10.9** creates a genuine **10,000 × 5,000**,
 Final timing uses three alternating normal-release pairs and the same independent 50 MP source/reference on Standard rendering. Every stage proves the native observer with a deliberate **75 ms** task, for **12 controls** total. File-change to matching preflight DOM and real import click to committed-layer/dialog-close DOM are captured separately. Exact full-resolution PNG pixels are checked afterward. No tests/builds run alongside these measurements. The initial diagnostic pilot is not pooled into them.
 
 | Pair | Baseline inspection / import (ms) | Worker inspection / import (ms) |
-| --- | --- | --- |
-| 1 | 662.5 / 2054.1 | 717.2 / 2212.3 |
-| 2 | 709.6 / 2097.2 | 711.0 / 2215.3 |
-| 3 | 673.6 / 2120.5 | 757.4 / 2131.0 |
+| ---- | --------------------------------- | ------------------------------- |
+| 1    | 662.5 / 2054.1                    | 717.2 / 2212.3                  |
+| 2    | 709.6 / 2097.2                    | 711.0 / 2215.3                  |
+| 3    | 673.6 / 2120.5                    | 757.4 / 2131.0                  |
 
 Baseline inspection records **644 / 687 / 650 ms** overlapping main-thread tasks and only **2 / 2 / 2** observed frames; worker inspection records none and **41 / 40 / 42** frames. Maximum inspection gaps change from **695.3 to 88.1 ms**. Baseline import records **644 / 680 / 688 ms** tasks; none are observed in the three worker imports. Maximum import gaps change from **687.2 to 100.3 ms**, with **65 / 64 / 66** versus **54 / 50 / 48** observed frames. These results establish removal of the measured half-second main-thread stalls, not a universal frame cadence or causality for remaining delays. Median total inspection readiness rises from **673.6 to 717.2 ms**, and import readiness from **2,097.2 to 2,212.3 ms**. That local overhead is retained as an explicit tradeoff; there is no total-throughput speedup claim. Physical presentation, sustained all-tool <=33 ms input, heap/device, CMYK/HDR/RAW and full F14 remain unproven.
 
@@ -4993,7 +4947,6 @@ Updated the architecture/system invariants, requirements, API/scripting signatur
 [Sealed evidence](benchmarks/photoshop-import-2026-10-17.json) preserves raw final tests/native controls/paired timing, independent pixel results, new source and fixture hashes, exact incremental patch, pilot/build history and reproduction controllers. Prior source is reconstructed from both preceding sealed patches and hash-verified for **18 modified inputs**, alongside **19 new inputs** including nine binary fixtures. All **924 current inputs / 53 release files**, all **52** preserved baseline release hashes and the four earlier TIFF/PDF/PSB/encoding evidence artifacts remain unchanged through final checks. This dated entry and the performance record are appended afterward, outside developer-doc build inputs.
 
 Remaining: full metadata-only/streamed-file parsing, original Photoshop container retention, process/reader/native memory and residual frame delays; ZIP and complete higher-precision/color/mask/group/editable Photoshop semantics and broader independent-editor/multi-GiB/device acceptance; deeper TIFF/SVG/PDF/AVIF and high precision/CMYK/HDR/RAW; richer brush/vector/type/font/retouch/matting/semantic tools; A12 human/design checks; real AI/provider/evaluation/production, sustained editor-wide F14, workflow/collaboration/commercial and specialist requirements throughout the original roadmap. This advances the full objective without redefining or completing F11/F14 or the roadmap.
-
 
 ### 2026-10-17 — F11 native Photoshop ZIP and prediction decoding
 
@@ -5017,7 +4970,6 @@ Updated current README, supported-format strategy/requirements, architecture/sys
 
 Remaining: higher precision/CMYK/ICC/HDR/RAW; full Photoshop mask/group/editability and original-container retention; metadata-only/streamed-file parsing, multi-GiB/reader/process memory and independent desktop/device acceptance; deeper TIFF/SVG/PDF/AVIF; richer brush/vector/type/font/retouch/matting/semantic tools; A12 human/design checks; real AI/provider/evaluation/production, sustained editor-wide F14/heap/device, workflow/collaboration/commercial and specialist requirements throughout the original roadmap. The full objective stays active without reducing its scope.
 
-
 ### 2026-10-17 — F11 actual Photoshop raster-mask sources and truthful fallback
 
 Owner: implementation agent. Estimate: M–L within T17/F11. The preceding ZIP implementation is verified progress. Revalidated its source/evidence and implemented the next concrete fidelity gap: raster masks previously became solid rectangular geometry. The full professional-editor objective and F11/F14 remain active and incomplete.
@@ -5039,7 +4991,6 @@ Full input/decoded planes, returned ImageData, native bitmaps, PNG output and re
 Updated current supported-format README/strategy, requirements, architecture/system invariants, feasibility and trusted API/scripting defaults, report/asset ownership, errors, representation limits and executable OO mask example. [Sealed evidence](benchmarks/photoshop-mask-2026-10-17.json) retains all raw final reports/JSON attachments, independent fixture hashes/source bytes, complete failed/interrupted pilot history, test-observer diagnostic/fix, exact incremental patch and reproduction controller/commands. All **13 modified source baselines** match prior sealed inputs; **40 new inputs**, **987 frozen inputs**, **53 release files** and **seven preceding evidence artifacts** remain verified. This dated entry and the performance note are appended afterward outside developer-doc build inputs.
 
 Remaining: editable Photoshop groups/vector/combined masks and exact feather/linkage semantics, higher precision/CMYK/ICC/HDR/RAW, original-container retention and metadata-only/streamed parsing, multi-GiB/process/reader/device acceptance; deeper TIFF/SVG/PDF/AVIF, richer brush/vector/type/font/retouch/matting/semantic tools, A12 human/design checks, real AI/provider/evaluation/production, sustained editor-wide F14/heap/device, workflow/collaboration/commercial and specialist requirements throughout the original roadmap. The full objective remains active with its original scope.
-
 
 ### 2026-10-18 — F11 editable Photoshop hierarchy and actual native pass-through groups
 
@@ -5079,13 +5030,11 @@ All **70 production cases** pass in one final run, without failures, skips or re
 
 Still open: native editable Photoshop type/vector/effect/adjustment output, original container retention, mask-control/off-canvas fidelity, higher precision/ICC/color/CMYK/HDR/RAW and desktop-reader/multi-GiB/process-memory acceptance; broader TIFF/SVG/PDF/AVIF interoperability, professional brush/vector/type/retouch/matting/semantic work, A12 human/design checks, real AI/provider/evaluation/production, sustained editor-wide F14/heap/device, workflow/collaboration/commercial and specialist requirements. No paid service, upload, dependency or arbitrary import-resolution cap is introduced, and functional browser checks establish neither 60fps nor the full objective.
 
-
 ### 2026-10-18 — F06 authored pressure response in verification
 
 Owner: implementation agent. Estimate: M within T16/F06. Implemented immutable normalized PressureCurve values, strict schema-29 brush metadata, shared native/SVG/supported-WGSL size/alpha/spacing/bounds, explicit zero response with legacy-default compatibility, pen low/zero/final-release sample preservation, a draft-only curve dialog and constructor/REST/history/project/workspace integration. R15 review replaces numeric-only knot fields with the shared paired Slider/exact-input component. No image-resolution cap, provider call or new isolated privilege is introduced.
 
 Verification remains in progress. Focused current engine/API checks pass 83 tests. Earlier pilots passed 17 native-browser cases (including software WGSL and genuine 50 MP source/undo/project comparisons) and one normal-production documented example; those precede the final paired controls and new redo-only workspace check, so are not final-source release claims. The earlier pen pilot exposed a missing same-position release-pressure endpoint; the tool now preserves pressure-only changes for explicit curves. Final full unit/build, relevant browser, normal-production and immutable evidence gates remain pending. This advances the original full roadmap; physical tablet/tilt, textured tips, brush libraries, symmetry/mixer/smudge, sustained F14 and the broader portfolio remain unfinished.
-
 
 ### 2026-10-18 — F06 authored brush pressure curves verified delivery
 
@@ -5101,13 +5050,11 @@ Native checks cover actual trusted Chromium pen events at zero/low/full/release 
 
 Remaining: physical tablet/tilt and richer dynamics, textured tips, persistent brush presets/libraries, symmetry/mixer/smudge and complete F06; sustained editor-wide F14, hardware GPU/display/device and whole-process memory acceptance; broader professional vector/type/font/retouch/matting/semantic tools, high precision/ICC/CMYK/HDR/RAW and independent-editor interoperability, real AI/provider/evaluation/production gates, human/design/commercial evaluation, workflow/collaboration and specialist requirements. Software WGSL and functional tests establish neither universal acceleration nor 60fps. No arbitrary image/import cap, provider call, upload, new dependency or isolated privilege is introduced. The complete roadmap remains active and incomplete.
 
-
 ### 2026-10-18 — F06/W04 saved portable brush presets implementation
 
 Owner: implementation agent. Estimate: M–L within T16/F06 and W04 brush-library foundations. Revalidated the pressure-curve delivery and every frozen source/release/prior hash before starting. The preceding goal continuation made concrete progress: pressure authoring, browser/production verification and immutable evidence are complete, while the full roadmap remains active.
 
 Implement saved, named presets for the actual brush/pencil/eraser/clone/dodge/burn/healing tools, capturing supported dynamics including authored curves and explicit optional foreground color. Presets configure future gestures without changing document selection/mask targets, source assets or history; each real stroke still uses shared commands. Add local transactional persistence, optimistic update/delete conflict checks, search/rename/update/duplicate/delete, validated portable data-only import/export, recovery-friendly storage errors and keyboard-accessible custom UI. Verify real reloads, multiple tabs, invalid imports, failed persistence, cancellation, source/undo/project retention and normal-production behavior. This does not imply textured tips, tablet/tilt, symmetry/mixer/smudge, the full personal asset library, or sustained F06/F14 completion.
-
 
 ### 2026-10-18 — F06/W04 saved portable brush presets verified delivery
 
@@ -5125,7 +5072,6 @@ The original cancellation pilot exposed an overwritten abort reason after one qu
 
 Remaining: physical tablet/tilt and richer dynamics, textured tips, symmetry/mixer/smudge and complete F06; broader W04 asset/palette/component libraries; sustained all-tool F14 and actual device/hardware-GPU/display/whole-process memory gates; deeper professional vector/type/font/retouch/matting/semantic tools, color/precision/RAW/interchange and independent-editor acceptance, real AI/provider/evaluation/production, workflow/collaboration/commercial and specialist requirements. No provider call, upload, account, dependency, arbitrary image-import cap, plugin execution privilege or REST/browser synchronization is introduced. Functional correctness does not establish universal responsiveness. The original complete roadmap remains active and incomplete.
 
-
 ### 2026-10-18 — F06 brush-tip shape and stylus tilt implementation
 
 Owner: implementation agent. Estimate: L within T16/F06. The preceding goal turn made verified progress by delivering saved portable presets; all its frozen source/release/prior hashes were revalidated before this increment. The complete roadmap remains active.
@@ -5133,7 +5079,6 @@ Owner: implementation agent. Estimate: L within T16/F06. The preceding goal turn
 Implement authored angle/roundness with optional pen-tilt orientation/flattening and a normalized response curve. Retain canonical spherical pen orientation in stroke-plane coordinates, transforming the projected direction through layer/mask inverse affine geometry while preserving altitude. Canvas, SVG and supported WGSL must share one stamp geometry/interpolation contract; rotated pencils, clipping, incremental caches, masks/filter masks, erasures/tonal/healing, source capture, preview/commit/export and numerical fallback need actual verification. UI controls, cursor feedback, constructors/sandbox/REST, schema-age checks, projects/workspace history and portable preset evolution belong to the same delivery. Legacy absent-tip artwork must remain unchanged.
 
 Pointer orientation follows [W3C Pointer Events 3](https://www.w3.org/TR/pointerevents3/#converting-between-tiltx-tilty-and-altitudeangle-azimuthangle); axis/boundary ambiguity and the absence of actual physical-tablet verification must remain explicit. No source-image resolution cap or paid/provider privilege is introduced. Native/wide/50 MP, real shader and normal-production gates remain pending. This does not complete textured tips, symmetry/mixer/smudge, all F06 or sustained F14.
-
 
 ### 2026-10-18 — F06 authored brush-tip and spherical tilt verified increment
 
@@ -5160,7 +5105,6 @@ Remaining: physical-tablet/hardware-GPU/display validation, textured tips, symme
 Owner: implementation agent. Estimate: L within T16/F06. Previous goal turn: progress, sealed authored tip/tilt with actual build, 1,212 unit/API, 255 browser and 74 production cases. Revalidated all 1,040 frozen inputs, 54 release files and thirteen immutable evidence artifacts before this next baseline. The full professional-editor objective stays active.
 
 Implement self-contained mirror/radial stroke symmetry using validated affine copy transforms, retaining original samples and one stroke/undo entry. Transform the complete tip footprint and clip every copy on the same captured selection. Tool settings live in document space and are conjugated into the attached layer/mask/native master plane. Native/SVG/supported-WGSL geometry, deterministic incremental replay, bounds/culling/source capture, cursors/guides, erasures/tonal/healing/clone, OO/script/REST, schema-age/history/persistence and portable presets belong to the same delivery. No sample dropping, arbitrary image-resolution cap, source mutation or added extension/provider privilege is allowed. Real browser/shader/50 MP/production gates are pending; this does not complete textured tips, mixer/smudge, hardware or full F06/F14 acceptance.
-
 
 ### 2026-10-18 — F06 mirror/radial brush symmetry verified increment
 
@@ -5298,11 +5242,9 @@ The seventeen new native ownership cases verify real colored pixels after either
 
 Next required work remains active ToolSettings/gesture/document-switch integration, actual source controls/previews/cursors, and original-byte source-bearing portable brush preset/library storage with legacy compatibility. Document 32/project 3/workspace 2 and preset/pack 1–3/database 1 remain unchanged; live ownership counts/preferences are not serialized. Mixer/smudge, physical tablet/hardware GPU/display, sustained all-tool F14, peak-process-memory and every other unfinished original-roadmap family remain active. Concurrent functional browser/production observations establish no controlled speedup or universal 60fps; native matting still records long tasks. No provider call, upload, account, dependency, arbitrary image cap, new isolated privilege or REST/browser synchronization is introduced.
 
-
 ### 2026-10-18 — F06 texture source dialog and pointer integration in verification
 
 Owner: implementation agent. Estimate: L within T16/F06. Classification: progress. The private-draft Texture dialog now connects original file/document selection, TIFF review, coverage/channel/inversion and Apply/Cancel to the existing source owner. Brush-family and mask gestures capture document-local references with cancellation/history/identity guards; bounded cursor coverage follows existing affine/symmetry planes. Metadata-only presets explicitly reject enabled texture and older preset application resets it, preventing silent source loss. Actual build/unit/native-browser/production verification is underway. Original-byte source-bearing portable packs, additional brush families and sustained/device gates remain required; this does not complete F06/T16 or the full roadmap.
-
 
 ### 2026-10-18 — F06 texture controls and native gesture capture verified; portable presets remain open
 
@@ -5316,11 +5258,9 @@ Actual final verification: `npm run build`; **1,274 unit/API cases in 159 files*
 
 **Original-byte source-bearing portable presets are still unfinished and are the next connected increment.** Existing formats 1–3/DB 1 cannot silently drop textures: current capture rejects enabled texture, and legacy application disables it. Binary source packs, source-aware local persistence/recovery/import/export and complete preset UI workflows remain required. Broader brush families, tablet/hardware/display and sustained all-tool F14 gates also remain open. This increment does not complete F06/T16 or the full professional-editor roadmap. Concurrent browser/production timings are functional observations under shared load, not a controlled latency/60fps or whole-process memory claim.
 
-
 ### 2026-10-18 — F06 source-bearing preset workflow in verification
 
 Owner: implementation agent. Estimate: L within T16/F06. Classification: progress. Preset/pack v4, original-blob checksums/native validation, source-aware library CRUD/import/export, complete binary recovery, guarded asynchronous Apply and the visible preset dialog are now connected. The existing single IndexedDB v1 record stores its optional source atomically with the preset, preserving old records without a physical migration; this replaces the earlier proposed separate-source-store layout while retaining the complete original-source workflow and atomic recovery/conflict guarantees. Raw binary backup/reset compares all bytes under a maintained native write lock. Existing JSON1–3 exports/readers and JSON recovery remain compatible for source-free records. Pure tests pass; native pilots and complete build/unit/browser/production verification remain underway. No full F06/T16, physical-device/F14 or overall-roadmap completion is claimed.
-
 
 ### 2026-10-18 — F06 original-source portable presets verified; mixer/smudge and broader gates remain open
 
@@ -5338,7 +5278,6 @@ The first full production file had **77 pass/1 failure**: its documentation sele
 
 Remaining F06 includes real mixer/smudge behavior and physical tablet/device gates; sustained editor-wide F14, hardware display/GPU, process peak-memory and the wider professional-editor roadmap also remain open. Concurrent browser/production timing attachments are functional observations under shared load, not controlled latency/speedup or general60fps acceptance. This increment does not complete F06/T16 or the overall objective.
 
-
 ### 2026-10-18 — F06 native wet-paint dependency verified; spatial replay and authoring remain open
 
 Owner: implementation agent. Estimate: L within T16/F06. Classification: progress. Actual WASM now initializes finite loaded/sample pigment and performs per-dab premultiplied RGBA deposit and pre-deposit pickup with flow, wetness and byte coverage. Float32 carried pigment preserves sub-byte alpha/color between dabs. Independent equations cover every 256 source-alpha values against every 256 coverage values across five settings, with explicit byte/floating-point tolerances; direct endpoint cases assert exact transport/lifting, finite load exhaustion, zero-flow/coverage identity and once-only final opacity/selection. Split/reordered per-dab tiles retain exact pixels/reservoirs. This proves a numerical dependency of the intended workflow, not complete spatial stroke replay.
@@ -5349,7 +5288,6 @@ The ordinary image worker captures options/pixels/carried coverage before readin
 
 Next required work remains spatial carried-pigment transport across the complete native stroke, captured dependencies independent of viewport cropping, ordered paint/raster replacement including reduced alpha, shared authored OO commands/history/assets, original/result persistence, actual tool UI/controls/gestures/previews/cancel/presets/cursors and native/SVG/GPU/automation parity. Original sources are not capped or resized by the 4,000,000-pixel per-request working policy; callers must tile larger regions. No general 60fps, sustained-use, peak-process-memory, physical tablet/GPU/display, F06/T16/F14 or full-roadmap completion is claimed. The original complete professional-editor objective stays active.
 
-
 ### 2026-10-18 — F06 native spatial replay implementation in verification
 
 Owner: implementation agent. Estimate: L within T16/F06. Previous goal turn: progress, with the actual-WASM wet-paint dependency, full build/unit/native/production evidence and exact source reconstructions sealed. This continuation revalidated all 1,072 baseline inputs, release/generated bytes and 21 prior artifacts before implementation. The full original professional-editor objective remains active.
@@ -5359,7 +5297,6 @@ Internal replay now follows the complete shared stamp path with a separate spati
 Focused actual-WASM spatial tests pass, including stripes rather than average-color smear, turns, alpha lifting, selection/opacity, overlapping symmetry, native coordinate/crop independence, independent inverse-basis equations, ownership and failure cleanup. The initial native pilot passes six cases, including real 50 MP fractional-alpha transport, native typed storage, worker-termination cleanup, texture/tilt/affine tile parity and cancellation/quota. Its source-replacement fixture called a nonexistent sharing method; the fixture is corrected to the actual AssetStore.shareTo boundary and the entire native file will rerun. The native complex case now also includes overlapping affine symmetry. No initial pilot result is accepted as final evidence.
 
 Full build/unit and corrected native/normal-production verification remain pending. This is an internal engine dependency, not a shipped mixer/smudge tool: ordered target-layer replacement, authored OO commands/undo/assets, persistent source/result operations, actual tools/controls/cursors/previews/cancel/presets and native/SVG/GPU/automation publication still remain. The rendered-branch preparation adapter must not bake selected-layer appearance twice when the mutation plane is integrated. Incremental preview, sustained all-tool F14, whole-process memory, unsupported-browser abandoned-storage cleanup and physical tablet/GPU/display gates remain open. No public model/schema/host privilege, provider call, upload or image/source cap is introduced.
-
 
 ### 2026-10-18 — F06 native spatial preparation verified; authored tools remain open
 
@@ -5373,7 +5310,6 @@ The actual 50 MP RGBA source retains its 10,000 by 5,000 geometry and original b
 
 The production diff contains only the three generated architecture/requirements/system-design pages. Existing app/worker/WASM bytes remain identical; new replay modules are exercised through native dev-module browser tests and are not yet imported by an editor/UI/REST entry point. No new authoring workflow or production mixer/smudge gesture is claimed. Still required: ordered target-layer replacement including alpha reduction and expanded ink bounds where needed, shared authored OO commands/history/assets, persistent operations/source references, actual tools/controls/cursors/preview/cancel/presets and native/SVG/GPU/isolated/REST integration. Incremental gesture prefixes, sustained F14/process memory, unsupported-browser abandoned-storage cleanup, physical tablet/GPU/display and all other unfinished original-roadmap families remain active.
 
-
 ### 2026-10-18 — F06 ordered wet-paint authoring integration in verification
 
 Owner: implementation agent. Estimate: L within T16/F06. The intervening architecture answer was read-only and is classified as no implementation progress. This continuation verified the live worktree/typecheck and resumed the unfinished authored replacement slice. It preserves the original complete-roadmap objective and the 22 existing sealed artifacts.
@@ -5382,9 +5318,7 @@ Schema 33 now carries distinct prepared wet values through ordered paint/raster 
 
 This is progress toward the actual tool, not completion of F06/T16/F14. Actual gestures/controls/cursors/presets, incremental live preview/cancel, mask/filter-mask/master target workflows and device/sustained-performance gates remain required. Every other unfinished roadmap family remains active. No provider, cloud upload, new isolated privilege, REST/browser synchronization or arbitrary source-image/tile-count cap is added.
 
-
 The integration additionally preserves wet ink outside original raster bounds in Photoshop layer records and uses expanded ink bounds for real resize handles while scaling the unchanged source plane. The complete eight-case browser pilot passes, including premasked/overlapping replacement alpha, neutral paint sampling, source-preserving raster resize, PSD/SVG output, complete native versus partitioned affine composition, cancellation/ownership boundaries, the real isolated documentation example and the authored 50 MP workflow. A normal-production example now uses only visible import/Scripts/save/export/reopen controls without debug globals. Final acceptance and exact source/release/test manifests are recorded in [authored wet integration evidence](benchmarks/brush-wet-authoring-2026-10-18.json); pilots are excluded from final counts. Actual interactive mixer/smudge tools and the broader roadmap remain open.
-
 
 ### 2026-10-18 — F06 retained native wet session and inert-record correction in verification
 
@@ -5450,7 +5384,6 @@ On the named Linux/AMD3900X/Chrome153host, median per-runp95 changes257.3→171.
 
 [Sealed evidence](benchmarks/brush-wet-gesture-performance-2026-10-18.json) reconstructs all10changed/new files, embeds complete raw measurements/PNGs/projects and preserves25prior artifacts. A new owned baseline captures1,104inputs and26immutable artifacts before the next implementation slice. Further diagnostic profiling still finds hundreds of private parent-workspace writes per20point stroke; reducing unnecessary persistence is the next investigation, with private result/source/undo/quota/cancellation guarantees retained. The original complete roadmap, fullF06/T16/F14 and all other unfinished families remain active.
 
-
 ### 2026-10-18 — F14 resident wet epochs applied for main verification
 
 Owner: founder/engineer; estimate: one bounded implementation/verification slice, not closure of the original goal. The parent-workspace diagnostic identified 572 readwrite transactions during one 20-point stroke. The candidate now retains private working epochs within the existing memory budget, atomically persists dirty evictions, discards superseded unpublished scratch without writes, pairs independent snapshot original/result records, and requires a guarded flush before final store ownership transfers. Original pixels, source resolution, shared OO commands/history, schema34/project3/workspace2, script/plugin isolation and separate REST sessions remain unchanged.
@@ -5459,7 +5392,6 @@ The isolated final runtime passes build/typecheck, all 1,352 unit/API cases acro
 
 Exactly six owned engine/test files are applied; private Vite configuration is excluded and all 26 earlier evidence artifacts remain byte-identical. Main build/runtime compatibility and clean alternating production latency comparisons are pending. Correctness is not latency acceptance: full F06/F14, sustained/device/process-memory and every other unfinished original-roadmap requirement remain active.
 
-
 ### 2026-10-18 — F14 resident cache verified; remaining wet latency measured
 
 The applied main worktree passes actual build, all 1,352 unit/API cases across 167 files and all 56 native browser cases across nine complete files, with no accepted retries/skips/flakes. Its 51 non-documentation release files, including actual app/worker/WASM, exactly match the isolated release that passes all 82 production workflows. The final result documentation changes only five Markdown inputs and three generated pages; runtime and test inputs remain identical.
@@ -5467,7 +5399,6 @@ The applied main worktree passes actual build, all 1,352 unit/API cases across 1
 Three clean alternating unprofiled production pairs ran after correctness/setup jobs stopped. Across the six layer/mask/filter-mask Mixer/Smudge fixtures, median per-run p95 changes from 155.0–177.6 ms to 88.1–119.7 ms, a local 32.6–46.2% reduction. Every fixture still fails the 33 ms target. All 720 newly matching pointer samples, 36 native task controls, 108 exact native PNGs and 108 independently decoded projects pass. Each of 36 strokes preserves all 21 x/y coordinates, adds only one intended native operation and undoes exactly. No overlapping native long task was observed; animation callbacks do not prove 60fps ink presentation. External host activity, paced/synthetic proxy scope, physical/tablet/GPU/display and process-memory limits remain explicit.
 
 [sealed evidence](benchmarks/brush-wet-resident-cache-2026-10-18.json) preserves all 26 earlier artifacts and reconstructs all 11 changed/new inputs against the owned baseline. Restricted unit and no-op-quota native pilots are wholly excluded. Source resolution, OO commands/history, script/plugin permissions and separate REST sessions remain unchanged. The next investigation is prefix materialization and remaining worker/storage/scheduling cost. Full F06/T16/F14, sustained/device/process-memory and every other unfinished original-roadmap requirement remain active; the complete original goal is not achieved.
-
 
 ### 2026-10-18 — F14 prepared prefix reuse and frame cadence applied for main verification
 
@@ -5479,7 +5410,6 @@ Three clean alternating pairs per study preserve720matching pointer samples/36na
 
 Exactly nine owned engine/UI/test inputs and five documents are applied against the1,106input/27artifact baseline. Private Vite configuration is excluded. Main build/unit/native/runtime compatibility and [prefix evidence](benchmarks/brush-wet-prefix-reuse-2026-10-18.json) sealing remain pending. The first reuse candidate's extra native probe exposed a missing processing-store lifetime check; it is excluded despite its old functional matrix. The corrected candidate and the initially overbroad frame-clock fixture are documented separately. Output memory is workload dependent and shares actual bitmaps with frames; no arbitrary source cap or whole-process bound is implied. Full F06/T16/F14, sustained/device/process-memory and every other unfinished original-roadmap requirement remain active; the complete goal is not achieved.
 
-
 ### 2026-10-18 — F14 prefix/cadence verified; release improves, continuous input remains open
 
 The applied main worktree passes actual build, all 1,354 unit/API cases across 167 files and all 65 native cases across ten files. Its 51 non-documentation release resources, including actual app/worker/WASM, exactly match the isolated release that passes all 82 production workflows. Final results documentation changes only five Markdown inputs and three generated pages, with runtime/unit/native/production inputs unchanged.
@@ -5487,7 +5417,6 @@ The applied main worktree passes actual build, all 1,354 unit/API cases across 1
 The two separate clean three-pair studies each retain 720 matching pointer samples, 36 native task controls, 108 exact native PNGs and 108 independently decoded project containers. Across both studies, all 72 strokes add only one intended native operation, retain every one of 21 x/y coordinates and undo exactly. The release study uses a different History-panel layout and observes only three releases per fixture/release: its medians must not be pooled with pointer p95. Local release-to-History medians improve 52.2–60.7 ms → 28.9–32.7 ms and release-to-final-canvas-copy medians improve 58.5–87.8 ms → 36.5–64.4 ms. Continuous-pointer p95 remains mixed at 78.7–106.6 ms, above 33 ms. No general pointer speedup, sustained/hardware/display/tablet/process-memory acceptance or full F06/T16/F14 completion is claimed.
 
 [Sealed prefix evidence](benchmarks/brush-wet-prefix-reuse-2026-10-18.json) reconstructs all 14 changed/new inputs, captures the accepted source/release identities and preserves all 27 earlier artifacts. The first lifecycle-gap candidate and the pointer-pausing clock fixture are excluded; the reuse-only timing study remains separate. The complete original roadmap remains active, including every other unfinished professional, AI/provider/evaluation, workflow and commercial requirement. Next work must address remaining continuous-input preparation and numerical/render scheduling cost, with the same source/undo/isolation invariants.
-
 
 ### 2026-10-18 — F14 dependent-dab packets verified and rejected for main adoption
 
@@ -5499,7 +5428,6 @@ Three clean alternating unprofiled pairs retain 720 newly matching pointer movem
 
 The [sealed rejected experiment](benchmarks/brush-wet-dependent-dabs-experiment-2026-10-18.json) reconstructs eight isolated engine/test inputs and preserves all 28 previous artifacts. Main engine, model34/project3/workspace2, public OO commands/history, isolated scripting/plugin permissions, separate REST sessions and original source resolution remain unchanged. This records a rejected experiment rather than declaring success from passing tests or fewer worker calls. Full F06/T16/F14, sustained/editor-wide/device/process-memory and every other unfinished original-roadmap requirement remain active; the full goal is not achieved.
 
-
 ### 2026-10-18 — F14 direct-prefix/paired-preparation tradeoff measured; combined adoption rejected
 
 Owner: implementation engineer; estimate: one controlled experiment. The preceding goal turn completed the user's distinct-icon and two-column rail correction, with a production build, native laptop-height workflow and multi-viewport production smoke check. This continuation preserved that result identically in both variants, froze the old pre-rail candidate and captured a new owned source/release baseline. The complete original implementation goal remains active.
@@ -5509,7 +5437,6 @@ The isolated combined candidate connects ready wet-prefix producer notifications
 Two separate three-pair production studies each preserve 720 newly matched movements, 36 native controls, 108 complete PNGs and 108 independently decoded project containers; all 72 combined strokes preserve 21 exact x/y points, the intended operation and exact undo. All six median per-run pointer p95 values decrease 11.4–25.2%, to 78.3–103.4 ms, but release-to-History medians increase in all six fixtures and final-canvas-copy medians increase in four. The combined candidate is not applied. Three observations per fixture/release and headless DOM/native-copy proxies are not sustained or physical presentation acceptance. The [sealed experiment](benchmarks/brush-wet-direct-prefix-experiment-2026-10-18.json) retains complete evidence and reconstructable isolated code; all 29 prior artifacts remain unchanged.
 
 Main engine, schema34/project3/workspace2, original source resolution, OO commands/history, script/plugin isolation and separate REST sessions stay unchanged. Direct delivery and paired image preparation must next be separated and checked across both interaction phases. Full F06/T16/F14, editor-wide sustained/physical-device/process-memory and every other unfinished professional, AI/provider/evaluation, workflow and commercial requirement remain open. No reduced completion target is substituted.
-
 
 ### 2026-10-18 — F14 stable cursor invalidation and corrected two-column panel budget
 
@@ -5523,7 +5450,6 @@ Final isolated build, all 1,354 unit/API cases across 167 files, all 115 native 
 
 Actual main build, all 1,354 unit/API cases across 167 files and all 115 native cases across ten files now pass. All 51 other release resources exactly match the isolated 82-workflow production release; only three updated developer guides differ. The final update touches only nongenerated PERFORMANCE_BENCHMARKS/IMPLEMENTATION_ROADMAP decision logs, leaving all 54 release files identical to the main validation build. The [sealed record](benchmarks/cursor-adapters-panel-layout-2026-10-18.json) captures final acceptance when complete. No public schema, original source resolution, command/history, isolation, provider/upload/account or REST/browser synchronization boundary changes. Full F06/T16/F14, sustained/editor-wide/physical-device/process-memory and every other unfinished professional, AI/provider/evaluation, workflow and commercial roadmap requirement remain active; the original goal is not narrowed.
 
-
 ### 2026-10-18 — F05 manual red-eye correction functionally verified
 
 Implemented the previously missing named red-eye capability as a parametric AdjustmentLayer, with strict threshold/strength data, immutable RedEyeAdjustment constructor, selection-masked command/context creation, paired preview/cancel/commit controls and mask-preserving reset. Actual worker WASM and supported viewport WGSL correct red-dominant encoded RGB8 while preserving G/B/alpha; no eye detector or provider is implied. One creation transaction captures selection in the inserted layer's local plane, including transformed parents. Shared locks, revisions, atomic rollback, undo, recipes, isolated scripting, headless REST, embedded-master schema checks and source retention remain intact. Document schema is 35; project/workspace stay 3/2.
@@ -5534,13 +5460,11 @@ Three first native-attempt failures were test issues: an older gradient-map sche
 
 This completes the defined manual red-eye implementation, not full F05 or the full roadmap. Automatic/semantic eye detection is not implemented or claimed; portrait-quality evaluation, frequency separation and all remaining professional/AI/provider/workflow/commercial/device/memory/latency gates stay active. Software-adapter correctness and functional tests do not prove physical GPU/tablet responsiveness or 60fps.
 
-
 ### 2026-10-19 — F05 native frequency separation in verification
 
 Implementing full-native manual separation with a retained original, editable low/high retouch layers, protected precision correction, native alpha and original appearance/erasure/tone ordering. Added strict schema-36 constructors and shared commands, native composition boundaries and document-phase tone, actual WASM Linear Light/Linear Burn/encoding, bounded Gaussian sharing, command-search dialog and raster context action. The original two native browser cases pass, including transparent/affine/masked/erased/tone reconstruction and exact undo/project/source hashes. Exhaustive byte-pair, UI retouch/cancel, isolated scripts, REST, interchange, 50MP and full build/regressions are still being verified; no completed-delivery count is claimed yet.
 
 Live radius preview, coupled radius editing and portrait-quality evaluation remain open, alongside full F05 and all unfinished professional/AI/provider/workflow/commercial/device/memory/latency gates. This is movement toward the full original roadmap, not a replacement completion target.
-
 
 ### 2026-10-19 — F05 native frequency foundation functionally verified; broader workflow continues
 
@@ -5552,11 +5476,9 @@ The final 50 MP run takes 2,283.2 ms for capture/assembly and 61,056.5 ms for fu
 
 The F05 foundation is available, but live radius preview, coupled radius editing, portrait-quality evaluation and frequency-specific workspace/recipe acceptance remain unfinished. The full original professional-editor/AI/provider/workflow/commercial/device/memory/latency objective remains active. Next: implement the preview and coupled controls, profile full-resolution export, and continue the rest of the roadmap; do not replace the full goal with this increment.
 
-
 ### 2026-10-19 — F05 native preview/shared radius implementation in verification
 
 Added an explicit schema37 parent frequency radius with OO controls/shared commands, native-plane scope resolution, legacy fallback preservation and normal locks. The protected correction child is not unlocked or rewritten. Native capture is retained privately for a bounded original-pixel low/detail preview, original comparison, pointer/keyboard panning and latest-only single-flight requests. Commit assembles a fresh model from the retained base. Small-image regressions pass; full native ownership/cancellation, shared-radius, isolation/conversion/copy, source persistence, production and large-image verification remain in progress. An isolated export profile uses the frozen schema36 baseline. FullF05/F14, quality, device and every other unfinished original-roadmap requirement remain active.
-
 
 ### 2026-10-19 — F05 native preview/shared radius verified; exact export work reduced
 
@@ -5570,7 +5492,6 @@ Single intrusive offscreen native profiles observe unchanged export 61,681.5→4
 
 [Sealed workflow evidence](benchmarks/frequency-workflow-2026-10-19.json) preserves source/release identities, reconstructable deltas, complete raw reports and profile details. Full F05/F14, portrait-quality, sustained/editor-wide/device/process-memory and every other unfinished professional/AI/provider/workflow/commercial requirement remain active. The original complete roadmap is not achieved; next work must continue those requirements, including the still-slow full-frame path, rather than replacing the full objective with this increment.
 
-
 ### 2026-10-19 — F14 native frequency overscan tiling in verification
 
 The preceding turn sealed the schema-37 preview/shared-radius workflow and source/release baseline. This continuation preserves the full original goal and investigates the remaining full-frame export. A unit-native frequency-band plane can cover a 256-pixel composition tile plus overscan in one 512-pixel request, avoiding tiny extra Gaussian/encoding requests. Affine/fractional placement and unsafe large halos keep the established grid and working budgets; native composition and retouch canvas regions are unchanged. No schema/API/source-resolution change.
@@ -5578,7 +5499,6 @@ The preceding turn sealed the schema-37 preview/shared-radius workflow and sourc
 Fourteen isolated baseline/candidate PNG comparisons are exact across band modes, zero radius, masks/inversion, alpha, affine/fractional placement, disabled filters and low/high/both retouch. Two new browser cases compare disabled-filter semantic references across 256/512 seams and confirm large-halo sampling geometry. All 24 isolated feature/interchange cases and typecheck pass. An initial profile observes full-frame 50 MP Gaussian requests 6,241→3,160 and about 35 seconds versus the prior roughly 41-second profiled path; clean paired measurements and main regression/release verification are pending.
 
 A larger-composition variant is excluded: three retouched scenes differ at three/four soft-brush edge pixels (straight RGB up to four bytes, alpha unchanged), at native clipping boundaries. The accepted candidate changes only frequency-source sampling, with all fourteen PNGs exact. This exposes a separate brush crop-invariance investigation, not permission to relax pixel assertions. Full F05/F06/F14, quality/device/process-memory/editor-wide latency and every other unfinished original-roadmap requirement remain active.
-
 
 ### 2026-10-19 — F14 exact frequency-band tiling verified; full-frame export still open
 
@@ -5606,7 +5526,6 @@ Independent Pillow/NumPy checks verify all 216 PNGs, all known input pixels, com
 
 [Sealed coverage evidence](benchmarks/brush-crop-coverage-2026-10-20.json) retains source/release identities, reconstructable deltas, failed variants, complete raw reports and input artifacts. All 35 previous benchmark artifacts remain unchanged. Textured/wet crop invariance, roughly 35-second full-frame frequency retouch export, portrait quality, sustained/editor-wide latency, physical/tablet/display behavior, process memory and every other unfinished professional, AI/provider, workflow and commercial requirement remain active. This increment does not complete or redefine the full original goal. Next work must continue those requirements, including re-evaluating larger native composition requests against the corrected ordinary coverage and the remaining coverage types.
 
-
 ### 2026-10-20 — F06/F14 textured crop correction verified; repeated performance remains open
 
 Owner: implementation engineer; estimate: rendering correction and regression verification. The preceding commit-only turn confirmed an already clean checkpoint. The complete original roadmap remains active. An isolated candidate now keeps complete small texture footprints and canonical bounded sampling cells, independently of viewport cropping. Actual native projection remains full-sized even when only a smaller output region is read: sheared bitmap edges changed when projection canvases were cropped. Real WASM conversions batch at most 64 samples and 1,000,000 working pixels. Source images keep their original dimensions and bytes. Retention retirement is separate from explicit cancellation/disposal.
@@ -5617,9 +5536,7 @@ The candidate build and 31 focused actual-browser cases pass, including real 50 
 
 The isolated engine passes all 1,412 unit/API cases in 174 files, all 262 affected native browser cases and all 84 normal-production workflows. All 23 complete native composition scene comparisons are exact against the corrected 256-core reference. The adopted main worktree also passes build, all 1,412 unit/API cases and 50 focused native browser cases. Its 51 non-documentation release resources are byte-identical to the candidate that passes all 84 normal-production workflows; only the three updated architecture/requirements/system-design pages differ. These are functional and packaging checks; repeated input and full-frame frequency timing remain pending. Larger native-composition requests must also account for the inner Gaussian halo and prove pixel equivalence. Extreme bitmap projection, sustained/editor-wide latency, portrait quality, physical/tablet/display/process-memory and every other unfinished original professional, AI/provider, workflow and commercial gate remain open. No completed-roadmap claim is made.
 
-
 [Sealed textured-coverage evidence](benchmarks/texture-crop-readbacks-2026-10-20.json) preserves reconstructable adopted files, exact source/release identities, complete final reports, the exploratory production artifacts and earlier counterexamples/setup failures. All 36 previous benchmark artifacts remain byte-identical. The first production run passed 80 checks but four independent reader invocations failed because system Python lacked psd_tools/PyMuPDF. Existing test-only reader environments restored the unchanged 84-case suite; no assertion or timeout was relaxed. The corrected full-flow bounds, clipped native compositor overload and unchanged affine projection remain explicit invariants. Larger native compositions are pixel-equivalent in 23 scenes, but no new full-frame speedup is claimed. The complete original roadmap remains active, with repeated/sustained/editor-wide performance, roughly 35-second full-frame retouch, extreme bitmap projection, quality/device/process-memory and all other unfinished families still open.
-
 
 ### 2026-10-20 — F14 textured-input and native-composition production measurements
 
@@ -5633,18 +5550,15 @@ A separate six-run alternating full-native50MP low-retouch export study compares
 
 [Sealed paired performance evidence](benchmarks/texture-frequency-production-performance-2026-10-20.json) preserves complete reports, independent project/PNG/geometry checks, measured source/WASM/release identities and original outputs; all37 previous artifacts remain byte-identical. Next work investigates remaining sampling/task overhead and large filter-mask latency while preserving exact pixels and full scope. Sustained/editor-wide/release latency, extreme native bitmap projection, portrait quality, physical/tablet/hardware-GPU/display/process memory and every other unfinished professional, AI/provider, workflow and commercial requirement remain active. The full original roadmap is not achieved.
 
-
 ### 2026-10-20 — F14 literal-raster band overscan verified; full-frame export remains slow
 
 Owner: implementation engineer; estimate: bounded sampling follow-up within the full original objective. A read-only recognizer permits1024-core native frequency-band sampling only over one unchanged native raster with no filter mask, within the existing halo-inclusive4MP/8192-edge work budget. Complex master appearance, resampling/affine/fractional placement and masks retain their previous grid; native composition remains512. No source geometry, public mutation/schema, history or isolation change is introduced.
 
 The isolated prototype passes24 focused unit cases, typecheck, four semantic/halo browser cases and23 complete native frequency/interchange/WGSL workflows. All37 whole-image scene pairs and independently decoded74 PNGs are exact, including texture/wet/mask/fallback variants. A native50MP exploratory export is also exactly equal to the frozen implementation; full clean alternating measurements precede adoption. The main build, all1,432 unit/API cases in175 files, all27 affected native frequency/interchange/WGSL browser cases and the normal-production frequency workflow pass. No accepted skips, retries or flakes are reported. The affected production workflow was rerun on the rebuilt release; this is not a new84-workflow production claim. Input latency misses, device/quality/process-memory and every other unfinished original roadmap requirement remain active; this slice is not a reduced completion target.
 
-
 [Sealed band-overscan evidence](benchmarks/frequency-band-overscan-2026-10-20.json) preserves reconstructable changed sources, independent full-image comparisons, final build/test reports and all six clean50MP outputs. Three alternating pairs against the frozen corrected512-band renderer observe median32243.4→29017.1ms (10.0% locally),3081→1580 Gaussian requests and70432320→68432000 sampled pixels. Independent complete RGBA decoding matches every output and source/model hashes remain unchanged. All six native long-task controls are positive; no overlapping export long task is reported. Browser animation callbacks remain scheduling proxies. No competing builds/tests or application edits ran during measurement. A29-second export is still slow and no editor-wide/60fps acceptance is claimed.
 
 All38 earlier artifacts remain byte-identical. Early new-test fixtures omitted required mask options/tone IDs and used an incomplete raster-erasure wrapper or untyped dynamic imports; these setup/type failures are retained separately and corrected without changing pixel assertions or timeouts. Source masks/appearance, filter masks, source replacements and non-native placement retain their existing grid. Further Gaussian/sampling overhead, large filter-mask input misses, extreme native bitmap projection, sustained/release/editor-wide/physical/process-memory and every other unfinished original professional, AI/provider, workflow and commercial requirement remain active.
-
 
 ### 2026-10-21 — F14 rectangular native frequency and blend work
 
@@ -5658,7 +5572,6 @@ Three clean alternating50MP pairs against the committed engine observe median291
 
 Actual main build, all1,445 unit/API cases across176files, all seven affected main native/cancellation/WGSL cases and the rebuilt normal-production frequency workflow pass with no accepted skips, retries or flakes. This is not a new complete84-workflow production claim. [Sealed strip evidence](benchmarks/frequency-strip-batching-2026-10-21.json) retains reconstructable inputs and complete measured/test artifacts. FullF05/F06/F14, large filter-mask input misses, extreme native bitmap projection, representative quality, sustained/release/editor-wide/physical/process-memory gates and every other unfinished original professional, AI/provider/evaluation, workflow and commercial requirement remain active. The full original roadmap is not achieved or narrowed to this increment.
 
-
 ### 2026-10-21 — F02/F06/F14 extreme bitmap precision and capture scheduling
 
 Owner: implementation engineer; estimate: bounded native-geometry correction within the complete original objective. The previous increment committed verified strip batching as8fa077c. This continuation reproduces visible bitmap masks/textures becoming entirely transparent at1e9/1e12 transforms. Native fractional crops, local quads and texel rebasing do not repair the browser draw. A precision fallback gathers bounded native source patches in double precision and preserves original geometry/bytes, premultiplied filtering, mirrored/affine placement and image-edge support. Raster/mask/texture, native wet and filter projection paths share it; ordinary Canvas draw geometry/order stays unchanged.
@@ -5670,7 +5583,6 @@ The first asynchronous batch variant starts64 numerical captures before a queued
 The pre-queue engine passes all314 affected native/browser/WGSL cases. The final scheduling refinement passes22 focused cases, including mirrored/fractional geometry, independent premultiplied color/channel equations, actual textured strokes, mutable input ownership, source cancellation, real WGSL and a true50MP source/project round-trip. All37 ordinary whole-scene pairs and74 independently decoded PNGs match the committed reference; only capture scheduling/lifecycle checks change afterward. The frozen final release passes all85 production workflows, including an actual isolated-script transform/bitmap-mask edit, complete native PNG oracle, one undo/redo and project reopening without developer globals. No accepted skips/retries/flakes are reported.
 
 Actual main build, all1,446 unit/API cases across176files, all12 adopted native/50MP/WGSL cases and both rebuilt production workflows pass. All51 non-documentation release resources exactly match the frozen85-workflow candidate; only three updated developer pages differ. [Sealed precision evidence](benchmarks/bitmap-projection-precision-2026-10-21.json) retains reconstructable code, all failed/corrected diagnostics, raw final reports and prior artifact hashes. The new test initially passed transform as a constructor option and used console.log for panel output; fixtures now use the actual setter and documented print API without loosening pixel/history assertions or timeouts. All40 prior sealed artifacts remain unchanged. FullF02/F05/F06/F14, remaining editor-wide/sustained/release/input/device/process-memory/quality gates, and every other unfinished original professional, AI/provider/evaluation, workflow and commercial requirement stay active. The full original roadmap is not achieved or narrowed to this correction.
-
 
 ### 2026-10-21 — F14 texture input experiments deferred after production measurements
 
@@ -5688,7 +5600,6 @@ The endpoint prototype passes12 focused actual-WASM unit checks,28 native browse
 
 Actual main production build passes. All54 rebuilt release resources, every engine file and the actual WASM binary are byte-identical to the committed control; only this work log, the benchmark narrative and the new sealed evaluation artifact change. No new main unit/browser-suite pass is claimed for these documentation-only changes.
 
-
 ### 2026-10-21 — F02/F03/F07/F11 native Canvas coverage correction
 
 Owner: implementation engineer; estimate: rendering correctness within the complete original objective. The preceding turn commits measured deferrals as80959d1. A new isolated pointwise tonal request prototype passes24 focused units,31 native cases and13 worker-equation mask combinations but changes complete scene pixels for bitmap masks, transformed source rasters and vector artwork. It is not adopted. Those scenes also expose existing viewport/PNG disagreement, including affine smart-object projection.
@@ -5703,7 +5614,6 @@ A later full run passes413/414 checks and exposes an extreme-miter metadata regr
 
 Actual main production build and all1450 unit/API checks across177 files pass. The adopted main source passes13 focused browser/WGSL checks, including actual50MP source preservation, and both affected production workflows. All51 non-documentation release resources, every engine file and the actual WASM binary are byte-identical to the final414-native/86-production candidate; only three published developer documentation pages differ. These checks establish the stated rendering correction, not a new performance or complete-roadmap acceptance.
 
-
 ### 2026-10-21 — F07/F14 linear coincident-vector footprint work
 
 The previous turn makes concrete progress by committing the native Canvas correction as acee560, including the completed build,1450 unit/API checks,13 focused native/WGSL checks and two production workflows. The full original objective remains active. Review of its new render-only vector footprint query finds quadratic repeated scans of coincident segments, within valid20,000-anchor path data. A bounded512-anchor diagnostic confirms6,297,600 coordinate reads and about448ms under coordinate-access instrumentation.
@@ -5713,7 +5623,6 @@ Per-contour forward/backward memoization now shares nearest resolved tangents, i
 The new maximum-size browser pilot passes with all20,000 anchors retained, exact equivalent sparse/editor/native-PNG/reopened output and the existing independent Canvas contour thresholds. Its first fixture incorrectly required raw Canvas channel identity before editor compositing;176 channel-byte differences are retained as setup evidence. The corrected fixture preserves exact editor/reopen comparisons and applies the pre-existing independent-reference thresholds. Final main build, complete unit/API, focused native/vector/affine and full production verification follow below. [Sealed evidence](benchmarks/vector-tangent-linearity-2026-10-21.json) retains this increment and all43 previous artifact identities. Full professional/AI/provider/evaluation/workflow/commercial scope and all remaining quality, device, process-memory and F14 gates stay active.
 
 Final main production build, all1451 unit/API checks across177 files, all31 focused native/vector/affine cases and all86 normal-production workflows pass with no accepted skips/retries/flakes. Engine/WASM/release and relevant test identities remain frozen across both browser jobs. All54 resources served by the production preview match the built bytes; the live native module includes the validated memoization. The first restricted unit attempt is wholly excluded after listen/spawnSync EPERM errors; the authorized full rerun passes. All43 earlier sealed artifacts remain byte-identical. The original414-case native matrix predates this refinement and is not represented as a new final-source run. Further large-blur, input/editor-wide/sustained/release/quality/device/process-memory and every other unfinished original-roadmap gate remain active.
-
 
 ### 2026-10-21 — F04/F09/F14 exact transparent spatial support
 
@@ -5725,7 +5634,6 @@ The actual candidate browser pilot completes the previously timing-out affine re
 
 Final main production build, all1454 unit/API checks across177 files, all91 affected native/spatial/filter-mask/frequency/interchange/50MP/WGSL cases and all86 normal-production workflows pass with no accepted skips/retries/flakes. Engine/assembly/WASM/release and relevant test identities stay frozen across both browser jobs. All54 actual served production resources and native WASM match the build. The actual main sigma331 viewport completes in about630ms, with eight real1999×1999 jobs across viewport/PNG and exact complete output/source/model checks. The unchanged50 other release resources confirm only WASM and three published guide changes. All44 earlier sealed artifacts remain byte-identical. Single native filter-mask probes still show about56.7–82.4ms p95 and long tasks up to119ms; they are not paired production/frame-ownership acceptance. Dense large-blur throughput, full input/editor-wide/sustained/release/quality/device/process-memory and every other unfinished original professional/AI/provider/evaluation/workflow/commercial requirement remain active. The complete original objective is not achieved or narrowed to this correction.
 
-
 ### 2026-10-21 — F04/F09/F14 adjacent convolution sample reuse
 
 Owner: implementation engineer; estimate: exact dense-filter work within the complete original objective. The preceding turn makes concrete progress by committing the sparse Gaussian timeout fix as68e5e8a. Dense convolution and broader input/editor-wide/sustained/release/quality/device/process-memory gates remain active.
@@ -5735,7 +5643,6 @@ Two isolated Float64 SIMD variants preserve1,200 native-WASM comparisons but imp
 Three clean alternating normal-production1537×1024 sigma12 export pairs improve every run, median1545.5→1216.5ms (21.3%). Six complete PNGs independently decode RGBA-exact across all runs; original source bytes and exact model undo/redo survive. Both source/release identities stay frozen and only WASM differs; developer globals are absent. These paced click-to-download software-browser measurements do not prove input-to-visible-frame, sustained/editor-wide/physical/quality/process-memory acceptance. Exactly two owned implementation/test files are applied to main. Final main build, complete unit/API, affected native/filter/frequency/interchange/50MP and full production checks follow below. [Sealed evidence](benchmarks/spatial-adjacent-output-2026-10-21.json) retains the adopted/rejected source and all45 previous artifact identities. The full original professional, AI/provider/evaluation, workflow, commercial and specialist objective remains active.
 
 Final main production build, all1455 unit/API checks across177 files, all91 affected native/spatial/filter-mask/frequency/interchange/50MP/WGSL cases and all86 normal-production workflows pass with no accepted skips/retries/flakes. Source/WASM/release/test identities remain frozen across the browser jobs. All54 actual served production resources and native WASM match the build; binary imports/exports/function arities are unchanged. Only WASM and three published developer guides differ from68e5e8a, with50 other release resources identical. All45 earlier sealed artifacts remain byte-identical. The paired export gain is specific to the measured workflow; native input probes remain unpaired diagnostics without proof of each timed frame containing its input. The complete original professional, AI/provider/evaluation, workflow/commercial/specialist objective and remaining input/editor-wide/sustained/release/quality/device/process-memory gates stay active.
-
 
 ### 2026-10-21 — F02/F04/F09/F14 native pointwise input requests
 
@@ -5863,13 +5770,11 @@ This delivers based-on styles while mixed character/paragraph runs, variable axe
 
 Owner: implementation agent. Estimate: L within T16/T17/F11 and W03. Revalidated the clean f1a8921 baseline and the preceding style-hierarchy increment as progress. This continuation advances a different explicitly unfinished delivery format: real local AVIF encoding, native-resolution capture, private cancellable workers, strict output/settings validation, Export controls and deterministic batch delivery. The pinned Apache-2.0 jSquash/libavif WASM encoder is being inspected; actual independent decoding, alpha/color fidelity, 50 MP behavior, cancellation/source/font lifetime and complete build/unit/browser/production validation remain pending. No browser toBlob MIME fallback, source downsampling, import cap, provider call, upload or completed-roadmap claim is accepted as delivery.
 
-
 ### 2026-10-22 — AVIF delivery browser acceptance in progress
 
 The AVIF foundation is committed at `119d42c`. This continuation adds maintained trusted-host/isolated-guide contracts, independent Pillow/libavif output verification, native composition/wide/empty/alpha fixtures, busy-codec cancellation/source/font revocation, missing-codec retries, fitted batch variants, persistence/hash/ZIP checks and production UI workflows. Custom batch variants now appear in the delivery list with format/quality and accessible format/compression controls. The codec factory is explicitly pre-bundled in development to avoid the observed first-worker dependency-discovery reload.
 
 The build and complete serial unit/API suite passed 1537 tests across 184 files before the final accessible-control adjustment. The unbounded default parallel invocation produced 11 five-second timeouts while spawning 184 workers; no assertion mismatch was observed. Final serial verification is running. Native browser pilot passed 10 cases; the production export/undo/reopen and cancellation/retry paths passed, while the custom batch path exposed the now-corrected selector label. Earlier pilot reports, artifacts and source identities are retained. Independent lossless file decoding remains exact; browser canvas appearance is measured separately with a two-level premultiplied rounding bound (observed 1.7804 against the browser PNG path on the 256-alpha fixture). Real 50 MP codec behavior, the final pilot and broad browser/production regression remain unconfirmed at this point. The entire original roadmap, remaining F11 precision/reader/format breadth and editor-wide F14/device/process-memory gates remain active.
-
 
 ### 2026-10-22 — F11/W03 native AVIF delivery verified
 
@@ -5888,13 +5793,11 @@ Verification against frozen runtime/test/build inputs:
 
 This delivers local still AVIF output and fitted batch delivery. Full native RGBA plus codec memory remains necessary; there is no source downsampling or arbitrary import cap, constant-memory/process-peak promise or universal viewer/device claim. AVIF input, higher-precision/wide-gamut/CMYK/HDR editing, broader photographic quality, TIFF/PDF/Photoshop reader/editability/prepress breadth and all remaining professional, AI/provider/evaluation/production, workflow/collaboration/commercial/specialist and sustained editor-wide F14/device/process-memory requirements remain active. No paid operation, account, upload, new plugin permission or completed-roadmap claim was introduced.
 
-
 ### 2026-10-22 — F13 docked/named workspace layouts in implementation
 
 The preceding AVIF increment is progress at clean `f454685`. This continuation advances the explicitly unfinished configurable workspace: dock Layers/history and Properties independently left/right, reorder same-side adjacent columns, hide/recover either dock, retain mounted canvas/panel state and visual/DOM focus order, and save/update/rename/delete named layouts. A strict local envelope imports legacy widths read-only and rejects malformed, failed-write and detected newer-tab settings before publication. Dialog drafts, explicit reset/reload and existing custom splitter controls preserve document/assets/history and view state. No default keyboard chord is added; registry actions remain rebindable.
 
 Focused preference tests pass; complete build/unit, real DOM/canvas/pixel/state preservation, native accessibility/resize/persistence/recovery and normal-production workflows remain pending. Floating/tabbed/vertical docks, portable layout exchange, atomic concurrent-tab preference transactions, broader accessibility/performance/device requirements and the full original roadmap remain active. No provider, paid operation, account, upload, public document schema or new isolated privilege is introduced.
-
 
 ### 2026-10-22 — F13 docked and named workspace layouts verified
 
@@ -5914,13 +5817,11 @@ Verification:
 
 This delivers horizontal docked/named local layouts, not floating/tabbed/vertical docking, layout file exchange or a claim of complete workspace/accessibility/latency support. Broad professional parity, photographic/color/interchange breadth, AI/provider/evaluation/production, workflow/collaboration/commercial/specialist and sustained editor-wide F13/F14/device/process-memory requirements remain active. No paid operation, account or cloud upload is introduced; the full original roadmap remains active.
 
-
 ### 2026-10-22 — F01/F13/T22 recent local files and resource-aware command search in implementation
 
 Revalidated clean `ce21e92` and classified the preceding named-layout increment as progress. T22 still required actual recent files and open document resources in command search; the current registry contained actions only. This continuation adds disclosed exact local copies after accepted file-backed I/O/project-download requests, bounded private incremental hashing, a transactional shared-payload recent repository, generation-guarded removal/clear, integrity-checked reopening and session/resource-identity selection. New trusted openImage stages a fresh native-size document and preserves edited tabs; original importImage placement remains unchanged. Existing SVG/TIFF/Photoshop preflight is reused, without added isolated/REST file privileges or manufactured live disk links.
 
 At this implementation checkpoint, independent SHA-256 vectors/boundaries and service ownership/queue/corruption/storage-failure tests passed and the code typechecked. The full build/unit/API and browser gates were still pending; see the subsequent verification entry below. All other original roadmap requirements remain active; no provider, paid operation, account or upload is introduced.
-
 
 ### 2026-10-22 — F01/F13/T22 recent local copies and document search functionally verified
 
@@ -5948,7 +5849,6 @@ Verification:
 
 This verifies the local-copy/resource-search increment, not external disk synchronization, cloud backup, universal file/format support, sustained 60fps, whole-process memory, physical-device acceptance or completion of F01/F13/F14. Remaining professional, photographic/color/interchange, brush/type/vector, AI/provider/evaluation/production, workflow/collaboration/commercial/specialist and editor-wide performance requirements remain active. No paid operation, provider connection, account, upload or outreach is introduced.
 
-
 ### 2026-10-22 — F01/F14 recovery failure containment and deferred status experiment in verification
 
 Classified the preceding recent-files verification/commit as progress and revalidated clean `847d8b5`. Main-thread profiles and six clean production samples reproduced dense Boolean frame gaps without accessibility polling. Tested a candidate footer subscription isolation. The initial pair study used occupied port 5317 and is invalid; a later byte-verified static-server run remains exploratory because server implementations differed. Five final pairs per state use the same Vite implementation on an OS-allocated baseline port, with every served byte verified. That valid study shows no reliable latency gain and more cold-case long tasks, so the UI refactor is deferred and the original App is restored. All twenty native PNGs and ID-normalized project geometry are exact; original 2,000-anchor inputs yield the same 1,336-anchor union. Large frame gaps remain unaccepted.
@@ -5956,7 +5856,6 @@ Classified the preceding recent-files verification/commit as progress and revali
 The recovery regression suite exposed a genuine recent-service startup failure when reading the IndexedDB capability throws, plus denied notification construction/sending now contained without misreporting committed local copies. Production quota injection exposed synchronous IndexedDB callback exceptions escaping and losing their original cause. Shared checkpoint/asset persistence now guards setup/callbacks and aborts with the original error while retaining the previous checkpoint and original bytes. Fixed a test-ordering deadlock by starting closure, releasing its held save and then awaiting closure; no timeout or assertion tolerance was relaxed. Retain original failures and the excluded stale-bundle probe after a test typing error prevented rebuilding.
 
 Corrected native pilot: 33 passed. Two new synchronous checkpoint/asset rollback cases and the production storage-error/retry/recovery workflow pass on the rebuilt source. The approved full build/unit/API passed 1,553 tests in 187 files before deferring the UI prototype. Final canonical and broad native/production gates follow for the retained storage fixes. The entire original roadmap remains active, including editor-wide/sustained/device/process-memory latency and all other unfinished feature, AI/provider/evaluation, workflow and commercial requirements.
-
 
 ### 2026-10-22 — F01 storage failure containment verified; F14 status prototype deferred
 
@@ -5980,7 +5879,6 @@ Verification:
 
 The full original professional-editor roadmap remains active. This increment does not complete F01/F14, crash/power-loss/device/process-memory/latency/quality acceptance, or any other unfinished professional, photographic/color/interchange, AI/provider/evaluation/production, workflow/collaboration/commercial or specialist requirement.
 
-
 ### 2026-10-22 — F11 AVIF input reader and private decoder foundation
 
 Owner: implementation agent. Estimate: L within T16/T17/F11; the full AVIF input workflow remains unfinished. The preceding storage containment increment is committed at `481deed`; the intervening commit check verified a clean tree. This continuation adds a separate primary-item AVIF metadata reader, trusted read-only `editor.inspectAvif`, and an internal cancellable local WASM decode-to-PNG boundary. It preserves the strict existing export validator and all existing application asset acceptance/persistence boundaries.
@@ -5991,14 +5889,11 @@ Independent input corpus uses Pillow 12/native libavif 1.3 plus ffmpeg/libaom hi
 
 Next required work remains the actual picker/drop/recent-file preflight and staged `openAvif`, original AVIF plus exact decode-choice retention through AssetStore/projects/workspaces/history/recovery/recipes/brushes and cross-document copy, production UI workflows and full 50 MP import/save/reopen/export. Internal decoder/preflight acceptance alone cannot close that requirement. The complete original professional-editor, photographic/color/interchange, AI/provider/evaluation/production, workflow/collaboration/commercial/specialist and sustained editor-wide F14/device/process-memory roadmap remains active. No paid operation, upload, account or new isolated Scripts/plugin/REST privilege is introduced.
 
-
 The first browser pilot passed 21 cases, including exact independent 50 MP output; its missing-codec case was invalid because fault injection also intercepted Vite's JavaScript `?url` module. That report/artifacts remain diagnostic. Review then found the upstream decoder wrapper discards native allocation/conversion return codes and retains optional default geometry guards. It is replaced, not used as the accepted input decoder. The owned C ABI builds pinned libavif 1.3.0/AOM 3.12.1 with Emscripten 4.0.10, checks every native phase, validates depth/alpha/CICP and RGBA extents and copies samples before release. A maintained build-local patch permits the native uint32 pixel field above libavif's optional default while retaining division/per-plane/PTRDIFF checks; unrepresentable RGBA rejects immediately after parsing and before frame decoding. No source downsampling or arbitrary app image/file-size cap is added. Build tools/dependency sources stay outside the checkout; ordinary npm builds use checked-in native artifacts, provenance and notices.
 
 Independent fixtures additionally encode a genuine 40000×3 source beyond the optional axis guard. Known solid RGB source samples provide an independent one-level RGB/YUV reconstruction bound; the default native reader rejects that axis. Focused native tests prove conversion failure rejects rather than publishing false pixels, resource release and fresh retry, source/result ownership, native nonshared memory and exact artifact/source fingerprints. A deliberately mismatched 550 MP metadata case proves native pointer-representation rejection before decoding; it is explicitly not a functional 550 MP import or a memory benchmark. Final build/unit/browser/production acceptance follows for the replacement decoder; earlier prototype results cannot establish final-release acceptance.
 
-
 The checked-decoder 24-case Chromium pilot passed, including real 40000-axis input, consent-before-codec loading, actual binary failure/retry and 50 MP cancellation followed by exact independent decoding. A subsequent independently generated AV1/PQ file with no container `colr` reproduced an additional real defect: fallback consent could publish an sRGB-tagged PNG even though native decoding identified HDR. The retained diagnostic records both native CICP and the incorrect publication. Input now checks native color after decoding as well as container metadata. Known sRGB/Display P3/linear-sRGB identification takes precedence over an assumption and updates the decoder report/profile; genuinely unidentified RGB retains explicit fallback. Container/native PQ or HLG rejects even with ICC/precision/fallback consent. Real missing-`colr` sRGB/P3/unidentified/PQ/HLG fixtures cover resolution and rejection. The 24-case report is retained as an earlier scoped pilot, not proof of the corrected color boundary; final acceptance uses the expanded corpus.
-
 
 ### 2026-10-22 — AVIF reader/checked-decoder foundation verified
 
@@ -6015,7 +5910,6 @@ Verification on the fixed final source/release:
 
 The required next work is transactional AVIF app opening and exact original-source/decode-choice retention through AssetStore, native projects/workspaces/history/recovery, portable recipes/brush sources and cross-document copying, with picker/drop/recent-file preflight and full app 50 MP import/save/reopen/export acceptance. The foundation's source-Blob hash checks do not substitute for those persistence tests. HDR/tone-map/sample-transform/sequence/color/photographic breadth, real device/display/process-memory and sustained editor-wide F14 gates remain open, together with every other unfinished original professional, AI/provider/evaluation/production, workflow/collaboration/commercial/specialist roadmap requirement. No paid operation, account, upload, new isolated permission or complete-roadmap claim is introduced.
 
-
 ### 2026-10-27 — F10 connected ICC proof, RGB delivery and workspace ownership
 
 Owner: implementation agent. Continues the active objective to finish the complete roadmap; this increment does not close F10/F11 or reduce professional-editor scope.
@@ -6030,7 +5924,6 @@ Evidence: [ICC application verification](benchmarks/icc-application-2026-10-27.z
 
 Still required: working-space assignment/conversion and rendering architecture, genuine high precision and CMYK/HDR delivery, complete portable recipe/batch/delivery-job profile dependencies, remaining format color fidelity, measured physical devices, broader browser/device/performance/resource gates, and every other unfinished roadmap family. No live ChatGPT/provider/commercial acceptance is inferred.
 
-
 ### 2026-10-27 — F10/W01/W03 profile-owned repeatable delivery verified
 
 Owner: implementation agent. The preceding eff20c8 increment is verified progress. This continuation preserves the complete active roadmap objective and implements profile-aware fitted PNG/TIFF/PDF batch variants, complete original profile ownership, native preflight, explicit output receipts/settings fingerprints, portable delivery presets and recipe schema-3/package-4 dependencies. UI capture/import/export/recipe attachment and review use the same host contract. Current document commands/history and separate isolated/headless surfaces retain their authority. Final `npm run build` passes with 35 generated guides; all **2,471 unit/API tests in 264 files**, **74 source-browser regression cases**, **158 production browser cases** and the JavaScript-disabled 390 px delivery guide pass. Actual normal UI captures the current target, exports/reimports presets, attaches/imports a recipe package, loads its defaults and produces profile-aware PNG/TIFF/PDF after reload without developer globals. Independent Pillow/Little CMS and MuPDF match all stored RGBA samples and exact original target ICC bytes with maximum error **0**, including a genuine **10000 × 5000 (50 MP)** source. Complete source/profile ownership, unchanged document/history, integrity-covered receipts, library removal and preference-change independence, corruption rejection, partial retry with exactly two missing-file renders, native/database cancellation without orphan records, disposal cleanup and legacy database preservation/old-client rejection are verified.
@@ -6040,7 +5933,6 @@ The first full unit run exposed a compact legacy-manifest fixture with no varian
 Evidence: [profile-aware delivery verification](benchmarks/color-delivery-2026-10-27.zip) contains exact changed sources, reconstructable patch, frozen build, independent reader results, complete preset/recipe/delivery files and actual failed/accepted browser reports. Native/compiler/reference provenance remains in the preceding ICC engine/application archives. No physical color, universal performance or completed-roadmap claim is inferred. [Contract](COLOR_DELIVERY.md).
 
 Full working-space assignment/conversion, high precision, CMYK/HDR delivery, other-format fidelity, independent REST color rendering/jobs, remaining W03 artboard/packaging work, physical devices/performance/resource gates and every other unfinished roadmap requirement remain required.
-
 
 ### 2026-10-27 — F10 explicit RGB source and precision dependency
 
@@ -6054,7 +5946,6 @@ The first broad focused run had a test-ordering failure: awaiting the concurrent
 
 Full document working-space assignment/conversion, source/color model and compositing/effects architecture, high-precision import/persistence/editing/output, high-precision proofing, CMYK/HDR delivery, other-format fidelity, independent REST rendering/jobs, physical devices/performance/resource gates and every other unfinished roadmap requirement remain required. No public constructor/script/plugin/REST permission, document schema, command/history or current sRGB8 scene contract changes.
 
-
 ### 2026-10-27 — F10/F11/F12 native RAW master TIFF delivery
 
 Owner: implementation agent. The preceding explicit RGB precision dependency is verified progress. Current source inspection confirms intermediate scene canvases remain sRGB8; assigning a profile or expanding final 8-bit pixels would not implement genuine working-space/precision editing. This connected increment uses the existing native linear RGB16 sensor masters directly for integer16/float32 TIFF delivery while the full working-space model/renderer objective remains required.
@@ -6067,7 +5958,6 @@ The early browser pilot passes all four new workflows, including true integer an
 
 Working-space assignment/conversion, high-precision scene/source model, compositing/effects/import/persistence/editing, general float TIFF input, high-precision scene/batch output, HDR reconstruction/CMYK, camera/print quality, full photographic/interchange breadth, independent REST color rendering/jobs, physical device/resource/sustained performance and every other unfinished original-roadmap requirement remain active. Float encoding from a 16-bit sensor development does not add sensor detail or prove HDR, physical quality or universal performance.
 
-
 ### 2026-10-27 — F10/F11 normalized float TIFF input
 
 Owner: implementation agent. Estimate: L within color/precision/interchange. Classification: progress. The original-preserving TIFF workflow now accepts normalized SDR float32 source samples with independent explicit sRGB8 editing consent and, when unprofiled, an explicit sRGB/linear-sRGB interpretation. Native ICC consumes actual floats before quantization. Source little/big endian, strips/tiles, chunky/planar, raw/LZW/Deflate/PackBits, predictors 1/2/3, RGB/gray and alpha reconstruction use a private streamed source reader. Nonfinite data, invalid alpha, HDR numeric ranges and known PQ/HLG ICC CICP declarations reject without publishing partial artwork. Shared ICC ownership, abort/revision/session/dispose guards and strict result/source/hash verification retain existing command/Undo and isolated/REST boundaries. Complete original samples/profile and choices persist; derived color diagnostics are reconstructed. See [FLOAT_TIFF.md](FLOAT_TIFF.md).
@@ -6075,7 +5965,6 @@ Owner: implementation agent. Estimate: L within color/precision/interchange. Cla
 Independent native libtiff/CMM fixtures verify intended source samples and reference colors. Initial big-endian predictor fixtures exposed libtiff 4.3.0 writer byte-swapping; native readback reproduced the issue. The fixture generator compensates writer input only and retains the original diagnostic. Initial type-check-only test issues and a real Vite dynamic JSON import/MIME failure are corrected, with failed logs retained. The corrected four-case browser pilot and nine worker-result/cancellation cases supplied focused evidence; the complete observed final gates follow below.
 
 Working-space assignment/conversion, float scene/compositing/effects/persistence and high-precision scene/batch output, HDR tone mapping/reconstruction, CMYK, physical color/photographic quality, broader interchange, sustained editor-wide F14/device/resource and all other unfinished original-roadmap requirements remain active. Normalized float input converted to sRGB8 does not close those gates.
-
 
 Final observed verification for the normalized float TIFF increment: `npm run build` passes with **37 published developer guides**; all **2,584 unit/API tests in 268 files** pass; all **179 affected source-browser checks** pass; and all **22 affected production workflows** pass without developer globals. Accepted browser reports have no skips, retries, flaky or unexpected cases. The complete production portfolio is not rerun for this increment. Source/build inputs remain fixed through the final suites. Afterward, this observed work log changes and one terminal blank line is removed from each of two new test files. Exact byte comparisons prove those two cleanups remove only LF bytes; behavior checks are not repeated for that formatting-only cleanup, and the complete built release stays identical.
 
@@ -6085,7 +5974,6 @@ The genuine **10000 × 5000 float32 P3 BigTIFF** retains its exact original byte
 
 [Sealed float TIFF evidence](benchmarks/float-tiff-2026-10-27.zip) retains the reconstructable source patch against 9c93828, complete frozen release, independent original-bearing fixtures/native references and generator/library provenance, failed/aborted initial diagnostic runs, final raw reports, projects/PNGs/screenshots, original float/sample comparisons and integrity audits. Every payload, changed-source reconstruction and committed byte identity is checked. The broad original roadmap, float scene/working spaces/HDR/CMYK, independent REST rendering/jobs, physical quality and sustained editor-wide/device/resource gates remain active.
 
-
 ### 2026-10-27 — F10 native float processing dependency in verification
 
 Owner: implementation agent. Estimate: L within color/precision. Classification: progress. Starting from verified 2c8f7b1, native float32 source-over now implements all 18 model blend modes, float masks/opacity and unclipped RGB affine operations through private native memory and actual pixel workers. Normal accepts finite extended RGB; artistic modes retain an explicit normalized domain pending HDR blend semantics. Owned replies, synchronous capture/private transfers, native-window scratch, wire working-buffer budgets and overflow/failure/disposal checks preserve originals and existing byte owners. This is a required precision-processing dependency, not a float document renderer or a smaller replacement objective. [Contract and remaining integrations](FLOAT_PROCESSING.md).
@@ -6093,7 +5981,6 @@ Owner: implementation agent. Estimate: L within color/precision. Classification:
 Independent NumPy references and 29 focused native/host ownership cases pass. Initial type checking identified missing private payload fields; these are corrected. A verification-only original float TIFF -> native ICC float -> native affine/masked composition -> genuine float TIFF path and independent native libtiff/Linux CMM/NumPy checker exercise real precision end to end. The complete observed final gates are recorded below. No public precision selector, working-space field or float editing capability is claimed.
 
 Owned float source/derived-tile storage; versioned working-space/precision OO commands; actual scene, effects, masks, tools, caches and viewport; original-bearing project/workspace/history/recovery; color-managed precision scene/batch output; wider artistic HDR semantics, HDR reconstruction/tone mapping/CMYK; scoped isolated/independent REST/recipe integration; physical quality, device/resource/sustained F14 and every other unfinished original-roadmap requirement remain active.
-
 
 Final observed verification for the native float dependency: `npm run build` passes with **38 published developer guides**; all **2,615 unit/API tests in 270 files** pass; all **120 affected source-browser cases** pass; and the complete **161-case production suite** passes without skips, retries, flaky or unexpected cases. The production float check uses the actual compiled worker with no developer globals. All source/test/build inputs remain fixed through both final browser jobs; only this observed work log changes afterward.
 
@@ -6105,13 +5992,11 @@ The pixel WASM adds only `compositeFloat` and `affineFloat`; all **34 previous n
 
 [Sealed native float processing evidence](benchmarks/float-processing-2026-10-27.zip) retains the reconstructable source patch against 2c8f7b1, complete frozen release, independent numerical/original-bearing fixtures and native library/provenance/licenses, initial type-check diagnostics and scoped pilot, actual source/full-production reports, true float outputs, native ABI reflection, screenshots and final integrity audits. Every payload, changed-source reconstruction and committed byte identity is checked. All remaining source/tile ownership, working-space/precision OO commands, actual scene/tool/effect/mask/cache/display, persistence/history/recovery/automation/delivery, wider HDR/CMYK, physical quality, sustained editor-wide/device/resource and every other unfinished original professional/AI/workflow/collaboration/commercial/specialist roadmap gate remains active.
 
-
 ### 2026-10-27 — F10 owned float source storage in verification
 
 Owner: implementation agent. Estimate: L within precision/source ownership. Classification: progress. Starting from verified 1f53dff, independent trusted source leases now retain original float TIFF bytes/settings and prepare exact native ICC float32 tiles under shared ownership. Metadata/cache lookup precedes CMM allocation; private workers, bounded backpressure, strict sample/hash/native receipts and atomic staged IndexedDB publication preserve complete sources. Read windows use independent buffers and checked encoded tiles, bounded decoded LRU, cancellation and conditional corruption repair. This is the source-storage dependency required before real float documents, not a replacement objective. [Contract and remaining scope](FLOAT_SOURCES.md).
 
 Early type checking and six lifecycle browser checks pass; initial diagnostic outputs are retained. Independent Linux libtiff/native CMM fixtures cover twelve small original layouts and a genuine 50 MP original. Full final checks and the actual stored-window float-file oracle are still in progress; their results will be recorded after observation. No public precision selector, float renderer, schema change, authored float persistence, isolated grant or REST/browser synchronization is claimed. Every unfinished original roadmap gate remains required.
-
 
 Final observed verification for the owned float-source increment: the first frozen broad source-browser matrix passes all **131 cases**. Review then independently reproduces a malformed-manifest build-identifier failure: structured-cloned objects cannot be compared by reference, so retry repeatedly rejected. The correction changes only cache invalidation, removes the observed invalid ready head/derived tiles, and protects a newer valid UUID. The failing regression and passing correction are retained. A fresh final `npm run build` passes with **39 published developer guides**, all **2,634 unit/API tests in 271 files** pass, and the **12 corrected focused source/storage/guide cases** pass. Those runs cover **132 distinct affected source-browser cases**, with the broader pre-correction result and final focused result explicitly separate. The complete **162-case production suite** passes on the corrected release without developer globals. Accepted reports have no skips, retries, flaky or unexpected cases. Product/test/build inputs remain fixed through final production and corrected focused verification; only this observed work log changes afterward.
 
@@ -6123,11 +6008,9 @@ Actual browser cases verify lease/bitmap separation; owned returned arrays; tran
 
 Versioned document working-space/precision OO commands, actual float scene/effects/masks/tools/cache/viewport, authored precision persistence/Undo/recovery, color-managed precision scene/batch delivery, scoped isolated/independent REST/recipe integration, broader HDR/CMYK, physical/device/resource/sustained editor-wide performance and every other unfinished original professional/AI/workflow/collaboration/commercial/specialist roadmap gate remain required. The goal stays active. The disposable cache contains original-derived pixels only; authored float edits cannot use it as their sole persistent owner. Public editing remains sRGB8, and REST sessions remain independent of the browser.
 
-
 ### 2026-10-27 — F10 linear float document integration in implementation
 
 Owner: implementation agent. Estimate: XL, staged within the complete precision/working-space objective. Starting from verified c6f50b1, the next connected work replaces intermediate byte canvases for explicit float document rendering, preserves native original samples through affine projection/composition/exposure, and connects versioned OO commands/Undo, trusted host preflight, source-preserving persistence and real display/file output. Source sampling must remain bounded for sparse/extreme affine views, with premultiplied filtering and explicit geometry coverage. Unsupported operations must fail validation before publication rather than silently introduce an 8-bit editing plane. This entry records work in progress, not a shipped precision mode or completion of F10. The complete original roadmap remains required.
-
 
 ### 2026-10-27 — F10 initial float document workflow connected; final release checks in progress
 
@@ -6148,7 +6031,6 @@ Observed before final release checks:
 
 Final build/typecheck, frozen source/release checks, broader affected source-browser matrix, complete production run, sealed independent evidence and the commit are still in progress. Broader F10 profiles/assignment/precision and source formats, all remaining tools/layer/blend/style/coverage/proof/HDR/CMYK/interchange work, physical/device/resource/sustained F14 and every other unfinished original professional/AI/workflow/collaboration/commercial/specialist gate remain required. The full original goal stays active.
 
-
 Final review reproduces a second proof snapshot regression with actual native proofing followed by isolated precision conversion: the active session correctly stores null, but null-coalescing falls back to the old proof mirror. The corrected snapshot uses the mirror only before a session exists. The targeted real-browser case fails before correction and passes afterward with identical proof-clear assertions. The first broad matrix was interrupted for this correction and is not accepted as a complete run; it also exposes an obsolete guide assertion that editing is exclusively sRGB8. Guide checks now verify the default byte-mode boundary alongside the linked connected mode. The initial frozen release/source identities and original failed/interrupted reports remain retained. A fresh final full unit/build and browser/production verification follows on corrected fixed inputs.
 
 A further lifecycle audit reproduces queued source/output work remaining pending after renderer disposal while two unrelated ICC owners stay open. Captured scenes now own an abort signal and final source-identity check, propagated through fitted views, display and file sessions. Renderer clear/disposal aborts native queue waits promptly. Float PNG also validates the original/captured owner after its last pixel read and after compression before publishing. Both new queued-owner cases fail before correction; all five corrected queue/final-publication cases pass, including healthy retry, unchanged native owners and explicit no-file assertions. The first publication pilot used newly remapped asset IDs without remapping its model; correcting that test fixture to retain the original IDs makes the intended post-read cancellation boundary reachable. No timing/numerical assertion is relaxed. Corrected script/plugin/group, normal UI and portable batch checks also pass. Final full checks are repeated after this connected lifecycle correction.
@@ -6168,7 +6050,6 @@ Independent exact acceptance retains the actual 50 MP source, authored exposure/
 [Sealed float document evidence](benchmarks/float-documents-2026-10-27.zip) contains exact source reconstruction against c6f50b1; initial, pre-admission and final frozen release identities; separately preserved source versions; independent original/profile/native-library/reference/generator/reader bytes and provenance; failed/interrupted/corrected build, unit and browser reports; actual file/project/workspace/recipe/batch/lifecycle/admission outputs; and screenshots/integrity audits. Earlier production reports are preserved separately from the authoritative final production artifacts. Task-owned older reports were relocated with byte/mode verification and original-path symlinks to keep room for verification and the archive; receipts retain the initial symlink-metadata verification correction without deleting unique data. Every payload and reconstructed/committed source byte is checked before reporting this increment.
 
 This is the initial supported float scene subset, not F10 or full-roadmap completion. Broader source/working profiles and precision formats, remaining tools/layers/blends/styles/clipping/coverage/proof/HDR/CMYK/interchange, actual photographic/device/process-memory/sustained F14 and every other unfinished original professional/AI/workflow/collaboration/commercial/specialist gate remain required. No physical accuracy, whole-process peak-memory or sustained 60fps acceptance is inferred. The complete original goal stays active.
-
 
 ### 2026-10-27 — F10 unsigned 16-bit original admission to float documents
 
@@ -6270,7 +6151,6 @@ payload is verified after sealing and committed source bytes are checked before
 reporting this increment. This advances supported source admission; it does not
 complete F10, performance/device quality or the full original roadmap. The
 complete goal remains active.
-
 
 ### 2026-10-27 — F10 full float tone controls in implementation
 
@@ -6388,7 +6268,6 @@ remaining tools/working spaces/blends/HDR/proof/CMYK/interchange, physical/devic
 sustained performance and every other unfinished original gate remain required.
 The complete original implementation-roadmap goal remains active.
 
-
 ### 2026-10-27 — F10 sibling clipping in float documents verified
 
 Owner: implementation agent; continuation from 676ba39. The existing shared
@@ -6462,7 +6341,6 @@ file SHA-256 `c9face74035d7707ef8f0969e020fe958b20dc9de5500b79be22caa77abe34c6`
 unexpected results and uses the existing 600-second per-case limit. Combined
 source acceptance is 59 distinct cases. Complete normal production acceptance
 is now running against the same frozen source and release inputs.
-
 
 Complete production acceptance passes all 167 cases without developer globals,
 including the new isolated example, palette release, Inspector creation, exact
@@ -6567,7 +6445,6 @@ results within the existing 600-second per-case limit. Combined source acceptanc
 is 84 distinct cases. Complete production acceptance is now running. These
 comparisons do not establish physical/device quality, peak process memory or
 sustained all-tool performance; the complete original roadmap remains active.
-
 
 Complete production acceptance passes all 168 cases without developer globals,
 including original-bearing import, the actual isolated erasure example, pointer
@@ -6694,7 +6571,6 @@ does not prove equivalence to resampling the completed native composition for
 nonlinear adjustments at arbitrary zoom. Native-scene resampling parity remains
 required under broader F10/F14 quality; these new operators do not close it.
 
-
 Complete production acceptance passes all 169 cases without developer globals,
 including continuous curve/gamma editing, cancelled preview, palette creation,
 sampled linear histogram disclosure, exact Undo/Redo and original-bearing native
@@ -6732,7 +6608,6 @@ headless REST source admission remain authoritative. No new document/container
 schema, public mutation API, isolated privilege, paid call, account, upload,
 browser/REST synchronization or arbitrary original-resolution cap was added.
 The complete original roadmap goal remains active.
-
 
 ### 2026-10-27 — Native-first float preview sampling (verified increment)
 
@@ -6832,7 +6707,6 @@ No schema, public mutation API, isolated privilege, paid operation, account,
 upload, browser/REST synchronization or arbitrary original-resolution cap is
 added. The complete original roadmap goal remains active.
 
-
 ### 2026-10-27 — Connected normalized float blend modes (verified; production report gap closed 2026-10-28)
 
 Owner: implementation agent; L within T16/T17/F04/F10. The previous goal turn
@@ -6870,7 +6744,6 @@ The genuine 50 MP mixed-mode group/clipping/adjustment pilot and portable batch
 integration are in progress; complete unit/build/source/production acceptance is
 pending. No schema, new public mutator, plugin grant, paid call, account, upload,
 REST/browser synchronization or original-resolution cap is added.
-
 
 Expanded acceptance caught a stale generated sandbox: source-host/Inspector
 blends worked while isolated scripts still loaded the preceding Normal-only
@@ -7215,7 +7088,6 @@ full build/unit, native-binary compatibility and complete source/production/50 M
 acceptance remain in progress. Private primitive success is not application
 acceptance or completion of F04/F10/F14 or the original roadmap.
 
-
 ### 2026-10-28 — Continuous float HSL, Color Balance and Vibrance: verified increment
 
 Owner: implementation agent; estimate L within T17/F04/F10. The full original
@@ -7444,7 +7316,6 @@ AI/provider/evaluation, installed ChatGPT/live identity, workflow/collaboration,
 specialist and commercial gates remain required. No paid call, account, upload,
 new plugin grant, source-resolution cap or REST/browser synchronization is added.
 
-
 The current optimized build completed all 75 existing performance cases in 30
 files. This is functional baseline evidence, not performance-budget acceptance.
 New real-input float LUT/Gradient Map checks also pass, matching the prepared
@@ -7464,7 +7335,6 @@ to 71 ms, still above responsiveness targets. Actual application integration is
 in verification. It retains all control elements/indices, off-artboard access
 and a conservative SVG precision fallback; no geometry is discarded.
 
-
 Fractional-pixel studies are bound to an immutable baseline outDir and verify
 the actual loaded entry script plus all release hashes before/after. One earlier
 study served a rebuilt candidate instead; it is explicitly excluded, with its
@@ -7477,7 +7347,6 @@ marks retain their original paint, and a handle/line crossing into view must
 revive its group even when the anchor remains outside. This covers curved
 controls as well as coincident handles; actual UI acceptance remained pending at that prototype stage.
 
-
 The first application pilot passed 18/21. Independent affine pixel checks found
 two 2–5-code discrepancies introduced by the explicit SVG clipping effect;
 all seven untouched-baseline affine checks pass. The final approach removes that
@@ -7489,7 +7358,6 @@ The pilot's mask-marker color assertion also assumed an inactive anchor after
 explicit selection; it now asserts the correct selected green, without changing
 application selection behavior. Failed pilots and their source versions remain
 retained; final application acceptance was still required at that pilot stage.
-
 
 ### 2026-10-28 — Accepted Pen viewport performance increment; full F14 remains open
 
@@ -7533,7 +7401,6 @@ global memory, AI/provider/evaluation, live installed ChatGPT/identity,
 collaboration, specialist and commercial gates remain required. The full
 original implementation roadmap objective stays active and unfinished.
 
-
 ### 2026-10-28 — Float preview transport and bounded-work follow-up (bounded increment)
 
 Owner: implementation agent; estimate XL within T01/F14, beginning at clean
@@ -7551,7 +7418,6 @@ color transform does not satisfy this work. Measure paired actual controls and
 independent pixels, then verify transformed/masked/interchange and large-image
 behavior where affected. Full all-tool/device/global-memory and every other
 unfinished roadmap gate remain required.
-
 
 ### 2026-10-28 — Accepted bounded native float display reuse; full F14 remains open
 
@@ -7611,7 +7477,6 @@ device, AI/provider/evaluation, live installed ChatGPT/identity, collaboration,
 specialist and commercial gates remain required. The complete original roadmap
 objective remains active and unfinished.
 
-
 ### 2026-10-28 — Script snapshot handoff and owned reconstruction (in progress)
 
 Owner: implementation agent; estimate XL within T01/F14, starting at clean
@@ -7630,7 +7495,6 @@ and freeze only the private worker-owned snapshot before normal validated OO
 reconstruction. Public mutable Document.fromJSON must remain defensive. Measure
 actual paired transport and keep all editor-wide/physical/global-memory and
 other unfinished roadmap gates open.
-
 
 ### 2026-10-28 — Direct isolated script transport verified (bounded T01/F14)
 
@@ -7684,7 +7548,6 @@ GPU/display/tablet/device acceptance, AI/provider/evaluation, live installed
 ChatGPT/identity, collaboration, specialist and commercial gates remain required.
 The complete original implementation-roadmap objective remains active.
 
-
 ### 2026-10-28 — Dense-text/editor layout attribution (in progress)
 
 Owner: implementation agent; estimate XL within T01/F14, starting at clean
@@ -7699,7 +7562,6 @@ then reduce proven redundant work while preserving full-resolution artwork,
 native text/shaping, complete pixels, commands/Undo, source/font invalidation,
 independent REST and isolated script/plugin grants. Retain real control timing,
 whole-editor coverage and all unfinished F14/roadmap gates.
-
 
 ### 2026-10-28 — Repeated development navigation interruption reproduced
 
@@ -7719,7 +7581,6 @@ differ. Preserve the measured before/after releases and their complete identitie
 rather than relabeling them. The full native matrix is rerunning with a separate
 fresh cache before unit/normal-build/production acceptance. Failed traces,
 initial invalid layer-count fixture and helper log collisions remain preserved.
-
 
 ### 2026-10-28 — Verification memory pressure relieved without losing evidence
 
@@ -7742,7 +7603,6 @@ The unchanged independent reader then verifies the exact previously timed-out
 PNG/PSB files in 21.9 seconds, retaining the 180-second subprocess deadline and
 complete original/preview/member/base-alpha comparisons. A new fresh-cache full
 native run is active before unit, normal build and production acceptance.
-
 
 ### 2026-10-28 — Cooperative layer input boundaries verified (bounded T01/F14)
 
@@ -7811,7 +7671,6 @@ all-tool timing, broader float/HDR/working-space and photographic/interchange
 quality, global memory and physical GPU/display/tablet/device acceptance,
 AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
 and commercial gates remain required.
-
 
 ### 2026-10-28 — Committed-edit viewport scheduling (bounded acceptance)
 
@@ -7976,7 +7835,6 @@ quality, sustained editor-wide F14/device/global-memory, AI/provider/evaluation,
 installed ChatGPT/live identity, collaboration, specialist and commercial gates
 remain required. The complete original objective stays active.
 
-
 ### 2026-10-29 — F10 native float shadows (bounded acceptance)
 
 Owner: implementation agent; delivered the L T17/F10/F14 increment beginning at
@@ -8026,7 +7884,6 @@ F14 latency/process-memory/device gates, and every unfinished original
 professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
 requirement remain active. The full original roadmap remains active.
 
-
 ### 2026-10-29 — F14 native shadow source-read performance (measured progress)
 
 Owner: implementation agent; delivered the M T17/F10/F14 increment beginning at
@@ -8070,7 +7927,6 @@ float/layer/tool/HDR/color/interchange requirements and every unfinished origina
 professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
 gate remain active. The complete original roadmap remains active.
 
-
 ### 2026-10-29 — F14 bounded native float appearance reuse (measured progress)
 
 Owner: implementation agent; delivered the native-size viewport increment
@@ -8104,7 +7960,6 @@ performance, global/process-memory/device F14, other native float/HDR/color/
 interchange and every unfinished original professional-editor/AI/provider/workflow/
 installed ChatGPT/live identity/commercial requirement remain active. The complete
 original roadmap remains active.
-
 
 ### 2026-10-29 — F14 direct pointer preview admission (measured progress)
 
@@ -8141,7 +7996,6 @@ float/HDR/color/interchange/layer/tool requirements and every unfinished origina
 professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
 gate remain active. The complete original roadmap remains active.
 
-
 ### 2026-10-29 — Selection authority through gesture continuation and commit (verified increment)
 
 Owner: implementation agent; bounded F03/F14 correctness follow-up at `758cea0`.
@@ -8166,7 +8020,6 @@ No new latency or full F03/F14 acceptance follows from this correctness fix.
 All-tool/sustained/cold/import/global-process-memory/device F14, native precision/
 color/interchange/layout, AI/provider/evaluation, installed ChatGPT/live identity/
 commercial and every other unfinished original roadmap requirement remain active.
-
 
 ### 2026-10-30 — F14 cold native float source staging (verified increment)
 
@@ -8197,7 +8050,6 @@ rehomed; historical source/SDK/evidence/releases and host containment remain.
 Remaining import/projection, all-tool/sustained/global-process-memory/device F14,
 professional precision/color/interchange/layout, AI/provider/evaluation, installed
 ChatGPT/live identity/commercial and every unfinished original gate remain active.
-
 
 ### 2026-10-30 — F13 keyboard layer-tree navigation (implemented increment)
 
@@ -8662,7 +8514,6 @@ run above passes. These failed/corrected runs remain in the evidence.
 The full roadmap goal remains active; the remaining F03 editing and broader
 professional-editor acceptance requirements above are still required.
 
-
 ### 2026-10-30 — F03 direct image perspective corners
 
 Baseline `8d0f071`. The prior public image placement increment was verified
@@ -8731,7 +8582,6 @@ The full F03 brush/mask/clip/symmetry/cursor mapping, preserving-position mask
 relinking, general warp and broader photographic, interchange, sustained
 performance/device and original roadmap gates remain required. Direct handles
 do not redefine those acceptance requirements. The full goal remains active.
-
 
 ### 2026-10-30 — F03 placed-to-original coverage transport
 
@@ -8812,7 +8662,6 @@ through shared commands/history. General warp, photographic/interchange quality,
 sustained editor-wide performance/device acceptance and every unfinished
 original roadmap requirement remain active. No private sampler is being counted
 as a completed public editing workflow.
-
 
 ### 2026-10-30 — F03: captured placed raster erasing
 
@@ -8897,7 +8746,6 @@ performance and physical-device acceptance remain required. Every unfinished
 original roadmap requirement remains active; this slice does not close F03 or
 the overall goal.
 
-
 ### 2026-10-30 — F03: projected selection Delete and placed clear
 
 Connected the existing raster Delete/clear action to captured perspective
@@ -8976,7 +8824,6 @@ quality, sustained editor-wide performance and physical-device acceptance remain
 required. All unfinished original roadmap requirements remain active; this
 selection-clearing slice does not close F03 or the overall goal.
 
-
 ### 2026-10-30 — F03 captured perspective mask brush editing
 
 Implemented Brush, Pencil and Eraser input for linked ordinary and smart-object
@@ -9033,7 +8880,6 @@ acceptance remain required. This slice does not close F03 or the overall goal.
 The receipt includes reports, command logs, source/release identities, raw
 comparison fields and the independent oracle results. Selected browser checks
 do not replace the remaining full quality/performance/device gates.
-
 
 ### 2026-10-30 — F03 perspective Bézier mask path editing
 
@@ -9102,7 +8948,6 @@ diagnostics. Native pixel WASM is unchanged, SHA-256
 These selected checks do not establish full F03, photographic/interchange
 quality, sustained editor-wide latency, whole-process memory or physical-device
 acceptance; every unfinished original roadmap requirement remains active.
-
 
 ### 2026-10-30 — F03 ordinary mask movement after perspective
 
@@ -9182,7 +9027,6 @@ wet input, general warp, photographic/interchange quality, sustained editor-wide
 latency, whole-process memory, physical-device or any other unfinished original
 roadmap requirement. The full goal remains active.
 
-
 ### 2026-10-31 — F03/F06 independent masks in smart masters
 
 Starting from `a6c1dba`, conversion/expansion forced unlinked ordinary and filter
@@ -9207,7 +9051,6 @@ The original broad roadmap remains active. This correction does not complete
 preserving-position projective relinking, projected wet input, general warp,
 full photographic/interchange fidelity, sustained all-tool latency, whole-process
 memory or physical-device acceptance. Final verification and evidence follow.
-
 
 Final verification: full build/typecheck passes with 43 developer guides.
 The complete serial `npm test -- --maxWorkers=1` passes **3,151 tests across
@@ -9248,7 +9091,6 @@ project/PNG witnesses, source/release identities and diagnostics. Native pixel
 WASM/ABI remains unchanged. This accepts the independent smart-master mask
 plane correction; all unfinished F03 and original roadmap gates remain active.
 
-
 ### 2026-10-31 — F12/T17 native Node worker loading repair
 
 Owner: implementation engineer; estimate S within native source/API acceptance.
@@ -9268,7 +9110,6 @@ third-party execution and independent REST sessions retain their existing
 contracts. Standalone plain-JavaScript native execution and parent-thread
 rejection have direct regression tests. Full cross-version/native/browser
 verification follows; all unfinished original roadmap requirements stay active.
-
 
 Final acceptance: full default Node **26.13.0** build/typecheck passes with 43
 developer guides. The complete serial `npm test -- --maxWorkers=1` passes
@@ -9313,7 +9154,6 @@ This closes the observed native Node 26 module-loading defect. It does not close
 projective relinking/wet tools, broad color/device/interchange conformance,
 sustained all-tool latency/process-memory, other operating systems or any other
 unfinished original roadmap gate. The full implementation goal remains active.
-
 
 ### 2026-10-31 — F03/F06 captured projected wet editing verified; performance remains open
 
@@ -9432,7 +9272,6 @@ photographic quality and every other unfinished original professional/AI/workflo
 ChatGPT/live identity/commercial/specialist/motion gate remain required. The
 complete implementation goal remains active.
 
-
 ### 2026-10-31 — F06/F14 private wet footprint surfaces verified
 
 Owner: implementation engineer; estimate M across coverage parity, resource
@@ -9492,7 +9331,6 @@ required. The complete implementation goal stays active. This increment changes
 no public constructor/command, schema/container, source-resolution limit,
 isolated/plugin grant, REST/browser separation, paid operation or account.
 
-
 ### 2026-10-31 — F03/F06/F14 bounded field footprint culling verified
 
 Owner: implementation engineer; estimate M/L across numerical/native parity,
@@ -9549,7 +9387,6 @@ process-memory and every unfinished original professional/AI/workflow/ChatGPT /
 live identity/commercial/specialist/motion gate remain required. The complete
 implementation goal stays active.
 
-
 ### 2026-10-31 — F03/F06/F14 projected wet composition bounds verified
 
 Owner: implementation engineer; estimate M/L across native parity, workflow
@@ -9601,7 +9438,6 @@ workflow/ChatGPT/live identity/commercial/specialist/motion requirement remain
 required. The complete implementation goal stays active. No public constructor /
 command, schema/container, source-resolution limit, isolated/plugin grant,
 REST/browser separation, paid operation or account changes.
-
 
 ### 2026-10-31 — F03 retained mask-map transport dependency verified
 
@@ -9708,7 +9544,6 @@ identity/commercial/specialist/motion roadmap, native float wet tools, general
 warp and all unfinished F03/F06/F14/quality/device/sustained-memory gates remain
 active, including the original <=33 ms live-input p95 and <50 ms routine-task
 requirements. Do not mark the complete roadmap goal achieved from this slice.
-
 
 The same candidate checkpoint now has all **3,215 unit/API/native tests across
 312 files passing with `npm test -- --maxWorkers=2`**, without changing existing
@@ -9863,7 +9698,6 @@ and performance, and every unfinished original professional, AI, workflow,
 ChatGPT/live identity, commercial, specialist and motion gate remain required.
 No latency improvement, speedup or continuous-60fps clearance is inferred.
 
-
 ### 2026-10-31 — F03/F10 linear float wet-paint numerical and worker foundation
 
 Owner: implementation agent; bounded increment from `5f858d0`; classification:
@@ -9914,7 +9748,6 @@ commercial, specialist and motion gate remain required. No continuous-60fps,
 physical pigment/device quality, paid operation, upload or browser/REST
 synchronization claim follows from this numerical dependency.
 
-
 ### 2026-10-31 — F03/F10 retained Float32 wet sessions and HDR spatial pigment
 
 Owner: implementation agent; bounded increment from `c7b222f`; classification:
@@ -9954,7 +9787,6 @@ photographic/device/sustained F14 memory/performance and every unfinished
 original professional, AI, workflow, ChatGPT/live identity, commercial,
 specialist and motion gate remain required. No performance clearance, physical
 pigment/device quality, paid operation, upload or browser/REST sync is inferred.
-
 
 ### 2026-10-31 — F03/F10 lossless HDR wet assets and Float64 replacement fields
 
@@ -10062,7 +9894,6 @@ original professional, AI, workflow, ChatGPT/live identity, commercial,
 specialist and motion gate remain required. No full-image HDR wet acceptance,
 continuous-60fps, physical pigment, paid call, upload or browser/REST sync follows.
 
-
 ### 2026-10-31 — F03/F10 trusted HDR Smudge/Mixer authoring
 
 Owner: implementation agent; increment from `4070680`; classification: progress.
@@ -10093,7 +9924,6 @@ quality, sustained F14 performance and every unfinished original professional,
 AI, workflow, ChatGPT/live identity, commercial, specialist and motion gate
 remain required. Small native windows on 50 MP sources do not establish
 full-image wet performance, continuous 60fps or a physical pigment model.
-
 
 ### 2026-10-31 — F03/F10 editable native linear paint
 
@@ -10126,7 +9956,6 @@ sustained F14 and all unfinished professional/AI/workflow/ChatGPT/live identity/
 commercial/specialist/motion gates. No complete F03/F10/F14 or roadmap acceptance
 is inferred.
 
-
 ### 2026-10-31 — F03/F10 native wet PaintLayers
 
 Owner: implementation agent; increment from `bc8a302`; classification: progress.
@@ -10157,7 +9986,6 @@ layers/tools/spaces, general warp/master coverage, photographic/device quality,
 sustained F14 and unfinished professional/AI/workflow/ChatGPT/live identity/
 commercial/specialist/motion gates.
 
-
 ### 2026-11-01 — F03/F10 native float clone integration
 
 Owner: implementation agent; increment from `0fd4065`; classification: progress.
@@ -10187,7 +10015,6 @@ The complete original roadmap remains active, including wider float tools/
 layers/spaces, warp/master breadth, photographic/device quality, sustained F14
 and unfinished professional/AI/workflow/ChatGPT/live identity/commercial/
 specialist/motion requirements.
-
 
 ### 2026-11-01 — F03/F07/F10 native editable vector integration in progress
 
@@ -10270,7 +10097,6 @@ from this local integration. Photographic/device/sustained performance and the
 full unfinished original professional/AI/workflow/commercial/specialist/motion
 scope remain required beyond this increment.
 
-
 ### 2026-11-01 — F05/F10 native linear Patch and Spot Healing verified
 
 The preceding goal turn made concrete implementation and verification progress;
@@ -10343,7 +10169,6 @@ and every unfinished original AI/provider/collaboration/installed-ChatGPT/live-
 identity/commercial/specialist/motion gate remain required. This increment does
 not complete the original professional-editor objective.
 
-
 ### 2026-11-01 — F08/F10 native float text implementation started
 
 Previous goal turn: progress, native Patch/Spot Healing accepted at 544cf9d.
@@ -10370,7 +10195,6 @@ change the public scripting API/schema or close F08/F10/F14. Full glyph/paint,
 font/tuple/source capture, native scene/UI/export, shared transport, independent
 references and actual large-original verification remain required.
 [Current dependency, errors, limitations and remaining contract](FLOAT_TEXT.md).
-
 
 ### 2026-11-01 — F08/F10 native CSS color dependency verified; text painting remains open
 
@@ -10402,7 +10226,6 @@ source/release identities, tests, the failed/corrected pilot and native probes.
 No account, upload, paid call, font permission or new isolated capability is
 introduced.
 
-
 ### 2026-11-01 — F08/F10 source-owned native text preparation connected
 
 Previous goal turn: progress, authored Float32 CSS colors accepted at 3ebb0df.
@@ -10427,7 +10250,6 @@ bearing persistence/50 MP acceptance remain required. Current float text gates
 stay in place. This is connected source ownership groundwork, not a substitute
 for the requested native float typography or evidence of roadmap completion.
 [Contract and remaining work](FLOAT_TEXT.md#source-owned-native-preparation).
-
 
 ### 2026-11-01 — F08/F10 native preparation owner verified; full float paint remains required
 
@@ -10461,7 +10283,6 @@ The full original professional/AI/provider/workflow/device/performance/commercia
 roadmap stays active. No new public mutation, grant, account, upload, paid call,
 REST/browser synchronization or arbitrary original-resolution limit is added.
 
-
 ### 2026-11-01 — F08/F10 native glyph-ID paint dependency implemented
 
 Previous goal turn: progress, native text preparation accepted at d3174f1.
@@ -10483,7 +10304,6 @@ persistence/50 MP text acceptance remain required. These limits are private
 preparation boundaries, not new import limits or a narrower definition of the
 original requested typography/editor objective. No schema/public scripting API,
 plugin grant, account, upload, paid call or REST/browser synchronization changes.
-
 
 ### 2026-11-01 — F08/F10 private native glyph paint verified; full typography remains open
 
@@ -10925,7 +10745,6 @@ native script/bidi/fallback/missing/intrinsic/host behavior and every unfinished
 original quality/device/performance/professional-editor requirement remain. No
 public mutation, model schema, grant or REST/browser synchronization change.
 
-
 ### 2026-11-01 — F08/F10 styled source-glyph dependency verified
 
 Owner: implementation agent; estimate L within T16/T17. Starting from d07e6db,
@@ -10968,7 +10787,6 @@ requirement remain required. No public model/schema/grant, ordinary appearance,
 source-resolution or REST/browser synchronization contract changes. The complete
 original goal remains active.
 
-
 ### 2026-11-01 — F08/F10 native script/direction/fallback items in progress
 
 Owner: implementation agent; estimate L within T16/T17. Previous goal turn made
@@ -10984,7 +10802,6 @@ Broad native layouts/hosts, connected Float32 TextLayer/tool/scenes/export/share
 transport/persistence and every unfinished original roadmap gate remain required.
 No public schema, grants, REST/browser synchronization, paid calls or uploads are
 authorized by this internal dependency.
-
 
 ### 2026-11-01 — F08/F10 original script and tracked native item dependency verified
 
@@ -11024,7 +10841,6 @@ precision/workflow, quality/device/performance, provider/installed ChatGPT/live
 identity/commercial and other roadmap gate remain required. No public model,
 schema, grants, source-resolution or REST/browser synchronization changes.
 
-
 ### 2026-11-01 — F08/F10 cross-span native paint ordering in progress
 
 Owner: implementation agent; estimate M within T16/T17. Starting from accepted
@@ -11055,7 +10871,6 @@ ownership/fault controls. Signed/HDR RGB, alpha 1e-8 and every partition word re
 exact. Full verification is next; the production fixture is being expanded to
 exercise emitted original-cluster Hebrew ordering alongside the existing Latin
 case. No full-roadmap or public Float32 text completion is claimed.
-
 
 ### 2026-11-01 — F08/F10 complete styled native bidi paint order verified
 
@@ -11093,7 +10908,6 @@ original professional-editor, photographic, precision/workflow, device/quality/
 performance, provider/installed ChatGPT/live identity/commercial and other roadmap
 gate remain required. The complete original goal remains active. Public model,
 schema, grants, source resolution and REST/browser session contracts are unchanged.
-
 
 ### 2026-11-01 — F08/F10 owned native font fallback in progress
 
@@ -11134,7 +10948,6 @@ other roadmap requirement remain. Empty normalized text spans are filtered befor
 matching; future public paragraph capture must preserve editable empty-line
 geometry while treating those lines as transparent. No public model/schema,
 grants, source-resolution or REST/browser synchronization contract changes.
-
 
 ### 2026-11-01 — F08/F10 owned fallback assembly and vertical diagnostics
 
@@ -11178,7 +10991,6 @@ scene/masks/styles/proof/export/shared scripting/separate REST/recipes/native
 persistence/Undo, and every other unfinished professional-editor, AI/provider,
 installed ChatGPT/live identity/device/quality/commercial gate stay required.
 
-
 Verification update: full build/typecheck, all 3,422 unit/API checks across 343
 files and all fifteen existing production regressions pass on the developing
 engine. The initial unrestricted unit attempt was deliberately stopped after
@@ -11191,7 +11003,6 @@ ownership tests reproduce the invocation-deadline leak for both single-font and
 fallback fields. This is a confirmed native lifetime bug, not a lease expiry to
 accept. All broader targets, known vertical failures, independent references,
 final verification/sealing/commit and the complete original roadmap remain open.
-
 
 ### 2026-11-01 — F08/F10 completed-match font lifetime corrected
 
@@ -11404,8 +11215,7 @@ cache font tampering/caller cancellation/owner retirement, existing scripts/iner
 plugins/recipes/redo-only workspace, affine mask/clipping/style/shadow scenes and
 complete Float32 TIFF output. An independent original-font Canvas painter
 supplies glyph alpha; native libtiff verifies every output RGBA word. Ten focused
-model/API checks pass after versioning the new text/float combination as schema
-60. Separate REST admits original fonts and shared typography data with estimated
+model/API checks pass after versioning the new text/float combination as schema 60. Separate REST admits original fonts and shared typography data with estimated
 metrics, normal revision conflicts, atomic rollback, native-project source closure
 and Undo. It gains no renderer or browser synchronization.
 

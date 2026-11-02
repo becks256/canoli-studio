@@ -34,14 +34,14 @@ The original committed compositor also passes this control. All 36 complete
 baseline/candidate RGBA hashes match exactly. At opacity 0.5, instrumented
 composition `createImageData` pixel totals are:
 
-| Field | Identity before → after | Perspective before → after |
-| --- | ---: | ---: |
-| Sparse patch | 221,184 → 144 | 221,184 → 231 |
-| Window boundary patch | 224,640 → 720 | 224,640 → 474 |
-| Transparent clearing pigment | 221,184 → 144 | 221,184 → 231 |
-| Low coverage | 221,184 → 144 | 221,184 → 231 |
-| Empty | 0 → 0 | 0 → 0 |
-| Dense | 224,640 → 224,640 | 224,640 → 224,640 |
+| Field                        | Identity before → after | Perspective before → after |
+| ---------------------------- | ----------------------: | -------------------------: |
+| Sparse patch                 |           221,184 → 144 |              221,184 → 231 |
+| Window boundary patch        |           224,640 → 720 |              224,640 → 474 |
+| Transparent clearing pigment |           221,184 → 144 |              221,184 → 231 |
+| Low coverage                 |           221,184 → 144 |              221,184 → 231 |
+| Empty                        |                   0 → 0 |                      0 → 0 |
+| Dense                        |       224,640 → 224,640 |          224,640 → 224,640 |
 
 These count conversion-image pixels, not total process memory or native sampling
 work. Dense output stays complete; no source downsampling or input dropping is
@@ -60,14 +60,14 @@ hashing occurs after timing; readback is included. Twelve samples make p95 the
 maximum, so these observations do not establish sustained or physical display
 acceptance.
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 64.4 → 60.4 ms | 80.5 → 85.3 ms |
-| Affine ordinary mask | 68.6 → 61.2 ms | 89.1 → 79.8 ms |
-| Affine filter mask | 71.8 → 70.0 ms | 88.5 → 90.0 ms |
-| Projected raster | 89.0 → 88.7 ms | 114.3 → 114.7 ms |
-| Projected ordinary mask | 89.2 → 89.1 ms | 131.3 → 130.6 ms |
-| Projected filter mask | 104.6 → 110.5 ms | 165.0 → 164.2 ms |
+| Target                  | Median before → after | P95 before → after |
+| ----------------------- | --------------------: | -----------------: |
+| Affine raster           |        64.4 → 60.4 ms |     80.5 → 85.3 ms |
+| Affine ordinary mask    |        68.6 → 61.2 ms |     89.1 → 79.8 ms |
+| Affine filter mask      |        71.8 → 70.0 ms |     88.5 → 90.0 ms |
+| Projected raster        |        89.0 → 88.7 ms |   114.3 → 114.7 ms |
+| Projected ordinary mask |        89.2 → 89.1 ms |   131.3 → 130.6 ms |
+| Projected filter mask   |      104.6 → 110.5 ms |   165.0 → 164.2 ms |
 
 Every one of 72 complete foreground hashes and six final PNG exports matches
 exactly. Original source bytes, all twelve accepted points and exact one Undo /
@@ -106,14 +106,14 @@ checks finish. Both six-case runs pass without retries, skips or flakes.
 All 72 complete foreground hashes and six final PNGs match again, with source
 bytes, twelve accepted inputs and exact one Undo/Redo retained.
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 56.3 → 60.8 ms | 81.9 → 80.8 ms |
-| Affine ordinary mask | 56.0 → 61.9 ms | 82.5 → 85.6 ms |
-| Affine filter mask | 72.2 → 72.1 ms | 85.8 → 86.9 ms |
-| Projected raster | 86.6 → 87.5 ms | 114.7 → 115.2 ms |
-| Projected ordinary mask | 98.8 → 90.6 ms | 147.4 → 131.0 ms |
-| Projected filter mask | 104.0 → 103.9 ms | 166.9 → 164.1 ms |
+| Target                  | Median before → after | P95 before → after |
+| ----------------------- | --------------------: | -----------------: |
+| Affine raster           |        56.3 → 60.8 ms |     81.9 → 80.8 ms |
+| Affine ordinary mask    |        56.0 → 61.9 ms |     82.5 → 85.6 ms |
+| Affine filter mask      |        72.2 → 72.1 ms |     85.8 → 86.9 ms |
+| Projected raster        |        86.6 → 87.5 ms |   114.7 → 115.2 ms |
+| Projected ordinary mask |        98.8 → 90.6 ms |   147.4 → 131.0 ms |
+| Projected filter mask   |      104.0 → 103.9 ms |   166.9 → 164.1 ms |
 
 Final projected-mask median/p95 changes 98.8→90.6 / 147.4→131.0 ms, while
 projected filter-mask median is flat at 104.0→103.9 ms and other controls vary.

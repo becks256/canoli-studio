@@ -13,11 +13,7 @@
   "width": 10000,
   "height": 5000,
   "pixels": 50000000,
-  "inputChannelLevels": [
-    223,
-    152,
-    306
-  ],
+  "inputChannelLevels": [223, 152, 306],
   "windowPixels": 100000,
   "windows": 500,
   "outputFormat": "rgba16",

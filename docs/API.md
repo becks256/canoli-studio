@@ -37,7 +37,6 @@ plugin/independent REST commits and source-bearing persistence. Trusted Clone ge
 native previews, and stage linear TIFF tiles before one-Undo publication.
 [Signatures, defaults, errors, coordinates and limits](FLOAT_CLONE.md).
 
-
 ## Editable native float paint
 
 Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
@@ -49,7 +48,6 @@ Prepared HDR wet strokes now join dry paint on the content-local native grid
 before current affine placement; inert wet records retain the dry rendering
 path. Explicit native clone source values use schema 58; byte clone values reject.
 [Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
-
 
 ## Prepared HDR wet raster edits (schema 57)
 
@@ -73,7 +71,6 @@ Shared OO commands, independent REST sessions and existing isolated/plugin
 authority remain. Verified tool/export/production behavior and remaining broader acceptance are
 recorded in [the current contract and verification boundary](MASK_PLANES.md). Earlier
 scalar-dependency/reset limitations below describe the prior accepted baseline.
-
 
 ## Captured wet placement (document schema 55)
 
@@ -100,7 +97,6 @@ file or network service. REST sessions remain independent of the browser and
 do not provide a composed renderer or synchronize human edits.
 [Signatures, defaults and example](SCRIPTING_API.md#captured-perspective-wet-fields-schema-55).
 
-
 ## Native worker runtime
 
 The source API host uses the existing tsx dependency to load its TypeScript
@@ -111,7 +107,6 @@ worker retains its current strict request/result contract, cancellation and
 source validation. No new endpoint, permission, composed renderer or browser
 synchronization is added. See [worker startup](ARCHITECTURE.md#native-node-worker-startup).
 
-
 ## Private coverage transport keeps API boundaries
 
 The native scalar engine now supports both sampling directions for original and
@@ -119,7 +114,6 @@ placed coverage. It is host-owned rendering work; no new REST route, composed
 server renderer, browser synchronization or isolated pixel/worker service is
 exposed. Public perspective/tool availability retains its documented current
 boundary. [Private dependency and remaining integration](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
-
 
 ## Image perspective placement (schema 50)
 
@@ -132,7 +126,6 @@ preserves placement; null resets it. Public scripting uses PerspectiveTransform
 constructors. REST remains an independent headless session without composed
 rendering or browser synchronization. [Exact defaults, examples and current
 editing limits](SCRIPTING_API.md#perspectivetransform).
-
 
 ## Float tonal metadata
 
@@ -217,13 +210,11 @@ Design checks now accept optional explicit alignment rules against a canvas or i
 
 Omitted alignment policies retain strict version-1 reports; explicit policies use version 2 with measured evidence and complete matched/mismatched/unavailable/excluded coverage. The custom dialog exposes reviewable rules, stale-result protection, download/navigation and document-instance binding. Document schema 47 and existing native project/workspace/permission contracts are unchanged. Inferred alignment intent, bleed, rendered visibility, contrast/legibility and broader A12/roadmap gates remain required. See [DESIGN_CHECKS.md](DESIGN_CHECKS.md) for signatures, defaults, errors, limits and the dated verification boundary.
 
-
 ## Public vertical text (F08)
 
 Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
 
 The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
-
 
 ## Vertical renderer is private
 
@@ -329,7 +320,6 @@ Projects with RAW use checksummed container v4, preserving original bytes, accep
 
 The checked decoder produces linear RGB16/grayscale16 before explicit RGBA8 sRGB working conversion. Its build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. Broader camera/color, merge workflows, F10 precision and the complete F12 gates remain open.
 
-
 ## Native RAW REST sessions
 
 RAW endpoints belong to this server's independent in-memory documents. They neither locate browser documents nor synchronize browser edits. Existing API token/origin policy applies. Native LibRaw work runs in a private Node worker with the same checked C ABI, options/report validation and sRGB8 output as the browser. Server inspection/development share a cancellable FIFO; waiting jobs own original bytes but no worker/native heap. Workers terminate on success/error/abort, and termination completes before the next native job starts. Headless assets retain validated PNG/original bytes and real native dimensions; browser-bitmap access is explicitly unavailable, with no fabricated surface or general headless renderer claim.
@@ -406,7 +396,6 @@ Existing `layer.add` / `layer.update` adjustment DTOs accept strict `{kind:"red-
 
 Ordinary mask values in layer.add/layer.update.mask and smartObject.filterMask accept ordered `{mode:"wet",stroke:<complete WetPaintStroke DTO>}` entries. Embedded master definitions use the same version rule and asset discovery. Upload original output/coverage PNGs through the existing assets endpoint first. Native output alpha must not exceed coverage alpha, even for opacity0 metadata, disabled masks or hidden layers. The shared host validates these bytes before a synchronous command batch; invalid content returns400 with no partial rename/mask edits, stale revisions return409, and success is one undo step. No server brush-simulation endpoint or browser/session synchronization is added. Mask/filter-mask engine authoring is a separate trusted-browser `editor.applyWetPaint(...,{target})` contract documented in SCRIPTING_API.md.
 
-
 Prepared wet `opacity:0` remains serialized with all image references, whose validity is still checked before commands commit; it does not force native reconstruction or SVG rasterization. Constructor opacity/nativeTransform defaults apply only to undefined; explicit null rejects like invalid raw DTO fields. Retained spatial sessions remain internal to the browser engine, with no new REST endpoint or isolated host service. Current documents use schema55; prepared wet metadata does not change project/workspace container versions; ordinary prepared layer records retain their schema33 introduction.
 
 Schema 33 introduces prepared `WetPaintStroke` values through existing `paint.add`, `layer.add` and raster `layer.update.erasures` commands. No new REST simulation/render endpoint is added. A wet record contains `id`, `kind:"wet"`, independent `opacity` (0–1), `clip:null`, brush/pencil `brush` metadata, normalized `load`/`mix`, invertible `nativeTransform`, and native `tiles:[{x,y,width,height,assetId,coverage:{assetId}}]`. See [the constructor contract and runnable isolated example](SCRIPTING_API.md#prepared-wet-paint-schema-33). Native pixels are authoritative; metadata does not execute a brush engine on the server.
@@ -456,30 +445,30 @@ Set the `LUMA_API_KEY` environment variable to require token-based authenticatio
 - Requests missing or supplying an invalid key receive **401 Unauthorized** with the header `WWW-Authenticate: Bearer realm="Canoli Studio REST API"`.
 - When `LUMA_API_KEY` is omitted, loopback Host and Origin checks protect the local development service against cross-site requests.
 
-| Method | Endpoint                         | Behavior                                                               |
-| ------ | -------------------------------- | ---------------------------------------------------------------------- |
-| GET    | `/health`                        | Service status and storage/scope description                           |
-| GET    | `/documents`                     | IDs, names and revisions                                               |
-| POST   | `/documents`                     | Create from optional `name`, `width`, `height`                         |
-| POST | `/documents/:id/vector-boolean` | Combine closed path areas in a worker, revision checked; one atomic undo |
-| GET    | `/documents/:id`                 | Document DTO, revision, undo/redo availability                         |
-| POST   | `/documents/:id/commands`        | Apply validated command array as one atomic history entry              |
-| POST   | `/documents/:id/undo`            | Undo one entry                                                         |
-| POST   | `/documents/:id/redo`            | Redo one entry                                                         |
-| DELETE | `/documents/:id`                 | Delete from the in-memory session                                      |
-| POST   | `/documents/:id/assets`          | Upload binary image or base64 asset to document's asset store          |
-| GET    | `/documents/:id/assets`          | List stored assets for the document                                    |
-| GET    | `/documents/:id/assets/:assetId` | Retrieve raw image binary or JSON asset metadata                       |
-| POST   | `/documents/:id/color-range` | Prepare native color coverage from an explicit PNG asset, revision checked |
-| POST | `/documents/:id/selection-modify` | Modify native selection coverage with expand/contract/feather |
-| POST | `/documents/:id/quick-selection` | Grow native color/edge coverage from painted seeds in an explicit PNG source |
-| POST | `/documents/:id/select-subject` | Native original-raster contrast/alpha coverage with complete layer placement |
-| POST | `/documents/:id/preflight` | Read-only native metadata/geometry design report with expected revision |
-| POST | `/documents/:id/alpha-channel-load` | Load a saved channel with native Boolean/inverse coverage and a revision check |
-| POST   | `/documents/:id/jobs`            | Submit asynchronous generation job (supports idempotency key)          |
-| GET    | `/jobs/:jobId`                   | Poll status, progress, staged candidate, and error for an async job    |
-| POST   | `/jobs/:jobId/cancel`            | Cancel an active or queued background job                              |
-| POST   | `/documents/:id/apply-candidate` | Apply staged candidate to document with revision check and 1-step undo |
+| Method | Endpoint                            | Behavior                                                                       |
+| ------ | ----------------------------------- | ------------------------------------------------------------------------------ |
+| GET    | `/health`                           | Service status and storage/scope description                                   |
+| GET    | `/documents`                        | IDs, names and revisions                                                       |
+| POST   | `/documents`                        | Create from optional `name`, `width`, `height`                                 |
+| POST   | `/documents/:id/vector-boolean`     | Combine closed path areas in a worker, revision checked; one atomic undo       |
+| GET    | `/documents/:id`                    | Document DTO, revision, undo/redo availability                                 |
+| POST   | `/documents/:id/commands`           | Apply validated command array as one atomic history entry                      |
+| POST   | `/documents/:id/undo`               | Undo one entry                                                                 |
+| POST   | `/documents/:id/redo`               | Redo one entry                                                                 |
+| DELETE | `/documents/:id`                    | Delete from the in-memory session                                              |
+| POST   | `/documents/:id/assets`             | Upload binary image or base64 asset to document's asset store                  |
+| GET    | `/documents/:id/assets`             | List stored assets for the document                                            |
+| GET    | `/documents/:id/assets/:assetId`    | Retrieve raw image binary or JSON asset metadata                               |
+| POST   | `/documents/:id/color-range`        | Prepare native color coverage from an explicit PNG asset, revision checked     |
+| POST   | `/documents/:id/selection-modify`   | Modify native selection coverage with expand/contract/feather                  |
+| POST   | `/documents/:id/quick-selection`    | Grow native color/edge coverage from painted seeds in an explicit PNG source   |
+| POST   | `/documents/:id/select-subject`     | Native original-raster contrast/alpha coverage with complete layer placement   |
+| POST   | `/documents/:id/preflight`          | Read-only native metadata/geometry design report with expected revision        |
+| POST   | `/documents/:id/alpha-channel-load` | Load a saved channel with native Boolean/inverse coverage and a revision check |
+| POST   | `/documents/:id/jobs`               | Submit asynchronous generation job (supports idempotency key)                  |
+| GET    | `/jobs/:jobId`                      | Poll status, progress, staged candidate, and error for an async job            |
+| POST   | `/jobs/:jobId/cancel`               | Cancel an active or queued background job                                      |
+| POST   | `/documents/:id/apply-candidate`    | Apply staged candidate to document with revision check and 1-step undo         |
 
 Mutations to an existing document require `expectedRevision`; mismatch returns **409**. Re-read before retrying. Invalid requests return **400**, disallowed origins/hosts **403**, missing or invalid authorization **401**, and missing documents/endpoints **404**. Successful creation returns **201**; async acceptance returns **202**; other successful JSON operations return **200**. JSON requests must use `Content-Type: application/json`. Binary asset uploads accept `image/png`, `image/jpeg`, `image/webp`, or `application/octet-stream`.
 
@@ -529,34 +518,34 @@ Undo/redo/delete body: `{ "expectedRevision": 1 }` (use the current revision).
 
 Commands use `type` plus the fields below. Unknown properties in command envelopes/patches fail validation. See `src/core/validation.ts` and `src/core/commands.ts` for exact schemas.
 
-| Type              | Fields                                                                                                                                                                   |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `document.resize` | Positive safe-integer `width`, `height`; resize canvas without moving artwork.                                                                                           |
-| `document.crop`   | `bounds: { x, y, width, height }`; signed integer origin, positive integer dimensions, safe integer edges. Rebase content and unlinked masks; retain off-canvas artwork. |
-| `document.rename` | `name`                                                                                                                                                                   |
-| `layer.add`       | `layer`: serialized RasterLayer, PaintLayer, VectorLayer, TextLayer, AdjustmentLayer or LayerGroup; optional `parentId`                                                  |
-| `layer.update`    | `id`, `patch`: name/position/opacity/fillOpacity/styles/metadata/mask/visibility/lock/blend mode; raster width/height; adjustment                                        |
-| `layer.remove`    | `id`                                                                                                                                                                     |
-| `layer.duplicate` | `id`; optional `newIds` maps source node/effect/stroke/path IDs to replay-stable IDs                                                                                     |
-| `layer.reorder`   | `id`, `direction`: `up` or `down`                                                                                                                                        |
-| `layer.reparent`  | `id`, `parentId`: group ID or null for document root                                                                                                                     |
-| `selection.set`   | `selection`: full selection DTO or null; persisted and undoable                                                                                                          |
-| `alphaChannel.set` | `channel: {id,name,selection}`: complete saved-channel data, added or replaced by ID |
-| `alphaChannel.remove` | `id`: remove a saved channel without changing selection or masks |
-| `alphaChannel.reorder` | `id`, `direction`: `up` or `down`; move within the saved-channel list |
-| `selection.polygon` | `points`: 3–20,000 document-space `{x,y}` vertices; optional `operation`: replace (default), add, subtract, intersect. Closes/clips an even-odd polygon into fractional pixel coverage, with shared history. |
-| `layer.place`     | `id`, `targetId` (layer ID or null), `placement`: before/after/inside, `preservePosition`: boolean. Inside requires a group or null root.                                |
-| `paint.add`       | paint layer `id`, serialized `stroke` (brush/pencil/clone/fill)                                                                                                          |
-| `paint.remove`    | paint layer `id`, `strokeId`                                                                                                                                             |
-| `path.add`        | vector layer `id`, serialized `path`                                                                                                                                     |
-| `path.update`     | vector layer `id`, `pathId`, `patch`: points/closed/fill/stroke/strokeWidth                                                                                              |
-| `path.remove`     | vector layer `id`, `pathId`                                                                                                                                              |
-| `effect.tone`     | raster `id`, `values`: exposure/contrast/saturation                                                                                                                      |
-| `effect.reset`    | raster `id`                                                                                                                                                              |
-| `effect.add`      | raster `id`, serialized tone `effect`                                                                                                                                    |
-| `effect.update`   | raster `id`, `effectId`, `values`: enabled/exposure/contrast/saturation                                                                                                  |
-| `effect.remove`   | raster `id`, `effectId`                                                                                                                                                  |
-| `transaction`     | `label`, `commands`                                                                                                                                                      |
+| Type                   | Fields                                                                                                                                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `document.resize`      | Positive safe-integer `width`, `height`; resize canvas without moving artwork.                                                                                                                               |
+| `document.crop`        | `bounds: { x, y, width, height }`; signed integer origin, positive integer dimensions, safe integer edges. Rebase content and unlinked masks; retain off-canvas artwork.                                     |
+| `document.rename`      | `name`                                                                                                                                                                                                       |
+| `layer.add`            | `layer`: serialized RasterLayer, PaintLayer, VectorLayer, TextLayer, AdjustmentLayer or LayerGroup; optional `parentId`                                                                                      |
+| `layer.update`         | `id`, `patch`: name/position/opacity/fillOpacity/styles/metadata/mask/visibility/lock/blend mode; raster width/height; adjustment                                                                            |
+| `layer.remove`         | `id`                                                                                                                                                                                                         |
+| `layer.duplicate`      | `id`; optional `newIds` maps source node/effect/stroke/path IDs to replay-stable IDs                                                                                                                         |
+| `layer.reorder`        | `id`, `direction`: `up` or `down`                                                                                                                                                                            |
+| `layer.reparent`       | `id`, `parentId`: group ID or null for document root                                                                                                                                                         |
+| `selection.set`        | `selection`: full selection DTO or null; persisted and undoable                                                                                                                                              |
+| `alphaChannel.set`     | `channel: {id,name,selection}`: complete saved-channel data, added or replaced by ID                                                                                                                         |
+| `alphaChannel.remove`  | `id`: remove a saved channel without changing selection or masks                                                                                                                                             |
+| `alphaChannel.reorder` | `id`, `direction`: `up` or `down`; move within the saved-channel list                                                                                                                                        |
+| `selection.polygon`    | `points`: 3–20,000 document-space `{x,y}` vertices; optional `operation`: replace (default), add, subtract, intersect. Closes/clips an even-odd polygon into fractional pixel coverage, with shared history. |
+| `layer.place`          | `id`, `targetId` (layer ID or null), `placement`: before/after/inside, `preservePosition`: boolean. Inside requires a group or null root.                                                                    |
+| `paint.add`            | paint layer `id`, serialized `stroke` (brush/pencil/clone/fill)                                                                                                                                              |
+| `paint.remove`         | paint layer `id`, `strokeId`                                                                                                                                                                                 |
+| `path.add`             | vector layer `id`, serialized `path`                                                                                                                                                                         |
+| `path.update`          | vector layer `id`, `pathId`, `patch`: points/closed/fill/stroke/strokeWidth                                                                                                                                  |
+| `path.remove`          | vector layer `id`, `pathId`                                                                                                                                                                                  |
+| `effect.tone`          | raster `id`, `values`: exposure/contrast/saturation                                                                                                                                                          |
+| `effect.reset`         | raster `id`                                                                                                                                                                                                  |
+| `effect.add`           | raster `id`, serialized tone `effect`                                                                                                                                                                        |
+| `effect.update`        | raster `id`, `effectId`, `values`: enabled/exposure/contrast/saturation                                                                                                                                      |
+| `effect.remove`        | raster `id`, `effectId`                                                                                                                                                                                      |
+| `transaction`          | `label`, `commands`                                                                                                                                                                                          |
 
 REST provides **headless document metadata, assets, jobs, and commands**. It does not control the active browser tab, render interactive canvas exports, or run browser user scripts. Raster `assetId` values reference uploaded or generated assets stored in the session's AssetStore. Limits of 10 MB per binary asset upload, 1 MB per JSON request, 256 commands per array, bounded nesting/complexity, and 100 session documents protect the control endpoint; they do not constrain browser image-import size. Durable persistent storage, OpenAPI generation and browser synchronization remain future work.
 
@@ -842,11 +831,17 @@ Shared `layer.update` validation accepts `erasures` only on raster layers: an ar
 ```json
 {
   "expectedRevision": 0,
-  "commands": [{
-    "type": "selection.polygon",
-    "points": [{"x": 10, "y": 10}, {"x": 80, "y": 10}, {"x": 10, "y": 80}],
-    "operation": "replace"
-  }]
+  "commands": [
+    {
+      "type": "selection.polygon",
+      "points": [
+        { "x": 10, "y": 10 },
+        { "x": 80, "y": 10 },
+        { "x": 10, "y": 80 }
+      ],
+      "operation": "replace"
+    }
+  ]
 }
 ```
 
@@ -870,36 +865,29 @@ The local service allows at most four concurrent selection workers across its do
 
 Shared `layer.add` and `layer.update` adjustment DTOs accept schema-17 Color Balance and Vibrance through the existing authenticated/revision-checked commands endpoint. No new route is needed. Color Balance is `{ kind: "color-balance", shadows: {red,green,blue}, midtones: {red,green,blue}, highlights: {red,green,blue}, preserveLuminosity: boolean }`; all nine channel values are required finite numbers in [-100,100]. Vibrance is `{ kind: "vibrance", vibrance, saturation }`, with both required finite values in [-100,100]. Unknown/missing/invalid fields return 400 without committing; ordinary revision conflicts return 409. Locks, transaction rollback, undo/redo and constructor handle behavior remain shared. See SCRIPTING_API.md for exact encoded-sRGB tonal weights and gamut/luma math. Headless REST state remains separate from browser state and this route does not render pixels on the server.
 
-
 ### Gradient map adjustment commands
 
 The existing revision-checked `layer.add` and `layer.update` commands accept schema-18 `{kind: "gradient-map", stops: [{position, color}, ...], reverse: boolean}`. All fields are required; stop objects reject unknown fields. Use 2–32 strictly ordered, distinct finite positions in [0,1] and six-digit `#RRGGBB` colors; duplicate/unsorted/invalid stops return 400 without edits. Revision conflicts return 409; locks, transaction rollback and undo/redo are shared. See SCRIPTING_API.md for brightness/interpolation, endpoint clamping, reverse, alpha and processing-space semantics. There is no new route or permission. REST documents remain separate from the browser and this command endpoint does not render server-side pixels.
-
 
 ### Browser-host rendered PSD output
 
 Trusted `editor.export({format:"psd", psdMode?:"layers"|"flatten"}, control?)` defaults to supported nested folders, child pixel records and separate document-bounded user masks. It merges unsupported adjustments/Blend If in their real isolation scope, carrying dependencies through pass-through groups. Styled folders keep one rendered child; group fill folds into opacity, non-Normal pixel fill/masks bake, and unstyled Normal pixel fill stays separate. Preflight reports each loss, including hidden contents omitted inside baked scopes. Flatten emits one visible-composition layer. Native dimensions, placed-raster bounds, names/visibility/locks/opacity/modes and current appearance are carried through this RGB8 subset, with white-matted-preview rounding. Format/allocation failures reject explicitly without an import-resolution cap. See SCRIPTING_API.md for defaults, masks/control/off-canvas limits, errors, progress/cancellation and zero-asset group-only import. No HTTP export endpoint or browser synchronization is added.
 
-
 Trusted browser `editor.openPsd(buffer, {mode?, legacyStraightAlpha?})` accepts an explicit legacy straight-alpha override for old unmarked files; the normal path recognizes older Canoli ICC identifiers and container layout automatically and distinguishes standard extra alpha channels from signaled merged transparency. This is a browser import option, not a REST endpoint or script capability. See SCRIPTING_API.md for the exact default/compatibility boundary.
-
 
 ### White Balance adjustment commands
 
 Existing revision-checked `layer.add`/`layer.update` commands accept schema-19 `{kind:"white-balance", temperature, tint}`. Both fields are required finite numbers: temperature 2000–25000, tint -100–100; unknown/missing/invalid fields return 400 atomically. Revision conflicts remain 409. Locks, history and transaction behavior are shared. SCRIPTING_API.md specifies D65-relative illuminant/tint semantics, Bradford adaptation in linear sRGB, defaults, byte clipping, unclipped float working colors and exact alpha. This does not add REST pixel rendering or synchronization with browser documents.
 
-
 ### Color Lookup (LUT) adjustment commands
 
 Existing revision-checked `layer.add`/`layer.update` commands accept the strict schema-20 LUT adjustment DTO specified in SCRIPTING_API.md. The packed little-endian float32 table, 1D/3D dimensions, domain, amount and interpolation are validated at the common host boundary. Malformed base64/length, nonfinite values, invalid domains, unknown fields and unsupported interpolation return 400 atomically. Locks, revision conflicts (409), undo/redo and transaction validation remain shared. This adds no REST parsing/rendering route or browser synchronization. Trusted clients can call the exported `parseCubeLut` helper before submission; the existing 1 MB JSON request limit remains and may exclude larger packed tables from a single REST request.
-
 
 ### Native PNG-source Color Range
 
 `POST /api/v1/documents/:id/color-range` accepts `{expectedRevision, colors, exclude?, fuzziness?, invert?, operation?, source:{kind:"asset", assetId, x?, y?}}`. Sampling is at original PNG resolution, translated by integer x/y (default 0) and clipped to document bounds. The shared ColorRangeOptions/Document.selectColorRange contract defines CIELAB distance, falloff, defaults, strict validation and fractional Boolean operations; see SCRIPTING_API.md. Success commits one selection edit and returns the normal snapshot. Invalid options/assets/results/formats return 400 without edits; stale revisions return 409. Locks on artwork do not prevent document selection. The shared selection-worker concurrency limit is four; client disconnect/deletion/revision change cancels native preparation.
 
 The real Node worker decodes noninterlaced 8-bit unmarked/explicit-sRGB PNG (gray, RGB, indexed, optional alpha/tRNS), validates chunk CRC/order and row filters, inflates bounded scanlines/strips and executes the same WASM color kernel as the browser. Color declarations precede the palette and image data; an optional palette precedes transparency. These ordering rules follow the [PNG specification](https://www.w3.org/TR/png-3/#5ChunkOrdering). Unsupported ICC/HDR (including cICP/mDCV/cLLI), animated/interlaced/16-bit PNG, other source formats and non-asset source modes reject explicitly. It reads raw PNG pixels without EXIF orientation, ICC conversion, layer effects or a headless scene compositor. Upload a normalized sRGB PNG when those operations are needed. Separate REST documents never control the browser tab. Existing JSON/binary upload limits remain; no image megapixel/import cap was added.
-
 
 ### Saved alpha channels
 
@@ -909,20 +897,17 @@ Document schema 21 adds optional `alphaChannels: [{id,name,selection}]`, with at
 
 Channels are retained by `.luma` projects and workspace history. Crop/image resize transform channel geometry with the artwork; canvas resizing keeps it fixed. Loading/renaming/removing channels preserves source assets and previously captured layer masks. See [Alpha channels](SCRIPTING_API.md#alpha-channels) for constructor/member contracts, precision, errors and current limitations.
 
-
 ### Native PNG-source Quick Selection
 
 `POST /api/v1/documents/:id/quick-selection` accepts `{expectedRevision,points,size?,tolerance?,edgeThreshold?,operation?,source:{kind:"asset",assetId,x?,y?}}`. Defaults, exact seeded region-growing math, native coordinates, fractional coverage and errors match Document.selectQuickSelection in SCRIPTING_API.md. The actual Node worker decodes the published plain noninterlaced 8-bit PNG subset, validates its payload/dimensions, clips it to document bounds at integer source placement and runs the shared WASM grower. It does not read/render the browser session, orient EXIF or convert ICC data. Original PNG bytes are unchanged. Unsupported/malformed data, missing/transparent seeds and invalid requests return 400 without edits; stale revisions return 409. One successful request creates one selection undo entry.
 
 The existing four-worker selection-service budget, upload/body/complexity limits, client-disconnect/session-deletion/revision cancellation and isolated headless document scope remain. Native connectivity retains source/state planes and can exceed actual WASM/process memory; bounded PNG strips do not imply constant-memory segmentation or an image import limit.
 
-
 ### Native original-raster Select Subject
 
 `POST /api/v1/documents/:id/select-subject` accepts `{expectedRevision,targetLayerId?,threshold?,expandRadius?}`. Specify the target raster in headless sessions; otherwise the DOM's selected target is used. Threshold defaults to 0.35 in [0,1]; expansion defaults to 0 and accepts integer 0–64 original-source pixels. The host resolves its own source asset/dimensions and complete world placement, decodes a real noninterlaced 8-bit unmarked/explicit-sRGB PNG in a private Node worker and runs the same native contrast/alpha kernel as the browser. It retains holes, disconnected evidence and fractional source alpha, without a bounds-only result or fabricated source/fallback. Layer appearance adjustments/masks/opacity are not sampled; original bytes remain unchanged. Full ancestor transforms and placed scaling are applied to the retained native coverage.
 
 The exact heuristic, defaults, source-plane expansion, errors and memory limits are documented under Select Subject in SCRIPTING_API.md. Missing/non-raster/unsupported/no-foreground sources and invalid options return 400 without changing prior coverage/history; stale revisions return 409. Success creates one ordinary selection undo entry. Disconnect, document deletion and revision changes cancel private work. The shared four-worker selection capacity and existing upload/body/result limits remain. No browser scene rendering/synchronization, EXIF orientation, ICC conversion, semantic model or evaluated matting accuracy is added.
-
 
 ### Native Refine Edge and background removal
 
@@ -947,9 +932,7 @@ The worker decodes the same noninterlaced 8-bit unmarked/explicit-sRGB PNG subse
 
 The default global closed-form Laplacian and fractional WASM feather run in a terminable private Node worker. `options.solver:"color-line"` explicitly selects the former local method. Unknown rows keep connections across capture seams; budgeted IC(0) preconditioning (or global Jacobi when that factor cannot fit) preserves the original system and previous base graph capacity. An optional RGB-aware global Galerkin correction fits within that same budget after reserving base/IC(0) capacity; unavailable optional memory/work/factorization retains the base route. The 192 MiB estimated graph budget and 2,000-CG-iteration ceiling apply before any asset commit. Base success requires actual relative residual <=1e-7; active coarse correction tightens this to <=1e-9 without changing the native matrix or hard constraints. Genuine graph allocation/nonconvergence errors return 400 with the original intact. This is not an evaluated semantic model or a claim of natural hair/glass accuracy. Output PNGs stream bounded tiles/strips, while source/optional bitmap-mask decoding retains full native planes. Actual address-range/memory/format failures return 400 with no commit; no image import cap is added. Invalid options/labels, locks, missing sources, no foreground and unsupported inputs also return 400. Stale revisions and the shared four-worker selection capacity return 409. Disconnect, deletion and revision changes cancel the job; private assets cannot commit late. Current upload/body limits remain.
 
-
 The shared native closed-form matting solver can use private float64 WASM sparse iterations when optional graph capacity fits. This is an internal backend choice; REST request fields, commands, output ownership and revision/cancellation behavior remain the same. Optional allocation/capacity failure retains the global JavaScript route. Headless REST sessions still do not synchronize with the browser. The scripting guide describes operation budgets and measured limitations.
-
 
 ### Read-only design checks
 
@@ -957,14 +940,11 @@ The shared native closed-form matting solver can use private float64 WASM sparse
 
 Expected-revision mismatch or a document change during inspection returns 409. Invalid options return 400. Client disconnect and document deletion stop pending work; no result commits anything. The existing four-worker selection/inspection concurrency budget is shared. Standalone constructor use can inspect geometry without a configured host, with unavailable metadata explicitly reported. Native document dimensions, schemas and import limits are unchanged.
 
-
 ### Host SVG extraction (2026-10-16)
 
 Trusted browser editor.export({format: "svg"}, control?) pins an immutable document snapshot before yielding, so later edits cannot change the captured output. It uses the hierarchical vector/raster/text/paint/group serializer with smart-master expansion: full local affine matrices, ancestor visibility, isolated layer/fill opacity and CSS blend modes. Outside native backdrop prefixes, unfeathered vector masks remain editable; other masks use native-resolution embedded PNG coverage with rasterization reported. Color overlays and document-space drop shadows remain editable SVG filters; the capability report exposes native adjustment/Blend If backdrop prefixes and their baked editability; remaining SVG blending depends on viewer support. SVG encoding reports phase "encoding" with fraction null and yields between bounded fragments for cancellation. Constructor VectorLayer.toSvg remains synchronous and extracts only its own immediate parent plane; see SCRIPTING_API.md for exact defaults, errors and limits. No REST SVG-render endpoint or browser synchronization is introduced.
 
-
 SVG masks use document-resolution coverage without embedding original bitmap RGB. Native preparation reports rendering progress, checks current asset identities/repository lifetime and releases each tile on success, failure or cancellation. Missing/changed source assets reject the operation. Standalone layer serialization supports pure vector masks and rejects those requiring native host preparation; exact behavior is in SCRIPTING_API.md. This changes the existing trusted host export surface, not REST routes, asset permissions or isolated-script file access.
-
 
 Host SVG and standalone VectorLayer.toSvg preserve color-overlay/drop-shadow parameters as SVG filters. Shadow blur/offset remain in document-pixel units through full affine nesting; mask coverage precedes effects, fill opacity affects content without suppressing the shadow, and final layer opacity affects both. Native coverage tiles include required off-canvas shadow support. Viewer filter/rounding/allocation limits and the remaining Blend If loss are reported explicitly. Signatures and script/asset/REST permission boundaries are unchanged.
 
@@ -976,32 +956,25 @@ Visible nonempty text outside native backdrop prefixes also exports as editable 
 
 Host SVG also expands unfiltered smart masters into supported editable vector/raster/text/paint contents, with nested placement, masks, styles and editable master-canvas clips. Enabled smart filters instead use native document-resolution PNG content with native filter masks, while outer instance masks/styles/opacity remain separate. The report distinguishes baked content/filters/off-support pixels from independent editable contents, and identifies lost shared master links. Linked images use stored snapshots without file access/refresh. Native filtered dependencies and text fonts are captured/checked across preparation and encoding; missing/changed sources, graph/budget errors and cancellation reject without partial output or history changes. The shared 4,096-node/64-level render budget is independent of import resolution. See [smart SVG contents](SCRIPTING_API.md#smart-object-contents-in-svg-export); API signatures, schemas, REST rendering and isolated script/plugin file privileges are unchanged.
 
-
 Host SVG retains visible paint outside native backdrop prefixes as editable vector dabs and fill rectangles, with native pressure/flow, whole-stroke opacity and ordered erasure masks. Clone snapshots embed sanitized native-resolution source pixels beneath editable brush coverage; layer/group masks/styles/placement remain separate. Stroke selections use native coverage bounded to their transformed extent, without downsampling. The report distinguishes these primitives from the original brush-command model and discloses omitted off-support dabs, raster coverage/source pixels and dense/deep viewer limits. Original strokes and source bytes remain in projects. Native and SVG replay reject stamp indices beyond safe integer precision instead of entering a non-advancing loop; this does not impose an import-resolution cap. See [paint in SVG](SCRIPTING_API.md#paint-in-svg-export) for defaults, errors, limits and a runnable constructor example. Export signatures, schemas, REST routes and script/plugin privileges are unchanged.
 
-
 Host SVG now retains visible adjustments and enabled Blend If through native sibling-prefix images, instead of omitting them. Each isolated stack renders only through its last visible dependency; later artwork and outer parent settings stay separate. Reports identify affected stack endings and baked internal editability/off-support pixels. Source/font capture includes the complete native prefix, with existing cancellation/progress/cleanup and immutable snapshots. All current native adjustment kernels and Blend If rules use the real compositor. Synchronous VectorLayer.toSvg rejects enabled Blend If with a host-preparation error. See [native SVG backdrop composition](SCRIPTING_API.md#native-backdrop-composition-in-svg-export) for defaults, exact scope, errors and a runnable example. No export option/signature, schema, REST render route or script/plugin capability changes.
-
 
 ### Trusted local SVG file services
 
 The browser host exposes `editor.inspectSvg(file, control?)` and `editor.openSvg(file, {mode?: "editable" | "flatten"}, control?)`; see [the current import contract](SCRIPTING_API.md#local-svg-import). They inspect inert XML in a terminable worker and publish only a complete validated native document. Editable mode is the default and rejects unsupported features; flattening requires an explicit choice. UI preflight/cancel, source-byte preservation and normal OO edit/undo behavior apply. Headless REST sessions and isolated scripts/plugins gain no file parser, browser renderer, download or network privileges. The shared `VectorPath.fromSvgPath` helper now rejects malformed/compound single-path input instead of skipping it and supports quadratic/arc conversion.
 
-
 ### Native vector stroke command fields
 
 Schema 22 adds optional `strokeCap`, `strokeJoin`, `strokeMiterLimit`, `strokeDashArray`, and `strokeDashOffset` to path records and `path.update.patch`. The same `path.add`/`path.update` validators apply to UI, scripting/plugins and headless REST commands. See [VectorPath](SCRIPTING_API.md#vectorpath) for defaults, ranges, examples and error behavior. Unknown enums/fields, negative/nonfinite dash values, arrays over 256 entries, limits below 1 and invalid offsets reject atomically; ancestor locks, expectedRevision/409 and shared undo remain enforced. Pre-22 labels containing these fields reject; valid old roots migrate with legacy round appearance. This does not add browser rendering or SVG-file access to REST sessions. Existing layer-add recipe templates retain styled path records; standalone path-update recipe recording remains explicitly unsupported.
-
 
 ### Editable vector gradient fills (schema 23)
 
 Path records and `path.update.patch` accept nullable `fillGradient` with strict linear/radial geometry, 2–32 ordered color/opacity stops and an optional invertible affine paint transform. See [VectorPath gradient fills](SCRIPTING_API.md#gradient-fills) for signatures/defaults/ranges/examples/errors. The OO setters, isolated scripting/plugins, UI and separate headless REST sessions share validation, ancestor locks, expectedRevision/409 and undo. Older roots migrate to the current schema without injecting paint; older labels containing this field reject. Solid fill is retained beneath gradient paint; setting the gradient to null restores it. No REST renderer/SVG-file endpoint/browser synchronization or asset-byte access is added.
 
-
 ### Native compound paths (schema 24)
 
 `path.add` and `path.update.patch` accept optional `fillRule: "nonzero" | "evenodd"` (default nonzero) and `subpaths: [{id, points, closed:true}]`. Primary `points` remain the first contour; additional contours share paint/stroke. Each path supports at most 128 contours and 20,000 total anchors, unique contour IDs (including the primary), finite absolute local handles and a closed primary when extras exist. Complete merged-path validation, ancestor locks, expectedRevision/409, atomic commands/history and project persistence apply. Unknown fields, invalid fill rules/open extras/duplicates/budgets reject with 400 and no mutation. Empty `subpaths` removes all additional boundaries. See [compound paths](SCRIPTING_API.md#compound-paths-and-vectorcontour) for OO geometry editing, defaults, example, error behavior and mask capture rules. Boolean operations use the revision-checked endpoint below; sessions remain separate from browser documents.
-
 
 ### Boolean vector areas
 
@@ -1020,7 +993,6 @@ Strict 2–128 distinct paths, 128 total input contours and 20,000 total input a
 
 The ordinary `/commands` surface also accepts `{type:"paths.replace", operands:[{layerId,pathId},...], result: VectorPathData|null}` as a final-geometry replacement. It uses the same closed-source/existence/distinctness/lock checks. A nonempty result must retain the first path ID and be closed; complete strict path/subpath validation applies. Replacement occupies that first path's original slot, removes other operands and prunes only empty operand vector layers. It does not calculate or certify a Boolean operation for clients supplying arbitrary final geometry. Invalid batches roll back atomically. Recipes still report standalone path replacement as unsupported; complete layer-add templates can retain resulting geometry.
 
-
 ## Paragraph layout commands
 
 Schema-26 text layer.add/layer.update accept optional wrapWidth (finite 1…Number.MAX_SAFE_INTEGER document px, or null to select point text), paragraphSpacing (0…10000 px, effective 0) and firstLineIndent (-10000…10000 px, effective 0). The same locks, expectedRevision, strict external validation, atomic batches and undo apply; no endpoint is added. Use wrapWidth:null, paragraphSpacing:0 and firstLineIndent:0 in one patch to match TextLayer.resetParagraph(). Non-text targets and invalid fields return 400 without partial edits; stale revisions return 409. Headless advances/line counts remain approximate without browser fonts, while authored width is retained exactly. Reflow in the browser refreshes local metrics; REST documents do not synchronize with the browser. See the scripting Paragraph layout section for Unicode/grapheme, overflow, whitespace, persistence and SVG limits.
@@ -1033,19 +1005,15 @@ Schema-27 text layer.add/layer.update accept optional paragraphJustify: "none" |
 
 Trusted host SVG export may add whitespace-only inline spans after full-line native advance and ink-response checks, retaining literal root typography and one shaped chunk per visual line. Spans and boundary trimming respect native graphemes after ASCII normalization; unavailable segmentation declines optional styling. Invalid prepared ranges reject. Font pins, cancellation, cleanup, immutable snapshots and signed-advance fallback remain active. The verified NBSP/boundary correction is not universal glyph parity; combining marks, font-state and fractional/affine/viewer differences remain disclosed. Export signatures, schema 27/project 3/workspace 2, separate headless REST and isolated scripting privileges are unchanged. See the SVG whitespace example in SCRIPTING_API.md.
 
-
 ## TIFF export remains a browser-host operation
 
 Trusted `editor.export({format: "tiff", tiffVariant?: "auto" | "classic" | "big"}, control?)` returns a native-resolution, flattened lossless RGBA8 sRGB `.tif`, with alpha and an output ICC profile. Automatic selects classic TIFF or BigTIFF from actual file addressing. The existing Export dialog exposes compatibility, progress and cancellation. See [SCRIPTING_API.md](SCRIPTING_API.md#native-tiff-export-trusted-application-code) for defaults, limits, errors and lifetime behavior. This adds no REST rendering route, sandbox file method, cloud transfer or synchronization between headless and browser sessions. TIFF input and ordered open-document multipage output have separate contracts; higher-precision/editable TIFF output remains open.
-
 
 ### Trusted browser PSB delivery and Photoshop import
 
 `editor.export({format:"psb", psdMode?:"layers"|"flatten"}, control?)` returns the rendered RGB8 PSB version-2 subset, with `layers` as default. `editor.getExportCapabilityReport(options)` describes bounds, hidden content and baked editability before export. Large lengths/RLE rows follow PSB; actual multi-GiB and broader reader/device acceptance remain unverified. PSD keeps its format limits. `editor.openPsd(buffer, options?)` keeps its signature for both versions and now stages decoded PNG planes without a source-sized canvas, discarding stale owner/revision/session results. Its private worker still parses/allocates full input and decoded planes; inspection is not metadata-only parsing. See SCRIPTING_API.md for exact signatures/defaults, errors, source/font/cancel lifetimes, memory/precision and examples. These trusted methods add no REST export/import route, browser-session synchronization, isolated capability or schema change.
 
-
 PSD/PSB host export now uses a private strip-encoding worker with unchanged options/results. Abort terminates pending encoding; native rendering calls remain non-preemptible. Worker errors/message errors, invalid row/Blob results and source/font changes reject without output, with worker/surface cleanup and normal retry. This changes no REST endpoint, revision/command behavior, browser-session link or isolated script capability. See SCRIPTING_API.md for the complete lifetime/cancellation boundary.
-
 
 ### Trusted Photoshop input controls
 
@@ -1053,9 +1021,7 @@ PSD/PSB host export now uses a private strip-encoding worker with unchanged opti
 
 Trusted browser Photoshop inspection/import workers now decode 8-bit RGB/Gray ZIP and ZIP prediction, including layer channels and the merged planar image. Native Deflate/checksum/declared-output validation and worker cancellation protect private publication. Higher-precision ZIP and full Photoshop semantics remain incomplete; synchronous compatibility helpers retain explicit unsupported-codec reporting. See SCRIPTING_API.md for async low-level adapter signatures, defaults, failures and memory/source boundaries. This adds no REST import route or browser-session synchronization.
 
-
 Trusted browser Photoshop import now retains supported 8-bit user-mask coverage as separate native bitmap-mask PNG sources, with flags, outside coverage, density and coordinate placement. The legacy decoded assets map includes mask images. Unsupported feather/combined/rendered/higher-precision mask semantics remain explicit with merged fallback; preserveMasks:false reports omission. See SCRIPTING_API.md for exact defaults, representation, errors and the OO edit example. No REST file route or browser synchronization is added.
-
 
 ### Schema-28 group-only pass-through blending
 
@@ -1064,7 +1030,6 @@ The shared `layer.add` group DTO and `layer.update` patch accept `blendMode:"pas
 ### Schema-29 brush pressure DTOs
 
 Shared brush records accept optional `pressureCurve:{points:[{input,output},...]}` with 2–16 finite normalized knots, strict increasing inputs from 0 to 1 and nondecreasing outputs. Default response omits the field; raw DTO null/unknown fields and malformed curves reject atomically. Pure OO PressureCurve values and constructor null shorthand serialize through the existing commands. Paint, masks/filter masks, erasures and tonal-sculpt options use the same validation; attached locks, expectedRevision/409, atomic batches and undo remain shared. New document/history schema is 29; project 3/workspace 2 are unchanged. See SCRIPTING_API.md for presets/defaults, zero/minimum behavior, persistence and errors. No new route, browser-session synchronization or isolated privilege is introduced.
-
 
 ### Browser brush preferences
 
@@ -1089,7 +1054,6 @@ Document schema 41 admits optional paragraph-style basedOn `{id, overrides}` (or
 ## RAW lens options
 
 RAW import/development options accept optional strict `development.lens` version-1 settings documented in SCRIPTING_API.md. Independent native workers perform geometric validation and linear RGB16 radial/chromatic/vignette correction before returning RGBA8 working pixels. Transparent correction borders are supported; original RAW extra-sample coverage remains unsupported. Existing expectedRevision, locks, original/accepted validation, project/history and cancellation contracts remain. Invalid correction publishes nothing; no browser synchronization or general REST renderer is introduced.
-
 
 RAW inspection/development and retained asset/project metadata may include `report.shooting` with version 1, lensMake/lensModel (empty for unknown), and nullable positive finite focalLength/focalLength35mm (mm), aperture (f-number), exposureTime (seconds) and iso. Values are native-recorded declarations with float32 precision, not verified measurements or inferred calibrated crop factors. Invalid native values become unknown; malformed worker replies reject. Legacy reports remain valid without this object. Inspection remains read-only, accepted metadata follows ordinary source/undo/persistence boundaries, and REST sessions remain independent of the browser. See SCRIPTING_API.md for the complete report contract.
 
@@ -1117,11 +1081,9 @@ The existing raster erasure DTO also admits placed clear fills (`stroke.kind:"fi
 
 Existing `layer.update` mask/filterMask DTOs now accept optional strict `placement:{width,height,perspective:{corners},basis:{a,b,c,d,e,f}}` on Hide/Reveal brush/pencil entries. It captures image dimensions, normalized perspective and the mask-local-to-image basis, including smart-master scale for filter masks. Stroke coordinates follow the affine image plane after perspective. Invalid constructors/geometry, singular bases, unsupported Wet placement, false old labels, locks and asset/revision conflicts reject atomically. The OO surface is `layer.paintMask(stroke,mode?,{space?,filterMask?})`; local/ordinary defaults remain. Existing history/project/workspace transport and independent headless sessions preserve the DTO; no composed REST renderer, browser synchronization or new route is added. [Public contract and example](SCRIPTING_API.md#placed-ordinary-and-filter-mask-brushes-schema-53).
 
-
 ## Perspective mask path editing
 
 Perspective Pen editing commits existing strict native vector-mask DTOs through layer.update. Independent REST retains shared validation/locks/revisions/Undo but supplies no browser pointer service, composed renderer or synchronization. Public constructors and isolated scripting signatures remain unchanged.
-
 
 ## Mask placement and canvas translation
 

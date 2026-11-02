@@ -7,9 +7,9 @@ remain in history unless explicitly removed.
 The following original evidence archives are retained locally at their existing
 paths and excluded from Git history because they exceed GitHub's file limit:
 
-| Local archive | Bytes | SHA-256 |
-| --- | ---: | --- |
-| `float-color-2026-10-28.zip` | 164195201 | `74a327c038da9381cd1694929aa03b782fe2c80926e8f5f63a21f841f15730fa` |
+| Local archive                  |     Bytes | SHA-256                                                            |
+| ------------------------------ | --------: | ------------------------------------------------------------------ |
+| `float-color-2026-10-28.zip`   | 164195201 | `74a327c038da9381cd1694929aa03b782fe2c80926e8f5f63a21f841f15730fa` |
 | `float-palette-2026-10-28.zip` | 379090189 | `8b33d46661b0ee2088321b16e1507419dbd9ede3b4a318c31957b6bed294b6e3` |
 
 Links to these two ZIPs in historical work logs resolve only in a checkout that

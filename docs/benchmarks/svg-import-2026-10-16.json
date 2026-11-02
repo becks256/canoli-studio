@@ -51,7 +51,7 @@
   "geometryComparison": {
     "method": "Source browser SVG contour lengths and 101 normalized-length points per contour vs independently browser-measured imported cubic paths",
     "maxPointDistancePx": 0.011295436644653972,
-    "maxRelativeLengthError": 7.277394470432502e-05,
+    "maxRelativeLengthError": 7.277394470432502e-5,
     "acceptance": {
       "pointDistancePx": 0.04,
       "relativeLengthError": 0.0001
@@ -62,56 +62,20 @@
     "editableMs": 855.6000000014901,
     "flattenMs": 3441.300000000745,
     "bytes": 944636,
-    "dimensions": [
-      10000,
-      5000
-    ],
+    "dimensions": [10000, 5000],
     "sourceUnchanged": true,
     "reopened": true,
-    "flatDimensions": [
-      10000,
-      5000
-    ],
+    "flatDimensions": [10000, 5000],
     "flatType": "image/png",
     "tiles": 395,
     "released": true,
     "pixels": [
-      [
-        128,
-        64,
-        32,
-        255
-      ],
-      [
-        128,
-        64,
-        32,
-        255
-      ],
-      [
-        128,
-        64,
-        32,
-        255
-      ],
-      [
-        128,
-        64,
-        32,
-        255
-      ],
-      [
-        0,
-        160,
-        255,
-        255
-      ],
-      [
-        0,
-        160,
-        255,
-        255
-      ]
+      [128, 64, 32, 255],
+      [128, 64, 32, 255],
+      [128, 64, 32, 255],
+      [128, 64, 32, 255],
+      [0, 160, 255, 255],
+      [0, 160, 255, 255]
     ]
   },
   "limitations": [
@@ -562,56 +526,20 @@
       "editableMs": 855.6000000014901,
       "flattenMs": 3441.300000000745,
       "bytes": 944636,
-      "dimensions": [
-        10000,
-        5000
-      ],
+      "dimensions": [10000, 5000],
       "sourceUnchanged": true,
       "reopened": true,
-      "flatDimensions": [
-        10000,
-        5000
-      ],
+      "flatDimensions": [10000, 5000],
       "flatType": "image/png",
       "tiles": 395,
       "released": true,
       "pixels": [
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          0,
-          160,
-          255,
-          255
-        ],
-        [
-          0,
-          160,
-          255,
-          255
-        ]
+        [128, 64, 32, 255],
+        [128, 64, 32, 255],
+        [128, 64, 32, 255],
+        [128, 64, 32, 255],
+        [0, 160, 255, 255],
+        [0, 160, 255, 255]
       ]
     },
     "canoli-svg-import-abort.json": {
@@ -715,22 +643,22 @@
       },
       {
         "d": "M0 0Q20 40 40 0T80 0q20-40 40 0t40 0",
-        "lengthError": 1.2896692591598115e-07,
-        "distance": 4.1580637658294e-05
+        "lengthError": 1.2896692591598115e-7,
+        "distance": 4.1580637658294e-5
       },
       {
         "d": "M0 0A20 30 35 0 1 80 40a30 20 -20 1 0 -60 40Z",
-        "lengthError": 5.2595933787866936e-05,
+        "lengthError": 5.2595933787866936e-5,
         "distance": 0.011295436644653972
       },
       {
         "d": "M0 0C10 20 30 20 40 0Q50-20 60 0S80 20 90 0T120 0",
         "lengthError": 0,
-        "distance": 1.5377536293599222e-05
+        "distance": 1.5377536293599222e-5
       },
       {
         "d": "M0 0A10 10 0 0110 10L20 20",
-        "lengthError": 7.277394470432502e-05,
+        "lengthError": 7.277394470432502e-5,
         "distance": 0.002824454937237191
       },
       {
@@ -811,7 +739,7 @@
       },
       "interiorErrors": 0,
       "contourErrors": 0,
-      "areaError": 3.36234982241484e-05,
+      "areaError": 3.36234982241484e-5,
       "centroidError": 0.0013807892804569813,
       "alpha": 29,
       "premult": 29,
@@ -850,7 +778,7 @@
       },
       "interiorErrors": 0,
       "contourErrors": 0,
-      "areaError": 4.475733053375507e-05,
+      "areaError": 4.475733053375507e-5,
       "centroidError": 0.005004715232027872,
       "alpha": 50,
       "premult": 43.92156862745097,
@@ -894,22 +822,9 @@
     },
     "canoli-svg-import-flat-ui.json": {
       "type": "image/png",
-      "dimensions": [
-        160,
-        120
-      ],
-      "left": [
-        254,
-        0,
-        0,
-        255
-      ],
-      "right": [
-        1,
-        0,
-        255,
-        255
-      ]
+      "dimensions": [160, 120],
+      "left": [254, 0, 0, 255],
+      "right": [1, 0, 255, 255]
     },
     "canoli-svg-import-image-auto.json": {
       "aspect": "auto",
@@ -919,10 +834,7 @@
       "centroidError": 0,
       "alpha": 0,
       "premult": 0,
-      "dimensions": [
-        64,
-        32
-      ],
+      "dimensions": [64, 32],
       "original": true,
       "reopened": true
     },
@@ -934,10 +846,7 @@
       "centroidError": 0.003921398027415535,
       "alpha": 8,
       "premult": 8,
-      "dimensions": [
-        64,
-        32
-      ],
+      "dimensions": [64, 32],
       "original": true,
       "reopened": true
     },
@@ -949,10 +858,7 @@
       "centroidError": 0.003921398027415535,
       "alpha": 8,
       "premult": 8,
-      "dimensions": [
-        64,
-        32
-      ],
+      "dimensions": [64, 32],
       "original": true,
       "reopened": true
     },
@@ -964,10 +870,7 @@
       "centroidError": 0.003921398027415535,
       "alpha": 8,
       "premult": 8,
-      "dimensions": [
-        64,
-        32
-      ],
+      "dimensions": [64, 32],
       "original": true,
       "reopened": true
     },
@@ -979,10 +882,7 @@
       "centroidError": 0.08105746682163531,
       "alpha": 66,
       "premult": 80.21960784313725,
-      "dimensions": [
-        64,
-        32
-      ],
+      "dimensions": [64, 32],
       "original": true,
       "reopened": true
     },
@@ -994,10 +894,7 @@
       "centroidError": 0.004705680516153166,
       "alpha": 8,
       "premult": 8,
-      "dimensions": [
-        64,
-        32
-      ],
+      "dimensions": [64, 32],
       "original": true,
       "reopened": true
     },
@@ -1044,30 +941,10 @@
       "width": 160,
       "height": 120,
       "pixels": [
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          255,
-          0,
-          255
-        ],
-        [
-          0,
-          0,
-          0,
-          0
-        ]
+        [128, 64, 32, 255],
+        [0, 0, 0, 0],
+        [0, 255, 0, 255],
+        [0, 0, 0, 0]
       ]
     },
     "canoli-svg-import-roundtrip.json": {
@@ -1223,7 +1100,7 @@
     },
     "canoli-svg-import-viewbox.json": {
       "mode": "viewbox",
-      "circleRadiusError": 4.2256936700013625e-05,
+      "circleRadiusError": 4.2256936700013625e-5,
       "report": {
         "version": 1,
         "width": 160,

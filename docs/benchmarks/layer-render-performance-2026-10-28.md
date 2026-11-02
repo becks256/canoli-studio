@@ -30,13 +30,13 @@ time. All twelve samples, including cold starts and outliers, remain included;
 p95 is nearest rank and therefore the maximum for twelve samples.
 
 | Cold stack | Pair | Queued input p95 before / after, ms | Complete render p95 before / after, ms |
-| --- | --- | --- | --- |
-| Flat | 1 | 54.4 / 9.5 | 52.6 / 53.9 |
-| Flat | 2 | 48.6 / 10.6 | 46.7 / 51.3 |
-| Flat | 3 | 58.0 / 8.8 | 55.9 / 48.7 |
-| Grouped | 1 | 54.6 / 12.4 | 51.7 / 55.5 |
-| Grouped | 2 | 61.8 / 9.2 | 59.6 / 59.5 |
-| Grouped | 3 | 64.0 / 30.8 | 61.9 / 63.9 |
+| ---------- | ---- | ----------------------------------- | -------------------------------------- |
+| Flat       | 1    | 54.4 / 9.5                          | 52.6 / 53.9                            |
+| Flat       | 2    | 48.6 / 10.6                         | 46.7 / 51.3                            |
+| Flat       | 3    | 58.0 / 8.8                          | 55.9 / 48.7                            |
+| Grouped    | 1    | 54.6 / 12.4                         | 51.7 / 55.5                            |
+| Grouped    | 2    | 61.8 / 9.2                          | 59.6 / 59.5                            |
+| Grouped    | 3    | 64.0 / 30.8                         | 61.9 / 63.9                            |
 
 Every candidate queued task runs before composition completes (72/72); baseline
 tasks run afterward (0/72). No render long tasks are observed in the candidate
@@ -57,13 +57,13 @@ Actual font-control presentation is mixed and remains above target. The same
 paired runs retain these click-to-canvas p95 values:
 
 | Text layers | Pair | Font presentation p95 before / after, ms |
-| --- | --- | --- |
-| 16 | 1 | 63.0 / 66.8 |
-| 16 | 2 | 60.9 / 70.1 |
-| 16 | 3 | 60.5 / 62.0 |
-| 64 | 1 | 92.8 / 99.0 |
-| 64 | 2 | 70.0 / 112.7 |
-| 64 | 3 | 97.9 / 77.1 |
+| ----------- | ---- | ---------------------------------------- |
+| 16          | 1    | 63.0 / 66.8                              |
+| 16          | 2    | 60.9 / 70.1                              |
+| 16          | 3    | 60.5 / 62.0                              |
+| 64          | 1    | 92.8 / 99.0                              |
+| 64          | 2    | 70.0 / 112.7                             |
+| 64          | 3    | 97.9 / 77.1                              |
 
 The 64-layer second pair is materially slower after the change. This increment
 accepts queued input and cancellation during composition, not completion of the

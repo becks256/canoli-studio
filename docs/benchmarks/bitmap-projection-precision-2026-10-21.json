@@ -3676,370 +3676,259 @@
       {
         "suite": "basic",
         "scenario": "native-low",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "e11da82ec9f7862b773145ce0281192c5cafb560e5396b5b4113c954193ad350",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "native-high",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "3c712310633eedbbbfb3e6ab81dca2751798b019fe6e02c8867fd29dbe119360",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "native-correction",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "54f9ca74d3c880443306d1bafc9d91b66f2d5635ca084130fd1dff942fe7333c",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "zero-low",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "8a6adf6528a88d16c6b1574ea5967a04c44e128e3c8459139476beb0c194511c",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "zero-high",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "fb2499c761c574d18c7322c71dcbd06596c47bd2813738db43c8e29baccda81b",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "masked",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "9f22419f1c208b5df0fe18919df840cf67c48342b8a8d52d62b8f169831fe1f6",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "inverted-mask",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "02d2ea3c377d83ff4a0a3b9cf26f2c76e4d1bf6600717d7c3ee9a2b3c45d1b43",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "transparent",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "e11da82ec9f7862b773145ce0281192c5cafb560e5396b5b4113c954193ad350",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "affine",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "e1c85e9922174300a1e89b2e02b6bc4d251e8a3e2f13060d6278ee1a4ad14de2",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "fractional",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "6c4b202450868914516b0e9ba0acbc7e959a4dc2646bc3484062e56b7a566eb2",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "disabled",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "3d9fd6d0f8acc1d3f1dcf82cc2be22f1a3231482e2a55a9d4e1b8193fe578038",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "retouch-low",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "05444e1fc18523dbf8e447a248e70caa940ca3fd95f3c8b998d36f7466a4f2bc",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "retouch-high",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "5c0e890a1acfe3750953c7b15b12b70db1bdc35affaf15406ed374192acef222",
         "exact": true
       },
       {
         "suite": "basic",
         "scenario": "retouch-both",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "27b0885173f620bac60dddda2babae643489c04949c880b5574978db9c1cba49",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-texture-alpha",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "0c4c55ec0ad15b9ddce255b763b633785be60bae8cee5411a9442dd38a84caf1",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-texture-luminance",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "d4b501b1883630d280d04e6456a460f2aef627e560eeb198d9c89169f66fb7fa",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-texture-pencil",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "0402eb176c6842dfe878b85cfdc8007017b9c8c38cc51128710c373c7ff360cd",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-symmetry-tip",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "f66a81cd507e0407b94ab7ffea0e12b4b721d69c1face7c743ad824ee9cba2ca",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-eraser",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "6d45978dda273917442a1ca63e66ca2c4c920c1bf716833963292bb15fdfc05b",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-texture-eraser",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "21d9c43853694212895fcb23b822c7e4a7e2b55be2e43ccdbb37275008f5dc0f",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-clipped",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "0d36b2fe56dd4ca0aaa390601bc2fe709f2edebcb95b589cf9a8a52b23034eff",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-clone",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "5dc58a744cb3beef3c54f47ec54c72b3bd6ab2961d18a218650cc5f46999cb72",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-wet",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "1175d476b0d9d2d7c48d509441c28e2e62475b649f0e5d60a25c3ccd007a2bba",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-wet-affine",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "6381a5c5c3a91a3ebb611e352a36c60063598b58ea085cd7a8985e6cc5577d0a",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-wet-then-erase",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "5624320cb810305d0da3927f450155c8c7576591b8c5c44597f083cd400b1c9f",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-erase-then-wet",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "5624320cb810305d0da3927f450155c8c7576591b8c5c44597f083cd400b1c9f",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-stroke-after-wet",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "9f7200941ffd6ab811b79b7200d5b57d69a95867739b431be46db6bbed427def",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-outer-painted-mask",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "8a4510850b4d0b394de17ebdfd4e8b75004de7ed86b0ce3451d566e0156632ec",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-outer-vector-mask",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "53afdf3b62ae10a63373e121401d34e144ef434030791bc47046c3644301ad31",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-outer-wet-mask",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "b3fda3222f01dcc71517c1122553aeb243e0767517dc631c289c3492ddb2566a",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-layer-mask",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "54b3a5d55fafc12b6de5b32d7d2a430cbece6174d0e201a43854f96cfa160022",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-layer-style",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "f7428bc840190ea5fd43b9cc3c576f5ea64916e3da7460c6236b505f620040ea",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-layer-affine",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "d95355493ebef3a87caae506211abb8850d125334335c71fee0edbda5e2e7ea2",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-extra-vector",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "9a1a7a355378d49272cb47a6299c1b0ff03f04d38f6af5d9f7ba33e25d3fe8ed",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-affine",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "38b15f269c3c96548dbd04cff735f7b262bb126cae2c399f1b2421885b2f16e5",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-fractional",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "c0f40aec286831ede4bd75546b6827ddf961c707f440fc2970aa5ddde38bd5da",
         "exact": true
       },
       {
         "suite": "extended",
         "scenario": "retouch-extra-filter",
-        "size": [
-          1080,
-          440
-        ],
+        "size": [1080, 440],
         "rgbaSha256": "27b0885173f620bac60dddda2babae643489c04949c880b5574978db9c1cba49",
         "exact": true
       }
@@ -4068,1944 +3957,648 @@
           "scale": 128,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ]
+          "mask": [1, 1, 0, 0, 0],
+          "raster": [1, 1, 0, 0, 0],
+          "expected": [1, 1, 0, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 128,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ]
+          "mask": [0, 0, 1, 1, 1],
+          "raster": [0, 0, 1, 1, 1],
+          "expected": [0, 0, 1, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 128,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ]
+          "mask": [1, 1, 1, 0, 0],
+          "raster": [1, 1, 1, 0, 0],
+          "expected": [1, 1, 1, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 128,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
+          "mask": [0, 0, 0, 1, 1],
+          "raster": [0, 0, 0, 1, 1],
+          "expected": [0, 0, 0, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 128,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ]
+          "mask": [1, 1, 1, 0, 0],
+          "raster": [1, 1, 1, 0, 0],
+          "expected": [1, 1, 1, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 128,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
+          "mask": [0, 0, 0, 1, 1],
+          "raster": [0, 0, 0, 1, 1],
+          "expected": [0, 0, 0, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ]
+          "mask": [1, 1, 0, 0, 0],
+          "raster": [1, 1, 0, 0, 0],
+          "expected": [1, 1, 0, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ]
+          "mask": [0, 0, 1, 1, 1],
+          "raster": [0, 0, 1, 1, 1],
+          "expected": [0, 0, 1, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ]
+          "mask": [1, 1, 1, 0, 0],
+          "raster": [1, 1, 1, 0, 0],
+          "expected": [1, 1, 1, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
+          "mask": [0, 0, 0, 1, 1],
+          "raster": [0, 0, 0, 1, 1],
+          "expected": [0, 0, 0, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ]
+          "mask": [1, 1, 1, 0, 0],
+          "raster": [1, 1, 1, 0, 0],
+          "expected": [1, 1, 1, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
+          "mask": [0, 0, 0, 1, 1],
+          "raster": [0, 0, 0, 1, 1],
+          "expected": [0, 0, 0, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            0,
-            0,
-            0
-          ]
+          "mask": [1, 1, 0, 0, 0],
+          "raster": [1, 1, 0, 0, 0],
+          "expected": [1, 1, 0, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            1,
-            1,
-            1
-          ]
+          "mask": [0, 0, 1, 1, 1],
+          "raster": [0, 0, 1, 1, 1],
+          "expected": [0, 0, 1, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ]
+          "mask": [1, 1, 1, 0, 0],
+          "raster": [1, 1, 1, 0, 0],
+          "expected": [1, 1, 1, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
+          "mask": [0, 0, 0, 1, 1],
+          "raster": [0, 0, 0, 1, 1],
+          "expected": [0, 0, 0, 1, 1]
         },
         {
           "alpha": 1,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "raster": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ],
-          "expected": [
-            1,
-            1,
-            1,
-            0,
-            0
-          ]
+          "mask": [1, 1, 1, 0, 0],
+          "raster": [1, 1, 1, 0, 0],
+          "expected": [1, 1, 1, 0, 0]
         },
         {
           "alpha": 1,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
+          "mask": [0, 0, 0, 1, 1],
+          "raster": [0, 0, 0, 1, 1],
+          "expected": [0, 0, 0, 1, 1]
         },
         {
           "alpha": 64,
           "scale": 128,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ]
+          "mask": [64, 64, 0, 0, 0],
+          "raster": [64, 64, 0, 0, 0],
+          "expected": [64, 64, 0, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 128,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ]
+          "mask": [0, 0, 64, 64, 64],
+          "raster": [0, 0, 64, 64, 64],
+          "expected": [0, 0, 64, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 128,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ]
+          "mask": [64, 64, 64, 0, 0],
+          "raster": [64, 64, 64, 0, 0],
+          "expected": [64, 64, 64, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 128,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ]
+          "mask": [0, 0, 0, 64, 64],
+          "raster": [0, 0, 0, 64, 64],
+          "expected": [0, 0, 0, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 128,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ]
+          "mask": [64, 64, 64, 0, 0],
+          "raster": [64, 64, 64, 0, 0],
+          "expected": [64, 64, 64, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 128,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ]
+          "mask": [0, 0, 0, 64, 64],
+          "raster": [0, 0, 0, 64, 64],
+          "expected": [0, 0, 0, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ]
+          "mask": [64, 64, 0, 0, 0],
+          "raster": [64, 64, 0, 0, 0],
+          "expected": [64, 64, 0, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ]
+          "mask": [0, 0, 64, 64, 64],
+          "raster": [0, 0, 64, 64, 64],
+          "expected": [0, 0, 64, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ]
+          "mask": [64, 64, 64, 0, 0],
+          "raster": [64, 64, 64, 0, 0],
+          "expected": [64, 64, 64, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ]
+          "mask": [0, 0, 0, 64, 64],
+          "raster": [0, 0, 0, 64, 64],
+          "expected": [0, 0, 0, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ]
+          "mask": [64, 64, 64, 0, 0],
+          "raster": [64, 64, 64, 0, 0],
+          "expected": [64, 64, 64, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ]
+          "mask": [0, 0, 0, 64, 64],
+          "raster": [0, 0, 0, 64, 64],
+          "expected": [0, 0, 0, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            0,
-            0,
-            0
-          ]
+          "mask": [64, 64, 0, 0, 0],
+          "raster": [64, 64, 0, 0, 0],
+          "expected": [64, 64, 0, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            64,
-            64,
-            64
-          ]
+          "mask": [0, 0, 64, 64, 64],
+          "raster": [0, 0, 64, 64, 64],
+          "expected": [0, 0, 64, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ]
+          "mask": [64, 64, 64, 0, 0],
+          "raster": [64, 64, 64, 0, 0],
+          "expected": [64, 64, 64, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ]
+          "mask": [0, 0, 0, 64, 64],
+          "raster": [0, 0, 0, 64, 64],
+          "expected": [0, 0, 0, 64, 64]
         },
         {
           "alpha": 64,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "raster": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ],
-          "expected": [
-            64,
-            64,
-            64,
-            0,
-            0
-          ]
+          "mask": [64, 64, 64, 0, 0],
+          "raster": [64, 64, 64, 0, 0],
+          "expected": [64, 64, 64, 0, 0]
         },
         {
           "alpha": 64,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            64,
-            64
-          ]
+          "mask": [0, 0, 0, 64, 64],
+          "raster": [0, 0, 0, 64, 64],
+          "expected": [0, 0, 0, 64, 64]
         },
         {
           "alpha": 128,
           "scale": 128,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ]
+          "mask": [128, 128, 0, 0, 0],
+          "raster": [128, 128, 0, 0, 0],
+          "expected": [128, 128, 0, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 128,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ]
+          "mask": [0, 0, 128, 128, 128],
+          "raster": [0, 0, 128, 128, 128],
+          "expected": [0, 0, 128, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 128,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ]
+          "mask": [128, 128, 128, 0, 0],
+          "raster": [128, 128, 128, 0, 0],
+          "expected": [128, 128, 128, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 128,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ]
+          "mask": [0, 0, 0, 128, 128],
+          "raster": [0, 0, 0, 128, 128],
+          "expected": [0, 0, 0, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 128,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ]
+          "mask": [128, 128, 128, 0, 0],
+          "raster": [128, 128, 128, 0, 0],
+          "expected": [128, 128, 128, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 128,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ]
+          "mask": [0, 0, 0, 128, 128],
+          "raster": [0, 0, 0, 128, 128],
+          "expected": [0, 0, 0, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ]
+          "mask": [128, 128, 0, 0, 0],
+          "raster": [128, 128, 0, 0, 0],
+          "expected": [128, 128, 0, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ]
+          "mask": [0, 0, 128, 128, 128],
+          "raster": [0, 0, 128, 128, 128],
+          "expected": [0, 0, 128, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ]
+          "mask": [128, 128, 128, 0, 0],
+          "raster": [128, 128, 128, 0, 0],
+          "expected": [128, 128, 128, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ]
+          "mask": [0, 0, 0, 128, 128],
+          "raster": [0, 0, 0, 128, 128],
+          "expected": [0, 0, 0, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ]
+          "mask": [128, 128, 128, 0, 0],
+          "raster": [128, 128, 128, 0, 0],
+          "expected": [128, 128, 128, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ]
+          "mask": [0, 0, 0, 128, 128],
+          "raster": [0, 0, 0, 128, 128],
+          "expected": [0, 0, 0, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            0,
-            0,
-            0
-          ]
+          "mask": [128, 128, 0, 0, 0],
+          "raster": [128, 128, 0, 0, 0],
+          "expected": [128, 128, 0, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            128,
-            128,
-            128
-          ]
+          "mask": [0, 0, 128, 128, 128],
+          "raster": [0, 0, 128, 128, 128],
+          "expected": [0, 0, 128, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ]
+          "mask": [128, 128, 128, 0, 0],
+          "raster": [128, 128, 128, 0, 0],
+          "expected": [128, 128, 128, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ]
+          "mask": [0, 0, 0, 128, 128],
+          "raster": [0, 0, 0, 128, 128],
+          "expected": [0, 0, 0, 128, 128]
         },
         {
           "alpha": 128,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "raster": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ],
-          "expected": [
-            128,
-            128,
-            128,
-            0,
-            0
-          ]
+          "mask": [128, 128, 128, 0, 0],
+          "raster": [128, 128, 128, 0, 0],
+          "expected": [128, 128, 128, 0, 0]
         },
         {
           "alpha": 128,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            128,
-            128
-          ]
+          "mask": [0, 0, 0, 128, 128],
+          "raster": [0, 0, 0, 128, 128],
+          "expected": [0, 0, 0, 128, 128]
         },
         {
           "alpha": 255,
           "scale": 128,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ]
+          "mask": [255, 255, 0, 0, 0],
+          "raster": [255, 255, 0, 0, 0],
+          "expected": [255, 255, 0, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 128,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ]
+          "mask": [0, 0, 255, 255, 255],
+          "raster": [0, 0, 255, 255, 255],
+          "expected": [0, 0, 255, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 128,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ]
+          "mask": [255, 255, 255, 0, 0],
+          "raster": [255, 255, 255, 0, 0],
+          "expected": [255, 255, 255, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 128,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ]
+          "mask": [0, 0, 0, 255, 255],
+          "raster": [0, 0, 0, 255, 255],
+          "expected": [0, 0, 0, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 128,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ]
+          "mask": [255, 255, 255, 0, 0],
+          "raster": [255, 255, 255, 0, 0],
+          "expected": [255, 255, 255, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 128,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ]
+          "mask": [0, 0, 0, 255, 255],
+          "raster": [0, 0, 0, 255, 255],
+          "expected": [0, 0, 0, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ]
+          "mask": [255, 255, 0, 0, 0],
+          "raster": [255, 255, 0, 0, 0],
+          "expected": [255, 255, 0, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 1000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ]
+          "mask": [0, 0, 255, 255, 255],
+          "raster": [0, 0, 255, 255, 255],
+          "expected": [0, 0, 255, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ]
+          "mask": [255, 255, 255, 0, 0],
+          "raster": [255, 255, 255, 0, 0],
+          "expected": [255, 255, 255, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 1000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ]
+          "mask": [0, 0, 0, 255, 255],
+          "raster": [0, 0, 0, 255, 255],
+          "expected": [0, 0, 0, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ]
+          "mask": [255, 255, 255, 0, 0],
+          "raster": [255, 255, 255, 0, 0],
+          "expected": [255, 255, 255, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 1000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ]
+          "mask": [0, 0, 0, 255, 255],
+          "raster": [0, 0, 0, 255, 255],
+          "expected": [0, 0, 0, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            0,
-            0,
-            0
-          ]
+          "mask": [255, 255, 0, 0, 0],
+          "raster": [255, 255, 0, 0, 0],
+          "expected": [255, 255, 0, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 1000000000000,
           "edge": 0.25,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            255,
-            255,
-            255
-          ]
+          "mask": [0, 0, 255, 255, 255],
+          "raster": [0, 0, 255, 255, 255],
+          "expected": [0, 0, 255, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ]
+          "mask": [255, 255, 255, 0, 0],
+          "raster": [255, 255, 255, 0, 0],
+          "expected": [255, 255, 255, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 1000000000000,
           "edge": 0.5,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ]
+          "mask": [0, 0, 0, 255, 255],
+          "raster": [0, 0, 0, 255, 255],
+          "expected": [0, 0, 0, 255, 255]
         },
         {
           "alpha": 255,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": false,
-          "mask": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "raster": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ],
-          "expected": [
-            255,
-            255,
-            255,
-            0,
-            0
-          ]
+          "mask": [255, 255, 255, 0, 0],
+          "raster": [255, 255, 255, 0, 0],
+          "expected": [255, 255, 255, 0, 0]
         },
         {
           "alpha": 255,
           "scale": 1000000000000,
           "edge": 0.75,
           "mirrored": true,
-          "mask": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "raster": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ],
-          "expected": [
-            0,
-            0,
-            0,
-            255,
-            255
-          ]
+          "mask": [0, 0, 0, 255, 255],
+          "raster": [0, 0, 0, 255, 255],
+          "expected": [0, 0, 0, 255, 255]
         }
       ]
     ],
@@ -6026,22 +4619,7 @@
     "nativePremultipliedOracle": [
       {
         "original": [
-          235,
-          20,
-          98,
-          13,
-          16,
-          216,
-          63,
-          97,
-          84,
-          58,
-          207,
-          171,
-          194,
-          157,
-          18,
-          241
+          235, 20, 98, 13, 16, 216, 63, 97, 84, 58, 207, 171, 194, 157, 18, 241
         ],
         "rows": [
           {
@@ -6102,12 +4680,7 @@
           "captures": 1,
           "closes": 1,
           "error": "",
-          "pixel": [
-            255,
-            0,
-            0,
-            255
-          ]
+          "pixel": [255, 0, 0, 255]
         },
         {
           "cancel": true,
@@ -6142,24 +4715,12 @@
     ],
     "native50mp": [
       {
-        "nativeSize": [
-          10000,
-          5000
-        ],
-        "reopenedSize": [
-          10000,
-          5000
-        ],
+        "nativeSize": [10000, 5000],
+        "reopenedSize": [10000, 5000],
         "sourceHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
         "reopenedHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
         "sameModel": true,
-        "maskAlpha": [
-          255,
-          255,
-          255,
-          0,
-          0
-        ],
+        "maskAlpha": [255, 255, 255, 0, 0],
         "maxWorkingPixels": 32768,
         "maxWorkingEdge": 256,
         "independentPng": "Complete extreme-view PNG and reopened source pixels exact\n"

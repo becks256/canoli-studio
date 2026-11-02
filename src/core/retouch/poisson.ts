@@ -1,6 +1,11 @@
 import { solvePoissonSystem, type PoissonLinearSolver } from "./poisson-solver";
 import type { PoissonBlendOptions, PoissonBlendResult } from "./types";
-import {captureFloatPoissonOptions,validateFloatRetouchPixels,validateFloatRetouchCoverage,type FloatPoissonBlendResult} from './float-types';
+import {
+  captureFloatPoissonOptions,
+  validateFloatRetouchPixels,
+  validateFloatRetouchCoverage,
+  type FloatPoissonBlendResult,
+} from "./float-types";
 
 type Bytes = Uint8Array | Uint8ClampedArray;
 
@@ -19,18 +24,56 @@ export function poissonBlend(
   options: PoissonBlendOptions = {},
   solve: PoissonLinearSolver = solvePoissonSystem,
 ): PoissonBlendResult {
- return solveBlend(target,donor,width,height,coverage,options,solve,false) as PoissonBlendResult;
+  return solveBlend(
+    target,
+    donor,
+    width,
+    height,
+    coverage,
+    options,
+    solve,
+    false,
+  ) as PoissonBlendResult;
 }
 
 /** Signed/HDR linear guidance with the same Dirichlet system and native solve.
  * RGB never clamps or rounds through integer staging; target alpha is exact. */
-export function floatPoissonBlend(target:Float32Array,donor:Float32Array,width:number,height:number,coverage:Bytes,options:PoissonBlendOptions={},solve:PoissonLinearSolver=solvePoissonSystem):FloatPoissonBlendResult {
- validateFloatRetouchPixels(target,width,height);validateFloatRetouchPixels(donor,width,height);
- validateFloatRetouchCoverage(coverage,width,height);
- return solveBlend(target,donor,width,height,coverage,captureFloatPoissonOptions(options),solve,true) as FloatPoissonBlendResult;
+export function floatPoissonBlend(
+  target: Float32Array,
+  donor: Float32Array,
+  width: number,
+  height: number,
+  coverage: Bytes,
+  options: PoissonBlendOptions = {},
+  solve: PoissonLinearSolver = solvePoissonSystem,
+): FloatPoissonBlendResult {
+  validateFloatRetouchPixels(target, width, height);
+  validateFloatRetouchPixels(donor, width, height);
+  validateFloatRetouchCoverage(coverage, width, height);
+  return solveBlend(
+    target,
+    donor,
+    width,
+    height,
+    coverage,
+    captureFloatPoissonOptions(options),
+    solve,
+    true,
+  ) as FloatPoissonBlendResult;
 }
 
-function solveBlend(target:Bytes|Float32Array,donor:Bytes|Float32Array,width:number,height:number,coverage:Bytes,options:PoissonBlendOptions,solve:PoissonLinearSolver,floating:boolean):Omit<PoissonBlendResult,'pixels'>&{pixels:Float32Array|Uint8ClampedArray} {
+function solveBlend(
+  target: Bytes | Float32Array,
+  donor: Bytes | Float32Array,
+  width: number,
+  height: number,
+  coverage: Bytes,
+  options: PoissonBlendOptions,
+  solve: PoissonLinearSolver,
+  floating: boolean,
+): Omit<PoissonBlendResult, "pixels"> & {
+  pixels: Float32Array | Uint8ClampedArray;
+} {
   const count = width * height;
   if (
     !Number.isSafeInteger(width) ||
@@ -61,7 +104,9 @@ function solveBlend(target:Bytes|Float32Array,donor:Bytes|Float32Array,width:num
       "Poisson tolerance and iteration limit must be positive and finite; iterations must be integer.",
     );
   }
-  const pixels = floating?new Float32Array(target):new Uint8ClampedArray(target);
+  const pixels = floating
+    ? new Float32Array(target)
+    : new Uint8ClampedArray(target);
   const indices = new Int32Array(count).fill(-1);
   const active: number[] = [];
   for (let p = 0; p < count; p++) {
@@ -128,9 +173,13 @@ function solveBlend(target:Bytes|Float32Array,donor:Bytes|Float32Array,width:num
     for (let i = 0; i < n; i++) {
       const index = active[i] * 4 + channel,
         amount = coverage[active[i]] / 255;
-      const corrected=floating?x[i]:Math.max(0,Math.min(255,x[i])),value=target[index]+amount*(corrected-target[index]);
-      pixels[index]=floating?value:Math.round(value);
-      if(floating&&!Number.isFinite(pixels[index]))throw new Error('Float Poisson output exceeds finite Float32 precision.');
+      const corrected = floating ? x[i] : Math.max(0, Math.min(255, x[i])),
+        value = target[index] + amount * (corrected - target[index]);
+      pixels[index] = floating ? value : Math.round(value);
+      if (floating && !Number.isFinite(pixels[index]))
+        throw new Error(
+          "Float Poisson output exceeds finite Float32 precision.",
+        );
     }
     iterations = Math.max(iterations, solved.iterations);
   }

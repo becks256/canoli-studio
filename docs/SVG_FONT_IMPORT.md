@@ -31,6 +31,7 @@ Default whitespace collapses ASCII spaces/tabs/newlines; supported xml:space pre
 The caller supplies a selected SVG File as `svgFile`. This code performs no chooser, fetch, native source installation or edit. It belongs to trusted application code, not the isolated Scripts panel.
 
 <!-- example: svg-font-inspection-trusted -->
+
 ```js
 const report = await editor.inspectSvg(svgFile);
 return {

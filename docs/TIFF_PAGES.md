@@ -28,12 +28,12 @@ This example runs in a trusted browser adapter, outside isolated Scripts:
 
 ```js
 const first = editor.document;
-first.name = 'First page';
+first.name = "First page";
 first.resize(400, 300);
-editor.newDocument({name: 'Second page', width: 640, height: 480});
+editor.newDocument({ name: "Second page", width: 640, height: 480 });
 const pages = [editor.document, first];
-const report = editor.getTiffPagesCapabilityReport(pages, {variant: 'auto'});
-const result = await editor.exportTiffPages(pages, {variant: 'auto'});
+const report = editor.getTiffPagesCapabilityReport(pages, { variant: "auto" });
+const result = await editor.exportTiffPages(pages, { variant: "auto" });
 // Review report/result.report and offer result.blob as a .tif download.
 ```
 

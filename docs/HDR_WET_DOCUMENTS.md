@@ -85,25 +85,49 @@ Source layers are retained and hidden; the target's original remains unchanged.
 <!-- example: hdr-wet-prepared -->
 
 ```js
-const target = [...document.layers].find(layer => layer.name === 'HDR target');
-const output = [...document.layers].find(layer => layer.name === 'HDR wet output');
-const coverage = [...document.layers].find(layer => layer.name === 'HDR wet coverage');
-if (!(target instanceof RasterLayer) || !(output instanceof RasterLayer) ||
-    !(coverage instanceof RasterLayer)) {
-  throw new Error('Import the HDR target and matching prepared float TIFF sources first.');
+const target = [...document.layers].find(
+  (layer) => layer.name === "HDR target",
+);
+const output = [...document.layers].find(
+  (layer) => layer.name === "HDR wet output",
+);
+const coverage = [...document.layers].find(
+  (layer) => layer.name === "HDR wet coverage",
+);
+if (
+  !(target instanceof RasterLayer) ||
+  !(output instanceof RasterLayer) ||
+  !(coverage instanceof RasterLayer)
+) {
+  throw new Error(
+    "Import the HDR target and matching prepared float TIFF sources first.",
+  );
 }
-target.applyWetPaint(new WetPaintStroke({
-  precision: 'float32',
-  brush: new PencilStroke({points: [{x: 3.5, y: 4.5}], pressureSize: false}),
-  opacity: 0.625,
-  load: {color: [4, -2, 8, 0.375], load: 0.5},
-  tiles: [{x: 3, y: 4, width: output.width, height: output.height,
-    assetId: output.assetId, coverage: {assetId: coverage.assetId}}]
-}));
+target.applyWetPaint(
+  new WetPaintStroke({
+    precision: "float32",
+    brush: new PencilStroke({
+      points: [{ x: 3.5, y: 4.5 }],
+      pressureSize: false,
+    }),
+    opacity: 0.625,
+    load: { color: [4, -2, 8, 0.375], load: 0.5 },
+    tiles: [
+      {
+        x: 3,
+        y: 4,
+        width: output.width,
+        height: output.height,
+        assetId: output.assetId,
+        coverage: { assetId: coverage.assetId },
+      },
+    ],
+  }),
+);
 output.visible = false;
 coverage.visible = false;
 document.selectedLayer = target;
-print('Prepared HDR wet paint ready');
+print("Prepared HDR wet paint ready");
 ```
 
 The example uses existing source references and shared commands. No pixels,
@@ -174,13 +198,18 @@ an isolated Scripts example:
 ```js
 const controller = new AbortController();
 const stroke = new PencilStroke({
-  size: 2, pressureSize: false, opacity: 0.64123, flow: 1,
-  points: [{x: 3.5, y: 4.5}]
+  size: 2,
+  pressureSize: false,
+  opacity: 0.64123,
+  flow: 1,
+  points: [{ x: 3.5, y: 4.5 }],
 });
 const result = await editor.applyWetPaint(stroke, {
-  mode: 'mixer', respectSelection: false, signal: controller.signal,
-  load: {color: [4, -2, 8, 0.375], load: 1},
-  mix: {flow: 1, wetness: 0, pickup: 0}
+  mode: "mixer",
+  respectSelection: false,
+  signal: controller.signal,
+  load: { color: [4, -2, 8, 0.375], load: 1 },
+  mix: { flow: 1, wetness: 0, pickup: 0 },
 });
 ```
 

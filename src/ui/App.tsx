@@ -1,45 +1,64 @@
-import {insertEditorText} from './insert-text';
-import {translateMaskData} from '../core/masks';
-import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
-import {activePerspective} from '../core/perspective';
-import {PerspectiveCornerDrag} from './perspective-corner';
-import {PerspectiveOverlay} from './PerspectiveOverlay';
-import {PerspectiveTransform} from '../dom/perspective';
-import {clippingBaseFor} from '../core/clipping';
-import {SpacingOverlay} from './SpacingOverlay';
-import {alignmentCommands,layerAlignmentSchema,type LayerAlignment,type AlignmentTarget} from '../core/layer-layout';
-import {HistoryInspectorDialog} from './HistoryInspectorDialog';
-import {PaletteLibraryContext,type PalettePickerRequest} from './PaletteColorControl';
-import {PaletteLibraryDialog} from './PaletteLibraryDialog';
-import {ArtworkLibraryDialog} from './ArtworkLibraryDialog';
-import {AccountClient} from '../account/client';
-import {AccountButton,AccountDialog} from './AccountDialog';
-import {RawDevelopmentDialog,isCameraRawFile,rawFileAccept} from "./RawDevelopmentDialog";
-import {ChatGptConnectionDialog,ChatGptConnectionButton} from './ChatGptConnectionDialog';
+import { insertEditorText } from "./insert-text";
+import { translateMaskData } from "../core/masks";
+import {
+  measureSpacing,
+  snapToSpacing,
+  type SpacingMatch,
+} from "../core/spacing";
+import { activePerspective } from "../core/perspective";
+import { PerspectiveCornerDrag } from "./perspective-corner";
+import { PerspectiveOverlay } from "./PerspectiveOverlay";
+import { PerspectiveTransform } from "../dom/perspective";
+import { clippingBaseFor } from "../core/clipping";
+import { SpacingOverlay } from "./SpacingOverlay";
+import {
+  alignmentCommands,
+  layerAlignmentSchema,
+  type LayerAlignment,
+  type AlignmentTarget,
+} from "../core/layer-layout";
+import { HistoryInspectorDialog } from "./HistoryInspectorDialog";
+import {
+  PaletteLibraryContext,
+  type PalettePickerRequest,
+} from "./PaletteColorControl";
+import { PaletteLibraryDialog } from "./PaletteLibraryDialog";
+import { ArtworkLibraryDialog } from "./ArtworkLibraryDialog";
+import { AccountClient } from "../account/client";
+import { AccountButton, AccountDialog } from "./AccountDialog";
+import {
+  RawDevelopmentDialog,
+  isCameraRawFile,
+  rawFileAccept,
+} from "./RawDevelopmentDialog";
+import {
+  ChatGptConnectionDialog,
+  ChatGptConnectionButton,
+} from "./ChatGptConnectionDialog";
 import { FrequencySeparationDialog } from "./FrequencySeparationDialog";
-import {BrushSymmetryDialog} from './BrushSymmetryDialog';
-import {pointerPenTilt} from '../core/brush-tip';
-import {BrushTipDialog} from './BrushTipDialog';
-import {BrushTextureDialog} from './BrushTextureDialog';
-import {useBrushTexturePreview} from './hooks/useBrushTexturePreview';
-import {BrushPresetsDialog} from './BrushPresetsDialog';
-import {PressureCurveDialog} from './PressureCurveDialog';
-import {SvgImportDialog} from './SvgImportDialog';
-import {TiffImportDialog} from './TiffImportDialog';
-import {AvifImportDialog} from './AvifImportDialog';
-import type {RefineEdgeProgress} from '../core/matting';
-import {PreflightDialog} from './PreflightDialog';
+import { BrushSymmetryDialog } from "./BrushSymmetryDialog";
+import { pointerPenTilt } from "../core/brush-tip";
+import { BrushTipDialog } from "./BrushTipDialog";
+import { BrushTextureDialog } from "./BrushTextureDialog";
+import { useBrushTexturePreview } from "./hooks/useBrushTexturePreview";
+import { BrushPresetsDialog } from "./BrushPresetsDialog";
+import { PressureCurveDialog } from "./PressureCurveDialog";
+import { SvgImportDialog } from "./SvgImportDialog";
+import { TiffImportDialog } from "./TiffImportDialog";
+import { AvifImportDialog } from "./AvifImportDialog";
+import type { RefineEdgeProgress } from "../core/matting";
+import { PreflightDialog } from "./PreflightDialog";
 import { CanvasCursor } from "./CanvasCursor";
 import { ColorRangeDialog } from "./ColorRangeDialog";
 import { SelectionModifyDialog } from "./SelectionModifyDialog";
-import { VectorBooleanDialog } from './VectorBooleanDialog';
-import { SubjectSelectionProgress } from './SubjectSelectionProgress';
-import type { SelectionModificationProgress } from '../core/selection-modification';
+import { VectorBooleanDialog } from "./VectorBooleanDialog";
+import { SubjectSelectionProgress } from "./SubjectSelectionProgress";
+import type { SelectionModificationProgress } from "../core/selection-modification";
 import type { SelectionModificationOptions } from "../core/selection-modification";
 import { PanelResizeHandle } from "./PanelResizeHandle";
 import { usePanelLayout } from "./hooks/usePanelLayout";
-import {FontManagerDialog} from './FontManagerDialog';
-import type {Document as EditorDocument} from '../dom';
+import { FontManagerDialog } from "./FontManagerDialog";
+import type { Document as EditorDocument } from "../dom";
 import { ShortcutHints } from "./ShortcutHints";
 import {
   readShortcutBindings,
@@ -55,8 +74,8 @@ import { useDocumentViewport } from "./hooks/useDocumentViewport";
 import { DocumentTabBar } from "./DocumentTabBar";
 import { flushSync } from "react-dom";
 import { WorkspaceCommandPalette } from "./WorkspaceCommandPalette";
-import {RecentFilesDialog,RecentFilesButton} from "./RecentFilesDialog";
-import type {RecentKind} from "../workspace/recent-files";
+import { RecentFilesDialog, RecentFilesButton } from "./RecentFilesDialog";
+import type { RecentKind } from "../workspace/recent-files";
 import {
   useCallback,
   useEffect,
@@ -76,7 +95,13 @@ import {
   X,
 } from "lucide-react";
 import { EditorApplication } from "../editor";
-import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, SmartObjectLayer } from "../dom";
+import {
+  AdjustmentLayer,
+  LayerGroup,
+  PaintLayer,
+  RasterLayer,
+  SmartObjectLayer,
+} from "../dom";
 import {
   defaultCurvesAdjustment,
   defaultHslAdjustment,
@@ -90,7 +115,7 @@ import {
   defaultToneAdjustment,
 } from "../core/adjustments";
 import { execute } from "../core/commands";
-import{GesturePreviews,samePreviewSelection}from'./gesture-previews';
+import { GesturePreviews, samePreviewSelection } from "./gesture-previews";
 import type { LayerMaskData } from "../core/masks";
 import type { EditorCommand, LayerPatch } from "../core/commands";
 import { allLayers, findLayer, findParent, isLocked } from "../core/model";
@@ -121,17 +146,17 @@ import { GenerateAssetDialog } from "./GenerateAssetDialog";
 import { RecipeDialog } from "./RecipeDialog";
 import { BatchRunnerDialog } from "./BatchRunnerDialog";
 import { ColorProfileDialog } from "./ColorProfileDialog";
-import {PhotoshopImportDialog} from "./PhotoshopImportDialog";
+import { PhotoshopImportDialog } from "./PhotoshopImportDialog";
 import { RefineEdgeDialog } from "./RefineEdgeDialog";
-import {iccTarget} from '../core/color/profile-source';
+import { iccTarget } from "../core/color/profile-source";
 import type { GenerationCandidate } from "../ai/jobs/types";
 import { ScriptPanel } from "./ScriptPanel";
 import { PluginPanel } from "./PluginPanel";
 import { ToolOptions } from "./ToolOptions";
 import { TypographyPanel, TextProperties } from "./TypographyPanel";
 import { ShortcutDialog } from "./ShortcutDialog";
-import {WorkspaceDock} from "./WorkspaceDock";
-import {WorkspaceLayoutDialog} from "./WorkspaceLayoutDialog";
+import { WorkspaceDock } from "./WorkspaceDock";
+import { WorkspaceLayoutDialog } from "./WorkspaceLayoutDialog";
 import { TopBar } from "./TopBar";
 import { ToolRail } from "./ToolRail";
 import { LayersPanel } from "./LayersPanel";
@@ -178,22 +203,31 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor.recovery.getSnapshot,
   );
   const [showRecovery, setShowRecovery] = useState(false);
-  const [showPreflight,setShowPreflight]=useState(false);
+  const [showPreflight, setShowPreflight] = useState(false);
   const backendState = useSyncExternalStore(
     editor.renderer.subscribeBackend,
     editor.renderer.getBackendSnapshot,
   );
   const [preview, updatePreview] = useState<EditorCommand | null>(null);
   const [gesturePreviews] = useState(() => new GesturePreviews());
-  const setPreview = useCallback((command:EditorCommand|null) => {
-    gesturePreviews.publish(command,{owner:dom,source:state.document,selection:state.selectedIds,gesture:gesture.current});
-    updatePreview(command);
-  },[gesturePreviews,dom,state.document,state.selectedIds]);
+  const setPreview = useCallback(
+    (command: EditorCommand | null) => {
+      gesturePreviews.publish(command, {
+        owner: dom,
+        source: state.document,
+        selection: state.selectedIds,
+        gesture: gesture.current,
+      });
+      updatePreview(command);
+    },
+    [gesturePreviews, dom, state.document, state.selectedIds],
+  );
   const [tool, setTool] = useState<Tool>("move");
   const [guidesVisible, setGuidesVisible] = useState(true);
   const [snapEnabled, setSnapEnabled] = useState(false);
   const [snapArtwork, setSnapArtwork] = useState(false);
-  const [spacingHints,setSpacingHints]=useState(true),[snapSpacing,setSnapSpacing]=useState(false);
+  const [spacingHints, setSpacingHints] = useState(true),
+    [snapSpacing, setSnapSpacing] = useState(false);
   const [snapGuides, setSnapGuides] = useState<{ x?: number; y?: number }>({});
   useEffect(() => {
     if (!preview) setSnapGuides({});
@@ -207,33 +241,74 @@ export function App({ editor }: { editor: EditorApplication }) {
       ? filterMaskTarget.filterMask?.kind
       : undefined;
   useEffect(() => {
-    if(editor.document!==dom||dom.getSnapshot().selectedId!==state.selectedId)return;
+    if (
+      editor.document !== dom ||
+      dom.getSnapshot().selectedId !== state.selectedId
+    )
+      return;
     setMoveTarget("layer");
-    if(editor.tools.hasCurrentWetGesture)return;
+    if (editor.tools.hasCurrentWetGesture) return;
     editor.tools.configure({ paintTarget: "layer", penEditTarget: "layer" });
   }, [editor, dom, state.selectedId, selectedMaskKind, selectedFilterMaskKind]);
   useEffect(() => {
-    if (editor.tools.drawingMaskContour || editor.tools.drawingPolygonLasso || editor.tools.drawingQuickSelection || editor.tools.crop.active)
+    if (
+      editor.tools.drawingMaskContour ||
+      editor.tools.drawingPolygonLasso ||
+      editor.tools.drawingQuickSelection ||
+      editor.tools.crop.active
+    )
       editor.tools.cancel();
   }, [editor, dom, state.revision]);
-  const toolSizes = useRef({ brush: 24, pencil: 1, eraser: 24, smudge:24, mixer:24 });
+  const toolSizes = useRef({
+    brush: 24,
+    pencil: 1,
+    eraser: 24,
+    smudge: 24,
+    mixer: 24,
+  });
   const toolState = useSyncExternalStore(
     editor.tools.subscribe,
     editor.tools.getUiSnapshot,
   );
-  useEffect(()=>{if(toolState.error)setError(toolState.error);},[toolState.error]);
-  useEffect(()=>{if(!editor.tools.canUseTool(tool)){editor.tools.cancel();setTool('move');setPreview(null);}},[editor,dom,state.revision,tool,toolState]);
+  useEffect(() => {
+    if (toolState.error) setError(toolState.error);
+  }, [toolState.error]);
+  useEffect(() => {
+    if (!editor.tools.canUseTool(tool)) {
+      editor.tools.cancel();
+      setTool("move");
+      setPreview(null);
+    }
+  }, [editor, dom, state.revision, tool, toolState]);
   const [customCursors, setCustomCursors] = useState(() => {
-    try { return localStorage.getItem("luma.custom-cursors.v1") !== "false"; } catch { return true; }
+    try {
+      return localStorage.getItem("luma.custom-cursors.v1") !== "false";
+    } catch {
+      return true;
+    }
   });
-  useEffect(() => { try { localStorage.setItem("luma.custom-cursors.v1", String(customCursors)); } catch { /* Session-only preference. */ } }, [customCursors]);
+  useEffect(() => {
+    try {
+      localStorage.setItem("luma.custom-cursors.v1", String(customCursors));
+    } catch {
+      /* Session-only preference. */
+    }
+  }, [customCursors]);
   const [cursorStore] = useState(() => {
     let point: Point | null = null;
     const listeners = new Set<() => void>();
     return {
       getSnapshot: () => point,
-      subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
-      set: (next: Point | null) => { point = next; listeners.forEach(listener => listener()); },
+      subscribe: (listener: () => void) => {
+        listeners.add(listener);
+        return () => {
+          listeners.delete(listener);
+        };
+      },
+      set: (next: Point | null) => {
+        point = next;
+        listeners.forEach((listener) => listener());
+      },
     };
   });
   const pendingCursor = useRef<Point | null>(null);
@@ -262,23 +337,31 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [error, setError] = useState<string | null>(null);
   const panelLayout = usePanelLayout(setError);
   const [showPalette, setShowPalette] = useState(false);
-  const [recentRequest,setRecentRequest]=useState<{id?:string}|null>(null);
+  const [recentRequest, setRecentRequest] = useState<{ id?: string } | null>(
+    null,
+  );
   const [showHelp, setShowHelp] = useState(false);
-  const [showWorkspaceLayout,setShowWorkspaceLayout]=useState(false);
-  const [fontManagerOwner,setFontManagerOwner]=useState<EditorDocument|null>(null);
-  const [showChatGptConnection,setShowChatGptConnection]=useState(false);
-  const [accountClient]=useState(()=>new AccountClient());
-  const [showAccount,setShowAccount]=useState(false);
-  const [showArtworkLibrary,setShowArtworkLibrary]=useState(false);
-  const [showHistoryInspector,setShowHistoryInspector]=useState(false);
-  const [showColorPalettes,setShowColorPalettes]=useState(false);
-  const [colorPaletteRequest,setColorPaletteRequest]=useState<PalettePickerRequest|null>(null);
-  const [showPressureCurve,setShowPressureCurve]=useState(false);
-  const [showBrushTip,setShowBrushTip]=useState(false);
-  const [showBrushTexture,setShowBrushTexture]=useState(false);
-  const texturePreview=useBrushTexturePreview(editor.brushTextureSource,toolState.settings.texture,editor.renderer.processor);
-  const [showBrushSymmetry,setShowBrushSymmetry]=useState(false);
-  const [showBrushPresets,setShowBrushPresets]=useState(false);
+  const [showWorkspaceLayout, setShowWorkspaceLayout] = useState(false);
+  const [fontManagerOwner, setFontManagerOwner] =
+    useState<EditorDocument | null>(null);
+  const [showChatGptConnection, setShowChatGptConnection] = useState(false);
+  const [accountClient] = useState(() => new AccountClient());
+  const [showAccount, setShowAccount] = useState(false);
+  const [showArtworkLibrary, setShowArtworkLibrary] = useState(false);
+  const [showHistoryInspector, setShowHistoryInspector] = useState(false);
+  const [showColorPalettes, setShowColorPalettes] = useState(false);
+  const [colorPaletteRequest, setColorPaletteRequest] =
+    useState<PalettePickerRequest | null>(null);
+  const [showPressureCurve, setShowPressureCurve] = useState(false);
+  const [showBrushTip, setShowBrushTip] = useState(false);
+  const [showBrushTexture, setShowBrushTexture] = useState(false);
+  const texturePreview = useBrushTexturePreview(
+    editor.brushTextureSource,
+    toolState.settings.texture,
+    editor.renderer.processor,
+  );
+  const [showBrushSymmetry, setShowBrushSymmetry] = useState(false);
+  const [showBrushPresets, setShowBrushPresets] = useState(false);
   const [shortcutPreferences, setShortcutPreferences] = useState<{
     bindings: ShortcutOverrides;
     error?: string;
@@ -292,32 +375,42 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showScripts, setShowScripts] = useState(false);
   const [showPlugins, setShowPlugins] = useState(false);
   const [showImageSizeDialog, setShowImageSizeDialog] = useState(false);
-  const [frequencySource,setFrequencySource]=useState<string|null>(null);
+  const [frequencySource, setFrequencySource] = useState<string | null>(null);
   const [showArtboardDialog, setShowArtboardDialog] = useState(false);
   const [showCropDialog, setShowCropDialog] = useState(false);
-  const [selectionModification, setSelectionModification] = useState<SelectionModificationOptions['operation'] | null>(null);
-  const [showColorRange,setShowColorRange]=useState(false);
-  const [showVectorBoolean,setShowVectorBoolean]=useState(false);
-  const [subjectProgress,setSubjectProgress]=useState<SelectionModificationProgress|null>(null);
-  const subjectAbort=useRef<AbortController|null>(null);
-  const [mattingProgress,setMattingProgress]=useState<RefineEdgeProgress|null>(null);
-  const mattingAbort=useRef<AbortController|null>(null);
-  useEffect(()=>()=>mattingAbort.current?.abort(),[]);
-  useEffect(()=>()=>subjectAbort.current?.abort(),[]);
+  const [selectionModification, setSelectionModification] = useState<
+    SelectionModificationOptions["operation"] | null
+  >(null);
+  const [showColorRange, setShowColorRange] = useState(false);
+  const [showVectorBoolean, setShowVectorBoolean] = useState(false);
+  const [subjectProgress, setSubjectProgress] =
+    useState<SelectionModificationProgress | null>(null);
+  const subjectAbort = useRef<AbortController | null>(null);
+  const [mattingProgress, setMattingProgress] =
+    useState<RefineEdgeProgress | null>(null);
+  const mattingAbort = useRef<AbortController | null>(null);
+  useEffect(() => () => mattingAbort.current?.abort(), []);
+  useEffect(() => () => subjectAbort.current?.abort(), []);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [showRecipeDialog, setShowRecipeDialog] = useState(false);
-  const [recipeRecordingOptions,setRecipeRecordingOptions]=useState({name:'Recorded Action',autoParameterizeTone:true});
+  const [recipeRecordingOptions, setRecipeRecordingOptions] = useState({
+    name: "Recorded Action",
+    autoParameterizeTone: true,
+  });
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [showRefineEdgeDialog, setShowRefineEdgeDialog] = useState(false);
-  const [svgFile,setSvgFile]=useState<File|null>(null);
-  const [tiffFile,setTiffFile]=useState<File|null>(null);
-  const [rawFile,setRawFile]=useState<File|null>(null);
-  const [rawLayer,setRawLayer]=useState<SmartObjectLayer|null>(null);
-  const [avifFile,setAvifFile]=useState<File|null>(null);
-  const [photoshopFile,setPhotoshopFile]=useState<{file:File;id:number}|null>(null);
-  const photoshopRequest=useRef(0);
+  const [svgFile, setSvgFile] = useState<File | null>(null);
+  const [tiffFile, setTiffFile] = useState<File | null>(null);
+  const [rawFile, setRawFile] = useState<File | null>(null);
+  const [rawLayer, setRawLayer] = useState<SmartObjectLayer | null>(null);
+  const [avifFile, setAvifFile] = useState<File | null>(null);
+  const [photoshopFile, setPhotoshopFile] = useState<{
+    file: File;
+    id: number;
+  } | null>(null);
+  const photoshopRequest = useRef(0);
   const [generateDialogModality, setGenerateDialogModality] = useState<
     "text-to-image" | "cutout" | "texture" | "masked-edit"
   >("text-to-image");
@@ -338,14 +431,24 @@ export function App({ editor }: { editor: EditorApplication }) {
   const viewport = useRef<HTMLDivElement>(null);
   const displayHost = useRef<HTMLDivElement>(null);
   const capturedPointer = useRef<number | null>(null);
-  const [perspectiveTarget,setPerspectiveTarget]=useState<{owner:EditorDocument;id:string}|null>(null);
-  const [perspectiveIssue,setPerspectiveIssue]=useState<string|null>(null);
+  const [perspectiveTarget, setPerspectiveTarget] = useState<{
+    owner: EditorDocument;
+    id: string;
+  } | null>(null);
+  const [perspectiveIssue, setPerspectiveIssue] = useState<string | null>(null);
   const gesture = useRef<
     | null
     | { kind: "pan"; startX: number; startY: number; x: number; y: number }
     | {
-        kind:'perspective';id:string;selection:readonly string[];revision:number;documentId:string;
-        source:PerspectiveCornerDrag;patch:LayerPatch;changed:boolean;valid:boolean;
+        kind: "perspective";
+        id: string;
+        selection: readonly string[];
+        revision: number;
+        documentId: string;
+        source: PerspectiveCornerDrag;
+        patch: LayerPatch;
+        changed: boolean;
+        valid: boolean;
       }
     | {
         kind: "move";
@@ -392,107 +495,214 @@ export function App({ editor }: { editor: EditorApplication }) {
         layerY: number;
         layerWidth: number;
         layerHeight: number;
-        layerContentBounds?: import('../core/drawing').Rect;
+        layerContentBounds?: import("../core/drawing").Rect;
         layerFontSize?: number;
         layerText?: string;
         layerFontFamily?: string;
         layerLineHeight?: number;
-        layerTextStyle?: import('./utils').ResizeDragState['layerTextStyle'];
+        layerTextStyle?: import("./utils").ResizeDragState["layerTextStyle"];
         id: string;
         layerKind: "raster" | "text";
         patch: LayerPatch;
       }
   >(null);
-  const pointerDocument=useRef<EditorDocument|null>(null);
-  useEffect(()=>editor.chatGpt.setInteractionGuard(sessionId=>editor.recoverySessionId===sessionId&&(capturedPointer.current!==null||gesture.current!==null||editor.tools.getSnapshot().drawing)),[editor]);
-  const gestureIsCurrent=useCallback((drag:NonNullable<typeof gesture.current>)=>{
-    if(pointerDocument.current!==dom||editor.document!==dom)return false;
-    if(drag.kind==='pan')return true;
-    const snapshot=dom.getSnapshot();
-    return drag.documentId===dom.id&&drag.revision===snapshot.revision&&samePreviewSelection(drag.selection,snapshot.selectedIds);
-  },[dom,editor]);
-  useLayoutEffect(()=>{
+  const pointerDocument = useRef<EditorDocument | null>(null);
+  useEffect(
+    () =>
+      editor.chatGpt.setInteractionGuard(
+        (sessionId) =>
+          editor.recoverySessionId === sessionId &&
+          (capturedPointer.current !== null ||
+            gesture.current !== null ||
+            editor.tools.getSnapshot().drawing),
+      ),
+    [editor],
+  );
+  const gestureIsCurrent = useCallback(
+    (drag: NonNullable<typeof gesture.current>) => {
+      if (pointerDocument.current !== dom || editor.document !== dom)
+        return false;
+      if (drag.kind === "pan") return true;
+      const snapshot = dom.getSnapshot();
+      return (
+        drag.documentId === dom.id &&
+        drag.revision === snapshot.revision &&
+        samePreviewSelection(drag.selection, snapshot.selectedIds)
+      );
+    },
+    [dom, editor],
+  );
+  useLayoutEffect(() => {
     // Selection changes do not advance document revision. Observe them at
     // publication so a change-and-restore in one task cannot revive a gesture.
-    const cancelStale=()=>{
-      const drag=gesture.current;if(!drag||gestureIsCurrent(drag))return;
-      gesture.current=null;pointerDocument.current=null;
-      setPreview(null);setPerspectiveIssue(null);setSnapGuides({});setResizingCursor(null);
+    const cancelStale = () => {
+      const drag = gesture.current;
+      if (!drag || gestureIsCurrent(drag)) return;
+      gesture.current = null;
+      pointerDocument.current = null;
+      setPreview(null);
+      setPerspectiveIssue(null);
+      setSnapGuides({});
+      setResizingCursor(null);
     };
-    const stopDocument=dom.subscribe(cancelStale),stopEditor=editor.subscribe(cancelStale);
+    const stopDocument = dom.subscribe(cancelStale),
+      stopEditor = editor.subscribe(cancelStale);
     cancelStale();
-    return()=>{stopDocument();stopEditor();};
-  },[dom,editor,gestureIsCurrent,setPreview]);
+    return () => {
+      stopDocument();
+      stopEditor();
+    };
+  }, [dom, editor, gestureIsCurrent, setPreview]);
 
   const activePreview = toolState.preview ?? preview;
-  const wetPreview=toolState.wetPreview?.isCurrent()?toolState.wetPreview:null;
+  const wetPreview = toolState.wetPreview?.isCurrent()
+    ? toolState.wetPreview
+    : null;
   const viewDocument = useMemo(() => {
-    if(wetPreview)return wetPreview.document;
+    if (wetPreview) return wetPreview.document;
     if (!activePreview) return state.document;
-    if(activePreview===preview){
-      const captured=gesturePreviews.getSnapshot();
-      return captured?.command===preview&&captured.owner===dom&&captured.source===state.document&&samePreviewSelection(captured.selection,state.selectedIds)
-        ?captured.document:state.document;
+    if (activePreview === preview) {
+      const captured = gesturePreviews.getSnapshot();
+      return captured?.command === preview &&
+        captured.owner === dom &&
+        captured.source === state.document &&
+        samePreviewSelection(captured.selection, state.selectedIds)
+        ? captured.document
+        : state.document;
     }
     try {
       return execute(state.document, activePreview);
     } catch {
       return state.document;
     }
-  }, [state.document,state.selectedIds,dom,activePreview,preview,gesturePreviews,wetPreview]);
-  const spacingGuides=useMemo(()=>{
-    const drag=gesture.current;
-    if(!spacingHints||!guidesVisible||!preview||tool!=='move'||!drag||drag.kind!=='move'||drag.mask||drag.bypass||pointerDocument.current!==dom||drag.revision!==state.revision)return[];
-    const final=unionBounds((drag.members??[{id:drag.id}]).flatMap(member=>{const bounds=layerBounds(viewDocument,member.id);return bounds?[bounds]:[];}));
-    return final?measureSpacing(final,drag.snapTargets??[],snapEnabled&&snapArtwork&&snapSpacing?drag.spacingMatches:[]):[];
-  },[spacingHints,guidesVisible,preview,tool,dom,state.revision,viewDocument,snapEnabled,snapArtwork,snapSpacing]);
+  }, [
+    state.document,
+    state.selectedIds,
+    dom,
+    activePreview,
+    preview,
+    gesturePreviews,
+    wetPreview,
+  ]);
+  const spacingGuides = useMemo(() => {
+    const drag = gesture.current;
+    if (
+      !spacingHints ||
+      !guidesVisible ||
+      !preview ||
+      tool !== "move" ||
+      !drag ||
+      drag.kind !== "move" ||
+      drag.mask ||
+      drag.bypass ||
+      pointerDocument.current !== dom ||
+      drag.revision !== state.revision
+    )
+      return [];
+    const final = unionBounds(
+      (drag.members ?? [{ id: drag.id }]).flatMap((member) => {
+        const bounds = layerBounds(viewDocument, member.id);
+        return bounds ? [bounds] : [];
+      }),
+    );
+    return final
+      ? measureSpacing(
+          final,
+          drag.snapTargets ?? [],
+          snapEnabled && snapArtwork && snapSpacing ? drag.spacingMatches : [],
+        )
+      : [];
+  }, [
+    spacingHints,
+    guidesVisible,
+    preview,
+    tool,
+    dom,
+    state.revision,
+    viewDocument,
+    snapEnabled,
+    snapArtwork,
+    snapSpacing,
+  ]);
   const selected = findLayer(viewDocument, state.selectedId);
   const movingMask =
     tool === "move" && moveTarget === "mask" && !!selected?.mask;
   const selectedObject = dom.getLayer(state.selectedId);
   const locked = selected ? isLocked(viewDocument, selected.id) : false;
-  const modalOpen=showPreflight ||
-      showRecovery ||
-      showPalette ||
-      !!recentRequest ||
-      showHelp ||
-      showWorkspaceLayout ||
-      !!fontManagerOwner ||
-      showChatGptConnection ||
-      showAccount ||
-      showHistoryInspector || showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
-      showPressureCurve ||
-      showBrushTip ||
-      showBrushTexture ||
-      showBrushSymmetry ||
-      showBrushPresets ||
-      showScripts ||
-      showPlugins ||
-      showImageSizeDialog ||
-      showArtboardDialog ||
-      showCropDialog ||
-      !!selectionModification ||
-      showColorRange ||
-      showVectorBoolean ||
-      !!subjectProgress ||
-      !!mattingProgress ||
-      showExportDialog ||
-      showGenerateDialog ||
-      showRecipeDialog ||
-      showBatchDialog ||
-      showColorDialog ||
-      showRefineEdgeDialog ||
-      !!photoshopFile;
-  const perspectiveEligible=!!selected&&selected.visible&&!locked&&state.selectedIds.length===1&&(selected.kind==='raster'||selected.kind==='smart-object');
-  const canEditPerspective=perspectiveEligible&&!busy;
-  const perspectiveEditing=perspectiveEligible&&!modalOpen&&!svgFile&&!tiffFile&&!rawFile&&!rawLayer&&!avifFile&&tool==='move'&&!movingMask&&perspectiveTarget?.owner===dom&&perspectiveTarget.id===selected?.id;
-  useLayoutEffect(()=>{
-    if(busy&&gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;setPreview(null);setPerspectiveIssue(null);}
-    if(perspectiveTarget&&!perspectiveEditing){
-      if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;setPreview(null);}
-      setPerspectiveTarget(null);setPerspectiveIssue(null);
+  const modalOpen =
+    showPreflight ||
+    showRecovery ||
+    showPalette ||
+    !!recentRequest ||
+    showHelp ||
+    showWorkspaceLayout ||
+    !!fontManagerOwner ||
+    showChatGptConnection ||
+    showAccount ||
+    showHistoryInspector ||
+    showArtworkLibrary ||
+    showColorPalettes ||
+    !!colorPaletteRequest ||
+    showPressureCurve ||
+    showBrushTip ||
+    showBrushTexture ||
+    showBrushSymmetry ||
+    showBrushPresets ||
+    showScripts ||
+    showPlugins ||
+    showImageSizeDialog ||
+    showArtboardDialog ||
+    showCropDialog ||
+    !!selectionModification ||
+    showColorRange ||
+    showVectorBoolean ||
+    !!subjectProgress ||
+    !!mattingProgress ||
+    showExportDialog ||
+    showGenerateDialog ||
+    showRecipeDialog ||
+    showBatchDialog ||
+    showColorDialog ||
+    showRefineEdgeDialog ||
+    !!photoshopFile;
+  const perspectiveEligible =
+    !!selected &&
+    selected.visible &&
+    !locked &&
+    state.selectedIds.length === 1 &&
+    (selected.kind === "raster" || selected.kind === "smart-object");
+  const canEditPerspective = perspectiveEligible && !busy;
+  const perspectiveEditing =
+    perspectiveEligible &&
+    !modalOpen &&
+    !svgFile &&
+    !tiffFile &&
+    !rawFile &&
+    !rawLayer &&
+    !avifFile &&
+    tool === "move" &&
+    !movingMask &&
+    perspectiveTarget?.owner === dom &&
+    perspectiveTarget.id === selected?.id;
+  useLayoutEffect(() => {
+    if (busy && gesture.current?.kind === "perspective") {
+      gesture.current = null;
+      pointerDocument.current = null;
+      capturedPointer.current = null;
+      setPreview(null);
+      setPerspectiveIssue(null);
     }
-  },[perspectiveTarget,perspectiveEditing,busy,setPreview]);
+    if (perspectiveTarget && !perspectiveEditing) {
+      if (gesture.current?.kind === "perspective") {
+        gesture.current = null;
+        pointerDocument.current = null;
+        capturedPointer.current = null;
+        setPreview(null);
+      }
+      setPerspectiveTarget(null);
+      setPerspectiveIssue(null);
+    }
+  }, [perspectiveTarget, perspectiveEditing, busy, setPreview]);
   const isResizable = selected
     ? !locked && (selected.kind === "raster" || selected.kind === "text")
     : false;
@@ -522,7 +732,13 @@ export function App({ editor }: { editor: EditorApplication }) {
       (selected.kind !== "raster" && selected.kind !== "text")
     )
       return undefined;
-    const content = selected.kind === 'raster' && selected.erasures?.some(entry => entry.stroke.kind === 'wet' && entry.stroke.opacity > 0) ? localBounds(selected)! : { x: 0, y: 0, width: selected.width, height: selected.height };
+    const content =
+      selected.kind === "raster" &&
+      selected.erasures?.some(
+        (entry) => entry.stroke.kind === "wet" && entry.stroke.opacity > 0,
+      )
+        ? localBounds(selected)!
+        : { x: 0, y: 0, width: selected.width, height: selected.height };
     const corner = layerTransform(viewDocument, selected.id)!.point({
       x: content.x + (right ? content.width : 0),
       y: content.y + (bottom ? content.height : 0),
@@ -544,28 +760,58 @@ export function App({ editor }: { editor: EditorApplication }) {
     );
   }, [viewDocument.width, viewDocument.height, viewportSize, zoom, pan]);
 
-  const penOverlayWindow=useMemo(()=>computePenOverlayWindow(
-    {width:viewDocument.width,height:viewDocument.height},viewportSize,pan,zoom,
-  ),[viewDocument.width,viewDocument.height,viewportSize,zoom,pan]);
+  const penOverlayWindow = useMemo(
+    () =>
+      computePenOverlayWindow(
+        { width: viewDocument.width, height: viewDocument.height },
+        viewportSize,
+        pan,
+        zoom,
+      ),
+    [viewDocument.width, viewDocument.height, viewportSize, zoom, pan],
+  );
 
   function chooseTool(next: Tool) {
-    if(!editor.tools.canChooseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
-    if(dom.precision==='float32'&&(next==='brush'||next==='pencil')&&!editor.tools.canUseTool(next))editor.tools.configure({paintTarget:'mask-hide'});
-    if(dom.precision==='float32'&&(next==='smudge'||next==='mixer')&&!editor.tools.canUseTool(next))editor.tools.configure({paintTarget:'layer'});
-    if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
-    if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;}
-    setPerspectiveTarget(null);setPerspectiveIssue(null);
+    if (!editor.tools.canChooseTool(next)) {
+      notify(editor.tools.toolUnavailableReason(next)!);
+      return;
+    }
+    if (
+      dom.precision === "float32" &&
+      (next === "brush" || next === "pencil") &&
+      !editor.tools.canUseTool(next)
+    )
+      editor.tools.configure({ paintTarget: "mask-hide" });
+    if (
+      dom.precision === "float32" &&
+      (next === "smudge" || next === "mixer") &&
+      !editor.tools.canUseTool(next)
+    )
+      editor.tools.configure({ paintTarget: "layer" });
+    if (!editor.tools.canUseTool(next)) {
+      notify(editor.tools.toolUnavailableReason(next)!);
+      return;
+    }
+    if (gesture.current?.kind === "perspective") {
+      gesture.current = null;
+      pointerDocument.current = null;
+      capturedPointer.current = null;
+    }
+    setPerspectiveTarget(null);
+    setPerspectiveIssue(null);
     editor.tools.cancel();
     setPreview(null);
     updateCursor(null);
-    if(tool === "smudge" || tool === "mixer")toolSizes.current[tool]=editor.tools.getSnapshot().settings.size;
+    if (tool === "smudge" || tool === "mixer")
+      toolSizes.current[tool] = editor.tools.getSnapshot().settings.size;
     else if (tool === "pencil")
       toolSizes.current.pencil = editor.tools.getSnapshot().settings.size;
     else if (tool === "eraser")
       toolSizes.current.eraser = editor.tools.getSnapshot().settings.size;
     else if (["brush", "clone", "heal", "dodge", "burn"].includes(tool))
       toolSizes.current.brush = editor.tools.getSnapshot().settings.size;
-    if(next === "smudge" || next === "mixer")editor.tools.configure({size:toolSizes.current[next]});
+    if (next === "smudge" || next === "mixer")
+      editor.tools.configure({ size: toolSizes.current[next] });
     else if (next === "pencil")
       editor.tools.configure({ size: toolSizes.current.pencil });
     else if (next === "eraser")
@@ -596,7 +842,9 @@ export function App({ editor }: { editor: EditorApplication }) {
       );
     }
   }
-  const pendingCopy = useRef<{ pastes: number; cancelled: boolean } | null>(null);
+  const pendingCopy = useRef<{ pastes: number; cancelled: boolean } | null>(
+    null,
+  );
   async function task(
     action: () => Promise<void>,
     { preserveError = false }: { preserveError?: boolean } = {},
@@ -639,8 +887,10 @@ export function App({ editor }: { editor: EditorApplication }) {
     setZoom((current) => {
       const next = current * factor;
       // No arbitrary magnification ceiling; reject overflow and underflow.
-      return next > 0 && Number.isFinite(next * Math.max(dom.width, dom.height, 100))
-        ? next : current;
+      return next > 0 &&
+        Number.isFinite(next * Math.max(dom.width, dom.height, 100))
+        ? next
+        : current;
     });
   }
   function clearPreview() {
@@ -660,15 +910,32 @@ export function App({ editor }: { editor: EditorApplication }) {
   function save() {
     const name = dom.name;
     void task(async () => {
-      const blob=await editor.saveProject(),filename=`${fileName(name)}.luma`;
-      download(blob,filename);
-      editor.recentFiles.remember(new File([blob],filename,{type:blob.type}),'project');
+      const blob = await editor.saveProject(),
+        filename = `${fileName(name)}.luma`;
+      download(blob, filename);
+      editor.recentFiles.remember(
+        new File([blob], filename, { type: blob.type }),
+        "project",
+      );
       notify("Project downloaded. Keep this file to reopen your edits.");
     });
   }
   function exportPng() {
     void task(async () => {
-      download((await editor.export({format:"png",color:editor.colorSettings.output.profile==='srgb'&&editor.colorSettings.output.intent==='relative-colorimetric'&&!editor.colorSettings.output.blackPointCompensation?undefined:editor.colorSettings.output})).blob, `${fileName(dom.name)}.png`);
+      download(
+        (
+          await editor.export({
+            format: "png",
+            color:
+              editor.colorSettings.output.profile === "srgb" &&
+              editor.colorSettings.output.intent === "relative-colorimetric" &&
+              !editor.colorSettings.output.blackPointCompensation
+                ? undefined
+                : editor.colorSettings.output,
+          })
+        ).blob,
+        `${fileName(dom.name)}.png`,
+      );
       notify("PNG exported");
     });
   }
@@ -712,54 +979,91 @@ export function App({ editor }: { editor: EditorApplication }) {
     });
   }
   function addAdjustmentLayer(
-    kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye" = "curves",
+    kind:
+      | "curves"
+      | "levels"
+      | "tone"
+      | "hsl"
+      | "color-balance"
+      | "vibrance"
+      | "gradient-map"
+      | "white-balance"
+      | "lut"
+      | "red-eye" = "curves",
   ) {
     attempt(() => {
-      if(dom.precision==='float32'&&!['tone','curves','levels','white-balance','hsl','color-balance','vibrance','gradient-map','lut'].includes(kind))throw new Error('Float editing currently supports Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup.');
+      if (
+        dom.precision === "float32" &&
+        ![
+          "tone",
+          "curves",
+          "levels",
+          "white-balance",
+          "hsl",
+          "color-balance",
+          "vibrance",
+          "gradient-map",
+          "lut",
+        ].includes(kind)
+      )
+        throw new Error(
+          "Float editing currently supports Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup.",
+        );
       const pupilSelection = kind === "red-eye" ? dom.selection : null;
-      if (kind === "red-eye" && (!pupilSelection || !pupilSelection.toJSON().regions.length))
-        throw new Error("Select the red pupils first, then add a Red Eye adjustment.");
+      if (
+        kind === "red-eye" &&
+        (!pupilSelection || !pupilSelection.toJSON().regions.length)
+      )
+        throw new Error(
+          "Select the red pupils first, then add a Red Eye adjustment.",
+        );
       const existingNames = new Set(
         allLayers(dom.toJSON().children).map((l) => l.name),
       );
       const prefix =
-        kind === "red-eye" ? "Red Eye" : kind === "curves"
-          ? "Curves"
-          : kind === "levels"
-            ? "Levels"
-            : kind === "hsl"
-              ? "HSL"
-              : kind === "color-balance"
-                ? "Color Balance"
-                : kind === "vibrance"
-                  ? "Vibrance"
-                  : kind === "gradient-map"
-                    ? "Gradient Map"
-                    : kind === "white-balance"
-                      ? "White Balance"
-                      : kind === "lut" ? "Color Lookup"
-              : "Tone";
+        kind === "red-eye"
+          ? "Red Eye"
+          : kind === "curves"
+            ? "Curves"
+            : kind === "levels"
+              ? "Levels"
+              : kind === "hsl"
+                ? "HSL"
+                : kind === "color-balance"
+                  ? "Color Balance"
+                  : kind === "vibrance"
+                    ? "Vibrance"
+                    : kind === "gradient-map"
+                      ? "Gradient Map"
+                      : kind === "white-balance"
+                        ? "White Balance"
+                        : kind === "lut"
+                          ? "Color Lookup"
+                          : "Tone";
       let index = 1;
       while (existingNames.has(`${prefix} ${index}`)) index++;
       const layer = new AdjustmentLayer({
         name: `${prefix} ${index}`,
         adjustment:
-          kind === "red-eye" ? defaultRedEyeAdjustment() : kind === "curves"
-            ? defaultCurvesAdjustment()
-            : kind === "levels"
-              ? defaultLevelsAdjustment()
-              : kind === "hsl"
-                ? defaultHslAdjustment()
-                : kind === "color-balance"
-                  ? defaultColorBalanceAdjustment()
-                  : kind === "vibrance"
-                    ? defaultVibranceAdjustment()
-                    : kind === "gradient-map"
-                      ? defaultGradientMapAdjustment()
-                      : kind === "white-balance"
-                        ? defaultWhiteBalanceAdjustment()
-                        : kind === "lut" ? defaultLutAdjustment()
-                : defaultToneAdjustment(),
+          kind === "red-eye"
+            ? defaultRedEyeAdjustment()
+            : kind === "curves"
+              ? defaultCurvesAdjustment()
+              : kind === "levels"
+                ? defaultLevelsAdjustment()
+                : kind === "hsl"
+                  ? defaultHslAdjustment()
+                  : kind === "color-balance"
+                    ? defaultColorBalanceAdjustment()
+                    : kind === "vibrance"
+                      ? defaultVibranceAdjustment()
+                      : kind === "gradient-map"
+                        ? defaultGradientMapAdjustment()
+                        : kind === "white-balance"
+                          ? defaultWhiteBalanceAdjustment()
+                          : kind === "lut"
+                            ? defaultLutAdjustment()
+                            : defaultToneAdjustment(),
       });
       clearPreview();
       dom.transaction(`New ${prefix.toLowerCase()} adjustment layer`, () => {
@@ -796,66 +1100,247 @@ export function App({ editor }: { editor: EditorApplication }) {
       attempt(() => editor.tools.nudgeMaskPoint(x, y));
       return;
     }
-    if(tool==='pen'&&selected?.kind==='text'&&selected.textPath){
-      attempt(()=>editor.tools.nudgeTextPathPoint(x,y));
+    if (tool === "pen" && selected?.kind === "text" && selected.textPath) {
+      attempt(() => editor.tools.nudgeTextPathPoint(x, y));
       return;
     }
     selectedAction((layer) => {
       if (movingMask && layer.mask) {
-        layer.translateMask(x,y);
+        layer.translateMask(x, y);
       } else {
-        const delta = parentSpaceDelta(dom.getSnapshot().document, layer.id, { x, y });
+        const delta = parentSpaceDelta(dom.getSnapshot().document, layer.id, {
+          x,
+          y,
+        });
         layer.update({ x: layer.x + delta.x, y: layer.y + delta.y });
       }
     });
   }
 
-  function cancelWorkspaceGesture(){
-    editor.tools.cancel();clearPreview();setSpacePan(false);panelLayout.cancel();
-    if(pendingCopy.current)pendingCopy.current.cancelled=true;
-    capturedPointer.current=null;gesture.current=null;pointerDocument.current=null;setResizingCursor(null);
+  function cancelWorkspaceGesture() {
+    editor.tools.cancel();
+    clearPreview();
+    setSpacePan(false);
+    panelLayout.cancel();
+    if (pendingCopy.current) pendingCopy.current.cancelled = true;
+    capturedPointer.current = null;
+    gesture.current = null;
+    pointerDocument.current = null;
+    setResizingCursor(null);
   }
-  function togglePerspectiveEditing(){
-    cancelWorkspaceGesture();setPerspectiveIssue(null);
-    if(perspectiveEditing){setPerspectiveTarget(null);return;}
-    if(!canEditPerspective||!selected)return;
-    chooseTool('move');setMoveTarget('layer');setPerspectiveTarget({owner:dom,id:selected.id});
+  function togglePerspectiveEditing() {
+    cancelWorkspaceGesture();
+    setPerspectiveIssue(null);
+    if (perspectiveEditing) {
+      setPerspectiveTarget(null);
+      return;
+    }
+    if (!canEditPerspective || !selected) return;
+    chooseTool("move");
+    setMoveTarget("layer");
+    setPerspectiveTarget({ owner: dom, id: selected.id });
   }
-  function nudgePerspectiveCorner(index:number,dx:number,dy:number){
-    if(busy||!perspectiveEditing||!selected||capturedPointer.current!==null||editor.document!==dom)return;
-    const current=dom.getSnapshot();
-    if(current.document!==state.document||!samePreviewSelection(current.selectedIds,state.selectedIds))return;
-    attempt(()=>{
-      const target=dom.getLayer(selected.id);if(!(target instanceof RasterLayer||target instanceof SmartObjectLayer))return;
-      const drag=new PerspectiveCornerDrag(target.perspective,target.width,target.height,layerTransform(current.document,target.id)!,index,{x:0,y:0});
-      target.perspective=drag.at({x:dx,y:dy});setPerspectiveIssue(null);
+  function nudgePerspectiveCorner(index: number, dx: number, dy: number) {
+    if (
+      busy ||
+      !perspectiveEditing ||
+      !selected ||
+      capturedPointer.current !== null ||
+      editor.document !== dom
+    )
+      return;
+    const current = dom.getSnapshot();
+    if (
+      current.document !== state.document ||
+      !samePreviewSelection(current.selectedIds, state.selectedIds)
+    )
+      return;
+    attempt(() => {
+      const target = dom.getLayer(selected.id);
+      if (!(
+        target instanceof RasterLayer || target instanceof SmartObjectLayer
+      ))
+        return;
+      const drag = new PerspectiveCornerDrag(
+        target.perspective,
+        target.width,
+        target.height,
+        layerTransform(current.document, target.id)!,
+        index,
+        { x: 0, y: 0 },
+      );
+      target.perspective = drag.at({ x: dx, y: dy });
+      setPerspectiveIssue(null);
     });
   }
-  function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
+  function openWorkspaceLayout() {
+    cancelWorkspaceGesture();
+    setShowWorkspaceLayout(true);
+  }
 
-  const[chosenAlignmentKey,setChosenAlignmentKey]=useState<{owner:EditorDocument;selection:string;id:string}|null>(null);
-  const alignmentSelection=JSON.stringify(dom.getSnapshot().selectedIds),alignmentRoots=dom.layerSelection.rootLayers;
-  useEffect(()=>setChosenAlignmentKey(null),[dom,alignmentSelection]);
-  const requestedKey=chosenAlignmentKey?.owner===dom&&chosenAlignmentKey.selection===alignmentSelection?chosenAlignmentKey.id:dom.selectedLayer?.id;
-  const alignmentKey=alignmentRoots.find(layer=>layer.id===requestedKey)??alignmentRoots.find(layer=>layer.id===dom.selectedLayer?.id)??alignmentRoots[0]??null;
-  const alignLayers=(alignment:LayerAlignment,target:AlignmentTarget)=>{cancelWorkspaceGesture();attempt(()=>dom.layerSelection.align(alignment,target.type==='layer'?dom.getLayer(target.id)!:target.type));};
+  const [chosenAlignmentKey, setChosenAlignmentKey] = useState<{
+    owner: EditorDocument;
+    selection: string;
+    id: string;
+  } | null>(null);
+  const alignmentSelection = JSON.stringify(dom.getSnapshot().selectedIds),
+    alignmentRoots = dom.layerSelection.rootLayers;
+  useEffect(() => setChosenAlignmentKey(null), [dom, alignmentSelection]);
+  const requestedKey =
+    chosenAlignmentKey?.owner === dom &&
+    chosenAlignmentKey.selection === alignmentSelection
+      ? chosenAlignmentKey.id
+      : dom.selectedLayer?.id;
+  const alignmentKey =
+    alignmentRoots.find((layer) => layer.id === requestedKey) ??
+    alignmentRoots.find((layer) => layer.id === dom.selectedLayer?.id) ??
+    alignmentRoots[0] ??
+    null;
+  const alignLayers = (alignment: LayerAlignment, target: AlignmentTarget) => {
+    cancelWorkspaceGesture();
+    attempt(() =>
+      dom.layerSelection.align(
+        alignment,
+        target.type === "layer" ? dom.getLayer(target.id)! : target.type,
+      ),
+    );
+  };
   const defaultShortcuts = new ShortcutRegistry([
-    {id:'edit-perspective',label:'Edit perspective corners',category:'Layout',keys:SHORTCUT_BINDINGS['edit-perspective'],enabled:()=>canEditPerspective,run:togglePerspectiveEditing},
-    ...(['selection','canvas','layer']as const).flatMap(type=>layerAlignmentSchema.options.map(alignment=>({
-      id:`align-${alignment}-${type}`,label:`Align ${alignment} to ${type==='layer'?'key object':type}`,category:'Layout',keys:SHORTCUT_BINDINGS[`align-${alignment}-${type}`],
-      description:type==='layer'?'Keep the active selected root stationary':'Align selected-root geometry in canvas space',
-      enabled:()=>{try{const roots=dom.layerSelection.rootLayers,key=alignmentKey;if(!roots.length||type==='layer'&&(!key||!roots.some(layer=>layer.id===key.id)||roots.length<2))return false;alignmentCommands(dom._read(),dom.selectedLayers.map(layer=>layer.id),alignment,type==='layer'?{type,id:key!.id}:{type});return true;}catch{return false;}},
-      run:()=>{const key=alignmentKey;if(type==='layer'&&!key)return;alignLayers(alignment,type==='layer'?{type,id:key!.id}:{type});},
-    }))),
-    {id:'account',label:'Account',category:'Workspace',keys:SHORTCUT_BINDINGS.account,allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowAccount(true);}},
-    {id:'chatgpt-connection',label:'ChatGPT connection',category:'Workspace',keys:SHORTCUT_BINDINGS['chatgpt-connection'],allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}},
-    {id:"color-palettes",label:"Color palettes",keys:SHORTCUT_BINDINGS["color-palettes"],run:()=>{cancelWorkspaceGesture();setShowColorPalettes(true);}},
-    {id:"history-inspector",label:"Inspect history",keys:SHORTCUT_BINDINGS["history-inspector"],run:()=>{cancelWorkspaceGesture();setShowHistoryInspector(true);}},
-    {id:"artwork-library",label:"Artwork library",keys:SHORTCUT_BINDINGS["artwork-library"],run:()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}},
-    {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
-    {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
-    {id:'font-manager',label:'Document fonts',category:'Text',keys:SHORTCUT_BINDINGS['font-manager'],run:()=>{cancelWorkspaceGesture();setFontManagerOwner(dom);}},
-    {id:"workspace-reset",label:"Restore default workspace arrangement",keys:SHORTCUT_BINDINGS["workspace-reset"],run:()=>attempt(()=>{panelLayout.restore();cancelWorkspaceGesture();})},
+    {
+      id: "edit-perspective",
+      label: "Edit perspective corners",
+      category: "Layout",
+      keys: SHORTCUT_BINDINGS["edit-perspective"],
+      enabled: () => canEditPerspective,
+      run: togglePerspectiveEditing,
+    },
+    ...(["selection", "canvas", "layer"] as const).flatMap((type) =>
+      layerAlignmentSchema.options.map((alignment) => ({
+        id: `align-${alignment}-${type}`,
+        label: `Align ${alignment} to ${type === "layer" ? "key object" : type}`,
+        category: "Layout",
+        keys: SHORTCUT_BINDINGS[`align-${alignment}-${type}`],
+        description:
+          type === "layer"
+            ? "Keep the active selected root stationary"
+            : "Align selected-root geometry in canvas space",
+        enabled: () => {
+          try {
+            const roots = dom.layerSelection.rootLayers,
+              key = alignmentKey;
+            if (
+              !roots.length ||
+              (type === "layer" &&
+                (!key ||
+                  !roots.some((layer) => layer.id === key.id) ||
+                  roots.length < 2))
+            )
+              return false;
+            alignmentCommands(
+              dom._read(),
+              dom.selectedLayers.map((layer) => layer.id),
+              alignment,
+              type === "layer" ? { type, id: key!.id } : { type },
+            );
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        run: () => {
+          const key = alignmentKey;
+          if (type === "layer" && !key) return;
+          alignLayers(
+            alignment,
+            type === "layer" ? { type, id: key!.id } : { type },
+          );
+        },
+      })),
+    ),
+    {
+      id: "account",
+      label: "Account",
+      category: "Workspace",
+      keys: SHORTCUT_BINDINGS.account,
+      allowWhileBusy: true,
+      run: () => {
+        cancelWorkspaceGesture();
+        setShowAccount(true);
+      },
+    },
+    {
+      id: "chatgpt-connection",
+      label: "ChatGPT connection",
+      category: "Workspace",
+      keys: SHORTCUT_BINDINGS["chatgpt-connection"],
+      allowWhileBusy: true,
+      run: () => {
+        cancelWorkspaceGesture();
+        setShowChatGptConnection(true);
+      },
+    },
+    {
+      id: "color-palettes",
+      label: "Color palettes",
+      keys: SHORTCUT_BINDINGS["color-palettes"],
+      run: () => {
+        cancelWorkspaceGesture();
+        setShowColorPalettes(true);
+      },
+    },
+    {
+      id: "history-inspector",
+      label: "Inspect history",
+      keys: SHORTCUT_BINDINGS["history-inspector"],
+      run: () => {
+        cancelWorkspaceGesture();
+        setShowHistoryInspector(true);
+      },
+    },
+    {
+      id: "artwork-library",
+      label: "Artwork library",
+      keys: SHORTCUT_BINDINGS["artwork-library"],
+      run: () => {
+        cancelWorkspaceGesture();
+        setShowArtworkLibrary(true);
+      },
+    },
+    {
+      id: "recent-files",
+      label: "Recent files",
+      keys: SHORTCUT_BINDINGS["recent-files"],
+      run: () => {
+        cancelWorkspaceGesture();
+        setRecentRequest({});
+      },
+    },
+    {
+      id: "workspace-layout",
+      label: "Workspace layout",
+      keys: SHORTCUT_BINDINGS["workspace-layout"],
+      run: openWorkspaceLayout,
+    },
+    {
+      id: "font-manager",
+      label: "Document fonts",
+      category: "Text",
+      keys: SHORTCUT_BINDINGS["font-manager"],
+      run: () => {
+        cancelWorkspaceGesture();
+        setFontManagerOwner(dom);
+      },
+    },
+    {
+      id: "workspace-reset",
+      label: "Restore default workspace arrangement",
+      keys: SHORTCUT_BINDINGS["workspace-reset"],
+      run: () =>
+        attempt(() => {
+          panelLayout.restore();
+          cancelWorkspaceGesture();
+        }),
+    },
     {
       id: "command-palette",
       label: "Find a command",
@@ -880,17 +1365,26 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["hand"],
       run: () => chooseTool("hand"),
     },
-    ...(["smudge","mixer"] as const).map(key=>({id:key,label:key==="smudge"?"Smudge tool":"Mixer brush",keys:[],enabled:()=>editor.tools.canChooseTool(key),run:()=>chooseTool(key)})),
+    ...(["smudge", "mixer"] as const).map((key) => ({
+      id: key,
+      label: key === "smudge" ? "Smudge tool" : "Mixer brush",
+      keys: [],
+      enabled: () => editor.tools.canChooseTool(key),
+      run: () => chooseTool(key),
+    })),
     ...TOOL_SHORTCUTS.map(([key, label, binding]) => ({
       id: key,
       label,
       keys: [binding],
-      enabled:()=>editor.tools.canChooseTool(key),
+      enabled: () => editor.tools.canChooseTool(key),
       run: () => chooseTool(key),
     })),
     {
-      id: "copy-pixels", label: "Copy selected image pixels", keys: SHORTCUT_BINDINGS["copy-pixels"],
-      enabled: () => !busy && !pendingCopy.current && selected?.kind === "raster",
+      id: "copy-pixels",
+      label: "Copy selected image pixels",
+      keys: SHORTCUT_BINDINGS["copy-pixels"],
+      enabled: () =>
+        !busy && !pendingCopy.current && selected?.kind === "raster",
       run: () => {
         editor.tools.cancel();
         void task(async () => {
@@ -901,8 +1395,13 @@ export function App({ editor }: { editor: EditorApplication }) {
           try {
             await editor.pixels.copy();
             while (job.pastes > 0 && !job.cancelled) {
-              if (editor.document !== document || document.getSnapshot().revision !== revision)
-                throw new Error("The document changed before queued paste. Try again.");
+              if (
+                editor.document !== document ||
+                document.getSnapshot().revision !== revision
+              )
+                throw new Error(
+                  "The document changed before queued paste. Try again.",
+                );
               job.pastes--;
               await editor.pixels.paste();
               revision = document.getSnapshot().revision;
@@ -914,28 +1413,51 @@ export function App({ editor }: { editor: EditorApplication }) {
       },
     },
     {
-      id: "paste-pixels", label: "Paste pixels as new layer", keys: SHORTCUT_BINDINGS["paste-pixels"],
+      id: "paste-pixels",
+      label: "Paste pixels as new layer",
+      keys: SHORTCUT_BINDINGS["paste-pixels"],
       allowWhileBusy: true,
-      enabled: () => pendingCopy.current ? !pendingCopy.current.cancelled : !busy && editor.pixels.canPaste,
+      enabled: () =>
+        pendingCopy.current
+          ? !pendingCopy.current.cancelled
+          : !busy && editor.pixels.canPaste,
       run: () => {
-        if (pendingCopy.current) { pendingCopy.current.pastes++; return; }
+        if (pendingCopy.current) {
+          pendingCopy.current.pastes++;
+          return;
+        }
         editor.tools.cancel();
         void task(() => editor.pixels.paste());
       },
     },
     {
-      id: "image-size", label: "Image size…", keys: SHORTCUT_BINDINGS["image-size"],
+      id: "image-size",
+      label: "Image size…",
+      keys: SHORTCUT_BINDINGS["image-size"],
       enabled: () => !busy,
-      run: () => { editor.tools.cancel(); setShowImageSizeDialog(true); },
+      run: () => {
+        editor.tools.cancel();
+        setShowImageSizeDialog(true);
+      },
     },
     {
-      id: "canvas-cursors", label: customCursors ? "Use system canvas cursors" : "Use custom canvas cursors", keys: [],
-      run: () => setCustomCursors(value => !value),
+      id: "canvas-cursors",
+      label: customCursors
+        ? "Use system canvas cursors"
+        : "Use custom canvas cursors",
+      keys: [],
+      run: () => setCustomCursors((value) => !value),
     },
     {
-      id: "load-transparency", label: "Load layer transparency as selection", keys: [],
-      enabled: () => !busy && (selected?.kind === "raster" || selected?.kind === "paint"),
-      run: () => { editor.tools.cancel(); void task(() => editor.pixels.loadTransparency()); },
+      id: "load-transparency",
+      label: "Load layer transparency as selection",
+      keys: [],
+      enabled: () =>
+        !busy && (selected?.kind === "raster" || selected?.kind === "paint"),
+      run: () => {
+        editor.tools.cancel();
+        void task(() => editor.pixels.loadTransparency());
+      },
     },
     {
       id: "select-all",
@@ -943,13 +1465,37 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["select-all"],
       run: () => attempt(() => dom.selectAll()),
     },
-    ...(["expand", "contract", "feather"] as const).map(operation => ({
-      id: `selection-${operation}`, label: `${operation[0].toUpperCase()+operation.slice(1)} selection…`, keys: [],
+    ...(["expand", "contract", "feather"] as const).map((operation) => ({
+      id: `selection-${operation}`,
+      label: `${operation[0].toUpperCase() + operation.slice(1)} selection…`,
+      keys: [],
       enabled: () => !busy && !!state.document.selection,
-      run: () => { editor.tools.cancel(); setSelectionModification(operation); },
+      run: () => {
+        editor.tools.cancel();
+        setSelectionModification(operation);
+      },
     })),
-    {id:'select-color-range',label:'Select Color Range…',keys:[],enabled:()=>!busy,run:()=>{editor.tools.cancel();setShowColorRange(true);}},
-    {id:'save-alpha-channel',label:'Save selection as alpha channel',keys:[],enabled:()=>!busy&&!!state.document.selection&&dom.alphaChannels.length<64,run:()=>attempt(()=>{dom.alphaChannels.capture(`Alpha ${dom.alphaChannels.length+1}`);})},
+    {
+      id: "select-color-range",
+      label: "Select Color Range…",
+      keys: [],
+      enabled: () => !busy,
+      run: () => {
+        editor.tools.cancel();
+        setShowColorRange(true);
+      },
+    },
+    {
+      id: "save-alpha-channel",
+      label: "Save selection as alpha channel",
+      keys: [],
+      enabled: () =>
+        !busy && !!state.document.selection && dom.alphaChannels.length < 64,
+      run: () =>
+        attempt(() => {
+          dom.alphaChannels.capture(`Alpha ${dom.alphaChannels.length + 1}`);
+        }),
+    },
     {
       id: "deselect",
       label: "Deselect pixels",
@@ -958,7 +1504,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
     {
       id: "finish-path",
-      label: tool === "crop" ? "Apply crop" : tool === "lasso" ? "Finish polygon selection" : "Finish path",
+      label:
+        tool === "crop"
+          ? "Apply crop"
+          : tool === "lasso"
+            ? "Finish polygon selection"
+            : "Finish path",
       keys: SHORTCUT_BINDINGS["finish-path"],
       run: () =>
         attempt(() =>
@@ -966,7 +1517,8 @@ export function App({ editor }: { editor: EditorApplication }) {
             ? editor.tools.crop.apply()
             : editor.tools.finishPath(),
         ),
-      enabled: () => tool === "pen" || tool === "crop" || editor.tools.drawingPolygonLasso,
+      enabled: () =>
+        tool === "pen" || tool === "crop" || editor.tools.drawingPolygonLasso,
     },
     ...([-1, 1] as const).map((direction) => ({
       id: `brush-size-${direction}`,
@@ -1019,11 +1571,40 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["export"],
       run: () => setShowExportDialog(true),
     },
-    {id:'design-checks',label:'Design checks',keys:[],run:()=>setShowPreflight(true),enabled:()=>!busy},
-    {id:'clipping-mask',label:selected?.clipped?'Release clipping mask':'Create clipping mask',keys:[],
-      run:()=>selectedAction(layer=>{layer.clipped=!layer.clipped;}),
-      enabled:()=>!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
-    {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>!busy},
+    {
+      id: "design-checks",
+      label: "Design checks",
+      keys: [],
+      run: () => setShowPreflight(true),
+      enabled: () => !busy,
+    },
+    {
+      id: "clipping-mask",
+      label: selected?.clipped
+        ? "Release clipping mask"
+        : "Create clipping mask",
+      keys: [],
+      run: () =>
+        selectedAction((layer) => {
+          layer.clipped = !layer.clipped;
+        }),
+      enabled: () =>
+        !busy &&
+        !locked &&
+        !!selected &&
+        (!!selected.clipped ||
+          !!clippingBaseFor(state.document.children, selected.id)),
+    },
+    {
+      id: "combine-vector-paths",
+      label: "Combine vector paths…",
+      keys: [],
+      run: () => {
+        editor.tools.cancel();
+        setShowVectorBoolean(true);
+      },
+      enabled: () => !busy,
+    },
     {
       id: "undo",
       label: "Undo",
@@ -1056,7 +1637,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
     {
       id: "delete",
-      label: tool === "crop" ? "Clear crop frame" : editor.tools.drawingPolygonLasso ? "Remove last polygon corner" : "Delete layer",
+      label:
+        tool === "crop"
+          ? "Clear crop frame"
+          : editor.tools.drawingPolygonLasso
+            ? "Remove last polygon corner"
+            : "Delete layer",
       keys: SHORTCUT_BINDINGS["delete"],
       run: () =>
         attempt(() => {
@@ -1064,30 +1650,95 @@ export function App({ editor }: { editor: EditorApplication }) {
             editor.tools.crop.start(null);
             return;
           }
-          if ((tool === "pen" || editor.tools.drawingPolygonLasso) && editor.tools.removeLastAnchor()) return;
-          if (state.document.selection && (selectedObject instanceof PaintLayer || selectedObject instanceof RasterLayer))
+          if (
+            (tool === "pen" || editor.tools.drawingPolygonLasso) &&
+            editor.tools.removeLastAnchor()
+          )
+            return;
+          if (
+            state.document.selection &&
+            (selectedObject instanceof PaintLayer ||
+              selectedObject instanceof RasterLayer)
+          )
             editor.tools.fillSelection(true);
           else if (dom.selectedLayers.length > 1) dom.layerSelection.remove();
           else selectedObject?.remove();
         }),
-      enabled: () => tool === "crop" || editor.tools.drawingPolygonLasso || (!!selected && !locked),
+      enabled: () =>
+        tool === "crop" ||
+        editor.tools.drawingPolygonLasso ||
+        (!!selected && !locked),
     },
-    {id:"develop-raw",label:"Develop RAW…",keys:[],enabled:()=>!busy&&!locked&&selectedObject instanceof SmartObjectLayer&&!!selectedObject.rawDevelopment,run:()=>{if(selectedObject instanceof SmartObjectLayer)setRawLayer(selectedObject);}},
-    {id:"frequency-separation",label:"Frequency separation…",keys:[],enabled:()=>dom.precision!=='float32'&&!busy&&!locked&&selectedObject instanceof RasterLayer,
-      run:()=>{if(selectedObject instanceof RasterLayer){editor.tools.cancel();setFrequencySource(selectedObject.id);}}},
-    ...(["curves", "levels", "tone", "hsl", "color-balance", "vibrance", "gradient-map", "white-balance", "lut", "red-eye"] as const).map((kind) => ({
+    {
+      id: "develop-raw",
+      label: "Develop RAW…",
+      keys: [],
+      enabled: () =>
+        !busy &&
+        !locked &&
+        selectedObject instanceof SmartObjectLayer &&
+        !!selectedObject.rawDevelopment,
+      run: () => {
+        if (selectedObject instanceof SmartObjectLayer)
+          setRawLayer(selectedObject);
+      },
+    },
+    {
+      id: "frequency-separation",
+      label: "Frequency separation…",
+      keys: [],
+      enabled: () =>
+        dom.precision !== "float32" &&
+        !busy &&
+        !locked &&
+        selectedObject instanceof RasterLayer,
+      run: () => {
+        if (selectedObject instanceof RasterLayer) {
+          editor.tools.cancel();
+          setFrequencySource(selectedObject.id);
+        }
+      },
+    },
+    ...(
+      [
+        "curves",
+        "levels",
+        "tone",
+        "hsl",
+        "color-balance",
+        "vibrance",
+        "gradient-map",
+        "white-balance",
+        "lut",
+        "red-eye",
+      ] as const
+    ).map((kind) => ({
       id: `new-${kind}-adjustment`,
       label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind === "color-balance" ? "Color Balance" : kind === "gradient-map" ? "Gradient Map" : kind === "white-balance" ? "White Balance" : kind === "lut" ? "Color Lookup (LUT)" : kind === "red-eye" ? "Red Eye" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
       keys: [],
       run: () => addAdjustmentLayer(kind),
-      enabled: () => !busy && !locked && (dom.precision!=='float32'||['tone','curves','levels','white-balance','hsl','color-balance','vibrance','gradient-map','lut'].includes(kind)),
+      enabled: () =>
+        !busy &&
+        !locked &&
+        (dom.precision !== "float32" ||
+          [
+            "tone",
+            "curves",
+            "levels",
+            "white-balance",
+            "hsl",
+            "color-balance",
+            "vibrance",
+            "gradient-map",
+            "lut",
+          ].includes(kind)),
     })),
     {
       id: "new-layer",
       label: "New layer",
       keys: SHORTCUT_BINDINGS["new-layer"],
       run: addLayer,
-      enabled:()=>!busy,
+      enabled: () => !busy,
     },
     {
       id: "group",
@@ -1334,7 +1985,8 @@ export function App({ editor }: { editor: EditorApplication }) {
       setPerspectiveIssue(null);
       if (pendingCopy.current) pendingCopy.current.cancelled = true;
       capturedPointer.current = null;
-      gesture.current = null;pointerDocument.current=null;
+      gesture.current = null;
+      pointerDocument.current = null;
       setResizingCursor(null);
     },
   });
@@ -1342,35 +1994,62 @@ export function App({ editor }: { editor: EditorApplication }) {
   // Unrelated status renders must not invalidate stationary cursor geometry.
   // Read current tool data at draw time, including preferences changed before
   // React flushes; these dependencies invalidate real geometry/viewport edits.
-  const cursorAdapters = useMemo(() => ({
-    footprint(tool: Tool, tilt?: ReturnType<typeof pointerPenTilt>) {
-      return editor.tools.brushCursorAxes(tool, tilt, !!editor.tools.getSnapshot().settings.texture);
-    },
-    copies(tool: Tool, event: PointerEvent) {
-      if (!editor.tools.getSnapshot().settings.symmetry) return null;
-      return editor.tools.brushCursorCopies(tool, toCanvasPoint(event), event.pointerType === 'pen' ? pointerPenTilt(event) : undefined);
-    },
-  }), [editor, dom, state.document, state.selectedIds, toolState.settings, toolState.drawing, zoom, pan, viewportSize, panelLayout.widths.layers, panelLayout.widths.inspector, viewDocument.width, viewDocument.height]);
+  const cursorAdapters = useMemo(
+    () => ({
+      footprint(tool: Tool, tilt?: ReturnType<typeof pointerPenTilt>) {
+        return editor.tools.brushCursorAxes(
+          tool,
+          tilt,
+          !!editor.tools.getSnapshot().settings.texture,
+        );
+      },
+      copies(tool: Tool, event: PointerEvent) {
+        if (!editor.tools.getSnapshot().settings.symmetry) return null;
+        return editor.tools.brushCursorCopies(
+          tool,
+          toCanvasPoint(event),
+          event.pointerType === "pen" ? pointerPenTilt(event) : undefined,
+        );
+      },
+    }),
+    [
+      editor,
+      dom,
+      state.document,
+      state.selectedIds,
+      toolState.settings,
+      toolState.drawing,
+      zoom,
+      pan,
+      viewportSize,
+      panelLayout.widths.layers,
+      panelLayout.widths.inspector,
+      viewDocument.width,
+      viewDocument.height,
+    ],
+  );
 
-  const { rendering, renderError, renderBackend, paintedRegion, proofStatus } = useCanvasRenderer({
-    colorProof:editor.colorSettings.proof,
-    editor,
-    viewDocument,
-    assets:wetPreview?.assets??assets,
-    renderRegion,
-    zoom,
-    wetPreview,
-    paintPreview: editor.tools.getSnapshot().paintPreview,
-    previewGesture: preview && activePreview === preview ? gesture.current : null,
-    gestureRef: gesture,
-    gesturePreviews,
-    backendState,
-    displayHost,
-    onCleanupCursor: () => {
-      if (cursorFrame.current !== null)
-        cancelAnimationFrame(cursorFrame.current);
-    },
-  });
+  const { rendering, renderError, renderBackend, paintedRegion, proofStatus } =
+    useCanvasRenderer({
+      colorProof: editor.colorSettings.proof,
+      editor,
+      viewDocument,
+      assets: wetPreview?.assets ?? assets,
+      renderRegion,
+      zoom,
+      wetPreview,
+      paintPreview: editor.tools.getSnapshot().paintPreview,
+      previewGesture:
+        preview && activePreview === preview ? gesture.current : null,
+      gestureRef: gesture,
+      gesturePreviews,
+      backendState,
+      displayHost,
+      onCleanupCursor: () => {
+        if (cursorFrame.current !== null)
+          cancelAnimationFrame(cursorFrame.current);
+      },
+    });
 
   function toCanvasPoint(event: { clientX: number; clientY: number }) {
     const rect = displayHost.current!.parentElement!.getBoundingClientRect();
@@ -1380,7 +2059,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (contextMenu) setContextMenu(null);
     if (
       busy ||
-      editor.document!==dom ||
+      editor.document !== dom ||
       capturedPointer.current !== null ||
       ![0, 1].includes(event.button) ||
       ((event.target as HTMLElement).closest("button") &&
@@ -1390,11 +2069,14 @@ export function App({ editor }: { editor: EditorApplication }) {
     )
       return;
     event.preventDefault();
-    const perspectiveHandle=(event.target as HTMLElement).closest<HTMLElement>('[data-perspective-corner]');
-    if(perspectiveHandle)perspectiveHandle.focus({preventScroll:true});else event.currentTarget.focus();
+    const perspectiveHandle = (
+      event.target as HTMLElement
+    ).closest<HTMLElement>("[data-perspective-corner]");
+    if (perspectiveHandle) perspectiveHandle.focus({ preventScroll: true });
+    else event.currentTarget.focus();
     event.currentTarget.setPointerCapture(event.pointerId);
     capturedPointer.current = event.pointerId;
-    pointerDocument.current=dom;
+    pointerDocument.current = dom;
     if (tool === "hand" || spacePan || event.button === 1) {
       gesture.current = {
         kind: "pan",
@@ -1406,18 +2088,48 @@ export function App({ editor }: { editor: EditorApplication }) {
       return;
     }
     // A transform starts from the model represented by this committed UI.
-    if(tool==='move'&&(dom.getSnapshot().document!==state.document||!samePreviewSelection(dom.getSnapshot().selectedIds,state.selectedIds)))return;
-    if(perspectiveHandle&&perspectiveEditing&&selected&&(selected.kind==='raster'||selected.kind==='smart-object')){
-      const index=Number(perspectiveHandle.dataset.perspectiveCorner),value=selected.perspective?new PerspectiveTransform(selected.perspective):null;
-      gesture.current={kind:'perspective',id:selected.id,selection:state.selectedIds,revision:state.revision,documentId:dom.id,
-        source:new PerspectiveCornerDrag(value,selected.width,selected.height,layerTransform(state.document,selected.id)!,index,toCanvasPoint(event)),patch:{},changed:false,valid:true};
-      setPerspectiveIssue(null);return;
+    if (
+      tool === "move" &&
+      (dom.getSnapshot().document !== state.document ||
+        !samePreviewSelection(dom.getSnapshot().selectedIds, state.selectedIds))
+    )
+      return;
+    if (
+      perspectiveHandle &&
+      perspectiveEditing &&
+      selected &&
+      (selected.kind === "raster" || selected.kind === "smart-object")
+    ) {
+      const index = Number(perspectiveHandle.dataset.perspectiveCorner),
+        value = selected.perspective
+          ? new PerspectiveTransform(selected.perspective)
+          : null;
+      gesture.current = {
+        kind: "perspective",
+        id: selected.id,
+        selection: state.selectedIds,
+        revision: state.revision,
+        documentId: dom.id,
+        source: new PerspectiveCornerDrag(
+          value,
+          selected.width,
+          selected.height,
+          layerTransform(state.document, selected.id)!,
+          index,
+          toCanvasPoint(event),
+        ),
+        patch: {},
+        changed: false,
+        valid: true,
+      };
+      setPerspectiveIssue(null);
+      return;
     }
     if (movingMask) {
       if (selected?.mask && !locked)
         gesture.current = {
           kind: "move",
-          selection:dom.getSnapshot().selectedIds,
+          selection: dom.getSnapshot().selectedIds,
           revision: dom.getSnapshot().revision,
           documentId: dom.id,
           mask: selected.mask,
@@ -1455,7 +2167,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       });
       gesture.current = {
         kind: "rotate",
-        selection:dom.getSnapshot().selectedIds,
+        selection: dom.getSnapshot().selectedIds,
         center,
         members,
         startAngle: Math.atan2(point.y - center.y, point.x - center.x),
@@ -1493,7 +2205,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         });
         gesture.current = {
           kind: "scale-selection",
-          selection:dom.getSnapshot().selectedIds,
+          selection: dom.getSnapshot().selectedIds,
           center,
           members,
           startAngle: 0,
@@ -1519,7 +2231,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       ) {
         gesture.current = {
           kind: "resize",
-          selection:dom.getSnapshot().selectedIds,
+          selection: dom.getSnapshot().selectedIds,
           revision: dom.getSnapshot().revision,
           documentId: dom.id,
           handle,
@@ -1529,7 +2241,15 @@ export function App({ editor }: { editor: EditorApplication }) {
           layerY: selected.y,
           layerWidth: selected.width,
           layerHeight: selected.height,
-          layerContentBounds: selected.kind === 'raster' && (activePerspective(selected.perspective)||selected.erasures?.some(entry => entry.stroke.kind === 'wet' && entry.stroke.opacity > 0)) ? localBounds(selected) : undefined,
+          layerContentBounds:
+            selected.kind === "raster" &&
+            (activePerspective(selected.perspective) ||
+              selected.erasures?.some(
+                (entry) =>
+                  entry.stroke.kind === "wet" && entry.stroke.opacity > 0,
+              ))
+              ? localBounds(selected)
+              : undefined,
           layerFontSize:
             selected.kind === "text" ? selected.fontSize : undefined,
           layerText: selected.kind === "text" ? selected.text : undefined,
@@ -1537,16 +2257,34 @@ export function App({ editor }: { editor: EditorApplication }) {
             selected.kind === "text" ? selected.fontFamily : undefined,
           layerLineHeight:
             selected.kind === "text" ? selected.lineHeight : undefined,
-          layerTextStyle: selected.kind === 'text' ? {
-            textPath:selected.textPath,textPathOrigin:selected.textPathOrigin,textFrameOrigin:selected.textFrameOrigin,writingMode:selected.writingMode,textOrientation:selected.textOrientation,characterRanges:selected.characterRanges,color:selected.color,align:selected.align,
-            fontSize:selected.fontSize, fontFamily:selected.fontFamily,
-            fontWeight:selected.fontWeight, fontStyle:selected.fontStyle,
-            fontVariantCaps:selected.fontVariantCaps,fontStretch:selected.fontStretch,fontVariationSettings:selected.fontVariationSettings,
-            letterSpacing:selected.letterSpacing, wordSpacing:selected.wordSpacing,
-            fontKerning:selected.fontKerning, direction:selected.direction,
-            wrapWidth:selected.wrapWidth, paragraphSpacing:selected.paragraphSpacing, paragraphJustify:selected.paragraphJustify,
-            firstLineIndent:selected.firstLineIndent,
-          } : undefined,
+          layerTextStyle:
+            selected.kind === "text"
+              ? {
+                  textPath: selected.textPath,
+                  textPathOrigin: selected.textPathOrigin,
+                  textFrameOrigin: selected.textFrameOrigin,
+                  writingMode: selected.writingMode,
+                  textOrientation: selected.textOrientation,
+                  characterRanges: selected.characterRanges,
+                  color: selected.color,
+                  align: selected.align,
+                  fontSize: selected.fontSize,
+                  fontFamily: selected.fontFamily,
+                  fontWeight: selected.fontWeight,
+                  fontStyle: selected.fontStyle,
+                  fontVariantCaps: selected.fontVariantCaps,
+                  fontStretch: selected.fontStretch,
+                  fontVariationSettings: selected.fontVariationSettings,
+                  letterSpacing: selected.letterSpacing,
+                  wordSpacing: selected.wordSpacing,
+                  fontKerning: selected.fontKerning,
+                  direction: selected.direction,
+                  wrapWidth: selected.wrapWidth,
+                  paragraphSpacing: selected.paragraphSpacing,
+                  paragraphJustify: selected.paragraphJustify,
+                  firstLineIndent: selected.firstLineIndent,
+                }
+              : undefined,
           id: selected.id,
           layerKind: selected.kind,
           patch: {},
@@ -1560,13 +2298,26 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (tool !== "move") {
       if (tool === "wand") {
         const settings = editor.tools.getSnapshot().settings;
-        const operation = event.shiftKey && event.altKey ? "intersect" : event.shiftKey ? "add" : event.altKey ? "subtract" : settings.selectionMode;
-        void task(() => editor.pixels.wand(point, { tolerance: settings.wandTolerance, contiguous: settings.wandContiguous, operation }));
+        const operation =
+          event.shiftKey && event.altKey
+            ? "intersect"
+            : event.shiftKey
+              ? "add"
+              : event.altKey
+                ? "subtract"
+                : settings.selectionMode;
+        void task(() =>
+          editor.pixels.wand(point, {
+            tolerance: settings.wandTolerance,
+            contiguous: settings.wandContiguous,
+            operation,
+          }),
+        );
         return;
       }
       if (tool === "text") {
         void task(async () => {
-          await insertEditorText(editor,point);
+          await insertEditorText(editor, point);
           chooseTool("move");
         });
         return;
@@ -1575,7 +2326,20 @@ export function App({ editor }: { editor: EditorApplication }) {
         .closest("[data-crop-handle]")
         ?.getAttribute("data-crop-handle") as CropHandle | undefined;
       attempt(() =>
-        editor.tools.begin(tool, point, modifiers(event,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness)), zoom, cropHandle),
+        editor.tools.begin(
+          tool,
+          point,
+          modifiers(
+            event,
+            !!toolState.settings.pressureCurve,
+            !!(
+              toolState.settings.tip?.tiltAngle ||
+              toolState.settings.tip?.tiltRoundness
+            ),
+          ),
+          zoom,
+          cropHandle,
+        ),
       );
       return;
     }
@@ -1614,7 +2378,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       if (members.some((layer) => isLocked(state.document, layer.id))) return;
       gesture.current = {
         kind: "move",
-        selection:dom.getSnapshot().selectedIds,
+        selection: dom.getSnapshot().selectedIds,
         startX: event.clientX,
         startY: event.clientY,
         id: hitLayer.id,
@@ -1633,7 +2397,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (layer && !isLocked(state.document, layer.id))
       gesture.current = {
         kind: "move",
-        selection:dom.getSnapshot().selectedIds,
+        selection: dom.getSnapshot().selectedIds,
         revision: dom.getSnapshot().revision,
         documentId: dom.id,
         startX: event.clientX,
@@ -1653,18 +2417,48 @@ export function App({ editor }: { editor: EditorApplication }) {
       return;
     const point = toCanvasPoint(event);
     updateCursor(point);
-    if (editor.tools.getSnapshot().drawing || (editor.tools.drawingPolygonLasso && gesture.current?.kind !== "pan")) {
+    if (
+      editor.tools.getSnapshot().drawing ||
+      (editor.tools.drawingPolygonLasso && gesture.current?.kind !== "pan")
+    ) {
       attempt(() => {
         const samples = event.nativeEvent.getCoalescedEvents?.() ?? [];
         for (const sample of samples)
-          editor.tools.move(toCanvasPoint(sample), modifiers(sample,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness)));
-        editor.tools.move(point, modifiers(event,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness)));
+          editor.tools.move(
+            toCanvasPoint(sample),
+            modifiers(
+              sample,
+              !!toolState.settings.pressureCurve,
+              !!(
+                toolState.settings.tip?.tiltAngle ||
+                toolState.settings.tip?.tiltRoundness
+              ),
+            ),
+          );
+        editor.tools.move(
+          point,
+          modifiers(
+            event,
+            !!toolState.settings.pressureCurve,
+            !!(
+              toolState.settings.tip?.tiltAngle ||
+              toolState.settings.tip?.tiltRoundness
+            ),
+          ),
+        );
       });
       return;
     }
     const drag = gesture.current;
     if (!drag) return;
-    if(!gestureIsCurrent(drag)){gesture.current=null;pointerDocument.current=null;setPreview(null);setSnapGuides({});setResizingCursor(null);return;}
+    if (!gestureIsCurrent(drag)) {
+      gesture.current = null;
+      pointerDocument.current = null;
+      setPreview(null);
+      setSnapGuides({});
+      setResizingCursor(null);
+      return;
+    }
     if (drag.kind === "pan") {
       setPan({
         x: drag.x + event.clientX - drag.startX,
@@ -1672,15 +2466,32 @@ export function App({ editor }: { editor: EditorApplication }) {
       });
       return;
     }
-    if(drag.kind==='perspective'){
-      try{
-        const value=drag.source.at(point),before=drag.source.value.corners,after=value.corners;
-        drag.changed=after.some((p,i)=>p.x!==before[i].x||p.y!==before[i].y);
-        drag.patch={perspective:value.toJSON()};
-        setPreview(drag.changed?{type:'layer.update',id:drag.id,patch:drag.patch}:null);
-        drag.valid=!drag.changed||gesturePreviews.getSnapshot()?.valid===true;
-      }catch{drag.valid=false;drag.patch={};setPreview(null);}
-      setPerspectiveIssue(drag.valid?null:'That corner would fold the image or make its content infinite. Move it back before releasing.');
+    if (drag.kind === "perspective") {
+      try {
+        const value = drag.source.at(point),
+          before = drag.source.value.corners,
+          after = value.corners;
+        drag.changed = after.some(
+          (p, i) => p.x !== before[i].x || p.y !== before[i].y,
+        );
+        drag.patch = { perspective: value.toJSON() };
+        setPreview(
+          drag.changed
+            ? { type: "layer.update", id: drag.id, patch: drag.patch }
+            : null,
+        );
+        drag.valid =
+          !drag.changed || gesturePreviews.getSnapshot()?.valid === true;
+      } catch {
+        drag.valid = false;
+        drag.patch = {};
+        setPreview(null);
+      }
+      setPerspectiveIssue(
+        drag.valid
+          ? null
+          : "That corner would fold the image or make its content infinite. Move it back before releasing.",
+      );
       return;
     }
     if (drag.kind === "rotate" || drag.kind === "scale-selection") {
@@ -1746,8 +2557,17 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (drag.kind !== "move") return;
     drag.dx = Math.round((event.clientX - drag.startX) / zoom);
     drag.dy = Math.round((event.clientY - drag.startY) / zoom);
-    setSnapGuides({});drag.bypass=event.altKey;drag.spacingMatches=[];
-    if(!drag.mask&&(spacingHints&&guidesVisible||snapEnabled&&snapArtwork))drag.snapTargets??=artworkSnapBounds(state.document,(drag.members??[{id:drag.id}]).map(member=>member.id));
+    setSnapGuides({});
+    drag.bypass = event.altKey;
+    drag.spacingMatches = [];
+    if (
+      !drag.mask &&
+      ((spacingHints && guidesVisible) || (snapEnabled && snapArtwork))
+    )
+      drag.snapTargets ??= artworkSnapBounds(
+        state.document,
+        (drag.members ?? [{ id: drag.id }]).map((member) => member.id),
+      );
     if (snapEnabled && !event.altKey && !drag.mask) {
       const movingBounds = unionBounds(
         (drag.members ?? [{ id: drag.id }]).flatMap((member) => {
@@ -1762,7 +2582,11 @@ export function App({ editor }: { editor: EditorApplication }) {
               (drag.members ?? [{ id: drag.id }]).map((member) => member.id),
             ))
           : [];
-        let snapped:{x:number;y:number;guides:{x?:number;y?:number}} = snapToCanvas(
+        let snapped: {
+          x: number;
+          y: number;
+          guides: { x?: number; y?: number };
+        } = snapToCanvas(
           movingBounds,
           { x: drag.dx, y: drag.dy },
           dom.width,
@@ -1771,25 +2595,42 @@ export function App({ editor }: { editor: EditorApplication }) {
           artwork,
           guidesVisible ? state.document.guides : [],
         );
-        if(snapArtwork&&snapSpacing){const spacing=snapToSpacing(movingBounds,{x:drag.dx,y:drag.dy},snapped,artwork,6/zoom);snapped=spacing;drag.spacingMatches=spacing.matches;}
+        if (snapArtwork && snapSpacing) {
+          const spacing = snapToSpacing(
+            movingBounds,
+            { x: drag.dx, y: drag.dy },
+            snapped,
+            artwork,
+            6 / zoom,
+          );
+          snapped = spacing;
+          drag.spacingMatches = spacing.matches;
+        }
         drag.dx = snapped.x;
         drag.dy = snapped.y;
         setSnapGuides(snapped.guides);
       }
     }
-    try {setPreview(
-      drag.members
-        ? {
-            type: "transaction",
-            label: "Move selected layers",
-            commands: drag.members.map((member) => ({
-              type: "layer.update",
-              id: member.id,
-              patch: movePatch({ ...member, dx: drag.dx, dy: drag.dy }),
-            })),
-          }
-        : { type: "layer.update", id: drag.id, patch: movePatch(drag) },
-    );}catch(error){gesture.current=null;pointerDocument.current=null;setPreview(null);notify(error instanceof Error?error.message:String(error));}
+    try {
+      setPreview(
+        drag.members
+          ? {
+              type: "transaction",
+              label: "Move selected layers",
+              commands: drag.members.map((member) => ({
+                type: "layer.update",
+                id: member.id,
+                patch: movePatch({ ...member, dx: drag.dx, dy: drag.dy }),
+              })),
+            }
+          : { type: "layer.update", id: drag.id, patch: movePatch(drag) },
+      );
+    } catch (error) {
+      gesture.current = null;
+      pointerDocument.current = null;
+      setPreview(null);
+      notify(error instanceof Error ? error.message : String(error));
+    }
   }
   function movePatch(drag: {
     id: string;
@@ -1802,7 +2643,16 @@ export function App({ editor }: { editor: EditorApplication }) {
     const snapshot = dom.getSnapshot().document;
     let delta = { x: drag.dx, y: drag.dy };
     if (!drag.mask) delta = parentSpaceDelta(snapshot, drag.id, delta);
-    else return {mask:translateMaskData(drag.mask,layerTransform(snapshot,drag.id)!,drag.dx,drag.dy,activePerspective(findLayer(snapshot,drag.id)?.perspective))};
+    else
+      return {
+        mask: translateMaskData(
+          drag.mask,
+          layerTransform(snapshot, drag.id)!,
+          drag.dx,
+          drag.dy,
+          activePerspective(findLayer(snapshot, drag.id)?.perspective),
+        ),
+      };
     const position = {
       x: Math.max(
         -Number.MAX_SAFE_INTEGER,
@@ -1827,18 +2677,49 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (editor.tools.getSnapshot().drawing) {
       // Capture the final endpoint even if pointerup arrives before the next
       // animation frame. Pointer moves have already accumulated all samples.
-      attempt(() => editor.tools.move(toCanvasPoint(event), modifiers(event,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness))));
+      attempt(() =>
+        editor.tools.move(
+          toCanvasPoint(event),
+          modifiers(
+            event,
+            !!toolState.settings.pressureCurve,
+            !!(
+              toolState.settings.tip?.tiltAngle ||
+              toolState.settings.tip?.tiltRoundness
+            ),
+          ),
+        ),
+      );
       void task(() => editor.tools.end());
       return;
     }
-    const drag = gesture.current,current=drag&&gestureIsCurrent(drag);
-    gesture.current = null;pointerDocument.current=null;
+    const drag = gesture.current,
+      current = drag && gestureIsCurrent(drag);
+    gesture.current = null;
+    pointerDocument.current = null;
     setResizingCursor(null);
     setPreview(null);
-    if(!current)return;
-    if(drag?.kind==='perspective'){
-      if(drag.changed&&drag.valid)attempt(()=>{const target=dom.getLayer(drag.id);if(target instanceof RasterLayer||target instanceof SmartObjectLayer)target.perspective=new PerspectiveTransform(drag.patch.perspective!);});
-      else if(!drag.valid){setPerspectiveIssue('Perspective was not applied. Drag a corner to keep the complete image convex and finite.');notify('Perspective was not applied. Keep the corners convex and the complete image finite.');}
+    if (!current) return;
+    if (drag?.kind === "perspective") {
+      if (drag.changed && drag.valid)
+        attempt(() => {
+          const target = dom.getLayer(drag.id);
+          if (
+            target instanceof RasterLayer ||
+            target instanceof SmartObjectLayer
+          )
+            target.perspective = new PerspectiveTransform(
+              drag.patch.perspective!,
+            );
+        });
+      else if (!drag.valid) {
+        setPerspectiveIssue(
+          "Perspective was not applied. Drag a corner to keep the complete image convex and finite.",
+        );
+        notify(
+          "Perspective was not applied. Keep the corners convex and the complete image finite.",
+        );
+      }
       return;
     }
     if (drag?.kind === "move" && (drag.dx || drag.dy))
@@ -1894,1032 +2775,1590 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
   }
 
-  const handleImportFile=(file:File)=>{
-    if(isCameraRawFile(file)){setRawFile(file);return;}
-    if(file.type==='image/svg+xml'||/\.svg$/i.test(file.name)){setSvgFile(file);return;}
-    if(['image/tiff','image/x-tiff'].includes(file.type)||/\.tiff?$/i.test(file.name)){setTiffFile(file);return;}
-    if(file.type==='image/avif'||/\.avif$/i.test(file.name)){setAvifFile(file);return;}
-    void task(async()=>{await editor.importImage(file);notify('Image added');});
+  const handleImportFile = (file: File) => {
+    if (isCameraRawFile(file)) {
+      setRawFile(file);
+      return;
+    }
+    if (file.type === "image/svg+xml" || /\.svg$/i.test(file.name)) {
+      setSvgFile(file);
+      return;
+    }
+    if (
+      ["image/tiff", "image/x-tiff"].includes(file.type) ||
+      /\.tiff?$/i.test(file.name)
+    ) {
+      setTiffFile(file);
+      return;
+    }
+    if (file.type === "image/avif" || /\.avif$/i.test(file.name)) {
+      setAvifFile(file);
+      return;
+    }
+    void task(async () => {
+      await editor.importImage(file);
+      notify("Image added");
+    });
   };
 
-  const handlePsdFile=(file:File)=>setPhotoshopFile({file,id:++photoshopRequest.current});
-  const openRecentFile=(file:File,kind:RecentKind)=>{
-    if(kind==='svg'){setSvgFile(file);return;}
-    if(kind==='tiff'){setTiffFile(file);return;}
-    if(kind==='avif'){setAvifFile(file);return;}
-    if(kind==='raw'){setRawFile(file);return;}
-    if(kind==='photoshop'){handlePsdFile(file);return;}
-    void task(async()=>{if(kind==='project')await editor.openProject(file);else await editor.openImage(file);notify('Local recent-file copy opened');});
+  const handlePsdFile = (file: File) =>
+    setPhotoshopFile({ file, id: ++photoshopRequest.current });
+  const openRecentFile = (file: File, kind: RecentKind) => {
+    if (kind === "svg") {
+      setSvgFile(file);
+      return;
+    }
+    if (kind === "tiff") {
+      setTiffFile(file);
+      return;
+    }
+    if (kind === "avif") {
+      setAvifFile(file);
+      return;
+    }
+    if (kind === "raw") {
+      setRawFile(file);
+      return;
+    }
+    if (kind === "photoshop") {
+      handlePsdFile(file);
+      return;
+    }
+    void task(async () => {
+      if (kind === "project") await editor.openProject(file);
+      else await editor.openImage(file);
+      notify("Local recent-file copy opened");
+    });
   };
-
 
   const handleSelectSubject = async () => {
     await task(async () => {
-      const abort=new AbortController();subjectAbort.current=abort;setSubjectProgress({completed:0,total:1});
+      const abort = new AbortController();
+      subjectAbort.current = abort;
+      setSubjectProgress({ completed: 0, total: 1 });
       try {
-        await editor.selectSubject({}, {signal:abort.signal,onProgress:setSubjectProgress});
+        await editor.selectSubject(
+          {},
+          { signal: abort.signal, onProgress: setSubjectProgress },
+        );
         notify("Subject selected");
       } catch (err) {
-        if(abort.signal.aborted)return;
+        if (abort.signal.aborted) return;
         notify(
           `Select subject failed: ${err instanceof Error ? err.message : String(err)}`,
         );
-      }finally{if(subjectAbort.current===abort)subjectAbort.current=null;setSubjectProgress(null);}
+      } finally {
+        if (subjectAbort.current === abort) subjectAbort.current = null;
+        setSubjectProgress(null);
+      }
     });
   };
 
   const handleRemoveBackground = async () => {
     await task(async () => {
-      const abort=new AbortController();mattingAbort.current=abort;setMattingProgress({completed:0,total:1});
+      const abort = new AbortController();
+      mattingAbort.current = abort;
+      setMattingProgress({ completed: 0, total: 1 });
       try {
-        await editor.removeBackground(undefined,{}, {signal:abort.signal,onProgress:setMattingProgress});
+        await editor.removeBackground(
+          undefined,
+          {},
+          { signal: abort.signal, onProgress: setMattingProgress },
+        );
         notify("Background removed");
       } catch (err) {
-        if(abort.signal.aborted)return;
+        if (abort.signal.aborted) return;
         notify(
           `Remove background failed: ${err instanceof Error ? err.message : String(err)}`,
         );
-      }finally{if(mattingAbort.current===abort)mattingAbort.current=null;setMattingProgress(null);}
+      } finally {
+        if (mattingAbort.current === abort) mattingAbort.current = null;
+        setMattingProgress(null);
+      }
     });
   };
 
   return (
-    <PaletteLibraryContext.Provider value={request=>{
-      cancelWorkspaceGesture();setContextMenu(null);
-      const target=editor.document,revision=target.getSnapshot().revision,selection=JSON.stringify(target.selectedLayers.map(layer=>layer.id));
-      setColorPaletteRequest({...request,onChoose:color=>{
-        if(editor.document!==target||target.getSnapshot().revision!==revision||JSON.stringify(target.selectedLayers.map(layer=>layer.id))!==selection)
-          throw new Error("The document or selection changed. Close palettes and choose the color again.");
-        request.onChoose(color);
-      }});
-    }}><ShortcutHints.Provider value={activeOverrides}>
-      <div className="app-shell">
-        <input
-          ref={importInput}
-          data-testid="import-input"
-          type="file"
-          accept={`image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff,image/avif,.avif,${rawFileAccept}`}
-          hidden
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = "";
-            if(file)handleImportFile(file);
-          }}
-        />
-        <input
-          ref={openInput}
-          data-testid="project-input"
-          type="file"
-          accept=".luma,application/json"
-          hidden
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = "";
-            if (file)
-              void task(async () => {
-                await editor.openProject(file);
-              });
-          }}
-        />
-        <input
-          ref={psdInputRef}
-          data-testid="psd-input"
-          type="file"
-          accept=".psd,.psb"
-          hidden
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = "";
-            if (file) handlePsdFile(file);
-          }}
-        />
-        {recentRequest&&<RecentFilesDialog library={editor.recentFiles} initialId={recentRequest.id} onClose={()=>setRecentRequest(null)} onOpen={openRecentFile}/>}
-        {showRecovery && (
-          <RecoveryPanel
-            editor={editor}
-            onClose={() => setShowRecovery(false)}
+    <PaletteLibraryContext.Provider
+      value={(request) => {
+        cancelWorkspaceGesture();
+        setContextMenu(null);
+        const target = editor.document,
+          revision = target.getSnapshot().revision,
+          selection = JSON.stringify(
+            target.selectedLayers.map((layer) => layer.id),
+          );
+        setColorPaletteRequest({
+          ...request,
+          onChoose: (color) => {
+            if (
+              editor.document !== target ||
+              target.getSnapshot().revision !== revision ||
+              JSON.stringify(target.selectedLayers.map((layer) => layer.id)) !==
+                selection
+            )
+              throw new Error(
+                "The document or selection changed. Close palettes and choose the color again.",
+              );
+            request.onChoose(color);
+          },
+        });
+      }}
+    >
+      <ShortcutHints.Provider value={activeOverrides}>
+        <div className="app-shell">
+          <input
+            ref={importInput}
+            data-testid="import-input"
+            type="file"
+            accept={`image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff,image/avif,.avif,${rawFileAccept}`}
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) handleImportFile(file);
+            }}
           />
-        )}
-        <TopBar
-          documentId={dom.id}
-          documentName={dom.name}
-          canUndo={dom.canUndo}
-          canRedo={dom.canRedo}
-          hasLayers={!!dom.layers.length}
-          busy={busy}
-          onRename={(name) => {
-            attempt(() => {
-              dom.name = name;
-            });
-          }}
-          onUndo={() => {
-            setPreview(null);
-            dom.undo();
-          }}
-          onRedo={() => {
-            setPreview(null);
-            dom.redo();
-          }}
-          onOpen={() => openInput.current?.click()}
-          recentFilesControl={<RecentFilesButton library={editor.recentFiles} disabled={busy} onOpen={()=>{cancelWorkspaceGesture();setRecentRequest({});}}/>}
-          chatGptControl={<ChatGptConnectionButton editor={editor} disabled={false} onOpen={()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}}/>}
-          accountControl={<AccountButton client={accountClient} onOpen={()=>{cancelWorkspaceGesture();setShowAccount(true);}}/>}
-          onSave={save}
-          onExport={exportPng}
-          onExportDialog={() => setShowExportDialog(true)}
-          onGenerate={() => setShowGenerateDialog(true)}
-          onRecipes={() => setShowRecipeDialog(true)}
-          onBatch={() => setShowBatchDialog(true)}
-          onColorProfile={() => setShowColorDialog(true)}
-          onPsdImport={() => psdInputRef.current?.click()}
-          onRefineEdge={() => setShowRefineEdgeDialog(true)}
-          onSelectSubject={handleSelectSubject}
-        />
-        <WorkspaceDock
-          layout={panelLayout.layout}
-          style={
-            {
-              "--layers-width": `${panelLayout.widths.layers}px`,
-              "--inspector-width": `${panelLayout.widths.inspector}px`,
-            } as import("react").CSSProperties
-          }
-          rail={
-          <ToolRail
-            onOpenPalette={() => setShowPalette(true)}
-            tool={tool}
-            spacePan={spacePan}
+          <input
+            ref={openInput}
+            data-testid="project-input"
+            type="file"
+            accept=".luma,application/json"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file)
+                void task(async () => {
+                  await editor.openProject(file);
+                });
+            }}
+          />
+          <input
+            ref={psdInputRef}
+            data-testid="psd-input"
+            type="file"
+            accept=".psd,.psb"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) handlePsdFile(file);
+            }}
+          />
+          {recentRequest && (
+            <RecentFilesDialog
+              library={editor.recentFiles}
+              initialId={recentRequest.id}
+              onClose={() => setRecentRequest(null)}
+              onOpen={openRecentFile}
+            />
+          )}
+          {showRecovery && (
+            <RecoveryPanel
+              editor={editor}
+              onClose={() => setShowRecovery(false)}
+            />
+          )}
+          <TopBar
+            documentId={dom.id}
+            documentName={dom.name}
+            canUndo={dom.canUndo}
+            canRedo={dom.canRedo}
+            hasLayers={!!dom.layers.length}
             busy={busy}
-            canUseTool={value=>editor.tools.canChooseTool(value)}
-            onChooseTool={chooseTool}
-            onImport={() => importInput.current?.click()}
-            onNewDocument={() => editor.newDocument()}
-            onOpenScripts={() => setShowScripts(true)}
-            onOpenPlugins={() => setShowPlugins(true)}
-            onOpenHelp={() => setShowHelp(true)}
-            onOpenPreflight={()=>setShowPreflight(true)}
-            onOpenColorPalettes={()=>{cancelWorkspaceGesture();setShowColorPalettes(true);}}
-            onOpenArtworkLibrary={()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}}
-            onOpenWorkspace={openWorkspaceLayout}
-            onOpenRecovery={() => setShowRecovery(true)}
-          />
-          }
-          layers={
-          <LayersPanel
-            isCurrent={()=>editor.document===dom}
-            deferThumbnails={toolState.drawing}
-            onLoadTransparency={id => { editor.tools.cancel(); void task(() => editor.pixels.loadTransparency(id)); }}
-            onRelinkSmartObject={(layer, file) => {
-              void task(async () => {
-                await editor.relinkSmartObject(layer, file);
+            onRename={(name) => {
+              attempt(() => {
+                dom.name = name;
               });
             }}
-            onRasterizeSmartObject={(layer) => {
-              void task(async () => {
-                await layer.rasterize();
-              });
-            }}
-            onEditSmartObject={(layer) => {
-              void task(async () => {
-                await editor.editSmartObject(layer);
-              });
-            }}
-            copyTargets={(sessions ?? []).filter(
-              (session) => session.document !== dom,
-            )}
-            onCopyToDocument={(target) => {
-              void task(async () => {
-                const copied = await editor.copySelectedLayersTo(target);
-                notify(
-                  `Copied ${copied.length} layer${copied.length === 1 ? "" : "s"} to ${target.name}.`,
-                );
-              });
-            }}
-            document={dom}
-            viewDocument={viewDocument}
-            selectedId={state.selectedId}
-            selectedLayer={selectedObject}
-            locked={locked}
-            busy={busy}
-            onInspectHistory={()=>{cancelWorkspaceGesture();setShowHistoryInspector(true);}}
-            historyPast={state.past}
-            historyFuture={state.future}
-            pixels={editor.pixels}
-            getThumbnail={(assetId) => assets.get(assetId).thumbnail}
-            onCancelTools={() => editor.tools.cancel()}
-            onClearPreview={clearPreview}
-            onAttempt={attempt}
-            onAlign={alignLayers}
-            alignmentKeyId={alignmentKey?.id}
-            onAlignmentKeyChange={id=>setChosenAlignmentKey({owner:dom,selection:alignmentSelection,id})}
-            onSelectLayer={(layer, additive) => {
-              if (additive)
-                dom.selectLayers(
-                  [layer],
-                  dom.selectedLayers.some((item) => item.id === layer.id)
-                    ? "remove"
-                    : "add",
-                );
-              else dom.selectedLayer = layer;
-            }}
-            onAddLayer={addLayer}
-            onAddGroup={addGroup}
-            onAddAdjustmentLayer={() => addAdjustmentLayer(dom.precision==='float32'?"tone":"curves")}
-            onDuplicateLayer={() =>
-              selectedAction((layer) => {
-                dom.selectedLayer = layer.duplicate();
-              })
-            }
-            onMoveLayerForward={() => selectedAction((layer) => layer.moveUp())}
-            onMoveLayerBackward={() =>
-              selectedAction((layer) => layer.moveDown())
-            }
-            onDeleteLayer={() => attempt(() => dom.layerSelection.remove())}
-          />
-          }
-          layersResize={
-          <PanelResizeHandle
-            label="Resize layers panel"
-            value={panelLayout.widths.layers}
-            min={190}
-            max={panelLayout.max("layers")}
-            direction={panelLayout.layout.panels.layers.side==='left'?1:-1}
-            disabled={busy}
-            onStart={() => {
-              editor.tools.cancel();
+            onUndo={() => {
               setPreview(null);
+              dom.undo();
             }}
-            onPreview={(value) => panelLayout.change("layers", value, false)}
-            onCommit={(value) => panelLayout.change("layers", value, true)}
-            onCancel={panelLayout.cancel}
-            onReset={() => panelLayout.reset("layers")}
+            onRedo={() => {
+              setPreview(null);
+              dom.redo();
+            }}
+            onOpen={() => openInput.current?.click()}
+            recentFilesControl={
+              <RecentFilesButton
+                library={editor.recentFiles}
+                disabled={busy}
+                onOpen={() => {
+                  cancelWorkspaceGesture();
+                  setRecentRequest({});
+                }}
+              />
+            }
+            chatGptControl={
+              <ChatGptConnectionButton
+                editor={editor}
+                disabled={false}
+                onOpen={() => {
+                  cancelWorkspaceGesture();
+                  setShowChatGptConnection(true);
+                }}
+              />
+            }
+            accountControl={
+              <AccountButton
+                client={accountClient}
+                onOpen={() => {
+                  cancelWorkspaceGesture();
+                  setShowAccount(true);
+                }}
+              />
+            }
+            onSave={save}
+            onExport={exportPng}
+            onExportDialog={() => setShowExportDialog(true)}
+            onGenerate={() => setShowGenerateDialog(true)}
+            onRecipes={() => setShowRecipeDialog(true)}
+            onBatch={() => setShowBatchDialog(true)}
+            onColorProfile={() => setShowColorDialog(true)}
+            onPsdImport={() => psdInputRef.current?.click()}
+            onRefineEdge={() => setShowRefineEdgeDialog(true)}
+            onSelectSubject={handleSelectSubject}
           />
-          }
-          canvas={
-          <main className="canvas-column">
-            <DocumentTabBar
-              sessions={sessions ?? []}
-              activeId={sessionId}
-              busy={busy}
-              onMove={(document, index) => editor.moveDocument(document, index)}
-              onNew={() => editor.newDocument()}
-              onActivate={(document) => {
-                clearPreview();
-                gesture.current = null;pointerDocument.current=null;
-                capturedPointer.current = null;
-                editor.activateDocument(document);
-              }}
-              onClose={(document) => {
-                const dirty = editor
-                  .getSnapshot()
-                  .sessions.find(
-                    (session) => session.document === document,
-                  )?.dirty;
+          <WorkspaceDock
+            layout={panelLayout.layout}
+            style={
+              {
+                "--layers-width": `${panelLayout.widths.layers}px`,
+                "--inspector-width": `${panelLayout.widths.inspector}px`,
+              } as import("react").CSSProperties
+            }
+            rail={
+              <ToolRail
+                onOpenPalette={() => setShowPalette(true)}
+                tool={tool}
+                spacePan={spacePan}
+                busy={busy}
+                canUseTool={(value) => editor.tools.canChooseTool(value)}
+                onChooseTool={chooseTool}
+                onImport={() => importInput.current?.click()}
+                onNewDocument={() => editor.newDocument()}
+                onOpenScripts={() => setShowScripts(true)}
+                onOpenPlugins={() => setShowPlugins(true)}
+                onOpenHelp={() => setShowHelp(true)}
+                onOpenPreflight={() => setShowPreflight(true)}
+                onOpenColorPalettes={() => {
+                  cancelWorkspaceGesture();
+                  setShowColorPalettes(true);
+                }}
+                onOpenArtworkLibrary={() => {
+                  cancelWorkspaceGesture();
+                  setShowArtworkLibrary(true);
+                }}
+                onOpenWorkspace={openWorkspaceLayout}
+                onOpenRecovery={() => setShowRecovery(true)}
+              />
+            }
+            layers={
+              <LayersPanel
+                isCurrent={() => editor.document === dom}
+                deferThumbnails={toolState.drawing}
+                onLoadTransparency={(id) => {
+                  editor.tools.cancel();
+                  void task(() => editor.pixels.loadTransparency(id));
+                }}
+                onRelinkSmartObject={(layer, file) => {
+                  void task(async () => {
+                    await editor.relinkSmartObject(layer, file);
+                  });
+                }}
+                onRasterizeSmartObject={(layer) => {
+                  void task(async () => {
+                    await layer.rasterize();
+                  });
+                }}
+                onEditSmartObject={(layer) => {
+                  void task(async () => {
+                    await editor.editSmartObject(layer);
+                  });
+                }}
+                copyTargets={(sessions ?? []).filter(
+                  (session) => session.document !== dom,
+                )}
+                onCopyToDocument={(target) => {
+                  void task(async () => {
+                    const copied = await editor.copySelectedLayersTo(target);
+                    notify(
+                      `Copied ${copied.length} layer${copied.length === 1 ? "" : "s"} to ${target.name}.`,
+                    );
+                  });
+                }}
+                document={dom}
+                viewDocument={viewDocument}
+                selectedId={state.selectedId}
+                selectedLayer={selectedObject}
+                locked={locked}
+                busy={busy}
+                onInspectHistory={() => {
+                  cancelWorkspaceGesture();
+                  setShowHistoryInspector(true);
+                }}
+                historyPast={state.past}
+                historyFuture={state.future}
+                pixels={editor.pixels}
+                getThumbnail={(assetId) => assets.get(assetId).thumbnail}
+                onCancelTools={() => editor.tools.cancel()}
+                onClearPreview={clearPreview}
+                onAttempt={attempt}
+                onAlign={alignLayers}
+                alignmentKeyId={alignmentKey?.id}
+                onAlignmentKeyChange={(id) =>
+                  setChosenAlignmentKey({
+                    owner: dom,
+                    selection: alignmentSelection,
+                    id,
+                  })
+                }
+                onSelectLayer={(layer, additive) => {
+                  if (additive)
+                    dom.selectLayers(
+                      [layer],
+                      dom.selectedLayers.some((item) => item.id === layer.id)
+                        ? "remove"
+                        : "add",
+                    );
+                  else dom.selectedLayer = layer;
+                }}
+                onAddLayer={addLayer}
+                onAddGroup={addGroup}
+                onAddAdjustmentLayer={() =>
+                  addAdjustmentLayer(
+                    dom.precision === "float32" ? "tone" : "curves",
+                  )
+                }
+                onDuplicateLayer={() =>
+                  selectedAction((layer) => {
+                    dom.selectedLayer = layer.duplicate();
+                  })
+                }
+                onMoveLayerForward={() =>
+                  selectedAction((layer) => layer.moveUp())
+                }
+                onMoveLayerBackward={() =>
+                  selectedAction((layer) => layer.moveDown())
+                }
+                onDeleteLayer={() => attempt(() => dom.layerSelection.remove())}
+              />
+            }
+            layersResize={
+              <PanelResizeHandle
+                label="Resize layers panel"
+                value={panelLayout.widths.layers}
+                min={190}
+                max={panelLayout.max("layers")}
+                direction={
+                  panelLayout.layout.panels.layers.side === "left" ? 1 : -1
+                }
+                disabled={busy}
+                onStart={() => {
+                  editor.tools.cancel();
+                  setPreview(null);
+                }}
+                onPreview={(value) =>
+                  panelLayout.change("layers", value, false)
+                }
+                onCommit={(value) => panelLayout.change("layers", value, true)}
+                onCancel={panelLayout.cancel}
+                onReset={() => panelLayout.reset("layers")}
+              />
+            }
+            canvas={
+              <main className="canvas-column">
+                <DocumentTabBar
+                  sessions={sessions ?? []}
+                  activeId={sessionId}
+                  busy={busy}
+                  onMove={(document, index) =>
+                    editor.moveDocument(document, index)
+                  }
+                  onNew={() => editor.newDocument()}
+                  onActivate={(document) => {
+                    clearPreview();
+                    gesture.current = null;
+                    pointerDocument.current = null;
+                    capturedPointer.current = null;
+                    editor.activateDocument(document);
+                  }}
+                  onClose={(document) => {
+                    const dirty = editor
+                      .getSnapshot()
+                      .sessions.find(
+                        (session) => session.document === document,
+                      )?.dirty;
+                    if (
+                      dirty &&
+                      !window.confirm(
+                        `Close ${document.name} and discard unsaved changes? Download a project first to keep a separate copy.`,
+                      )
+                    )
+                      return;
+                    void task(async () => {
+                      await editor.closeDocument(document, {
+                        discardChanges: !!dirty,
+                      });
+                    });
+                  }}
+                />
+                {smartObjectEdit && (
+                  <div
+                    className="smart-object-edit-bar"
+                    role="region"
+                    aria-label="Smart-object contents"
+                  >
+                    <span>
+                      {smartObjectEdit.ownerOpen
+                        ? `Editing contents for ${smartObjectEdit.ownerName}.`
+                        : "Source document closed. Contents remain available in this tab."}
+                      {smartObjectEdit.ownerOpen &&
+                        (smartObjectEdit.changed
+                          ? " Changes are not applied."
+                          : " No pending contents changes.")}
+                    </span>
+                    <Button
+                      disabled={
+                        busy ||
+                        !smartObjectEdit.ownerOpen ||
+                        !smartObjectEdit.changed
+                      }
+                      onClick={() => {
+                        void task(async () => {
+                          await editor.applySmartObjectContents(dom);
+                          notify("Smart-object contents applied.");
+                        });
+                      }}
+                    >
+                      Apply to source
+                    </Button>
+                    <Button
+                      disabled={busy}
+                      onClick={() =>
+                        attempt(() => editor.detachSmartObjectContents(dom))
+                      }
+                    >
+                      Keep as document
+                    </Button>
+                  </div>
+                )}
+                <div className="canvas-toolbar">
+                  <span>
+                    {selected ? selected.name : "Canvas"}
+                    <ChevronRight size={12} />
+                    <span className="text-muted">
+                      {selected?.kind === "group"
+                        ? "Group"
+                        : selected
+                          ? `${selected.kind[0].toUpperCase() + selected.kind.slice(1)} layer`
+                          : "Document"}
+                    </span>
+                  </span>
+                  <button onClick={fit} title="Fit canvas">
+                    <Maximize size={13} />
+                    Fit
+                  </button>
+                </div>
+                <ToolOptions
+                  floatEditing={dom.precision === "float32"}
+                  onBrushPresets={() => {
+                    editor.tools.cancel();
+                    setShowBrushPresets(true);
+                  }}
+                  onBrushSymmetry={() => {
+                    editor.tools.cancel();
+                    setShowBrushSymmetry(true);
+                  }}
+                  onBrushTip={() => {
+                    editor.tools.cancel();
+                    setShowBrushTip(true);
+                  }}
+                  onBrushTexture={() => {
+                    editor.tools.cancel();
+                    setShowBrushTexture(true);
+                  }}
+                  onPressureCurve={() => {
+                    editor.tools.cancel();
+                    setShowPressureCurve(true);
+                  }}
+                  tool={tool}
+                  moveTarget={movingMask ? "mask" : "layer"}
+                  hasMask={!!selected?.mask}
+                  hasPaintMask={!!selected?.mask}
+                  hasFilterMask={
+                    selected?.kind === "smart-object" && !!selected.filterMask
+                  }
+                  hasVectorMask={selected?.mask?.kind === "vector"}
+                  hasTextPath={selected?.kind === "text" && !!selected.textPath}
+                  onMoveTarget={setMoveTarget}
+                  snapEnabled={snapEnabled}
+                  onSnapEnabled={setSnapEnabled}
+                  snapArtwork={snapArtwork}
+                  onSnapArtwork={setSnapArtwork}
+                  spacingHints={spacingHints}
+                  onSpacingHints={setSpacingHints}
+                  snapSpacing={snapSpacing}
+                  onSnapSpacing={setSnapSpacing}
+                  controller={editor.tools}
+                  settings={toolState.settings}
+                  hasSelection={!!state.document.selection}
+                  disabled={busy || locked}
+                  onAction={attempt}
+                  onModifySelection={() => {
+                    editor.tools.cancel();
+                    setSelectionModification("expand");
+                  }}
+                  onColorRange={() => {
+                    editor.tools.cancel();
+                    setShowColorRange(true);
+                  }}
+                  onOpenImageSize={() => {
+                    editor.tools.cancel();
+                    setShowImageSizeDialog(true);
+                  }}
+                  onOpenArtboard={() => setShowArtboardDialog(true)}
+                  onOpenCrop={() => {
+                    if (!busy) setShowCropDialog(true);
+                  }}
+                  documentBusy={busy}
+                />
+                <div
+                  ref={viewport}
+                  className={`viewport ${tool === "hand" || spacePan ? "hand" : `tool-${tool}`} ${resizingCursor ? `resizing-${resizingCursor}` : ""}`}
+                  tabIndex={-1}
+                  aria-label="Editing canvas"
+                  onContextMenu={(event) => {
+                    event.preventDefault();
+                    if (
+                      busy ||
+                      editor.tools.getSnapshot().drawing ||
+                      editor.tools.drawingPolygonLasso ||
+                      gesture.current
+                    )
+                      return;
+                    setContextMenu({ x: event.clientX, y: event.clientY });
+                  }}
+                  onPointerDown={pointerDown}
+                  onPointerMove={pointerMove}
+                  onPointerUp={pointerUp}
+                  onPointerLeave={() => updateCursor(null)}
+                  onLostPointerCapture={(event) => {
+                    if (capturedPointer.current !== event.pointerId) return;
+                    capturedPointer.current = null;
+                    setPerspectiveIssue(null);
+                    editor.tools.cancel();
+                    gesture.current = null;
+                    pointerDocument.current = null;
+                    setResizingCursor(null);
+                    setPreview(null);
+                  }}
+                  onPointerCancel={() => {
+                    capturedPointer.current = null;
+                    setPerspectiveIssue(null);
+                    editor.tools.cancel();
+                    gesture.current = null;
+                    pointerDocument.current = null;
+                    setResizingCursor(null);
+                    setPreview(null);
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    const file = event.dataTransfer.files[0];
+                    if (file) handleImportFile(file);
+                  }}
+                >
+                  {guidesVisible && (
+                    <CanvasRulers
+                      viewport={viewport}
+                      document={dom}
+                      zoom={zoom}
+                      pan={pan}
+                      revision={state.revision}
+                      editable={!busy && !spacePan}
+                      onAttempt={attempt}
+                    />
+                  )}
+                  <div
+                    className="canvas-wrap"
+                    style={{
+                      width: viewDocument.width * zoom,
+                      height: viewDocument.height * zoom,
+                      transform: `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px))`,
+                    }}
+                  >
+                    <span className="canvas-label">
+                      {dom.name.toUpperCase()}
+                    </span>
+                    <div className="artwork-clip">
+                      <div
+                        ref={displayHost}
+                        className="artwork-host"
+                        style={{
+                          visibility: renderError ? "hidden" : undefined,
+                          position: "absolute",
+                          left: paintedRegion.x * zoom,
+                          top: paintedRegion.y * zoom,
+                          width: paintedRegion.width * zoom,
+                          height: paintedRegion.height * zoom,
+                        }}
+                      />
+                    </div>
+                    <CanvasOverlays
+                      viewportWindow={penOverlayWindow}
+                      document={viewDocument}
+                      selected={selected}
+                      tool={tool}
+                      zoom={zoom}
+                      controller={editor.tools}
+                      cursorStore={cursorStore}
+                      showBrushCursor={!customCursors}
+                      onError={setError}
+                    />
+                    {previewCandidate && (
+                      <div
+                        className="generation-candidate-preview-overlay"
+                        style={{
+                          position: "absolute",
+                          left:
+                            Math.round(
+                              (dom.width - previewCandidate.width) / 2,
+                            ) * zoom,
+                          top:
+                            Math.round(
+                              (dom.height - previewCandidate.height) / 2,
+                            ) * zoom,
+                          width: previewCandidate.width * zoom,
+                          height: previewCandidate.height * zoom,
+                          pointerEvents: "none",
+                          zIndex: 20,
+                        }}
+                      >
+                        <img
+                          src={previewCandidate.asset.thumbnail}
+                          alt="Generation Candidate Preview"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            opacity: 0.9,
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            border: "2px dashed var(--color-accent)",
+                            borderRadius: 2,
+                          }}
+                        />
+                      </div>
+                    )}
+                    {tool === "crop" && editor.tools.crop.bounds && (
+                      <CropOverlay
+                        bounds={editor.tools.crop.bounds}
+                        width={dom.width}
+                        height={dom.height}
+                        zoom={zoom}
+                        onNudge={(handle, dx, dy) =>
+                          attempt(() => editor.tools.crop.nudge(dx, dy, handle))
+                        }
+                      />
+                    )}
+                    {(guidesVisible ? (state.document.guides ?? []) : [])
+                      .filter(
+                        (guide) =>
+                          guide.position >= 0 &&
+                          guide.position <=
+                            (guide.orientation === "vertical"
+                              ? dom.width
+                              : dom.height),
+                      )
+                      .map((guide) => (
+                        <GuideOverlay
+                          key={guide.id}
+                          guide={guide}
+                          document={dom}
+                          zoom={zoom}
+                          revision={state.revision}
+                          editable={
+                            tool === "move" && !busy && !spacePan && !movingMask
+                          }
+                          onAttempt={attempt}
+                        />
+                      ))}
+                    <SpacingOverlay guides={spacingGuides} zoom={zoom} />
+                    {snapGuides.x !== undefined && (
+                      <div
+                        className="snap-guide vertical"
+                        aria-hidden="true"
+                        style={{
+                          left: snapGuides.x * zoom,
+                          height: dom.height * zoom,
+                        }}
+                      />
+                    )}
+                    {snapGuides.y !== undefined && (
+                      <div
+                        className="snap-guide horizontal"
+                        aria-hidden="true"
+                        style={{
+                          top: snapGuides.y * zoom,
+                          width: dom.width * zoom,
+                        }}
+                      />
+                    )}
+                    {perspectiveEditing &&
+                      !busy &&
+                      selected &&
+                      (selected.kind === "raster" ||
+                        selected.kind === "smart-object") && (
+                        <PerspectiveOverlay
+                          layer={selected}
+                          world={layerTransform(viewDocument, selected.id)!}
+                          zoom={zoom}
+                          onNudge={nudgePerspectiveCorner}
+                        />
+                      )}
+                    {bounds &&
+                      selected?.visible &&
+                      tool === "move" &&
+                      !movingMask &&
+                      !perspectiveEditing && (
+                        <div
+                          className={`selection-outline ${locked ? "locked" : ""}`}
+                          style={{
+                            left: bounds.x * zoom,
+                            top: bounds.y * zoom,
+                            width: bounds.width * zoom,
+                            height: bounds.height * zoom,
+                          }}
+                        >
+                          {canRotateSelection && (
+                            <button
+                              type="button"
+                              className="rotation-handle"
+                              data-rotate="true"
+                              aria-label="Drag to rotate layer"
+                              title="Drag to rotate; hold Shift for 15° increments"
+                            />
+                          )}
+                          {(isResizable && state.selectedIds.length < 2) ||
+                          (state.selectedIds.length > 1 &&
+                            canRotateSelection) ? (
+                            <>
+                              <i
+                                className="handle handle-nw"
+                                data-handle="nw"
+                                style={resizeHandleStyle(false, false)}
+                                title="Resize"
+                              />
+                              <i
+                                className="handle handle-ne"
+                                data-handle="ne"
+                                style={resizeHandleStyle(true, false)}
+                                title="Resize"
+                              />
+                              <i
+                                className="handle handle-sw"
+                                data-handle="sw"
+                                style={resizeHandleStyle(false, true)}
+                                title="Resize"
+                              />
+                              <i
+                                className="handle handle-se"
+                                data-handle="se"
+                                style={resizeHandleStyle(true, true)}
+                                title="Resize"
+                              />
+                            </>
+                          ) : !locked ? (
+                            <>
+                              <i />
+                              <i />
+                              <i />
+                              <i />
+                            </>
+                          ) : null}
+                        </div>
+                      )}
+                  </div>
+                  {perspectiveEditing && perspectiveIssue && (
+                    <div className="perspective-issue" role="status">
+                      {perspectiveIssue}
+                    </div>
+                  )}
+                  {renderError && (
+                    <div className="canvas-render-error" role="alert">
+                      <strong>Preview unavailable</strong>
+                      <p>{renderError}</p>
+                    </div>
+                  )}
+                  <CanvasCursor
+                    viewport={viewport}
+                    enabled={customCursors}
+                    copies={cursorAdapters.copies}
+                    texturePreview={texturePreview.url}
+                    footprint={cursorAdapters.footprint}
+                    tool={tool}
+                    spacePan={spacePan}
+                    size={
+                      tool === "quick-select"
+                        ? toolState.settings.quickSize
+                        : toolState.settings.size
+                    }
+                    zoom={zoom}
+                  />
+                  {!dom.layers.length &&
+                    !dom.guides.length &&
+                    (tool === "move" || tool === "hand") && (
+                      <div className="empty-state">
+                        <div className="empty-icon">
+                          <ImagePlus size={27} />
+                        </div>
+                        <h1>Make room for your next idea.</h1>
+                        <p>Drop an image here, or start with a sample.</p>
+                        <Button
+                          variant="primary"
+                          onClick={() => importInput.current?.click()}
+                          disabled={busy}
+                        >
+                          <Plus size={15} />
+                          Import image
+                        </Button>
+                        <button
+                          className="sample-link"
+                          onClick={() => void task(() => editor.openSample())}
+                          disabled={busy}
+                        >
+                          Open sample composition <ChevronRight size={13} />
+                        </button>
+                        <small>
+                          PNG, JPG, WEBP, SVG · Original resolution preserved
+                        </small>
+                      </div>
+                    )}
+                  <div className="zoom-control">
+                    <IconButton
+                      label="Zoom out"
+                      onClick={() => changeZoom(1 / 1.2)}
+                    >
+                      <Minus size={14} />
+                    </IconButton>
+                    <button aria-label="Zoom level, click to fit" onClick={fit}>
+                      {Math.round(zoom * 100)}%
+                    </button>
+                    <IconButton label="Zoom in" onClick={() => changeZoom(1.2)}>
+                      <Plus size={14} />
+                    </IconButton>
+                    <span />
+                    <IconButton
+                      shortcutId="fit"
+                      label="Fit canvas (Mod+0)"
+                      onClick={fit}
+                    >
+                      <Maximize size={14} />
+                    </IconButton>
+                  </div>
+                </div>
+                <footer className="canvas-status">
+                  <span
+                    aria-label="Rendering backend"
+                    title={
+                      renderBackend === "webgpu"
+                        ? "WebGPU viewport acceleration"
+                        : "Canvas rendering with WASM processing"
+                    }
+                  >
+                    {renderBackend === "webgpu"
+                      ? "GPU accelerated"
+                      : "Standard rendering"}
+                  </span>
+                  <span>
+                    <span
+                      className={`status-dot ${rendering || busy ? "working" : renderError ? "failed" : ""}`}
+                    />
+                    {busy
+                      ? "Working…"
+                      : rendering
+                        ? "Rendering…"
+                        : renderError
+                          ? "Preview unavailable"
+                          : "Ready"}
+                    <span className="footer-divider">/</span>
+                    {viewDocument.width} × {viewDocument.height} px
+                    <span className="footer-divider">/</span>
+                    <button
+                      type="button"
+                      className="status-profile-btn"
+                      onClick={() => setShowColorDialog(true)}
+                      title={[
+                        dom.precision === "float32"
+                          ? "32-bit linear sRGB editing; SDR canvas preview. Click for output settings."
+                          : "sRGB8 editing. Click for output profile and canvas proof settings.",
+                        ...editor.colorWarnings,
+                      ].join(" ")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "inherit",
+                        font: "inherit",
+                        cursor: "pointer",
+                        padding: 0,
+                        textDecoration: "underline dotted",
+                        display: "inline-block",
+                        maxWidth: "min(20vw, 200px)",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        verticalAlign: "middle",
+                      }}
+                    >
+                      {dom.precision === "float32" ? "Linear RGB32" : "sRGB8"} ·
+                      Output:{" "}
+                      {iccTarget(editor.colorSettings.output.profile).name}
+                    </button>
+                    {(editor.colorSettings.proof ||
+                      proofStatus === "pending" ||
+                      proofStatus === "failed") && (
+                      <>
+                        <span className="footer-divider">/</span>
+                        <span
+                          data-testid="proof-status"
+                          style={{
+                            display: "inline-block",
+                            maxWidth: "min(25vw, 260px)",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            verticalAlign: "middle",
+                          }}
+                          title={
+                            proofStatus === "failed"
+                              ? "Proof update failed; the previous frame is retained."
+                              : editor.colorSettings.proof
+                                ? iccTarget(editor.colorSettings.proof.profile)
+                                    .name
+                                : "Removing proof"
+                          }
+                        >
+                          Proof: {proofStatus}
+                          {editor.colorSettings.proof
+                            ? ` · ${iccTarget(editor.colorSettings.proof.profile).name}`
+                            : ""}
+                        </span>
+                      </>
+                    )}
+                    {!!editor.colorWarnings.length && (
+                      <span title={editor.colorWarnings.join(" ")}>
+                        {" "}
+                        · Color notice
+                      </span>
+                    )}
+                  </span>
+                  <span title={recoveryState.message}>
+                    {recoveryState.status === "error"
+                      ? recoveryState.message
+                      : savedStamp === stamp
+                        ? "Project downloaded"
+                        : recoveryState.message}
+                  </span>
+                </footer>
+              </main>
+            }
+            inspectorResize={
+              <PanelResizeHandle
+                label="Resize inspector panel"
+                value={panelLayout.widths.inspector}
+                min={230}
+                max={panelLayout.max("inspector")}
+                direction={
+                  panelLayout.layout.panels.inspector.side === "left" ? 1 : -1
+                }
+                disabled={busy}
+                onStart={() => {
+                  editor.tools.cancel();
+                  setPreview(null);
+                }}
+                onPreview={(value) =>
+                  panelLayout.change("inspector", value, false)
+                }
+                onCommit={(value) =>
+                  panelLayout.change("inspector", value, true)
+                }
+                onCancel={panelLayout.cancel}
+                onReset={() => panelLayout.reset("inspector")}
+              />
+            }
+            inspector={
+              <InspectorPanel
+                perspectiveEditing={perspectiveEditing}
+                canEditPerspective={canEditPerspective}
+                onTogglePerspective={togglePerspectiveEditing}
+                guidesVisible={guidesVisible}
+                onGuidesVisible={setGuidesVisible}
+                assets={assets}
+                document={dom}
+                viewDocument={viewDocument}
+                selected={selected}
+                selectedObject={selectedObject}
+                selectedPathId={toolState.selectedPath?.pathId}
+                locked={locked}
+                busy={busy}
+                wasmReady={wasmReady}
+                preview={preview}
+                onPreview={setPreview}
+                onAttempt={attempt}
+                onSelectedAction={selectedAction}
+                onOpenHelp={() => setShowHelp(true)}
+                onDevelopRaw={(layer) => setRawLayer(layer)}
+                onManageFonts={() => {
+                  cancelWorkspaceGesture();
+                  setFontManagerOwner(dom);
+                }}
+                onCombinePaths={() => {
+                  editor.tools.cancel();
+                  setShowVectorBoolean(true);
+                }}
+              />
+            }
+          />
+
+          {(error || message) && (
+            <div
+              className={`toast ${error ? "error" : ""}`}
+              role={error ? "alert" : "status"}
+            >
+              {error || message}
+              <IconButton
+                label="Dismiss notification"
+                onClick={() => {
+                  setError(null);
+                  setMessage(null);
+                }}
+              >
+                <X size={14} />
+              </IconButton>
+            </div>
+          )}
+          {fontManagerOwner && (
+            <FontManagerDialog
+              document={fontManagerOwner}
+              fontSources={editor}
+              assertOwner={() => {
                 if (
-                  dirty &&
-                  !window.confirm(
-                    `Close ${document.name} and discard unsaved changes? Download a project first to keep a separate copy.`,
+                  editor.document !== fontManagerOwner ||
+                  !editor.documentSessions.some(
+                    (session) => session.document === fontManagerOwner,
                   )
                 )
-                  return;
-                void task(async () => {
-                  await editor.closeDocument(document, {
-                    discardChanges: !!dirty,
-                  });
+                  throw new Error(
+                    "The document changed or closed. Reopen Document fonts for the current document.",
+                  );
+              }}
+              onClose={() => setFontManagerOwner(null)}
+              onReplace={(from, to, revision) => {
+                if (
+                  editor.document !== fontManagerOwner ||
+                  !editor.documentSessions.some(
+                    (session) => session.document === fontManagerOwner,
+                  ) ||
+                  fontManagerOwner.getSnapshot().revision !== revision
+                )
+                  throw new Error(
+                    "The document changed or closed. Reopen Document fonts for the current document.",
+                  );
+                fontManagerOwner.fonts.replace(from, to);
+              }}
+            />
+          )}
+          {showPlugins && (
+            <PluginPanel
+              editor={editor}
+              onClose={() => setShowPlugins(false)}
+            />
+          )}
+          {selectionModification && (
+            <SelectionModifyDialog
+              operation={selectionModification}
+              onApply={(options, control) =>
+                dom.modifySelection(options, control)
+              }
+              onClose={() => setSelectionModification(null)}
+            />
+          )}
+          {showColorRange && (
+            <ColorRangeDialog
+              editor={editor}
+              onClose={() => setShowColorRange(false)}
+            />
+          )}
+          {showVectorBoolean && (
+            <VectorBooleanDialog
+              key={dom.id}
+              document={dom}
+              onClose={() => setShowVectorBoolean(false)}
+              onResult={(path) => {
+                if (editor.document === dom)
+                  editor.tools.selectVectorPath(path);
+              }}
+            />
+          )}
+          {subjectProgress && (
+            <SubjectSelectionProgress
+              progress={subjectProgress}
+              onCancel={() => subjectAbort.current?.abort()}
+            />
+          )}
+          {mattingProgress && (
+            <SubjectSelectionProgress
+              title="Remove Background"
+              description={
+                mattingProgress.phase === "solve"
+                  ? `Solving the global matte · iteration ${mattingProgress.iteration ?? 0}`
+                  : "Refining the selected raster's native matte…"
+              }
+              progress={mattingProgress}
+              onCancel={() => mattingAbort.current?.abort()}
+            />
+          )}
+          {showCropDialog && (
+            <CropDialog
+              width={dom.width}
+              height={dom.height}
+              selection={dom.selection?.toJSON() ?? null}
+              initialBounds={editor.tools.crop.bounds}
+              documentStamp={stamp}
+              onCrop={(bounds) => {
+                clearPreview();
+                dom.crop(bounds);
+                notify(
+                  `Cropped canvas to ${bounds.width} × ${bounds.height} px`,
+                );
+              }}
+              onClose={() => setShowCropDialog(false)}
+            />
+          )}
+          {frequencySource && (
+            <FrequencySeparationDialog
+              editor={editor}
+              layerId={frequencySource}
+              onClose={() => setFrequencySource(null)}
+              onBusyChange={setBusy}
+              onCreated={() => notify("Frequency layers created")}
+            />
+          )}
+          {showImageSizeDialog && (
+            <ArtboardDialog
+              mode="image"
+              currentWidth={dom.width}
+              currentHeight={dom.height}
+              onResize={(width, height) => {
+                editor.tools.cancel();
+                dom.resizeImage(width, height);
+                notify(`Resized image to ${width} × ${height} px`);
+              }}
+              onClose={() => setShowImageSizeDialog(false)}
+            />
+          )}
+          {showArtboardDialog && (
+            <ArtboardDialog
+              currentWidth={dom.width}
+              currentHeight={dom.height}
+              onResize={(w, h) =>
+                attempt(() => {
+                  dom.resize(w, h);
+                  notify(`Resized artboard to ${w} × ${h} px`);
+                })
+              }
+              onClose={() => setShowArtboardDialog(false)}
+            />
+          )}
+          {showPalette && (
+            <WorkspaceCommandPalette
+              editor={editor}
+              onRecent={(entry) => {
+                cancelWorkspaceGesture();
+                setRecentRequest({ id: entry.id! });
+              }}
+              actions={shortcuts.actions}
+              busy={busy}
+              onClose={() => setShowPalette(false)}
+              onExecute={(action) => {
+                flushSync(() => setShowPalette(false));
+                if (action.enabled?.() !== false) action.run();
+              }}
+            />
+          )}
+          {showBrushPresets && (
+            <BrushPresetsDialog
+              library={editor.brushPresets}
+              sourceOwner={editor.brushTextureSource}
+              tool={tool as import("../brushes/presets").BrushTool}
+              settings={toolState.settings}
+              onClose={() => setShowBrushPresets(false)}
+              onApply={async (preset, signal) => {
+                await editor.applyBrushPreset(preset, {
+                  signal,
+                  selectTool: chooseTool,
+                });
+                setShowBrushPresets(false);
+              }}
+            />
+          )}
+          {showBrushSymmetry && (
+            <BrushSymmetryDialog
+              symmetry={toolState.settings.symmetry}
+              width={dom.width}
+              height={dom.height}
+              onClose={() => setShowBrushSymmetry(false)}
+              onApply={(symmetry) => {
+                editor.tools.configure({ symmetry });
+                setShowBrushSymmetry(false);
+              }}
+            />
+          )}
+          {showBrushTip && (
+            <BrushTipDialog
+              tip={toolState.settings.tip}
+              pencil={tool === "pencil"}
+              onClose={() => setShowBrushTip(false)}
+              onApply={(tip) => {
+                editor.tools.configure({ tip });
+                setShowBrushTip(false);
+              }}
+            />
+          )}
+          {showBrushTexture && (
+            <BrushTextureDialog
+              editor={editor}
+              onClose={() => setShowBrushTexture(false)}
+            />
+          )}
+          {showPressureCurve && (
+            <PressureCurveDialog
+              curve={toolState.settings.pressureCurve}
+              onClose={() => setShowPressureCurve(false)}
+              onApply={(curve) => {
+                editor.tools.configure({ pressureCurve: curve });
+                setShowPressureCurve(false);
+              }}
+            />
+          )}
+          {showWorkspaceLayout && (
+            <WorkspaceLayoutDialog
+              preferences={panelLayout.preferences}
+              loadError={panelLayout.error}
+              onApply={(layout) => {
+                panelLayout.apply(layout);
+                cancelWorkspaceGesture();
+              }}
+              onSave={(layout, name, id) => {
+                panelLayout.save(layout, name, id);
+                cancelWorkspaceGesture();
+              }}
+              onRename={panelLayout.rename}
+              onDelete={panelLayout.remove}
+              onReload={panelLayout.reload}
+              onClose={() => setShowWorkspaceLayout(false)}
+            />
+          )}
+          {(showColorPalettes || colorPaletteRequest) && (
+            <PaletteLibraryDialog
+              library={editor.palettes}
+              color={colorPaletteRequest?.color ?? toolState.settings.color}
+              onChoose={colorPaletteRequest?.onChoose}
+              onClose={() => {
+                setShowColorPalettes(false);
+                setColorPaletteRequest(null);
+              }}
+            />
+          )}
+          {showHistoryInspector && (
+            <HistoryInspectorDialog
+              editor={editor}
+              onClose={() => setShowHistoryInspector(false)}
+            />
+          )}
+          {showArtworkLibrary && (
+            <ArtworkLibraryDialog
+              editor={editor}
+              onClose={() => setShowArtworkLibrary(false)}
+              onPlaced={() => notify("Placed saved artwork")}
+            />
+          )}
+          {showAccount && (
+            <AccountDialog
+              client={accountClient}
+              onClose={() => setShowAccount(false)}
+            />
+          )}
+          {showChatGptConnection && (
+            <ChatGptConnectionDialog
+              editor={editor}
+              onClose={() => setShowChatGptConnection(false)}
+            />
+          )}
+          {showHelp && (
+            <ShortcutDialog
+              shortcuts={shortcuts}
+              error={resolvedBindings.error ?? shortcutPreferences.error}
+              onBinding={changeShortcut}
+              onResetAll={resetShortcuts}
+              onClose={() => setShowHelp(false)}
+            />
+          )}
+          {showScripts && (
+            <ScriptPanel
+              editor={editor}
+              onClose={() => setShowScripts(false)}
+            />
+          )}
+          {showGenerateDialog && (
+            <GenerateAssetDialog
+              editor={editor}
+              initialModality={generateDialogModality}
+              onClose={() => {
+                setShowGenerateDialog(false);
+                setPreviewCandidate(null);
+              }}
+              onPreviewCandidate={setPreviewCandidate}
+            />
+          )}
+          {showRecipeDialog && (
+            <RecipeDialog
+              editor={editor}
+              recordingOptions={recipeRecordingOptions}
+              onRecordingOptionsChange={setRecipeRecordingOptions}
+              onClose={() => setShowRecipeDialog(false)}
+              onRunSuccess={(name) => notify(`Recipe "${name}" applied`)}
+            />
+          )}
+          {showBatchDialog && (
+            <BatchRunnerDialog
+              editor={editor}
+              onClose={() => setShowBatchDialog(false)}
+            />
+          )}
+          {showExportDialog && (
+            <ExportDialog
+              document={dom.toJSON()}
+              color={
+                editor.colorSettings.output.profile === "srgb" &&
+                editor.colorSettings.output.intent ===
+                  "relative-colorimetric" &&
+                !editor.colorSettings.output.blackPointCompensation
+                  ? undefined
+                  : editor.colorSettings.output
+              }
+              pages={editor.documentSessions.map((session) => ({
+                key: session.id,
+                document: session.document._read(),
+              }))}
+              busy={busy}
+              onClose={() => setShowExportDialog(false)}
+              onExport={async (options, control, pageKeys) => {
+                await task(async () => {
+                  let result;
+                  try {
+                    if (pageKeys) {
+                      const sessions = editor.documentSessions;
+                      const pages = pageKeys.map((key) => {
+                        const session = sessions.find(
+                          (session) => session.id === key,
+                        );
+                        if (!session)
+                          throw new Error(
+                            "A TIFF page document is no longer open. Choose its pages again.",
+                          );
+                        return session.document;
+                      });
+                      result = await editor.exportTiffPages(
+                        pages,
+                        {
+                          variant: options.tiffVariant,
+                          precision: options.tiffPrecision,
+                          color: options.color,
+                        },
+                        control,
+                      );
+                    } else result = await editor.export(options, control);
+                  } catch (error) {
+                    if (control?.signal?.aborted) return;
+                    throw error;
+                  }
+                  if (control?.signal?.aborted) return;
+                  download(
+                    result.blob,
+                    `${fileName(dom.name)}.${result.extension}`,
+                  );
+                  notify(`Exported .${result.extension}`);
                 });
               }}
             />
-            {smartObjectEdit && (
-              <div
-                className="smart-object-edit-bar"
-                role="region"
-                aria-label="Smart-object contents"
-              >
-                <span>
-                  {smartObjectEdit.ownerOpen
-                    ? `Editing contents for ${smartObjectEdit.ownerName}.`
-                    : "Source document closed. Contents remain available in this tab."}
-                  {smartObjectEdit.ownerOpen &&
-                    (smartObjectEdit.changed
-                      ? " Changes are not applied."
-                      : " No pending contents changes.")}
-                </span>
-                <Button
-                  disabled={
-                    busy ||
-                    !smartObjectEdit.ownerOpen ||
-                    !smartObjectEdit.changed
-                  }
-                  onClick={() => {
-                    void task(async () => {
-                      await editor.applySmartObjectContents(dom);
-                      notify("Smart-object contents applied.");
-                    });
-                  }}
-                >
-                  Apply to source
-                </Button>
-                <Button
-                  disabled={busy}
-                  onClick={() =>
-                    attempt(() => editor.detachSmartObjectContents(dom))
-                  }
-                >
-                  Keep as document
-                </Button>
-              </div>
-            )}
-            <div className="canvas-toolbar">
-              <span>
-                {selected ? selected.name : "Canvas"}
-                <ChevronRight size={12} />
-                <span className="text-muted">
-                  {selected?.kind === "group"
-                    ? "Group"
-                    : selected
-                      ? `${selected.kind[0].toUpperCase() + selected.kind.slice(1)} layer`
-                      : "Document"}
-                </span>
-              </span>
-              <button onClick={fit} title="Fit canvas">
-                <Maximize size={13} />
-                Fit
-              </button>
-            </div>
-            <ToolOptions
-              floatEditing={dom.precision==='float32'}
-              onBrushPresets={()=>{editor.tools.cancel();setShowBrushPresets(true);}}
-              onBrushSymmetry={()=>{editor.tools.cancel();setShowBrushSymmetry(true);}}
-              onBrushTip={()=>{editor.tools.cancel();setShowBrushTip(true);}}
-              onBrushTexture={()=>{editor.tools.cancel();setShowBrushTexture(true);}}
-              onPressureCurve={()=>{editor.tools.cancel();setShowPressureCurve(true);}}
-              tool={tool}
-              moveTarget={movingMask ? "mask" : "layer"}
-              hasMask={!!selected?.mask}
-              hasPaintMask={!!selected?.mask}
-              hasFilterMask={
-                selected?.kind === "smart-object" && !!selected.filterMask
-              }
-              hasVectorMask={selected?.mask?.kind === "vector"}
-              hasTextPath={selected?.kind === 'text' && !!selected.textPath}
-              onMoveTarget={setMoveTarget}
-              snapEnabled={snapEnabled}
-              onSnapEnabled={setSnapEnabled}
-              snapArtwork={snapArtwork}
-              onSnapArtwork={setSnapArtwork}
-              spacingHints={spacingHints}
-              onSpacingHints={setSpacingHints}
-              snapSpacing={snapSpacing}
-              onSnapSpacing={setSnapSpacing}
-              controller={editor.tools}
-              settings={toolState.settings}
-              hasSelection={!!state.document.selection}
-              disabled={busy || locked}
-              onAction={attempt}
-              onModifySelection={() => { editor.tools.cancel(); setSelectionModification("expand"); }}
-              onColorRange={()=>{editor.tools.cancel();setShowColorRange(true);}}
-              onOpenImageSize={() => { editor.tools.cancel(); setShowImageSizeDialog(true); }}
-              onOpenArtboard={() => setShowArtboardDialog(true)}
-              onOpenCrop={() => {
-                if (!busy) setShowCropDialog(true);
-              }}
-              documentBusy={busy}
-            />
-            <div
-              ref={viewport}
-              className={`viewport ${tool === "hand" || spacePan ? "hand" : `tool-${tool}`} ${resizingCursor ? `resizing-${resizingCursor}` : ""}`}
-              tabIndex={-1}
-              aria-label="Editing canvas"
-              onContextMenu={(event) => {
-                event.preventDefault();
-                if (
-                  busy ||
-                  editor.tools.getSnapshot().drawing ||
-                  editor.tools.drawingPolygonLasso ||
-                  gesture.current
-                )
-                  return;
-                setContextMenu({ x: event.clientX, y: event.clientY });
-              }}
-              onPointerDown={pointerDown}
-              onPointerMove={pointerMove}
-              onPointerUp={pointerUp}
-              onPointerLeave={() => updateCursor(null)}
-              onLostPointerCapture={(event) => {
-                if (capturedPointer.current !== event.pointerId) return;
-                capturedPointer.current = null;
-                setPerspectiveIssue(null);
-                editor.tools.cancel();
-                gesture.current = null;pointerDocument.current=null;
-                setResizingCursor(null);
-                setPreview(null);
-              }}
-              onPointerCancel={() => {
-                capturedPointer.current = null;
-                setPerspectiveIssue(null);
-                editor.tools.cancel();
-                gesture.current = null;pointerDocument.current=null;
-                setResizingCursor(null);
-                setPreview(null);
-              }}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                const file = event.dataTransfer.files[0];
-                if(file)handleImportFile(file);
-              }}
-            >
-              {guidesVisible && (
-                <CanvasRulers
-                  viewport={viewport}
-                  document={dom}
-                  zoom={zoom}
-                  pan={pan}
-                  revision={state.revision}
-                  editable={!busy && !spacePan}
-                  onAttempt={attempt}
-                />
-              )}
-              <div
-                className="canvas-wrap"
-                style={{
-                  width: viewDocument.width * zoom,
-                  height: viewDocument.height * zoom,
-                  transform: `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px))`,
-                }}
-              >
-                <span className="canvas-label">{dom.name.toUpperCase()}</span>
-                <div className="artwork-clip">
-                  <div
-                    ref={displayHost}
-                    className="artwork-host"
-                    style={{
-                      visibility: renderError ? 'hidden' : undefined,
-                      position: "absolute",
-                      left: paintedRegion.x * zoom,
-                      top: paintedRegion.y * zoom,
-                      width: paintedRegion.width * zoom,
-                      height: paintedRegion.height * zoom,
-                    }}
-                  />
-                </div>
-                <CanvasOverlays
-                  viewportWindow={penOverlayWindow}
-                  document={viewDocument}
-                  selected={selected}
-                  tool={tool}
-                  zoom={zoom}
-                  controller={editor.tools}
-                  cursorStore={cursorStore}
-                  showBrushCursor={!customCursors}
-                  onError={setError}
-                />
-                {previewCandidate && (
-                  <div
-                    className="generation-candidate-preview-overlay"
-                    style={{
-                      position: "absolute",
-                      left:
-                        Math.round((dom.width - previewCandidate.width) / 2) *
-                        zoom,
-                      top:
-                        Math.round((dom.height - previewCandidate.height) / 2) *
-                        zoom,
-                      width: previewCandidate.width * zoom,
-                      height: previewCandidate.height * zoom,
-                      pointerEvents: "none",
-                      zIndex: 20,
-                    }}
-                  >
-                    <img
-                      src={previewCandidate.asset.thumbnail}
-                      alt="Generation Candidate Preview"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
-                        opacity: 0.9,
-                      }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        border: "2px dashed var(--color-accent)",
-                        borderRadius: 2,
-                      }}
-                    />
-                  </div>
-                )}
-                {tool === "crop" && editor.tools.crop.bounds && (
-                  <CropOverlay
-                    bounds={editor.tools.crop.bounds}
-                    width={dom.width}
-                    height={dom.height}
-                    zoom={zoom}
-                    onNudge={(handle, dx, dy) =>
-                      attempt(() => editor.tools.crop.nudge(dx, dy, handle))
-                    }
-                  />
-                )}
-                {(guidesVisible ? (state.document.guides ?? []) : [])
-                  .filter(
-                    (guide) =>
-                      guide.position >= 0 &&
-                      guide.position <=
-                        (guide.orientation === "vertical"
-                          ? dom.width
-                          : dom.height),
-                  )
-                  .map((guide) => (
-                    <GuideOverlay
-                      key={guide.id}
-                      guide={guide}
-                      document={dom}
-                      zoom={zoom}
-                      revision={state.revision}
-                      editable={
-                        tool === "move" && !busy && !spacePan && !movingMask
-                      }
-                      onAttempt={attempt}
-                    />
-                  ))}
-                <SpacingOverlay guides={spacingGuides} zoom={zoom}/>
-                {snapGuides.x !== undefined && (
-                  <div
-                    className="snap-guide vertical"
-                    aria-hidden="true"
-                    style={{
-                      left: snapGuides.x * zoom,
-                      height: dom.height * zoom,
-                    }}
-                  />
-                )}
-                {snapGuides.y !== undefined && (
-                  <div
-                    className="snap-guide horizontal"
-                    aria-hidden="true"
-                    style={{
-                      top: snapGuides.y * zoom,
-                      width: dom.width * zoom,
-                    }}
-                  />
-                )}
-                {perspectiveEditing&&!busy&&selected&&(selected.kind==='raster'||selected.kind==='smart-object')&&<PerspectiveOverlay layer={selected} world={layerTransform(viewDocument,selected.id)!} zoom={zoom} onNudge={nudgePerspectiveCorner}/>}
-                {bounds &&
-                  selected?.visible &&
-                  tool === "move" &&
-                  !movingMask && !perspectiveEditing && (
-                    <div
-                      className={`selection-outline ${locked ? "locked" : ""}`}
-                      style={{
-                        left: bounds.x * zoom,
-                        top: bounds.y * zoom,
-                        width: bounds.width * zoom,
-                        height: bounds.height * zoom,
-                      }}
-                    >
-                      {canRotateSelection && (
-                        <button
-                          type="button"
-                          className="rotation-handle"
-                          data-rotate="true"
-                          aria-label="Drag to rotate layer"
-                          title="Drag to rotate; hold Shift for 15° increments"
-                        />
-                      )}
-                      {(isResizable && state.selectedIds.length < 2) ||
-                      (state.selectedIds.length > 1 && canRotateSelection) ? (
-                        <>
-                          <i
-                            className="handle handle-nw"
-                            data-handle="nw"
-                            style={resizeHandleStyle(false, false)}
-                            title="Resize"
-                          />
-                          <i
-                            className="handle handle-ne"
-                            data-handle="ne"
-                            style={resizeHandleStyle(true, false)}
-                            title="Resize"
-                          />
-                          <i
-                            className="handle handle-sw"
-                            data-handle="sw"
-                            style={resizeHandleStyle(false, true)}
-                            title="Resize"
-                          />
-                          <i
-                            className="handle handle-se"
-                            data-handle="se"
-                            style={resizeHandleStyle(true, true)}
-                            title="Resize"
-                          />
-                        </>
-                      ) : !locked ? (
-                        <>
-                          <i />
-                          <i />
-                          <i />
-                          <i />
-                        </>
-                      ) : null}
-                    </div>
-                  )}
-              </div>
-              {perspectiveEditing&&perspectiveIssue&&<div className="perspective-issue" role="status">{perspectiveIssue}</div>}
-              {renderError&&<div className="canvas-render-error" role="alert"><strong>Preview unavailable</strong><p>{renderError}</p></div>}
-              <CanvasCursor viewport={viewport} enabled={customCursors} copies={cursorAdapters.copies} texturePreview={texturePreview.url} footprint={cursorAdapters.footprint} tool={tool} spacePan={spacePan} size={tool==='quick-select'?toolState.settings.quickSize:toolState.settings.size} zoom={zoom} />
-              {!dom.layers.length &&
-                !dom.guides.length &&
-                (tool === "move" || tool === "hand") && (
-                  <div className="empty-state">
-                    <div className="empty-icon">
-                      <ImagePlus size={27} />
-                    </div>
-                    <h1>Make room for your next idea.</h1>
-                    <p>Drop an image here, or start with a sample.</p>
-                    <Button
-                      variant="primary"
-                      onClick={() => importInput.current?.click()}
-                      disabled={busy}
-                    >
-                      <Plus size={15} />
-                      Import image
-                    </Button>
-                    <button
-                      className="sample-link"
-                      onClick={() => void task(() => editor.openSample())}
-                      disabled={busy}
-                    >
-                      Open sample composition <ChevronRight size={13} />
-                    </button>
-                    <small>
-                      PNG, JPG, WEBP, SVG · Original resolution preserved
-                    </small>
-                  </div>
-                )}
-              <div className="zoom-control">
-                <IconButton
-                  label="Zoom out"
-                  onClick={() => changeZoom(1 / 1.2)}
-                >
-                  <Minus size={14} />
-                </IconButton>
-                <button aria-label="Zoom level, click to fit" onClick={fit}>
-                  {Math.round(zoom * 100)}%
-                </button>
-                <IconButton label="Zoom in" onClick={() => changeZoom(1.2)}>
-                  <Plus size={14} />
-                </IconButton>
-                <span />
-                <IconButton
-                  shortcutId="fit"
-                  label="Fit canvas (Mod+0)"
-                  onClick={fit}
-                >
-                  <Maximize size={14} />
-                </IconButton>
-              </div>
-            </div>
-            <footer className="canvas-status">
-              <span
-                aria-label="Rendering backend"
-                title={
-                  renderBackend === "webgpu"
-                    ? "WebGPU viewport acceleration"
-                    : "Canvas rendering with WASM processing"
-                }
-              >
-                {renderBackend === "webgpu"
-                  ? "GPU accelerated"
-                  : "Standard rendering"}
-              </span>
-              <span>
-                <span
-                  className={`status-dot ${rendering || busy ? "working" : renderError ? "failed" : ""}`}
-                />
-                {busy ? "Working…" : rendering ? "Rendering…" : renderError ? "Preview unavailable" : "Ready"}
-                <span className="footer-divider">/</span>
-                {viewDocument.width} × {viewDocument.height} px
-                <span className="footer-divider">/</span>
-                <button
-                  type="button"
-                  className="status-profile-btn"
-                  onClick={() => setShowColorDialog(true)}
-                  title={[dom.precision==='float32'?'32-bit linear sRGB editing; SDR canvas preview. Click for output settings.':"sRGB8 editing. Click for output profile and canvas proof settings.",...editor.colorWarnings].join(" ")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "inherit",
-                    font: "inherit",
-                    cursor: "pointer",
-                    padding: 0,
-                    textDecoration: "underline dotted",
-                    display: "inline-block",
-                    maxWidth: "min(20vw, 200px)",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  {dom.precision==='float32'?'Linear RGB32':'sRGB8'} · Output: {iccTarget(editor.colorSettings.output.profile).name}
-                </button>
-                {(editor.colorSettings.proof||proofStatus==='pending'||proofStatus==='failed')&&<><span className="footer-divider">/</span><span data-testid="proof-status" style={{display:"inline-block",maxWidth:"min(25vw, 260px)",overflow:"hidden",textOverflow:"ellipsis",verticalAlign:"middle"}} title={proofStatus==='failed'?'Proof update failed; the previous frame is retained.':editor.colorSettings.proof?iccTarget(editor.colorSettings.proof.profile).name:'Removing proof'}>Proof: {proofStatus}{editor.colorSettings.proof?` · ${iccTarget(editor.colorSettings.proof.profile).name}`:''}</span></>}
-                {!!editor.colorWarnings.length&&<span title={editor.colorWarnings.join(' ')}> · Color notice</span>}
-              </span>
-              <span title={recoveryState.message}>
-                {recoveryState.status === "error"
-                  ? recoveryState.message
-                  : savedStamp === stamp
-                    ? "Project downloaded"
-                    : recoveryState.message}
-              </span>
-            </footer>
-          </main>
-          }
-          inspectorResize={
-          <PanelResizeHandle
-            label="Resize inspector panel"
-            value={panelLayout.widths.inspector}
-            min={230}
-            max={panelLayout.max("inspector")}
-            direction={panelLayout.layout.panels.inspector.side==='left'?1:-1}
-            disabled={busy}
-            onStart={() => {
-              editor.tools.cancel();
-              setPreview(null);
-            }}
-            onPreview={(value) => panelLayout.change("inspector", value, false)}
-            onCommit={(value) => panelLayout.change("inspector", value, true)}
-            onCancel={panelLayout.cancel}
-            onReset={() => panelLayout.reset("inspector")}
-          />
-          }
-          inspector={
-          <InspectorPanel
-            perspectiveEditing={perspectiveEditing} canEditPerspective={canEditPerspective} onTogglePerspective={togglePerspectiveEditing}
-            guidesVisible={guidesVisible}
-            onGuidesVisible={setGuidesVisible}
-            assets={assets}
-            document={dom}
-            viewDocument={viewDocument}
-            selected={selected}
-            selectedObject={selectedObject}
-            selectedPathId={toolState.selectedPath?.pathId}
-            locked={locked}
-            busy={busy}
-            wasmReady={wasmReady}
-            preview={preview}
-            onPreview={setPreview}
-            onAttempt={attempt}
-            onSelectedAction={selectedAction}
-            onOpenHelp={() => setShowHelp(true)}
-            onDevelopRaw={layer=>setRawLayer(layer)}
-            onManageFonts={()=>{cancelWorkspaceGesture();setFontManagerOwner(dom);}}
-            onCombinePaths={()=>{editor.tools.cancel();setShowVectorBoolean(true);}}
-          />
-          }
-        />
-
-        {(error || message) && (
-          <div
-            className={`toast ${error ? "error" : ""}`}
-            role={error ? "alert" : "status"}
-          >
-            {error || message}
-            <IconButton
-              label="Dismiss notification"
-              onClick={() => {
-                setError(null);
-                setMessage(null);
-              }}
-            >
-              <X size={14} />
-            </IconButton>
-          </div>
-        )}
-        {fontManagerOwner&&<FontManagerDialog document={fontManagerOwner} fontSources={editor} assertOwner={()=>{
-          if(editor.document!==fontManagerOwner||!editor.documentSessions.some(session=>session.document===fontManagerOwner))throw new Error('The document changed or closed. Reopen Document fonts for the current document.');
-        }} onClose={()=>setFontManagerOwner(null)} onReplace={(from,to,revision)=>{
-          if(editor.document!==fontManagerOwner||!editor.documentSessions.some(session=>session.document===fontManagerOwner)||fontManagerOwner.getSnapshot().revision!==revision)throw new Error('The document changed or closed. Reopen Document fonts for the current document.');
-          fontManagerOwner.fonts.replace(from,to);
-        }}/>}
-        {showPlugins && (
-          <PluginPanel editor={editor} onClose={() => setShowPlugins(false)} />
-        )}
-        {selectionModification && <SelectionModifyDialog operation={selectionModification}
-          onApply={(options,control) => dom.modifySelection(options,control)} onClose={() => setSelectionModification(null)} />}
-        {showColorRange&&<ColorRangeDialog editor={editor} onClose={()=>setShowColorRange(false)}/>}
-        {showVectorBoolean&&<VectorBooleanDialog key={dom.id} document={dom} onClose={()=>setShowVectorBoolean(false)} onResult={path=>{if(editor.document===dom)editor.tools.selectVectorPath(path);}}/>}
-        {subjectProgress&&<SubjectSelectionProgress progress={subjectProgress} onCancel={()=>subjectAbort.current?.abort()}/>}
-        {mattingProgress&&<SubjectSelectionProgress title="Remove Background" description={mattingProgress.phase==='solve'?`Solving the global matte · iteration ${mattingProgress.iteration??0}`:"Refining the selected raster's native matte…"} progress={mattingProgress} onCancel={()=>mattingAbort.current?.abort()}/>}
-        {showCropDialog && (
-          <CropDialog
-            width={dom.width}
-            height={dom.height}
-            selection={dom.selection?.toJSON() ?? null}
-            initialBounds={editor.tools.crop.bounds}
-            documentStamp={stamp}
-            onCrop={(bounds) => {
-              clearPreview();
-              dom.crop(bounds);
-              notify(`Cropped canvas to ${bounds.width} × ${bounds.height} px`);
-            }}
-            onClose={() => setShowCropDialog(false)}
-          />
-        )}
-        {frequencySource&&<FrequencySeparationDialog editor={editor} layerId={frequencySource} onClose={()=>setFrequencySource(null)} onBusyChange={setBusy} onCreated={()=>notify("Frequency layers created")}/>}
-        {showImageSizeDialog && (
-          <ArtboardDialog mode="image" currentWidth={dom.width} currentHeight={dom.height}
-            onResize={(width, height) => { editor.tools.cancel(); dom.resizeImage(width, height); notify(`Resized image to ${width} × ${height} px`); }}
-            onClose={() => setShowImageSizeDialog(false)} />
-        )}
-        {showArtboardDialog && (
-          <ArtboardDialog
-            currentWidth={dom.width}
-            currentHeight={dom.height}
-            onResize={(w, h) =>
-              attempt(() => {
-                dom.resize(w, h);
-                notify(`Resized artboard to ${w} × ${h} px`);
-              })
-            }
-            onClose={() => setShowArtboardDialog(false)}
-          />
-        )}
-        {showPalette && (
-          <WorkspaceCommandPalette
-            editor={editor}
-            onRecent={entry=>{cancelWorkspaceGesture();setRecentRequest({id:entry.id!});}}
-            actions={shortcuts.actions}
-            busy={busy}
-            onClose={() => setShowPalette(false)}
-            onExecute={(action) => {
-              flushSync(() => setShowPalette(false));
-              if (action.enabled?.() !== false) action.run();
-            }}
-          />
-        )}
-        {showBrushPresets&&<BrushPresetsDialog library={editor.brushPresets} sourceOwner={editor.brushTextureSource} tool={tool as import('../brushes/presets').BrushTool} settings={toolState.settings} onClose={()=>setShowBrushPresets(false)} onApply={async(preset,signal)=>{await editor.applyBrushPreset(preset,{signal,selectTool:chooseTool});setShowBrushPresets(false);}}/>}
-        {showBrushSymmetry&&<BrushSymmetryDialog symmetry={toolState.settings.symmetry} width={dom.width} height={dom.height} onClose={()=>setShowBrushSymmetry(false)} onApply={symmetry=>{editor.tools.configure({symmetry});setShowBrushSymmetry(false);}}/>}
-        {showBrushTip&&<BrushTipDialog tip={toolState.settings.tip} pencil={tool==="pencil"} onClose={()=>setShowBrushTip(false)} onApply={tip=>{editor.tools.configure({tip});setShowBrushTip(false);}}/>}
-        {showBrushTexture&&<BrushTextureDialog editor={editor} onClose={()=>setShowBrushTexture(false)}/>}
-        {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
-        {showWorkspaceLayout&&<WorkspaceLayoutDialog preferences={panelLayout.preferences} loadError={panelLayout.error} onApply={layout=>{panelLayout.apply(layout);cancelWorkspaceGesture();}} onSave={(layout,name,id)=>{panelLayout.save(layout,name,id);cancelWorkspaceGesture();}} onRename={panelLayout.rename} onDelete={panelLayout.remove} onReload={panelLayout.reload} onClose={()=>setShowWorkspaceLayout(false)}/>}
-        {(showColorPalettes||colorPaletteRequest)&&<PaletteLibraryDialog library={editor.palettes} color={colorPaletteRequest?.color??toolState.settings.color} onChoose={colorPaletteRequest?.onChoose} onClose={()=>{setShowColorPalettes(false);setColorPaletteRequest(null);}}/>}
-        {showHistoryInspector&&<HistoryInspectorDialog editor={editor} onClose={()=>setShowHistoryInspector(false)}/>}
-        {showArtworkLibrary&&<ArtworkLibraryDialog editor={editor} onClose={()=>setShowArtworkLibrary(false)} onPlaced={()=>notify("Placed saved artwork")}/>}
-        {showAccount&&<AccountDialog client={accountClient} onClose={()=>setShowAccount(false)}/>}
-        {showChatGptConnection&&<ChatGptConnectionDialog editor={editor} onClose={()=>setShowChatGptConnection(false)}/>}
-        {showHelp && (
-          <ShortcutDialog
-            shortcuts={shortcuts}
-            error={resolvedBindings.error ?? shortcutPreferences.error}
-            onBinding={changeShortcut}
-            onResetAll={resetShortcuts}
-            onClose={() => setShowHelp(false)}
-          />
-        )}
-        {showScripts && (
-          <ScriptPanel editor={editor} onClose={() => setShowScripts(false)} />
-        )}
-        {showGenerateDialog && (
-          <GenerateAssetDialog
-            editor={editor}
-            initialModality={generateDialogModality}
-            onClose={() => {
-              setShowGenerateDialog(false);
-              setPreviewCandidate(null);
-            }}
-            onPreviewCandidate={setPreviewCandidate}
-          />
-        )}
-        {showRecipeDialog && (
-          <RecipeDialog
-            editor={editor}
-            recordingOptions={recipeRecordingOptions}
-            onRecordingOptionsChange={setRecipeRecordingOptions}
-            onClose={() => setShowRecipeDialog(false)}
-            onRunSuccess={(name) => notify(`Recipe "${name}" applied`)}
-          />
-        )}
-        {showBatchDialog && (
-          <BatchRunnerDialog
-            editor={editor}
-            onClose={() => setShowBatchDialog(false)}
-          />
-        )}
-        {showExportDialog && (
-          <ExportDialog
-            document={dom.toJSON()}
-            color={editor.colorSettings.output.profile==='srgb'&&editor.colorSettings.output.intent==='relative-colorimetric'&&!editor.colorSettings.output.blackPointCompensation?undefined:editor.colorSettings.output}
-            pages={editor.documentSessions.map(session=>({key:session.id,document:session.document._read()}))}
-            busy={busy}
-            onClose={() => setShowExportDialog(false)}
-            onExport={async (options, control, pageKeys) => {
-              await task(async () => {
-                let result;
-                try {
-                  if(pageKeys){
-                    const sessions=editor.documentSessions;
-                    const pages=pageKeys.map(key=>{const session=sessions.find(session=>session.id===key);if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');return session.document;});
-                    result=await editor.exportTiffPages(pages,{variant:options.tiffVariant,precision:options.tiffPrecision,color:options.color},control);
-                  }else result = await editor.export(options, control);
-                }
-                catch (error) { if (control?.signal?.aborted) return; throw error; }
-                if (control?.signal?.aborted) return;
-                download(
-                  result.blob,
-                  `${fileName(dom.name)}.${result.extension}`,
+          )}
+          {showColorDialog && (
+            <ColorProfileDialog
+              key={editor.recoverySessionId}
+              settings={editor.colorSettings}
+              precision={dom.precision}
+              conversionIssue={editor.floatConversionIssue}
+              onConvert={async (settings, signal) => {
+                await editor.convertDocumentToFloat({ signal }, settings);
+                notify(
+                  "32-bit linear editing and color output settings applied",
                 );
-                notify(`Exported .${result.extension}`);
-              });
-            }}
-          />
-        )}
-        {showColorDialog && (
-          <ColorProfileDialog
-            key={editor.recoverySessionId}
-            settings={editor.colorSettings}
-            precision={dom.precision}
-            conversionIssue={editor.floatConversionIssue}
-            onConvert={async(settings,signal)=>{await editor.convertDocumentToFloat({signal},settings);notify('32-bit linear editing and color output settings applied');}}
-            warnings={editor.colorWarnings}
-            inspect={(file,name,signal)=>editor.inspectColorProfile(file,name,{signal})}
-            onApply={async(settings,signal)=>{const warnings=await editor.setColorSettings(settings,{signal});notify(warnings.length?warnings.join(' '):'Color output and proof settings applied');}}
-            onClose={() => setShowColorDialog(false)}
-          />
-        )}
-        {svgFile&&<SvgImportDialog file={svgFile} editor={editor} onClose={()=>setSvgFile(null)} onBusyChange={setBusy} onImported={()=>notify("SVG imported")}/>}
-        {tiffFile&&<TiffImportDialog file={tiffFile} editor={editor} onClose={()=>setTiffFile(null)} onBusyChange={setBusy} onImported={()=>notify("TIFF page imported")}/>}
-        {(rawFile||rawLayer)&&<RawDevelopmentDialog editor={editor} file={rawFile??undefined} layer={rawLayer??undefined} onClose={()=>{setRawFile(null);setRawLayer(null);}} onBusyChange={setBusy} onApplied={()=>notify(rawFile?'RAW image imported':'RAW development applied')}/>}
-        {avifFile&&<AvifImportDialog file={avifFile} editor={editor} onClose={()=>setAvifFile(null)} onBusyChange={setBusy} onImported={()=>notify("AVIF image imported")}/>}
-        {photoshopFile&&<PhotoshopImportDialog key={photoshopFile.id} file={photoshopFile.file} editor={editor} onClose={()=>setPhotoshopFile(null)} onBusyChange={setBusy} onImported={()=>notify("Photoshop file imported")}/>}
-        {showPreflight&&<PreflightDialog editor={editor} onClose={()=>setShowPreflight(false)}/>}
-        {showRefineEdgeDialog && (
-          <RefineEdgeDialog
-            editor={editor}
-            onClose={() => setShowRefineEdgeDialog(false)}
-            onApply={async (options,control) => {
-              await editor.refineEdge(options,control);
-              notify("Edge refined");
-            }}
-          />
-        )}
-        {contextMenu && (
-          <CanvasContextMenu
-            x={contextMenu.x}
-            y={contextMenu.y}
-            tool={tool}
-            settings={toolState.settings}
-            controller={editor.tools}
-            floatEditing={dom.precision==='float32'}
-            disabled={busy || locked}
-            hasSelection={!!state.document.selection}
-            hasMask={!!selected?.mask}
-            hasVectorMask={selected?.mask?.kind === "vector"}
-            moveTarget={movingMask ? "mask" : "layer"}
-            onMoveTarget={setMoveTarget}
-            selectedLayer={selectedObject}
-            locked={locked}
-            onChooseTool={chooseTool}
-            onAddLayer={addLayer}
-            onAddAdjustmentLayer={addAdjustmentLayer}
-            onFrequencySeparation={dom.precision!=='float32'&&selectedObject instanceof RasterLayer ? () => setFrequencySource(selectedObject.id) : undefined}
-            onSelectSubject={handleSelectSubject}
-            onRemoveBackground={handleRemoveBackground}
-            onRefineEdge={() => setShowRefineEdgeDialog(true)}
-            onGenerateLayer={() => {
-              setGenerateDialogModality("text-to-image");
-              setShowGenerateDialog(true);
-            }}
-            onGenerativeFill={() => {
-              setGenerateDialogModality("masked-edit");
-              setShowGenerateDialog(true);
-            }}
-            onDuplicateLayer={() =>
-              selectedAction((layer) => {
-                dom.selectedLayer = layer.duplicate();
-              })
-            }
-            onDeleteLayer={() =>
-              selectedAction((layer) => {
-                layer.remove();
-              })
-            }
-            onSelectAll={() => attempt(() => dom.selectAll())}
-            onDeselect={() => attempt(() => dom.deselect())}
-            onFillSelection={() => attempt(() => editor.tools.fillSelection())}
-            onFit={fit}
-            onActualSize={() => {
-              setZoom(1);
-              setPan({ x: 0, y: 0 });
-            }}
-            onClose={() => setContextMenu(null)}
-          />
-        )}
-      </div>
-    </ShortcutHints.Provider></PaletteLibraryContext.Provider>
+              }}
+              warnings={editor.colorWarnings}
+              inspect={(file, name, signal) =>
+                editor.inspectColorProfile(file, name, { signal })
+              }
+              onApply={async (settings, signal) => {
+                const warnings = await editor.setColorSettings(settings, {
+                  signal,
+                });
+                notify(
+                  warnings.length
+                    ? warnings.join(" ")
+                    : "Color output and proof settings applied",
+                );
+              }}
+              onClose={() => setShowColorDialog(false)}
+            />
+          )}
+          {svgFile && (
+            <SvgImportDialog
+              file={svgFile}
+              editor={editor}
+              onClose={() => setSvgFile(null)}
+              onBusyChange={setBusy}
+              onImported={() => notify("SVG imported")}
+            />
+          )}
+          {tiffFile && (
+            <TiffImportDialog
+              file={tiffFile}
+              editor={editor}
+              onClose={() => setTiffFile(null)}
+              onBusyChange={setBusy}
+              onImported={() => notify("TIFF page imported")}
+            />
+          )}
+          {(rawFile || rawLayer) && (
+            <RawDevelopmentDialog
+              editor={editor}
+              file={rawFile ?? undefined}
+              layer={rawLayer ?? undefined}
+              onClose={() => {
+                setRawFile(null);
+                setRawLayer(null);
+              }}
+              onBusyChange={setBusy}
+              onApplied={() =>
+                notify(
+                  rawFile ? "RAW image imported" : "RAW development applied",
+                )
+              }
+            />
+          )}
+          {avifFile && (
+            <AvifImportDialog
+              file={avifFile}
+              editor={editor}
+              onClose={() => setAvifFile(null)}
+              onBusyChange={setBusy}
+              onImported={() => notify("AVIF image imported")}
+            />
+          )}
+          {photoshopFile && (
+            <PhotoshopImportDialog
+              key={photoshopFile.id}
+              file={photoshopFile.file}
+              editor={editor}
+              onClose={() => setPhotoshopFile(null)}
+              onBusyChange={setBusy}
+              onImported={() => notify("Photoshop file imported")}
+            />
+          )}
+          {showPreflight && (
+            <PreflightDialog
+              editor={editor}
+              onClose={() => setShowPreflight(false)}
+            />
+          )}
+          {showRefineEdgeDialog && (
+            <RefineEdgeDialog
+              editor={editor}
+              onClose={() => setShowRefineEdgeDialog(false)}
+              onApply={async (options, control) => {
+                await editor.refineEdge(options, control);
+                notify("Edge refined");
+              }}
+            />
+          )}
+          {contextMenu && (
+            <CanvasContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              tool={tool}
+              settings={toolState.settings}
+              controller={editor.tools}
+              floatEditing={dom.precision === "float32"}
+              disabled={busy || locked}
+              hasSelection={!!state.document.selection}
+              hasMask={!!selected?.mask}
+              hasVectorMask={selected?.mask?.kind === "vector"}
+              moveTarget={movingMask ? "mask" : "layer"}
+              onMoveTarget={setMoveTarget}
+              selectedLayer={selectedObject}
+              locked={locked}
+              onChooseTool={chooseTool}
+              onAddLayer={addLayer}
+              onAddAdjustmentLayer={addAdjustmentLayer}
+              onFrequencySeparation={
+                dom.precision !== "float32" &&
+                selectedObject instanceof RasterLayer
+                  ? () => setFrequencySource(selectedObject.id)
+                  : undefined
+              }
+              onSelectSubject={handleSelectSubject}
+              onRemoveBackground={handleRemoveBackground}
+              onRefineEdge={() => setShowRefineEdgeDialog(true)}
+              onGenerateLayer={() => {
+                setGenerateDialogModality("text-to-image");
+                setShowGenerateDialog(true);
+              }}
+              onGenerativeFill={() => {
+                setGenerateDialogModality("masked-edit");
+                setShowGenerateDialog(true);
+              }}
+              onDuplicateLayer={() =>
+                selectedAction((layer) => {
+                  dom.selectedLayer = layer.duplicate();
+                })
+              }
+              onDeleteLayer={() =>
+                selectedAction((layer) => {
+                  layer.remove();
+                })
+              }
+              onSelectAll={() => attempt(() => dom.selectAll())}
+              onDeselect={() => attempt(() => dom.deselect())}
+              onFillSelection={() =>
+                attempt(() => editor.tools.fillSelection())
+              }
+              onFit={fit}
+              onActualSize={() => {
+                setZoom(1);
+                setPan({ x: 0, y: 0 });
+              }}
+              onClose={() => setContextMenu(null)}
+            />
+          )}
+        </div>
+      </ShortcutHints.Provider>
+    </PaletteLibraryContext.Provider>
   );
 }

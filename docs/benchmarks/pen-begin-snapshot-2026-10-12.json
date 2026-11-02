@@ -17,9 +17,7 @@
               "prepareMs": 7.399999976158142
             }
           ],
-          "longTasks": [
-            93
-          ],
+          "longTasks": [93],
           "longTaskDetails": [
             {
               "start": 1365.7000000178814,
@@ -225,9 +223,7 @@
               "prepareMs": 7.100000023841858
             }
           ],
-          "longTasks": [
-            58
-          ],
+          "longTasks": [58],
           "longTaskDetails": [
             {
               "start": 1401.699999988079,
@@ -713,9 +709,7 @@
               "prepareMs": 7.800000011920929
             }
           ],
-          "longTasks": [
-            56
-          ],
+          "longTasks": [56],
           "longTaskDetails": [
             {
               "start": 2672.300000011921,

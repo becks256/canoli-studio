@@ -1,33 +1,54 @@
-import {retainedDocuments,captureRetainedHistory} from './core/history';
-import {maskPathMapping,type PointMapping} from './core/mask-path';
-import {captureMaskMappedPlacement} from './core/mask-plane-brush';
-import {maskOwnerPose} from './core/mask-plane';
-import {hitTestProjectivePath} from './core/projective-bezier';
-import {ProjectiveTransform} from './core/projective';
-import {activePerspective} from './core/perspective';
-import {brushSymmetrySchema,symmetryMatrices,type BrushSymmetryData} from './core/brush-symmetry';
-import {brushTipSchema,transformPenTilt,interpolatePenTilt,samePenTilt,type BrushTipData,type PenTiltData} from './core/brush-tip';
-import {paintStampGeometry} from './core/paint-stamps';
-import {pressureCurveSchema,type PressureCurveData} from './core/pressure-curve';
-import { BrushPreset, type BrushTool } from './brushes/presets';
-import {BrushTextureSourceOwner,brushTexturePreferenceSchema,type BrushTexturePreference} from './brushes/texture-source';
-import {AssetStore,type ImageAsset} from './core/assets';
-import {referencedAssets} from './core/model';
-import type {BrushTextureData} from './core/brush-texture';
-import { strokeCaptureRegion, strokeIntersectsRegion } from "./engine/stroke-region";
+import { retainedDocuments, captureRetainedHistory } from "./core/history";
+import { maskPathMapping, type PointMapping } from "./core/mask-path";
+import { captureMaskMappedPlacement } from "./core/mask-plane-brush";
+import { maskOwnerPose } from "./core/mask-plane";
+import { hitTestProjectivePath } from "./core/projective-bezier";
+import { ProjectiveTransform } from "./core/projective";
+import { activePerspective } from "./core/perspective";
+import {
+  brushSymmetrySchema,
+  symmetryMatrices,
+  type BrushSymmetryData,
+} from "./core/brush-symmetry";
+import {
+  brushTipSchema,
+  transformPenTilt,
+  interpolatePenTilt,
+  samePenTilt,
+  type BrushTipData,
+  type PenTiltData,
+} from "./core/brush-tip";
+import { paintStampGeometry } from "./core/paint-stamps";
+import {
+  pressureCurveSchema,
+  type PressureCurveData,
+} from "./core/pressure-curve";
+import { BrushPreset, type BrushTool } from "./brushes/presets";
+import {
+  BrushTextureSourceOwner,
+  brushTexturePreferenceSchema,
+  type BrushTexturePreference,
+} from "./brushes/texture-source";
+import { AssetStore, type ImageAsset } from "./core/assets";
+import { referencedAssets } from "./core/model";
+import type { BrushTextureData } from "./core/brush-texture";
+import {
+  strokeCaptureRegion,
+  strokeIntersectsRegion,
+} from "./engine/stroke-region";
 import { freeze } from "./core/immutable";
 import { ClonePreviewSource } from "./engine/clone-preview";
-import {FloatClonePreviewSource} from './engine/float-clone-preview';
-import {floatCloneCaptureRegions} from './engine/float-clone-regions';
-import {encodeFloatWetTile} from './core/float-wet-tile';
-import {captureFloatCloneAssets} from './core/float-clone-assets';
-import {wetBrowserAssets} from './engine/wet-composite';
+import { FloatClonePreviewSource } from "./engine/float-clone-preview";
+import { floatCloneCaptureRegions } from "./engine/float-clone-regions";
+import { encodeFloatWetTile } from "./core/float-wet-tile";
+import { captureFloatCloneAssets } from "./core/float-clone-assets";
+import { wetBrowserAssets } from "./engine/wet-composite";
 import { lassoSelection } from "./core/lasso";
 import { CanvasRenderer } from "./engine/renderer";
 import { CropController } from "./crop-controller";
 import type { CropHandle } from "./crop-controller";
-import type { QuickSelectionOptions } from './core/quick-selection';
-import type { SelectionModificationProgress } from './core/selection-modification';
+import type { QuickSelectionOptions } from "./core/quick-selection";
+import type { SelectionModificationProgress } from "./core/selection-modification";
 import type { EditorApplication } from "./editor";
 import {
   RasterLayer,
@@ -50,17 +71,21 @@ import {
   TextLayer,
   TextPath,
 } from "./dom";
-import type {TextPathData} from './core/text-path';
-import {PATH_POINT_LIMIT} from './core/drawing';
+import type { TextPathData } from "./core/text-path";
+import { PATH_POINT_LIMIT } from "./core/drawing";
 import type { Document, Layer, ShapeOptions } from "./dom";
 import type { EditorCommand } from "./core/commands";
 import { isLocked, findLayer } from "./core/model";
 import type { LayerMaskData } from "./core/masks";
-import { maskOrigin, maskTransform,maskPlacedPerspective } from "./core/masks";
+import { maskOrigin, maskTransform, maskPlacedPerspective } from "./core/masks";
 import { hitTestPath, splitPathSegment } from "./core/bezier";
 import type { CurveHit } from "./core/bezier";
 import { AffineTransform } from "./core/affine";
-import { intrinsicLocalBounds,layerOrigin, layerTransform } from "./core/spatial";
+import {
+  intrinsicLocalBounds,
+  layerOrigin,
+  layerTransform,
+} from "./core/spatial";
 import { strokeBounds, transformSelection } from "./core/drawing";
 import type {
   BrushStrokeData,
@@ -75,11 +100,16 @@ import type {
 } from "./core/drawing";
 import { release } from "./engine/canvas";
 import type { PaintPreview } from "./engine/renderer";
-import {maskStrokePointCount} from './core/masks';
-import type { PreparedWetPaintJob } from './engine/wet-authoring';
-import type { WetPaintPreview } from './engine/wet-preview';
+import { maskStrokePointCount } from "./core/masks";
+import type { PreparedWetPaintJob } from "./engine/wet-authoring";
+import type { WetPaintPreview } from "./engine/wet-preview";
 
-import {DEFAULT_SMUDGE,DEFAULT_MIXER,wetToolSettingsSchema,type WetToolSettings} from './brushes/wet-settings';
+import {
+  DEFAULT_SMUDGE,
+  DEFAULT_MIXER,
+  wetToolSettingsSchema,
+  type WetToolSettings,
+} from "./brushes/wet-settings";
 
 export type Tool =
   | "smudge"
@@ -106,11 +136,11 @@ export type Tool =
 export interface ToolSettings {
   smudge: WetToolSettings;
   mixer: WetToolSettings;
-  quickSize:number;
-  quickTolerance:number;
-  quickEdgeThreshold:number;
-  quickSampling:'merged'|'layer';
-  quickSelectionMode:'replace'|SelectionOperation;
+  quickSize: number;
+  quickTolerance: number;
+  quickEdgeThreshold: number;
+  quickSampling: "merged" | "layer";
+  quickSelectionMode: "replace" | SelectionOperation;
   healingRadius: number;
   patchSampling: "current-layer" | "current-and-below" | "all-layers";
   patchMode: "source" | "mixed";
@@ -133,10 +163,10 @@ export interface ToolSettings {
   smoothing: number;
   pressureSize: boolean;
   pressureOpacity: boolean;
-  pressureCurve: PressureCurveData|null;
-  tip:BrushTipData|null;
-  symmetry:BrushSymmetryData|null;
-  texture:BrushTexturePreference;
+  pressureCurve: PressureCurveData | null;
+  tip: BrushTipData | null;
+  symmetry: BrushSymmetryData | null;
+  texture: BrushTexturePreference;
   color: string;
   penWidth: number;
   penFill: boolean;
@@ -150,8 +180,8 @@ export interface ToolSettings {
 interface ToolState {
   wetPreview: WetPaintPreview | null;
   error: string | null;
-  quickSelectionPoints:Point[]|null;
-  quickSelectionProgress:SelectionModificationProgress|null;
+  quickSelectionPoints: Point[] | null;
+  quickSelectionProgress: SelectionModificationProgress | null;
   lassoPoints: Point[] | null;
   healingStroke: BrushStrokeData | null;
   patchOffset: Point | null;
@@ -165,14 +195,18 @@ interface ToolState {
   drawing: boolean;
 }
 interface BaseGesture {
-  previewAssets?:AssetStore;
-  hostAssets?:AssetStore;
-  selectionIds?:readonly string[];
-  stopChanges?:()=>void;
+  previewAssets?: AssetStore;
+  hostAssets?: AssetStore;
+  selectionIds?: readonly string[];
+  stopChanges?: () => void;
   document: Document;
   revision: number;
   generation: number;
-  textureLease?:{assets:AssetStore;asset:Readonly<ImageAsset>;created:boolean};
+  textureLease?: {
+    assets: AssetStore;
+    asset: Readonly<ImageAsset>;
+    created: boolean;
+  };
 }
 interface PaintGesture extends BaseGesture {
   inputTransform: AffineTransform;
@@ -188,15 +222,15 @@ interface PaintGesture extends BaseGesture {
   offset: Point | null;
   stroke: BrushStrokeData;
   cloneSource?: ClonePreviewSource;
-  floatCloneSource?:FloatClonePreviewSource;
-  erasurePlacement?:import('./core/drawing').ErasurePlacementData;
+  floatCloneSource?: FloatClonePreviewSource;
+  erasurePlacement?: import("./core/drawing").ErasurePlacementData;
 }
 interface WetGesture extends BaseGesture {
-  kind: 'wet';
-  selectionIds:readonly string[];
-  unsubscribe?:()=>void;
-  maxPoints:number;
-  tool: 'smudge' | 'mixer';
+  kind: "wet";
+  selectionIds: readonly string[];
+  unsubscribe?: () => void;
+  maxPoints: number;
+  tool: "smudge" | "mixer";
   inputTransform: AffineTransform;
   settings: ToolSettings;
   points: StrokePoint[];
@@ -214,9 +248,9 @@ interface LassoGesture extends BaseGesture {
   operation: "replace" | SelectionOperation;
 }
 interface QuickSelectionGesture extends BaseGesture {
-  kind:'quick-selection';
-  points:Point[];
-  options:Omit<QuickSelectionOptions,'points'>;
+  kind: "quick-selection";
+  points: Point[];
+  options: Omit<QuickSelectionOptions, "points">;
 }
 interface PolygonLassoDraft extends BaseGesture {
   points: Point[];
@@ -249,14 +283,14 @@ interface PenGesture extends BaseGesture {
   origin: Point;
 }
 interface TextPathGesture extends BaseGesture {
-  kind: 'text-path';
+  kind: "text-path";
   layer: TextLayer;
   selection: readonly string[];
   inputTransform: AffineTransform;
   data: TextPathData;
   original: PathAnchor;
   index: number;
-  mode: 'anchor' | 'in' | 'out' | 'insert';
+  mode: "anchor" | "in" | "out" | "insert";
   start: Point;
   changed: boolean;
 }
@@ -269,7 +303,7 @@ interface FillGesture extends BaseGesture {
   fill: PaintFill;
 }
 interface MaskPaintGesture extends BaseGesture {
-  placement?:import('./core/masks').MaskPlacementData;
+  placement?: import("./core/masks").MaskPlacementData;
   inputTransform: AffineTransform;
   kind: "mask-paint";
   filterMask: boolean;
@@ -282,7 +316,7 @@ interface MaskPaintGesture extends BaseGesture {
 }
 interface MaskPenGesture extends BaseGesture {
   inputTransform: PointMapping;
-  inputOffset?:Point;
+  inputOffset?: Point;
   kind: "mask-pen";
   layer: Layer;
   mask: LayerMask;
@@ -338,24 +372,24 @@ type Gesture =
 
 /** Stateful tool orchestration; previews are commands, commits use the public DOM. */
 export class ToolController {
-  private startingGesture:BaseGesture|null=null;
-  private quickAbort:AbortController|null=null;
+  private startingGesture: BaseGesture | null = null;
+  private quickAbort: AbortController | null = null;
   private patchAbort: AbortController | null = null;
   private state: ToolState = {
     wetPreview: null,
     error: null,
-    quickSelectionPoints:null,
-    quickSelectionProgress:null,
+    quickSelectionPoints: null,
+    quickSelectionProgress: null,
     healingStroke: null,
     patchOffset: null,
     settings: {
       smudge: DEFAULT_SMUDGE,
       mixer: DEFAULT_MIXER,
-      quickSize:32,
-      quickTolerance:32,
-      quickEdgeThreshold:64,
-      quickSampling:'merged',
-      quickSelectionMode:'add',
+      quickSize: 32,
+      quickTolerance: 32,
+      quickEdgeThreshold: 64,
+      quickSampling: "merged",
+      quickSelectionMode: "add",
       healingRadius: 64,
       patchSampling: "all-layers",
       patchMode: "source",
@@ -374,9 +408,9 @@ export class ToolController {
       pressureSize: true,
       pressureOpacity: false,
       pressureCurve: null,
-      tip:null,
-      symmetry:null,
-      texture:null,
+      tip: null,
+      symmetry: null,
+      texture: null,
       color: "#d5e79b",
       penWidth: 3,
       penFill: false,
@@ -406,7 +440,11 @@ export class ToolController {
     pathIndex: number;
     index: number;
   } | null = null;
-  private textPathPoint: {document: Document; layerId: string; index: number} | null = null;
+  private textPathPoint: {
+    document: Document;
+    layerId: string;
+    index: number;
+  } | null = null;
   private paintFrame: number | null = null;
   private cancelFrame() {
     if (this.paintFrame !== null) cancelAnimationFrame(this.paintFrame);
@@ -427,88 +465,215 @@ export class ToolController {
   getSnapshot = () => this.state;
   /** Choosing a coverage tool may first switch its target to an existing mask.
    * Gesture admission still checks the actual current target in canUseTool. */
-  canChooseTool(tool:Tool):boolean{
-    if(this.canUseTool(tool))return true;
-    if(this.editor.document.precision!=='float32')return false;
-    const document=this.editor.document,selected=document.selectedLayer;
-    if(tool==='smudge'||tool==='mixer')return !selected||selected instanceof RasterLayer||selected instanceof PaintLayer;
-    if(!['brush','pencil'].includes(tool))return false;
-    return !!selected&&!!findLayer(document._read(),selected.id)?.mask;
+  canChooseTool(tool: Tool): boolean {
+    if (this.canUseTool(tool)) return true;
+    if (this.editor.document.precision !== "float32") return false;
+    const document = this.editor.document,
+      selected = document.selectedLayer;
+    if (tool === "smudge" || tool === "mixer")
+      return (
+        !selected ||
+        selected instanceof RasterLayer ||
+        selected instanceof PaintLayer
+      );
+    if (!["brush", "pencil"].includes(tool)) return false;
+    return !!selected && !!findLayer(document._read(), selected.id)?.mask;
   }
-  canUseTool(tool:Tool):boolean{
-    if(this.editor.document.precision!=='float32')return true;
-    if(['move','hand','marquee','lasso','artboard','crop','text'].includes(tool))return true;
-    if(tool==='dodge'||tool==='burn'||tool==='fill'||tool==='clone'||tool==='heal'||tool==='patch')return true;
-    if(tool==='brush'||tool==='pencil')return this.state.settings.paintTarget==='layer'||this.state.settings.paintTarget.startsWith('mask-')&&!!this.editor.document.selectedLayer?.mask;
-    if(tool==='smudge'||tool==='mixer'){
-      const target=this.state.settings.paintTarget,selected=this.editor.document.selectedLayer;
-      return target==='layer'?!selected||selected instanceof RasterLayer||selected instanceof PaintLayer:target.startsWith('mask-')&&!!selected?.mask;
+  canUseTool(tool: Tool): boolean {
+    if (this.editor.document.precision !== "float32") return true;
+    if (
+      ["move", "hand", "marquee", "lasso", "artboard", "crop", "text"].includes(
+        tool,
+      )
+    )
+      return true;
+    if (
+      tool === "dodge" ||
+      tool === "burn" ||
+      tool === "fill" ||
+      tool === "clone" ||
+      tool === "heal" ||
+      tool === "patch"
+    )
+      return true;
+    if (tool === "brush" || tool === "pencil")
+      return (
+        this.state.settings.paintTarget === "layer" ||
+        (this.state.settings.paintTarget.startsWith("mask-") &&
+          !!this.editor.document.selectedLayer?.mask)
+      );
+    if (tool === "smudge" || tool === "mixer") {
+      const target = this.state.settings.paintTarget,
+        selected = this.editor.document.selectedLayer;
+      return target === "layer"
+        ? !selected ||
+            selected instanceof RasterLayer ||
+            selected instanceof PaintLayer
+        : target.startsWith("mask-") && !!selected?.mask;
     }
-    if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer||this.editor.document.selectedLayer instanceof PaintLayer;
-    if(tool==='pen')return true;
-    return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
+    if (tool === "eraser" && this.state.settings.paintTarget === "layer")
+      return (
+        this.editor.document.selectedLayer instanceof RasterLayer ||
+        this.editor.document.selectedLayer instanceof PaintLayer
+      );
+    if (tool === "pen") return true;
+    return (
+      ["brush", "pencil", "eraser"].includes(tool) &&
+      this.state.settings.paintTarget.startsWith("mask-")
+    );
   }
-  toolUnavailableReason(tool:Tool):string|null {
-    if(this.canUseTool(tool))return null;
-    return 'This tool requires its float document integration.';
+  toolUnavailableReason(tool: Tool): string | null {
+    if (this.canUseTool(tool)) return null;
+    return "This tool requires its float document integration.";
   }
   /** Current gestures may begin before React flushes a selection preference reset. */
-  get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&gesture.document.getSnapshot().selectedIds.length===gesture.selectionIds.length&&gesture.document.getSnapshot().selectedIds.every((id,i)=>id===gesture.selectionIds[i]);}
+  get hasCurrentWetGesture() {
+    const gesture = this.gesture;
+    if (
+      gesture?.kind !== "wet" ||
+      gesture.abort.signal.aborted ||
+      gesture.document !== this.editor.document
+    )
+      return false;
+    return (
+      gesture.document.getSnapshot().revision === gesture.revision &&
+      gesture.document.getSnapshot().selectedIds.length ===
+        gesture.selectionIds.length &&
+      gesture.document
+        .getSnapshot()
+        .selectedIds.every((id, i) => id === gesture.selectionIds[i])
+    );
+  }
 
   /** Trusted cursor adapter: use the same stroke plane as begin(), without mutations. */
-  brushCursorAxes(tool: Tool, tilt?: PenTiltData, includeDefault=false) {
-    const settings = this.state.settings, tip = settings.tip;
-    if ((!tip&&!includeDefault) || !['smudge','mixer','brush','pencil','eraser','clone','heal','dodge','burn'].includes(tool)) return null;
-    const doc = this.editor.document, snapshot = doc._read(), selected = doc.selectedLayer, gesture = this.gesture;
+  brushCursorAxes(tool: Tool, tilt?: PenTiltData, includeDefault = false) {
+    const settings = this.state.settings,
+      tip = settings.tip;
+    if (
+      (!tip && !includeDefault) ||
+      ![
+        "smudge",
+        "mixer",
+        "brush",
+        "pencil",
+        "eraser",
+        "clone",
+        "heal",
+        "dodge",
+        "burn",
+      ].includes(tool)
+    )
+      return null;
+    const doc = this.editor.document,
+      snapshot = doc._read(),
+      selected = doc.selectedLayer,
+      gesture = this.gesture;
     let world = new AffineTransform();
-    if (gesture?.kind === 'wet' || gesture?.kind === 'paint' || gesture?.kind === 'mask-paint') world = gesture.inputTransform.inverse();
-    else if ((['brush','pencil','eraser','smudge','mixer'].includes(tool)) && settings.paintTarget !== 'layer') {
-      const filter = settings.paintTarget.startsWith('filter-mask-');
+    if (
+      gesture?.kind === "wet" ||
+      gesture?.kind === "paint" ||
+      gesture?.kind === "mask-paint"
+    )
+      world = gesture.inputTransform.inverse();
+    else if (
+      ["brush", "pencil", "eraser", "smudge", "mixer"].includes(tool) &&
+      settings.paintTarget !== "layer"
+    ) {
+      const filter = settings.paintTarget.startsWith("filter-mask-");
       // Read immutable geometry directly: hover must not clone painted-mask
       // point arrays or construct an entire smart-master Document per frame.
       const record = selected ? findLayer(snapshot, selected.id) : null;
-      const mask = filter ? record?.kind === 'smart-object' ? record.filterMask : null : record?.mask;
+      const mask = filter
+        ? record?.kind === "smart-object"
+          ? record.filterMask
+          : null
+        : record?.mask;
       if (selected && mask) {
         let plane = layerTransform(snapshot, selected.id)!;
-        if(mask.plane)world=mask.linked!==false?plane:new AffineTransform();
-        else if(activePerspective(record?.perspective)&&mask.linked!==false)world=plane;
+        if (mask.plane)
+          world = mask.linked !== false ? plane : new AffineTransform();
+        else if (
+          activePerspective(record?.perspective) &&
+          mask.linked !== false
+        )
+          world = plane;
         else {
-        if (filter && selected instanceof SmartObjectLayer) {
-          const source = snapshot.components!.find(component=>component.id === selected.componentId)!.source;
-          const master = source.kind === 'document' ? source.document : source;
-          plane = plane.multiply(AffineTransform.scale(selected.width / master.width, selected.height / master.height));
-        }
-        world = maskTransform(mask, plane);
+          if (filter && selected instanceof SmartObjectLayer) {
+            const source = snapshot.components!.find(
+              (component) => component.id === selected.componentId,
+            )!.source;
+            const master =
+              source.kind === "document" ? source.document : source;
+            plane = plane.multiply(
+              AffineTransform.scale(
+                selected.width / master.width,
+                selected.height / master.height,
+              ),
+            );
+          }
+          world = maskTransform(mask, plane);
         }
       }
-    } else if (tool !== 'heal' && selected && (
-      tool === 'dodge' || tool === 'burn'
-        ? selected instanceof AdjustmentLayer && selected.adjustmentKind === 'tonal'
-        : selected instanceof PaintLayer || ['eraser','smudge','mixer'].includes(tool) && selected instanceof RasterLayer
-    )) world = layerTransform(doc._read(), selected.id)!;
-    const localTilt = tilt && (tip?.tiltAngle || tip?.tiltRoundness) ? transformPenTilt(tilt, world.inverse()) : undefined;
-    const pose = paintStampGeometry({kind:tool === 'pencil' ? 'pencil' : 'brush',size:settings.size,pressureSize:false,tip:tip??undefined},{x:0,y:0,pressure:1,tilt:localTilt},!!settings.texture);
+    } else if (
+      tool !== "heal" &&
+      selected &&
+      (tool === "dodge" || tool === "burn"
+        ? selected instanceof AdjustmentLayer &&
+          selected.adjustmentKind === "tonal"
+        : selected instanceof PaintLayer ||
+          (["eraser", "smudge", "mixer"].includes(tool) &&
+            selected instanceof RasterLayer))
+    )
+      world = layerTransform(doc._read(), selected.id)!;
+    const localTilt =
+      tilt && (tip?.tiltAngle || tip?.tiltRoundness)
+        ? transformPenTilt(tilt, world.inverse())
+        : undefined;
+    const pose = paintStampGeometry(
+      {
+        kind: tool === "pencil" ? "pencil" : "brush",
+        size: settings.size,
+        pressureSize: false,
+        tip: tip ?? undefined,
+      },
+      { x: 0, y: 0, pressure: 1, tilt: localTilt },
+      !!settings.texture,
+    );
     return {
-      a:(world.a*pose.cos+world.c*pose.sin)*pose.rx,
-      b:(world.b*pose.cos+world.d*pose.sin)*pose.rx,
-      c:(-world.a*pose.sin+world.c*pose.cos)*pose.ry,
-      d:(-world.b*pose.sin+world.d*pose.cos)*pose.ry,
+      a: (world.a * pose.cos + world.c * pose.sin) * pose.rx,
+      b: (world.b * pose.cos + world.d * pose.sin) * pose.rx,
+      c: (-world.a * pose.sin + world.c * pose.cos) * pose.ry,
+      d: (-world.b * pose.sin + world.d * pose.cos) * pose.ry,
     };
   }
   /** Nominal world-space footprints; offsets are relative to the pointer. */
-  brushCursorCopies(tool:Tool,point:Point,tilt?:PenTiltData){
-    if(!this.state.settings.symmetry)return null;
-    const axes=this.brushCursorAxes(tool,tilt,true);if(!axes)return null;
-    return symmetryMatrices(this.state.settings.symmetry).map(copy=>{const center=copy.point(point);return{x:center.x-point.x,y:center.y-point.y,
-      a:copy.a*axes.a+copy.c*axes.b,b:copy.b*axes.a+copy.d*axes.b,c:copy.a*axes.c+copy.c*axes.d,d:copy.b*axes.c+copy.d*axes.d};});
+  brushCursorCopies(tool: Tool, point: Point, tilt?: PenTiltData) {
+    if (!this.state.settings.symmetry) return null;
+    const axes = this.brushCursorAxes(tool, tilt, true);
+    if (!axes) return null;
+    return symmetryMatrices(this.state.settings.symmetry).map((copy) => {
+      const center = copy.point(point);
+      return {
+        x: center.x - point.x,
+        y: center.y - point.y,
+        a: copy.a * axes.a + copy.c * axes.b,
+        b: copy.b * axes.a + copy.d * axes.b,
+        c: copy.a * axes.c + copy.c * axes.d,
+        d: copy.b * axes.c + copy.d * axes.d,
+      };
+    });
   }
   private uiSnapshot: ToolState | null = null;
   /** High-frequency paint pixels are consumed directly by the viewport. */
   getUiSnapshot = () => {
     const previous = this.uiSnapshot;
-    if (!previous || (Object.keys(this.state) as (keyof ToolState)[]).some(
-      key => key !== "paintPreview" && previous[key] !== this.state[key],
-    )) this.uiSnapshot = this.state;
+    if (
+      !previous ||
+      (Object.keys(this.state) as (keyof ToolState)[]).some(
+        (key) => key !== "paintPreview" && previous[key] !== this.state[key],
+      )
+    )
+      this.uiSnapshot = this.state;
     return this.uiSnapshot!;
   };
   get maskContourIndex() {
@@ -520,7 +685,9 @@ export class ToolController {
   get drawingPolygonLasso() {
     return this.polygonLasso !== null;
   }
-  get drawingQuickSelection(){return this.gesture?.kind==='quick-selection';}
+  get drawingQuickSelection() {
+    return this.gesture?.kind === "quick-selection";
+  }
   get polygonLassoPointCount() {
     return this.polygonLasso?.points.length ?? 0;
   }
@@ -538,11 +705,27 @@ export class ToolController {
     return this.maskPoint ? { ...this.maskPoint } : null;
   }
   get selectedTextPathAnchor() {
-    const point=this.textPathPoint,doc=this.editor.document;
-    if(!point||this.state.settings.penEditTarget!=='layer'||point.document!==doc||doc.selectedLayer?.id!==point.layerId)return null;
-    const layer=findLayer(doc._read(),point.layerId);
-    const path=layer?.kind==='text'?layer.textPath:null;
-    return path?.points[point.index]?{layerId:point.layerId,index:point.index,canSplit:path.points.length<PATH_POINT_LIMIT&&(path.closed||point.index<path.points.length-1),canRemove:path.points.length>(path.closed?1:2)}:null;
+    const point = this.textPathPoint,
+      doc = this.editor.document;
+    if (
+      !point ||
+      this.state.settings.penEditTarget !== "layer" ||
+      point.document !== doc ||
+      doc.selectedLayer?.id !== point.layerId
+    )
+      return null;
+    const layer = findLayer(doc._read(), point.layerId);
+    const path = layer?.kind === "text" ? layer.textPath : null;
+    return path?.points[point.index]
+      ? {
+          layerId: point.layerId,
+          index: point.index,
+          canSplit:
+            path.points.length < PATH_POINT_LIMIT &&
+            (path.closed || point.index < path.points.length - 1),
+          canRemove: path.points.length > (path.closed ? 1 : 2),
+        }
+      : null;
   }
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -555,22 +738,75 @@ export class ToolController {
     this.listeners.forEach((listener) => listener());
   }
   /** Trusted UI selection; path geometry and document history are unchanged. */
-  selectVectorPath(path:VectorPath|null){
-    const owner=path?._owner;
-    if(path&&(!owner||owner.document!==this.editor.document||!owner.paths.get(path.id)))throw new Error('Select a path attached to the active document.');
-    if(this.gesture||this.maskContour||this.polygonLasso||this.quickAbort||this.patchAbort||this.crop.active)this.cancel();
-    if(path&&(this.editor.document.selectedLayer?.id!==owner!.id||this.editor.document.selectedLayers.length!==1))this.editor.document.selectedLayer=owner!;
-    const hadMaskPoint=!!this.maskPoint;this.maskPoint=null;
-    const selectedPath=path?{layerId:owner!.id,pathId:path.id}:null,mode=path?'layer':this.state.settings.penEditTarget;
-    if(!hadMaskPoint&&!this.state.penTarget&&this.state.selectedPath?.layerId===selectedPath?.layerId&&this.state.selectedPath?.pathId===selectedPath?.pathId&&mode===this.state.settings.penEditTarget)return;
-    this.publish({selectedPath,penTarget:null,settings:mode===this.state.settings.penEditTarget?this.state.settings:{...this.state.settings,penEditTarget:mode}});
+  selectVectorPath(path: VectorPath | null) {
+    const owner = path?._owner;
+    if (
+      path &&
+      (!owner ||
+        owner.document !== this.editor.document ||
+        !owner.paths.get(path.id))
+    )
+      throw new Error("Select a path attached to the active document.");
+    if (
+      this.gesture ||
+      this.maskContour ||
+      this.polygonLasso ||
+      this.quickAbort ||
+      this.patchAbort ||
+      this.crop.active
+    )
+      this.cancel();
+    if (
+      path &&
+      (this.editor.document.selectedLayer?.id !== owner!.id ||
+        this.editor.document.selectedLayers.length !== 1)
+    )
+      this.editor.document.selectedLayer = owner!;
+    const hadMaskPoint = !!this.maskPoint;
+    this.maskPoint = null;
+    const selectedPath = path ? { layerId: owner!.id, pathId: path.id } : null,
+      mode = path ? "layer" : this.state.settings.penEditTarget;
+    if (
+      !hadMaskPoint &&
+      !this.state.penTarget &&
+      this.state.selectedPath?.layerId === selectedPath?.layerId &&
+      this.state.selectedPath?.pathId === selectedPath?.pathId &&
+      mode === this.state.settings.penEditTarget
+    )
+      return;
+    this.publish({
+      selectedPath,
+      penTarget: null,
+      settings:
+        mode === this.state.settings.penEditTarget
+          ? this.state.settings
+          : { ...this.state.settings, penEditTarget: mode },
+    });
   }
   /** Trusted host preference operation; validates before discarding any gesture. */
-  applyBrushPreset(preset: BrushPreset,preparedSource?:BrushTextureSourceOwner): BrushTool {
-    const owned = new BrushPreset(preset.toJSON(),preset.source);
-    if(owned.texture){
-      const ready=preparedSource?.source,source=owned.source!;
-      if(!ready||ready.blob!==source.blob||ready.width!==source.width||ready.height!==source.height||ready.name!==source.name||ready.tiff?.page!==source.tiff?.page||ready.tiff?.allowPrecisionLoss!==source.tiff?.allowPrecisionLoss||ready.tiff?.floatColorSpace!==source.tiff?.floatColorSpace||ready.avif?.allowPrecisionLoss!==source.avif?.allowPrecisionLoss||ready.avif?.assumeSrgb!==source.avif?.assumeSrgb)throw new Error('Prepare the original preset source before applying a textured brush.');
+  applyBrushPreset(
+    preset: BrushPreset,
+    preparedSource?: BrushTextureSourceOwner,
+  ): BrushTool {
+    const owned = new BrushPreset(preset.toJSON(), preset.source);
+    if (owned.texture) {
+      const ready = preparedSource?.source,
+        source = owned.source!;
+      if (
+        !ready ||
+        ready.blob !== source.blob ||
+        ready.width !== source.width ||
+        ready.height !== source.height ||
+        ready.name !== source.name ||
+        ready.tiff?.page !== source.tiff?.page ||
+        ready.tiff?.allowPrecisionLoss !== source.tiff?.allowPrecisionLoss ||
+        ready.tiff?.floatColorSpace !== source.tiff?.floatColorSpace ||
+        ready.avif?.allowPrecisionLoss !== source.avif?.allowPrecisionLoss ||
+        ready.avif?.assumeSrgb !== source.avif?.assumeSrgb
+      )
+        throw new Error(
+          "Prepare the original preset source before applying a textured brush.",
+        );
       this.editor.brushTextureSource.captureFrom(preparedSource!);
     }
     this.cancel();
@@ -578,31 +814,112 @@ export class ToolController {
     return owned.tool;
   }
   /** Commit a validated dialog draft without changing document history. */
-  applyBrushTexture(source:BrushTextureSourceOwner,preference:BrushTexturePreference){
-    const texture=freeze(brushTexturePreferenceSchema.parse(preference));
-    if(texture&&!source.source)throw new Error('Choose a brush texture source first.');
-    if(source.source)this.editor.brushTextureSource.captureFrom(source);
+  applyBrushTexture(
+    source: BrushTextureSourceOwner,
+    preference: BrushTexturePreference,
+  ) {
+    const texture = freeze(brushTexturePreferenceSchema.parse(preference));
+    if (texture && !source.source)
+      throw new Error("Choose a brush texture source first.");
+    if (source.source) this.editor.brushTextureSource.captureFrom(source);
     this.cancel();
-    this.configure({texture});
+    this.configure({ texture });
   }
   configure(patch: Partial<ToolSettings>) {
-    for (const key of ['smudge','mixer'] as const) if (patch[key] !== undefined) {
-      patch = {...patch,[key]:freeze(wetToolSettingsSchema.parse(patch[key]))};
-    }
-    if(patch.texture!==undefined)patch={...patch,texture:freeze(brushTexturePreferenceSchema.parse(patch.texture))};
-    if(patch.symmetry!==undefined)patch={...patch,symmetry:patch.symmetry===null?null:freeze(brushSymmetrySchema.parse(patch.symmetry))};
-    if(patch.tip!==undefined)patch={...patch,tip:patch.tip===null?null:freeze(brushTipSchema.parse(patch.tip))};
-    if(patch.pressureCurve!==undefined)patch={...patch,pressureCurve:patch.pressureCurve===null?null:freeze(pressureCurveSchema.parse(patch.pressureCurve))};
-    if(patch.texture&&!this.editor.brushTextureSource.source)throw new Error('Choose a brush texture source first.');
-    if(this.gesture?.kind==='wet' && (Object.keys(patch) as (keyof ToolSettings)[]).some(key=>JSON.stringify(patch[key])!==JSON.stringify(this.state.settings[key])))this.cancel();
-    if(patch.texture!==undefined&&JSON.stringify(patch.texture)!==JSON.stringify(this.state.settings.texture))this.cancel();
-    if(patch.symmetry!==undefined&&JSON.stringify(patch.symmetry)!==JSON.stringify(this.state.settings.symmetry))this.cancel();
-    if(patch.tip!==undefined&&JSON.stringify(patch.tip)!==JSON.stringify(this.state.settings.tip))this.cancel();
-    if(patch.pressureCurve!==undefined&&JSON.stringify(patch.pressureCurve)!==JSON.stringify(this.state.settings.pressureCurve))this.cancel();
-    if((this.drawingQuickSelection||this.quickAbort)&&(['quickSize','quickTolerance','quickEdgeThreshold','quickSampling','quickSelectionMode'] as const).some(key=>patch[key]!==undefined&&patch[key]!==this.state.settings[key]))this.cancel();
-    if (patch.lassoMode !== undefined && patch.lassoMode !== this.state.settings.lassoMode)
+    for (const key of ["smudge", "mixer"] as const)
+      if (patch[key] !== undefined) {
+        patch = {
+          ...patch,
+          [key]: freeze(wetToolSettingsSchema.parse(patch[key])),
+        };
+      }
+    if (patch.texture !== undefined)
+      patch = {
+        ...patch,
+        texture: freeze(brushTexturePreferenceSchema.parse(patch.texture)),
+      };
+    if (patch.symmetry !== undefined)
+      patch = {
+        ...patch,
+        symmetry:
+          patch.symmetry === null
+            ? null
+            : freeze(brushSymmetrySchema.parse(patch.symmetry)),
+      };
+    if (patch.tip !== undefined)
+      patch = {
+        ...patch,
+        tip:
+          patch.tip === null ? null : freeze(brushTipSchema.parse(patch.tip)),
+      };
+    if (patch.pressureCurve !== undefined)
+      patch = {
+        ...patch,
+        pressureCurve:
+          patch.pressureCurve === null
+            ? null
+            : freeze(pressureCurveSchema.parse(patch.pressureCurve)),
+      };
+    if (patch.texture && !this.editor.brushTextureSource.source)
+      throw new Error("Choose a brush texture source first.");
+    if (
+      this.gesture?.kind === "wet" &&
+      (Object.keys(patch) as (keyof ToolSettings)[]).some(
+        (key) =>
+          JSON.stringify(patch[key]) !==
+          JSON.stringify(this.state.settings[key]),
+      )
+    )
       this.cancel();
-    if (this.polygonLasso && patch.selectionMode !== undefined && patch.selectionMode !== this.state.settings.selectionMode)
+    if (
+      patch.texture !== undefined &&
+      JSON.stringify(patch.texture) !==
+        JSON.stringify(this.state.settings.texture)
+    )
+      this.cancel();
+    if (
+      patch.symmetry !== undefined &&
+      JSON.stringify(patch.symmetry) !==
+        JSON.stringify(this.state.settings.symmetry)
+    )
+      this.cancel();
+    if (
+      patch.tip !== undefined &&
+      JSON.stringify(patch.tip) !== JSON.stringify(this.state.settings.tip)
+    )
+      this.cancel();
+    if (
+      patch.pressureCurve !== undefined &&
+      JSON.stringify(patch.pressureCurve) !==
+        JSON.stringify(this.state.settings.pressureCurve)
+    )
+      this.cancel();
+    if (
+      (this.drawingQuickSelection || this.quickAbort) &&
+      (
+        [
+          "quickSize",
+          "quickTolerance",
+          "quickEdgeThreshold",
+          "quickSampling",
+          "quickSelectionMode",
+        ] as const
+      ).some(
+        (key) =>
+          patch[key] !== undefined && patch[key] !== this.state.settings[key],
+      )
+    )
+      this.cancel();
+    if (
+      patch.lassoMode !== undefined &&
+      patch.lassoMode !== this.state.settings.lassoMode
+    )
+      this.cancel();
+    if (
+      this.polygonLasso &&
+      patch.selectionMode !== undefined &&
+      patch.selectionMode !== this.state.settings.selectionMode
+    )
       this.cancel();
     if (
       patch.paintTarget !== undefined &&
@@ -625,10 +942,11 @@ export class ToolController {
   cancel() {
     this.gesture?.stopChanges?.();
     this.maskContour?.stopChanges?.();
-    if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
+    if (this.gesture?.kind === "wet") this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
-    this.quickAbort?.abort();this.quickAbort=null;
-    this.publish({quickSelectionPoints:null,quickSelectionProgress:null});
+    this.quickAbort?.abort();
+    this.quickAbort = null;
+    this.publish({ quickSelectionPoints: null, quickSelectionProgress: null });
     this.patchAbort?.abort();
     this.patchAbort = null;
     this.publish({ patchOffset: null, healingStroke: null });
@@ -637,11 +955,14 @@ export class ToolController {
     this.polygonLasso = null;
     this.cancelFrame();
     this.generation++;
-    if(this.gesture?.kind === "paint"){this.gesture.cloneSource?.dispose();this.gesture.floatCloneSource?.dispose();}
-    if(this.gesture)this.releaseTexture(this.gesture);
+    if (this.gesture?.kind === "paint") {
+      this.gesture.cloneSource?.dispose();
+      this.gesture.floatCloneSource?.dispose();
+    }
+    if (this.gesture) this.releaseTexture(this.gesture);
     this.gesture = null;
     this.publish({
-      wetPreview:null,
+      wetPreview: null,
       preview: null,
       lassoPoints: null,
       paintPreview: null,
@@ -654,10 +975,11 @@ export class ToolController {
     this.gesture?.stopChanges?.();
     this.maskContour?.stopChanges?.();
     this.textPathPoint = null;
-    if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
+    if (this.gesture?.kind === "wet") this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
-    this.quickAbort?.abort();this.quickAbort=null;
-    this.publish({quickSelectionPoints:null,quickSelectionProgress:null});
+    this.quickAbort?.abort();
+    this.quickAbort = null;
+    this.publish({ quickSelectionPoints: null, quickSelectionProgress: null });
     this.patchAbort?.abort();
     this.patchAbort = null;
     this.publish({ patchOffset: null, healingStroke: null });
@@ -667,11 +989,14 @@ export class ToolController {
     this.maskPoint = null;
     this.cancelFrame();
     this.generation++;
-    if(this.gesture?.kind === "paint"){this.gesture.cloneSource?.dispose();this.gesture.floatCloneSource?.dispose();}
-    if(this.gesture)this.releaseTexture(this.gesture);
+    if (this.gesture?.kind === "paint") {
+      this.gesture.cloneSource?.dispose();
+      this.gesture.floatCloneSource?.dispose();
+    }
+    if (this.gesture) this.releaseTexture(this.gesture);
     this.gesture = null;
     this.publish({
-      wetPreview:null,
+      wetPreview: null,
       preview: null,
       lassoPoints: null,
       paintPreview: null,
@@ -683,7 +1008,11 @@ export class ToolController {
     });
   }
   finishPath() {
-    if(this.selectedTextPathAnchor){this.textPathPoint=null;this.cancel();return;}
+    if (this.selectedTextPathAnchor) {
+      this.textPathPoint = null;
+      this.cancel();
+      return;
+    }
     if (this.polygonLasso) {
       this.finishPolygonLasso();
       return;
@@ -727,11 +1056,14 @@ export class ToolController {
       });
       return true;
     }
-    const text=this.editor.document.selectedLayer;
-    if(text instanceof TextLayer&&text.textPath){
-      this.editTextPathPoint((path,index)=>{
-        if(path.points.length<=(path.closed?1:2))throw new Error('Keep at least one closed or two open baseline anchors.');
-        return path.with({points:path.points.filter((_,i)=>i!==index)});
+    const text = this.editor.document.selectedLayer;
+    if (text instanceof TextLayer && text.textPath) {
+      this.editTextPathPoint((path, index) => {
+        if (path.points.length <= (path.closed ? 1 : 2))
+          throw new Error(
+            "Keep at least one closed or two open baseline anchors.",
+          );
+        return path.with({ points: path.points.filter((_, i) => i !== index) });
       });
       return true;
     }
@@ -764,25 +1096,51 @@ export class ToolController {
     selected.mask = mask.with({ paths });
     if (!points.length || target.index >= points.length) this.maskPoint = null;
   }
-  private editTextPathPoint(edit:(path:TextPath,index:number)=>TextPath){
-    const target=this.selectedTextPathAnchor,doc=this.editor.document,layer=doc.selectedLayer;
-    if(!target||!(layer instanceof TextLayer)||!layer.textPath)return;
+  private editTextPathPoint(edit: (path: TextPath, index: number) => TextPath) {
+    const target = this.selectedTextPathAnchor,
+      doc = this.editor.document,
+      layer = doc.selectedLayer;
+    if (!target || !(layer instanceof TextLayer) || !layer.textPath) return;
     this.cancel();
-    const next=edit(layer.textPath,target.index);
-    doc.transaction('Edit text baseline',()=>{layer.textPath=next;});
-    this.textPathPoint={document:doc,layerId:layer.id,index:Math.min(target.index,next.points.length-1)};
+    const next = edit(layer.textPath, target.index);
+    doc.transaction("Edit text baseline", () => {
+      layer.textPath = next;
+    });
+    this.textPathPoint = {
+      document: doc,
+      layerId: layer.id,
+      index: Math.min(target.index, next.points.length - 1),
+    };
     this.publish({});
   }
-  insertTextPathAnchor(){
-    const index=this.selectedTextPathAnchor?.index;
-    this.editTextPathPoint((path,i)=>path.with({points:splitPathSegment(path.points,path.closed,i)}));
-    if(index!==undefined&&this.textPathPoint){this.textPathPoint.index=index+1;this.publish({});}
+  insertTextPathAnchor() {
+    const index = this.selectedTextPathAnchor?.index;
+    this.editTextPathPoint((path, i) =>
+      path.with({ points: splitPathSegment(path.points, path.closed, i) }),
+    );
+    if (index !== undefined && this.textPathPoint) {
+      this.textPathPoint.index = index + 1;
+      this.publish({});
+    }
   }
-  nudgeTextPathPoint(x:number,y:number){
-    const doc=this.editor.document,target=this.selectedTextPathAnchor;
-    if(!target)return;
-    const inverse=layerTransform(doc._read(),target.layerId)!.inverse(),dx=inverse.a*x+inverse.c*y,dy=inverse.b*x+inverse.d*y;
-    this.editTextPathPoint((path,index)=>{const points=path.points,p=points[index];p.x+=dx;p.y+=dy;p.in.x+=dx;p.in.y+=dy;p.out.x+=dx;p.out.y+=dy;return path.with({points});});
+  nudgeTextPathPoint(x: number, y: number) {
+    const doc = this.editor.document,
+      target = this.selectedTextPathAnchor;
+    if (!target) return;
+    const inverse = layerTransform(doc._read(), target.layerId)!.inverse(),
+      dx = inverse.a * x + inverse.c * y,
+      dy = inverse.b * x + inverse.d * y;
+    this.editTextPathPoint((path, index) => {
+      const points = path.points,
+        p = points[index];
+      p.x += dx;
+      p.y += dy;
+      p.in.x += dx;
+      p.in.y += dy;
+      p.out.x += dx;
+      p.out.y += dy;
+      return path.with({ points });
+    });
   }
   insertMaskAnchor() {
     if (this.maskContour) return;
@@ -802,18 +1160,34 @@ export class ToolController {
   }
   nudgeMaskPoint(x: number, y: number) {
     if (this.maskContour) return;
-    const doc=this.editor.document,layer=doc.selectedLayer,target=this.maskPoint;
+    const doc = this.editor.document,
+      layer = doc.selectedLayer,
+      target = this.maskPoint;
     if (layer?.mask) {
-      const world=maskPathMapping(doc._read(),layer.id,layer.mask.toJSON());
-      if(world.projection&&target?.layerId===layer.id){
-        const anchor=layer.mask.paths[target.pathIndex]?.points[target.index];if(!anchor)return;
-        const placed=world.point(anchor),next=world.inverse().point({x:placed.x+x,y:placed.y+y});x=next.x-anchor.x;y=next.y-anchor.y;
-      }else{
-        const inverse=world.world.inverse(),dx=inverse.a*x+inverse.c*y;
-        y=inverse.b*x+inverse.d*y;x=dx;
+      const world = maskPathMapping(doc._read(), layer.id, layer.mask.toJSON());
+      if (world.projection && target?.layerId === layer.id) {
+        const anchor = layer.mask.paths[target.pathIndex]?.points[target.index];
+        if (!anchor) return;
+        const placed = world.point(anchor),
+          next = world.inverse().point({ x: placed.x + x, y: placed.y + y });
+        x = next.x - anchor.x;
+        y = next.y - anchor.y;
+      } else {
+        const inverse = world.world.inverse(),
+          dx = inverse.a * x + inverse.c * y;
+        y = inverse.b * x + inverse.d * y;
+        x = dx;
       }
     }
-    this.editMaskPoint((points,index)=>{const p=points[index];p.x+=x;p.y+=y;p.in.x+=x;p.in.y+=y;p.out.x+=x;p.out.y+=y;});
+    this.editMaskPoint((points, index) => {
+      const p = points[index];
+      p.x += x;
+      p.y += y;
+      p.in.x += x;
+      p.in.y += y;
+      p.out.x += x;
+      p.out.y += y;
+    });
   }
   private unlocked() {
     const doc = this.editor.document,
@@ -825,39 +1199,69 @@ export class ToolController {
     return { doc, selected };
   }
   /** Capture document-space preference into a stroke's local affine plane once. */
-  private symmetryIn(mapping:AffineTransform){return this.state.settings.symmetry?new BrushSymmetry(this.state.settings.symmetry).transformed(mapping).toJSON():null;}
-  private captureTexture(gesture:BaseGesture):BrushTextureData|null{
-    const preference=this.state.settings.texture;if(!preference)return null;
-    const assets=gesture.previewAssets??this.editor.assetStore,{asset,created}=this.editor.brushTextureSource.leaseIn(assets);
-    gesture.textureLease={assets,asset,created};
-    return {assetId:asset.id,...preference};
+  private symmetryIn(mapping: AffineTransform) {
+    return this.state.settings.symmetry
+      ? new BrushSymmetry(this.state.settings.symmetry)
+          .transformed(mapping)
+          .toJSON()
+      : null;
   }
-  private releaseTexture(gesture:BaseGesture){
-    try{
-    const lease=gesture.textureLease;if(!lease?.created||!lease.assets.has(lease.asset.id)||lease.assets.get(lease.asset.id)!==lease.asset)return;
-    const state=gesture.document.getSnapshot();
-    if(retainedDocuments(state.document,captureRetainedHistory(state))
-      .some(document=>referencedAssets(document).has(lease.asset.id)))return;
-    lease.assets.remove(lease.asset.id);
-    }finally{gesture.stopChanges?.();gesture.stopChanges=undefined;gesture.previewAssets?.dispose();gesture.previewAssets=undefined;}
+  private captureTexture(gesture: BaseGesture): BrushTextureData | null {
+    const preference = this.state.settings.texture;
+    if (!preference) return null;
+    const assets = gesture.previewAssets ?? this.editor.assetStore,
+      { asset, created } = this.editor.brushTextureSource.leaseIn(assets);
+    gesture.textureLease = { assets, asset, created };
+    return { assetId: asset.id, ...preference };
   }
-  private textureCurrent(gesture:BaseGesture){
-    const lease=gesture.textureLease;if(!lease)return true;
-    return this.editor.assetStore===(gesture.hostAssets??lease.assets)&&lease.assets===(gesture.previewAssets??this.editor.assetStore)&&lease.assets.has(lease.asset.id)&&
-      lease.assets.get(lease.asset.id)===lease.asset&&lease.asset.bitmap.width===lease.asset.width&&lease.asset.bitmap.height===lease.asset.height;
+  private releaseTexture(gesture: BaseGesture) {
+    try {
+      const lease = gesture.textureLease;
+      if (
+        !lease?.created ||
+        !lease.assets.has(lease.asset.id) ||
+        lease.assets.get(lease.asset.id) !== lease.asset
+      )
+        return;
+      const state = gesture.document.getSnapshot();
+      if (
+        retainedDocuments(state.document, captureRetainedHistory(state)).some(
+          (document) => referencedAssets(document).has(lease.asset.id),
+        )
+      )
+        return;
+      lease.assets.remove(lease.asset.id);
+    } finally {
+      gesture.stopChanges?.();
+      gesture.stopChanges = undefined;
+      gesture.previewAssets?.dispose();
+      gesture.previewAssets = undefined;
+    }
+  }
+  private textureCurrent(gesture: BaseGesture) {
+    const lease = gesture.textureLease;
+    if (!lease) return true;
+    return (
+      this.editor.assetStore === (gesture.hostAssets ?? lease.assets) &&
+      lease.assets === (gesture.previewAssets ?? this.editor.assetStore) &&
+      lease.assets.has(lease.asset.id) &&
+      lease.assets.get(lease.asset.id) === lease.asset &&
+      lease.asset.bitmap.width === lease.asset.width &&
+      lease.asset.bitmap.height === lease.asset.height
+    );
   }
   private point(
     point: Point,
     origin: Point,
     pressure: number,
     inputTransform?: AffineTransform,
-    tilt?:PenTiltData,
+    tilt?: PenTiltData,
   ): StrokePoint {
     const hasDynamics =
       this.state.settings.pressureSize || this.state.settings.pressureOpacity;
     const p = hasDynamics
       ? this.state.settings.pressureCurve
-        ? Math.max(0,Math.min(1,Number.isFinite(pressure)?pressure:.05))
+        ? Math.max(0, Math.min(1, Number.isFinite(pressure) ? pressure : 0.05))
         : Math.max(0.05, Math.min(1, pressure || 0.5))
       : 1;
     return {
@@ -865,12 +1269,20 @@ export class ToolController {
         ? inputTransform.point(point)
         : { x: point.x - origin.x, y: point.y - origin.y }),
       pressure: p,
-      ...(tilt&&(this.state.settings.tip?.tiltAngle||this.state.settings.tip?.tiltRoundness)?{tilt:transformPenTilt(tilt,inputTransform)}:{}),
+      ...(tilt &&
+      (this.state.settings.tip?.tiltAngle ||
+        this.state.settings.tip?.tiltRoundness)
+        ? { tilt: transformPenTilt(tilt, inputTransform) }
+        : {}),
     };
   }
   private assertPolygonLasso(draft: PolygonLassoDraft) {
-    try { this.assertCurrent(draft); }
-    catch (error) { this.cancel(); throw error; }
+    try {
+      this.assertCurrent(draft);
+    } catch (error) {
+      this.cancel();
+      throw error;
+    }
   }
   private beginPolygonLasso(
     point: Point,
@@ -885,9 +1297,14 @@ export class ToolController {
         revision: document.getSnapshot().revision,
         generation: this.generation,
         points: [],
-        operation: modifiers.shift && modifiers.alt ? "intersect"
-          : modifiers.shift ? "add" : modifiers.alt ? "subtract"
-          : this.state.settings.selectionMode,
+        operation:
+          modifiers.shift && modifiers.alt
+            ? "intersect"
+            : modifiers.shift
+              ? "add"
+              : modifiers.alt
+                ? "subtract"
+                : this.state.settings.selectionMode,
       };
     }
     const draft = this.polygonLasso;
@@ -895,7 +1312,10 @@ export class ToolController {
     this.cancelFrame();
     draft.pointer = undefined;
     const first = draft.points[0];
-    if (draft.points.length >= 3 && Math.hypot(point.x-first.x, point.y-first.y) <= 6/zoom) {
+    if (
+      draft.points.length >= 3 &&
+      Math.hypot(point.x - first.x, point.y - first.y) <= 6 / zoom
+    ) {
       this.finishPolygonLasso();
       return;
     }
@@ -916,20 +1336,50 @@ export class ToolController {
     this.cancel();
   }
   begin(
-    tool:Tool,point:Point,modifiers:{alt:boolean;shift:boolean;pressure:number;tilt?:PenTiltData},zoom:number,cropHandle?:CropHandle,
-  ){
-    try{this.beginGesture(tool,point,modifiers,zoom,cropHandle);}
-    catch(error){if(this.startingGesture){if(this.startingGesture.previewAssets&&this.gesture?.kind==='paint'&&this.gesture.previewAssets===this.startingGesture.previewAssets){this.gesture.floatCloneSource?.dispose();this.gesture=null;}this.releaseTexture(this.startingGesture);}throw error;}
-    finally{this.startingGesture=null;}
+    tool: Tool,
+    point: Point,
+    modifiers: {
+      alt: boolean;
+      shift: boolean;
+      pressure: number;
+      tilt?: PenTiltData;
+    },
+    zoom: number,
+    cropHandle?: CropHandle,
+  ) {
+    try {
+      this.beginGesture(tool, point, modifiers, zoom, cropHandle);
+    } catch (error) {
+      if (this.startingGesture) {
+        if (
+          this.startingGesture.previewAssets &&
+          this.gesture?.kind === "paint" &&
+          this.gesture.previewAssets === this.startingGesture.previewAssets
+        ) {
+          this.gesture.floatCloneSource?.dispose();
+          this.gesture = null;
+        }
+        this.releaseTexture(this.startingGesture);
+      }
+      throw error;
+    } finally {
+      this.startingGesture = null;
+    }
   }
   private beginGesture(
     tool: Tool,
     point: Point,
-    modifiers: { alt: boolean; shift: boolean; pressure: number;tilt?:PenTiltData },
+    modifiers: {
+      alt: boolean;
+      shift: boolean;
+      pressure: number;
+      tilt?: PenTiltData;
+    },
     zoom: number,
     cropHandle?: CropHandle,
   ) {
-    if(!this.canUseTool(tool))throw new Error(this.toolUnavailableReason(tool)!);
+    if (!this.canUseTool(tool))
+      throw new Error(this.toolUnavailableReason(tool)!);
     if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
       this.beginPolygonLasso(point, modifiers, zoom);
       return;
@@ -953,57 +1403,243 @@ export class ToolController {
       this.publish({ cloneSource: point, cloneOffset: null });
       return;
     }
-    const base:BaseGesture = {
+    const base: BaseGesture = {
       document: doc,
       revision: doc.getSnapshot().revision,
       generation: this.generation,
-      ...(['clone','heal','patch'].includes(tool)&&doc.precision==='float32'?{selectionIds:[...doc.getSnapshot().selectedIds]}:{}),
+      ...(["clone", "heal", "patch"].includes(tool) &&
+      doc.precision === "float32"
+        ? { selectionIds: [...doc.getSnapshot().selectedIds] }
+        : {}),
     };
-    this.startingGesture=base;
-    if((tool==='heal'||tool==='patch')&&base.selectionIds){
-      base.stopChanges=doc.subscribe(()=>{if(this.gesture?.stopChanges!==base.stopChanges)return;const state=doc.getSnapshot();if(state.revision!==base.revision||state.selectedIds.length!==base.selectionIds!.length||state.selectedIds.some((key,i)=>key!==base.selectionIds![i]))this.cancel();});
+    this.startingGesture = base;
+    if ((tool === "heal" || tool === "patch") && base.selectionIds) {
+      base.stopChanges = doc.subscribe(() => {
+        if (this.gesture?.stopChanges !== base.stopChanges) return;
+        const state = doc.getSnapshot();
+        if (
+          state.revision !== base.revision ||
+          state.selectedIds.length !== base.selectionIds!.length ||
+          state.selectedIds.some((key, i) => key !== base.selectionIds![i])
+        )
+          this.cancel();
+      });
     }
-    if(tool==='smudge'||tool==='mixer'){
-      const selected=doc.selectedLayer,settings=structuredClone(this.state.settings),target=settings.paintTarget==='layer'?'layer':settings.paintTarget.startsWith('filter-mask-')?'filter-mask':'mask';
-      const mask=target==='layer'?null:target==='filter-mask'?selected instanceof SmartObjectLayer?selected.filterMask:null:selected?.mask;
-      if(target!=='layer'&&!mask)throw new Error(target==='filter-mask'?'Choose a smart object with a filter mask.':'Choose a layer with a mask.');
-      if(target==='layer'&&selected&&!(selected instanceof PaintLayer)&&!(selected instanceof RasterLayer))throw new Error('Choose an image or paint layer for Smudge or Mixer.');
-      const maskData=mask?.toJSON(),maxPoints=maskData?Math.min(20000,200000-(maskData.strokes??[]).reduce((total,entry)=>total+maskStrokePointCount(entry),0)):20000;
-      if(maskData&&((maskData.strokes?.length??0)>=2048||maxPoints<1))throw new Error('This mask has reached its stroke or point budget.');
-      let world=selected?layerTransform(doc._read(),selected.id)!:new AffineTransform();
-      if(target==='filter-mask'&&selected instanceof SmartObjectLayer){const master=doc.getComponent(selected.componentId);world=world.multiply(AffineTransform.scale(selected.width/master.width,selected.height/master.height));}
-      const image=findLayer(doc._read(),selected?.id??''),retained=!!maskData?.plane,placed=retained||!!image&&activePerspective(image.perspective)&&(!maskData||maskData.linked!==false);
-      if(retained&&selected)world=maskData!.linked!==false?layerTransform(doc._read(),selected.id)!:new AffineTransform();else if(placed&&selected)world=layerTransform(doc._read(),selected.id)!;else if(maskData)world=maskTransform(maskData,world);
-      const inputTransform=world.inverse();
-      const first=this.point(point,{x:0,y:0},modifiers.pressure,inputTransform,modifiers.tilt),abort=new AbortController();
-      const dynamics=settings[tool],symmetry=this.symmetryIn(inputTransform);
-      const ready=this.editor._beginWetPaint(assets=>new BrushStroke({
-        size:settings.size,hardness:settings.hardness,opacity:settings.opacity,flow:settings.flow,spacing:settings.spacing,
-        pressureSize:settings.pressureSize,pressureOpacity:settings.pressureOpacity,
-        ...(settings.pressureCurve?{pressureCurve:settings.pressureCurve}:{}),...(settings.tip?{tip:settings.tip}:{}),...(symmetry?{symmetry}:{}),
-        texture:settings.texture?{assetId:this.editor.brushTextureSource.leaseIn(assets).asset.id,...settings.texture}:null,
-        color:settings.color,points:[first],clip:transformSelection(doc.selection?.toJSON(),inputTransform),
-      }),{mode:tool,target,space:placed?'placed':'local',signal:abort.signal,load:{load:dynamics.load,...(maskData?{color:[255,255,255,settings.paintTarget.endsWith('hide')?0:255] as [number,number,number,number]}:{})},mix:{wetness:dynamics.wetness,pickup:dynamics.pickup,flow:1}});
-      const gesture:WetGesture={...base,kind:'wet',selectionIds:[...doc.getSnapshot().selectedIds],maxPoints,tool,inputTransform,settings,points:[first],processed:1,previewed:0,abort,ready,running:null,finishing:false};
-      this.gesture=gesture;
-      gesture.unsubscribe=doc.subscribe(()=>{const state=doc.getSnapshot();if(this.gesture===gesture&&!gesture.finishing&&(state.revision!==gesture.revision||state.selectedIds.length!==gesture.selectionIds.length||state.selectedIds.some((id,i)=>id!==gesture.selectionIds[i])))this.cancel();});
-      this.publish({drawing:true,error:null});void this.pumpWet(gesture).catch(()=>{});return;
+    if (tool === "smudge" || tool === "mixer") {
+      const selected = doc.selectedLayer,
+        settings = structuredClone(this.state.settings),
+        target =
+          settings.paintTarget === "layer"
+            ? "layer"
+            : settings.paintTarget.startsWith("filter-mask-")
+              ? "filter-mask"
+              : "mask";
+      const mask =
+        target === "layer"
+          ? null
+          : target === "filter-mask"
+            ? selected instanceof SmartObjectLayer
+              ? selected.filterMask
+              : null
+            : selected?.mask;
+      if (target !== "layer" && !mask)
+        throw new Error(
+          target === "filter-mask"
+            ? "Choose a smart object with a filter mask."
+            : "Choose a layer with a mask.",
+        );
+      if (
+        target === "layer" &&
+        selected &&
+        !(selected instanceof PaintLayer) &&
+        !(selected instanceof RasterLayer)
+      )
+        throw new Error("Choose an image or paint layer for Smudge or Mixer.");
+      const maskData = mask?.toJSON(),
+        maxPoints = maskData
+          ? Math.min(
+              20000,
+              200000 -
+                (maskData.strokes ?? []).reduce(
+                  (total, entry) => total + maskStrokePointCount(entry),
+                  0,
+                ),
+            )
+          : 20000;
+      if (
+        maskData &&
+        ((maskData.strokes?.length ?? 0) >= 2048 || maxPoints < 1)
+      )
+        throw new Error("This mask has reached its stroke or point budget.");
+      let world = selected
+        ? layerTransform(doc._read(), selected.id)!
+        : new AffineTransform();
+      if (target === "filter-mask" && selected instanceof SmartObjectLayer) {
+        const master = doc.getComponent(selected.componentId);
+        world = world.multiply(
+          AffineTransform.scale(
+            selected.width / master.width,
+            selected.height / master.height,
+          ),
+        );
+      }
+      const image = findLayer(doc._read(), selected?.id ?? ""),
+        retained = !!maskData?.plane,
+        placed =
+          retained ||
+          (!!image &&
+            activePerspective(image.perspective) &&
+            (!maskData || maskData.linked !== false));
+      if (retained && selected)
+        world =
+          maskData!.linked !== false
+            ? layerTransform(doc._read(), selected.id)!
+            : new AffineTransform();
+      else if (placed && selected)
+        world = layerTransform(doc._read(), selected.id)!;
+      else if (maskData) world = maskTransform(maskData, world);
+      const inputTransform = world.inverse();
+      const first = this.point(
+          point,
+          { x: 0, y: 0 },
+          modifiers.pressure,
+          inputTransform,
+          modifiers.tilt,
+        ),
+        abort = new AbortController();
+      const dynamics = settings[tool],
+        symmetry = this.symmetryIn(inputTransform);
+      const ready = this.editor._beginWetPaint(
+        (assets) =>
+          new BrushStroke({
+            size: settings.size,
+            hardness: settings.hardness,
+            opacity: settings.opacity,
+            flow: settings.flow,
+            spacing: settings.spacing,
+            pressureSize: settings.pressureSize,
+            pressureOpacity: settings.pressureOpacity,
+            ...(settings.pressureCurve
+              ? { pressureCurve: settings.pressureCurve }
+              : {}),
+            ...(settings.tip ? { tip: settings.tip } : {}),
+            ...(symmetry ? { symmetry } : {}),
+            texture: settings.texture
+              ? {
+                  assetId:
+                    this.editor.brushTextureSource.leaseIn(assets).asset.id,
+                  ...settings.texture,
+                }
+              : null,
+            color: settings.color,
+            points: [first],
+            clip: transformSelection(doc.selection?.toJSON(), inputTransform),
+          }),
+        {
+          mode: tool,
+          target,
+          space: placed ? "placed" : "local",
+          signal: abort.signal,
+          load: {
+            load: dynamics.load,
+            ...(maskData
+              ? {
+                  color: [
+                    255,
+                    255,
+                    255,
+                    settings.paintTarget.endsWith("hide") ? 0 : 255,
+                  ] as [number, number, number, number],
+                }
+              : {}),
+          },
+          mix: { wetness: dynamics.wetness, pickup: dynamics.pickup, flow: 1 },
+        },
+      );
+      const gesture: WetGesture = {
+        ...base,
+        kind: "wet",
+        selectionIds: [...doc.getSnapshot().selectedIds],
+        maxPoints,
+        tool,
+        inputTransform,
+        settings,
+        points: [first],
+        processed: 1,
+        previewed: 0,
+        abort,
+        ready,
+        running: null,
+        finishing: false,
+      };
+      this.gesture = gesture;
+      gesture.unsubscribe = doc.subscribe(() => {
+        const state = doc.getSnapshot();
+        if (
+          this.gesture === gesture &&
+          !gesture.finishing &&
+          (state.revision !== gesture.revision ||
+            state.selectedIds.length !== gesture.selectionIds.length ||
+            state.selectedIds.some((id, i) => id !== gesture.selectionIds[i]))
+        )
+          this.cancel();
+      });
+      this.publish({ drawing: true, error: null });
+      void this.pumpWet(gesture).catch(() => {});
+      return;
     }
-    if(tool==='quick-select'){
-      const settings=this.state.settings,layer=doc.selectedLayer;
-      if(settings.quickSampling==='layer'&&!layer)throw new Error('Choose a source layer for Quick Selection.');
-      const operation=modifiers.shift&&modifiers.alt?'intersect':modifiers.shift?'add':modifiers.alt?'subtract':settings.quickSelectionMode;
-      this.gesture={...base,kind:'quick-selection',points:[{...point}],options:{size:settings.quickSize,tolerance:settings.quickTolerance,edgeThreshold:settings.quickEdgeThreshold,operation,source:settings.quickSampling==='layer'?{kind:'layer',layerId:layer!.id}:{kind:'merged'}}};
-      this.publish({drawing:true,quickSelectionPoints:[{...point}]});return;
+    if (tool === "quick-select") {
+      const settings = this.state.settings,
+        layer = doc.selectedLayer;
+      if (settings.quickSampling === "layer" && !layer)
+        throw new Error("Choose a source layer for Quick Selection.");
+      const operation =
+        modifiers.shift && modifiers.alt
+          ? "intersect"
+          : modifiers.shift
+            ? "add"
+            : modifiers.alt
+              ? "subtract"
+              : settings.quickSelectionMode;
+      this.gesture = {
+        ...base,
+        kind: "quick-selection",
+        points: [{ ...point }],
+        options: {
+          size: settings.quickSize,
+          tolerance: settings.quickTolerance,
+          edgeThreshold: settings.quickEdgeThreshold,
+          operation,
+          source:
+            settings.quickSampling === "layer"
+              ? { kind: "layer", layerId: layer!.id }
+              : { kind: "merged" },
+        },
+      };
+      this.publish({ drawing: true, quickSelectionPoints: [{ ...point }] });
+      return;
     }
     if (tool === "heal") {
-      if(doc.precision==='float32'){base.previewAssets=new AssetStore();base.hostAssets=this.editor.assetStore;for(const key of referencedAssets(doc._read()))this.editor.assetStore.shareTo(base.previewAssets,key,key);}
+      if (doc.precision === "float32") {
+        base.previewAssets = new AssetStore();
+        base.hostAssets = this.editor.assetStore;
+        for (const key of referencedAssets(doc._read()))
+          this.editor.assetStore.shareTo(base.previewAssets, key, key);
+      }
       const settings = { ...this.state.settings };
       const stroke = new BrushStroke({
         ...settings,
-        texture:this.captureTexture(base),
+        texture: this.captureTexture(base),
         color: "#ffffff",
-        points: [this.point(point, { x: 0, y: 0 }, modifiers.pressure,undefined,modifiers.tilt)],
+        points: [
+          this.point(
+            point,
+            { x: 0, y: 0 },
+            modifiers.pressure,
+            undefined,
+            modifiers.tilt,
+          ),
+        ],
         clip: doc.selection,
       }).toJSON() as BrushStrokeData;
       this.gesture = { ...base, kind: "heal", stroke, settings };
@@ -1026,9 +1662,22 @@ export class ToolController {
       return;
     }
     if (tool === "lasso") {
-      const operation = modifiers.shift && modifiers.alt ? "intersect" : modifiers.shift ? "add" : modifiers.alt ? "subtract" : this.state.settings.selectionMode;
-      this.gesture = { ...base, kind: "lasso", points: [point], previous: doc.selection?.toJSON() ?? null, operation };
-      this.publish({drawing: true, lassoPoints: [point]});
+      const operation =
+        modifiers.shift && modifiers.alt
+          ? "intersect"
+          : modifiers.shift
+            ? "add"
+            : modifiers.alt
+              ? "subtract"
+              : this.state.settings.selectionMode;
+      this.gesture = {
+        ...base,
+        kind: "lasso",
+        points: [point],
+        previous: doc.selection?.toJSON() ?? null,
+        operation,
+      };
+      this.publish({ drawing: true, lassoPoints: [point] });
       return;
     }
     if (tool === "marquee") {
@@ -1078,7 +1727,11 @@ export class ToolController {
         20000,
         200000 -
           (data.strokes ?? []).reduce(
-            (total, entry) => total + (entry.stroke.kind==='wet'?entry.stroke.brush.points.length:entry.stroke.points.length),
+            (total, entry) =>
+              total +
+              (entry.stroke.kind === "wet"
+                ? entry.stroke.brush.points.length
+                : entry.stroke.points.length),
             0,
           ),
       );
@@ -1093,7 +1746,8 @@ export class ToolController {
         layerPosition.x,
         layerPosition.y,
       );
-      let maskWorld = this.maskWorld(doc, selected, data),placementBasis=maskTransform(data,new AffineTransform(),false);
+      let maskWorld = this.maskWorld(doc, selected, data),
+        placementBasis = maskTransform(data, new AffineTransform(), false);
       if (filterMask && selected instanceof SmartObjectLayer) {
         const master = doc.getComponent(selected.componentId);
         const nativeWorld = layerTransform(doc._read(), selected.id)!.multiply(
@@ -1103,18 +1757,66 @@ export class ToolController {
           ),
         );
         maskWorld = maskTransform(data, nativeWorld);
-        placementBasis=maskTransform(data,AffineTransform.scale(selected.width/master.width,selected.height/master.height));
+        placementBasis = maskTransform(
+          data,
+          AffineTransform.scale(
+            selected.width / master.width,
+            selected.height / master.height,
+          ),
+        );
       }
-      const image=findLayer(doc._read(),selected.id)!,placed=!!image&&activePerspective(image.perspective)&&data.linked!==false;
-      const world=layerTransform(doc._read(),selected.id)!,authoring=data.linked!==false?world:new AffineTransform();
-      const master=filterMask&&selected instanceof SmartObjectLayer?doc.getComponent(selected.componentId):undefined;
-      const imageFrame=image.kind==='raster'||image.kind==='smart-object';
-      const placement=data.plane?captureMaskMappedPlacement(data,maskOwnerPose(image,world,master),authoring,
-        data.linked!==false&&imageFrame?image.width:doc.width,data.linked!==false&&imageFrame?image.height:doc.height,filterMask):
-        placed&&imageFrame?{width:image.width,height:image.height,perspective:filterMask?image.perspective!:maskPlacedPerspective(image.perspective!,image.width,image.height,data),basis:placementBasis.toJSON()}:undefined;
-      const inputTransform = data.plane?authoring.inverse():placement?world.inverse():maskWorld.inverse();
+      const image = findLayer(doc._read(), selected.id)!,
+        placed =
+          !!image &&
+          activePerspective(image.perspective) &&
+          data.linked !== false;
+      const world = layerTransform(doc._read(), selected.id)!,
+        authoring = data.linked !== false ? world : new AffineTransform();
+      const master =
+        filterMask && selected instanceof SmartObjectLayer
+          ? doc.getComponent(selected.componentId)
+          : undefined;
+      const imageFrame =
+        image.kind === "raster" || image.kind === "smart-object";
+      const placement = data.plane
+        ? captureMaskMappedPlacement(
+            data,
+            maskOwnerPose(image, world, master),
+            authoring,
+            data.linked !== false && imageFrame ? image.width : doc.width,
+            data.linked !== false && imageFrame ? image.height : doc.height,
+            filterMask,
+          )
+        : placed && imageFrame
+          ? {
+              width: image.width,
+              height: image.height,
+              perspective: filterMask
+                ? image.perspective!
+                : maskPlacedPerspective(
+                    image.perspective!,
+                    image.width,
+                    image.height,
+                    data,
+                  ),
+              basis: placementBasis.toJSON(),
+            }
+          : undefined;
+      const inputTransform = data.plane
+        ? authoring.inverse()
+        : placement
+          ? world.inverse()
+          : maskWorld.inverse();
       const stroke = new (tool === "pencil" ? PencilStroke : BrushStroke)({
-        points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
+        points: [
+          this.point(
+            point,
+            origin,
+            modifiers.pressure,
+            inputTransform,
+            modifiers.tilt,
+          ),
+        ],
         size: this.state.settings.size,
         hardness: this.state.settings.hardness,
         opacity: this.state.settings.opacity,
@@ -1122,10 +1824,14 @@ export class ToolController {
         spacing: this.state.settings.spacing,
         pressureSize: this.state.settings.pressureSize,
         pressureOpacity: this.state.settings.pressureOpacity,
-        ...(this.state.settings.pressureCurve?{pressureCurve:this.state.settings.pressureCurve}:{}),
-        ...(this.state.settings.tip?{tip:this.state.settings.tip}:{}),
-        ...(this.state.settings.symmetry?{symmetry:this.symmetryIn(inputTransform)!}:{}),
-        texture:this.captureTexture(base),
+        ...(this.state.settings.pressureCurve
+          ? { pressureCurve: this.state.settings.pressureCurve }
+          : {}),
+        ...(this.state.settings.tip ? { tip: this.state.settings.tip } : {}),
+        ...(this.state.settings.symmetry
+          ? { symmetry: this.symmetryIn(inputTransform)! }
+          : {}),
+        texture: this.captureTexture(base),
         color: "#ffffff",
         clip: transformSelection(doc.selection?.toJSON(), inputTransform),
       }).toJSON() as BrushStrokeData;
@@ -1148,8 +1854,17 @@ export class ToolController {
               : "reveal",
       };
       this.gesture = gesture;
-      const selection=[...doc.getSnapshot().selectedIds];
-      gesture.stopChanges=doc.subscribe(()=>{if(this.gesture!==gesture)return;const state=doc.getSnapshot();if(state.revision!==gesture.revision||state.selectedIds.length!==selection.length||state.selectedIds.some((id,i)=>id!==selection[i]))this.cancel();});
+      const selection = [...doc.getSnapshot().selectedIds];
+      gesture.stopChanges = doc.subscribe(() => {
+        if (this.gesture !== gesture) return;
+        const state = doc.getSnapshot();
+        if (
+          state.revision !== gesture.revision ||
+          state.selectedIds.length !== selection.length ||
+          state.selectedIds.some((id, i) => id !== selection[i])
+        )
+          this.cancel();
+      });
       this.updateMaskPreview(gesture);
       this.publish({ drawing: true });
       return;
@@ -1159,7 +1874,11 @@ export class ToolController {
       return;
     }
     if (tool === "pen") {
-      if(selected instanceof TextLayer&&this.beginTextPathPen(base,selected,point,zoom))return;
+      if (
+        selected instanceof TextLayer &&
+        this.beginTextPathPen(base, selected, point, zoom)
+      )
+        return;
       this.beginPen(base, selected, point, zoom);
       this.publish({ drawing: true });
       return;
@@ -1226,7 +1945,8 @@ export class ToolController {
     const reusable = tonal
       ? selected instanceof AdjustmentLayer &&
         selected.adjustmentKind === "tonal"
-      : selected instanceof PaintLayer || (tool === "eraser" && selected instanceof RasterLayer);
+      : selected instanceof PaintLayer ||
+        (tool === "eraser" && selected instanceof RasterLayer);
     const fresh = !reusable,
       layer = reusable
         ? (selected as PaintLayer | AdjustmentLayer | RasterLayer)
@@ -1245,9 +1965,7 @@ export class ToolController {
                       ? "Eraser stroke"
                       : "Brush painting",
             });
-    const origin = fresh
-      ? { x: 0, y: 0 }
-      : layerOrigin(doc._read(), layer.id)!;
+    const origin = fresh ? { x: 0, y: 0 } : layerOrigin(doc._read(), layer.id)!;
     const inputTransform = fresh
       ? AffineTransform.translation(-origin.x, -origin.y)
       : layerTransform(doc._read(), layer.id)!.inverse();
@@ -1260,15 +1978,26 @@ export class ToolController {
               y: this.state.cloneSource!.y - point.y,
             }
         : null;
-    const raster=layer instanceof RasterLayer?findLayer(doc._read(),layer.id):undefined;
-    if(tool==='clone'&&doc.precision==='float32'){
-      base.previewAssets=new AssetStore();base.hostAssets=this.editor.assetStore;
-      for(const id of referencedAssets(doc._read()))base.hostAssets.shareTo(base.previewAssets,id,id);
+    const raster =
+      layer instanceof RasterLayer
+        ? findLayer(doc._read(), layer.id)
+        : undefined;
+    if (tool === "clone" && doc.precision === "float32") {
+      base.previewAssets = new AssetStore();
+      base.hostAssets = this.editor.assetStore;
+      for (const id of referencedAssets(doc._read()))
+        base.hostAssets.shareTo(base.previewAssets, id, id);
     }
     this.gesture = {
       ...base,
       kind: "paint",
-      erasurePlacement:raster&&activePerspective(raster.perspective)?{perspective:raster.perspective,bounds:intrinsicLocalBounds(raster)!}:undefined,
+      erasurePlacement:
+        raster && activePerspective(raster.perspective)
+          ? {
+              perspective: raster.perspective,
+              bounds: intrinsicLocalBounds(raster)!,
+            }
+          : undefined,
       tool,
       layer,
       fresh,
@@ -1276,15 +2005,34 @@ export class ToolController {
       origin,
       inputTransform,
       clip: transformSelection(doc.selection?.toJSON(), inputTransform),
-      points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
-      settings: { ...this.state.settings,symmetry:this.symmetryIn(inputTransform) },
+      points: [
+        this.point(
+          point,
+          origin,
+          modifiers.pressure,
+          inputTransform,
+          modifiers.tilt,
+        ),
+      ],
+      settings: {
+        ...this.state.settings,
+        symmetry: this.symmetryIn(inputTransform),
+      },
       offset,
       stroke: new (tool === "pencil"
         ? PencilStroke
         : tool === "eraser"
           ? EraserStroke
           : BrushStroke)({
-        points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
+        points: [
+          this.point(
+            point,
+            origin,
+            modifiers.pressure,
+            inputTransform,
+            modifiers.tilt,
+          ),
+        ],
         size: this.state.settings.size,
         hardness: this.state.settings.hardness,
         opacity: this.state.settings.opacity,
@@ -1292,16 +2040,20 @@ export class ToolController {
         spacing: this.state.settings.spacing,
         pressureSize: this.state.settings.pressureSize,
         pressureOpacity: this.state.settings.pressureOpacity,
-        ...(this.state.settings.pressureCurve?{pressureCurve:this.state.settings.pressureCurve}:{}),
-        ...(this.state.settings.tip?{tip:this.state.settings.tip}:{}),
-        ...(this.state.settings.symmetry?{symmetry:this.symmetryIn(inputTransform)!}:{}),
-        texture:this.captureTexture(base),
+        ...(this.state.settings.pressureCurve
+          ? { pressureCurve: this.state.settings.pressureCurve }
+          : {}),
+        ...(this.state.settings.tip ? { tip: this.state.settings.tip } : {}),
+        ...(this.state.settings.symmetry
+          ? { symmetry: this.symmetryIn(inputTransform)! }
+          : {}),
+        texture: this.captureTexture(base),
         color: this.state.settings.color,
         clip: transformSelection(doc.selection?.toJSON(), inputTransform),
       }).toJSON() as BrushStrokeData,
     };
     // captureTexture runs during construction, after the base object was spread.
-    if(base.textureLease)this.gesture.textureLease=base.textureLease;
+    if (base.textureLease) this.gesture.textureLease = base.textureLease;
     // Place an empty transient layer once. Pointer movement never clones or
     // validates the document; only the final DOM commit enters history.
     if (fresh)
@@ -1329,9 +2081,14 @@ export class ToolController {
   }
   private penPatch(gesture: PenGesture): Partial<Omit<VectorPathData, "id">> {
     const points = gesture.data.points.map((point, index) =>
-      index === gesture.index ? structuredClone(point) : point);
+      index === gesture.index ? structuredClone(point) : point,
+    );
     return gesture.contourId
-      ? { subpaths: gesture.rootOriginal!.subpaths!.map(contour => contour.id === gesture.contourId ? { ...contour, points } : contour) }
+      ? {
+          subpaths: gesture.rootOriginal!.subpaths!.map((contour) =>
+            contour.id === gesture.contourId ? { ...contour, points } : contour,
+          ),
+        }
       : { points, closed: gesture.data.closed };
   }
   private maskWorld(
@@ -1365,19 +2122,25 @@ export class ToolController {
       mask,
       pathIndex: data.paths.length,
       origin: maskOrigin(data, position.x, position.y),
-      world: maskPathMapping(doc._read(),selected.id,data),
-      inputTransform: maskPathMapping(doc._read(),selected.id,data).inverse(),
+      world: maskPathMapping(doc._read(), selected.id, data),
+      inputTransform: maskPathMapping(doc._read(), selected.id, data).inverse(),
       points: [],
     };
-    if(this.maskContour.world.projection)this.watchMaskPath(this.maskContour);
+    if (this.maskContour.world.projection) this.watchMaskPath(this.maskContour);
     this.publish({});
   }
-  private watchMaskPath(owner:BaseGesture){
-    const doc=owner.document,selection=[...doc.getSnapshot().selectedIds];
-    owner.stopChanges=doc.subscribe(()=>{
-      if(this.gesture!==owner&&this.maskContour!==owner)return;
-      const state=doc.getSnapshot();
-      if(state.revision!==owner.revision||state.selectedIds.length!==selection.length||state.selectedIds.some((id,i)=>id!==selection[i]))this.cancel();
+  private watchMaskPath(owner: BaseGesture) {
+    const doc = owner.document,
+      selection = [...doc.getSnapshot().selectedIds];
+    owner.stopChanges = doc.subscribe(() => {
+      if (this.gesture !== owner && this.maskContour !== owner) return;
+      const state = doc.getSnapshot();
+      if (
+        state.revision !== owner.revision ||
+        state.selectedIds.length !== selection.length ||
+        state.selectedIds.some((id, i) => id !== selection[i])
+      )
+        this.cancel();
     });
   }
   private assertMaskContour(draft: MaskContourDraft) {
@@ -1458,7 +2221,7 @@ export class ToolController {
       layer.id,
     )!;
     const origin = maskOrigin(data, layerPosition.x, layerPosition.y);
-    const world = maskPathMapping(base.document._read(),layer.id,data);
+    const world = maskPathMapping(base.document._read(), layer.id, data);
     const inputTransform = world.inverse();
     const local = inputTransform.point(point);
     for (let pathIndex = data.paths.length - 1; pathIndex >= 0; pathIndex--) {
@@ -1469,9 +2232,17 @@ export class ToolController {
             p = mode === "anchor" ? anchor : anchor[mode];
           if (mode !== "anchor" && p.x === anchor.x && p.y === anchor.y)
             continue;
-          let placed:Point;try{placed=world.point(p);}catch{continue;}
-          if(Math.hypot(placed.x-point.x,placed.y-point.y)>7/zoom)continue;
-          const inputOffset=world.projection?{x:placed.x-point.x,y:placed.y-point.y}:undefined;
+          let placed: Point;
+          try {
+            placed = world.point(p);
+          } catch {
+            continue;
+          }
+          if (Math.hypot(placed.x - point.x, placed.y - point.y) > 7 / zoom)
+            continue;
+          const inputOffset = world.projection
+            ? { x: placed.x - point.x, y: placed.y - point.y }
+            : undefined;
           this.maskPoint = { layerId: layer.id, pathIndex, index };
           this.gesture = {
             ...base,
@@ -1483,43 +2254,67 @@ export class ToolController {
             index,
             mode,
             original: structuredClone(anchor),
-            start: inputOffset?inputTransform.point({x:point.x+inputOffset.x,y:point.y+inputOffset.y}):local,
+            start: inputOffset
+              ? inputTransform.point({
+                  x: point.x + inputOffset.x,
+                  y: point.y + inputOffset.y,
+                })
+              : local,
             inputOffset,
             origin,
             inputTransform,
             changed: false,
           };
-          if(world.projection)this.watchMaskPath(this.gesture);
+          if (world.projection) this.watchMaskPath(this.gesture);
           this.publish({ drawing: true });
           return;
         }
     }
     this.maskPoint = null;
-    const nearest:{hit:(CurveHit & {pathIndex:number})|null}={hit:null};
+    const nearest: { hit: (CurveHit & { pathIndex: number }) | null } = {
+      hit: null,
+    };
     const budget = { remaining: 65536 };
     for (let pathIndex = data.paths.length - 1; pathIndex >= 0; pathIndex--) {
-      const candidate:CurveHit|null = world.projection?hitTestProjectivePath(data.paths[pathIndex].points,true,
-        ProjectiveTransform.fromAffine(AffineTransform.scale(zoom)).multiply(world.relativeTo(point)),nearest.hit?.distance??7,budget):hitTestPath(
-        data.paths[pathIndex].points.map((p) => ({
-          ...p,
-          ...world.point(p),
-          in: world.point(p.in),
-          out: world.point(p.out),
-        })),
-        true,
-        point,
-        zoom,
-        nearest.hit?.distance ?? 7,
-        budget,
-      );
-      if (candidate && (!nearest.hit || candidate.distance < nearest.hit.distance))
+      const candidate: CurveHit | null = world.projection
+        ? hitTestProjectivePath(
+            data.paths[pathIndex].points,
+            true,
+            ProjectiveTransform.fromAffine(
+              AffineTransform.scale(zoom),
+            ).multiply(world.relativeTo(point)),
+            nearest.hit?.distance ?? 7,
+            budget,
+          )
+        : hitTestPath(
+            data.paths[pathIndex].points.map((p) => ({
+              ...p,
+              ...world.point(p),
+              in: world.point(p.in),
+              out: world.point(p.out),
+            })),
+            true,
+            point,
+            zoom,
+            nearest.hit?.distance ?? 7,
+            budget,
+          );
+      if (
+        candidate &&
+        (!nearest.hit || candidate.distance < nearest.hit.distance)
+      )
         nearest.hit = { ...candidate, pathIndex };
     }
     if (!nearest.hit) return;
     if (data.paths.reduce((sum, path) => sum + path.points.length, 0) >= 20000)
       throw new Error("This mask has reached its 20,000-anchor limit.");
     const path = data.paths[nearest.hit.pathIndex];
-    path.points = splitPathSegment(path.points, true, nearest.hit.index, nearest.hit.t);
+    path.points = splitPathSegment(
+      path.points,
+      true,
+      nearest.hit.index,
+      nearest.hit.t,
+    );
     const index = nearest.hit.index + 1,
       original = path.points[index];
     this.gesture = {
@@ -1537,7 +2332,7 @@ export class ToolController {
       inputTransform,
       changed: true,
     };
-    if(world.projection)this.watchMaskPath(this.gesture);
+    if (world.projection) this.watchMaskPath(this.gesture);
     this.publish({
       drawing: true,
       preview: {
@@ -1547,34 +2342,112 @@ export class ToolController {
       },
     });
   }
-  private assertTextPathGesture(gesture:TextPathGesture){
+  private assertTextPathGesture(gesture: TextPathGesture) {
     this.assertCurrent(gesture);
-    const state=gesture.document.getSnapshot();
-    if(state.selectedId!==gesture.layer.id||state.selectedIds.length!==gesture.selection.length||state.selectedIds.some((id,i)=>id!==gesture.selection[i]))throw new Error('The baseline selection changed during this gesture. Try again.');
+    const state = gesture.document.getSnapshot();
+    if (
+      state.selectedId !== gesture.layer.id ||
+      state.selectedIds.length !== gesture.selection.length ||
+      state.selectedIds.some((id, i) => id !== gesture.selection[i])
+    )
+      throw new Error(
+        "The baseline selection changed during this gesture. Try again.",
+      );
     this.unlocked();
   }
-  private textPathPreview(gesture:TextPathGesture):EditorCommand{
-    return{type:'layer.update',id:gesture.layer.id,patch:{textPath:{...gesture.data,points:gesture.data.points.map((p,i)=>i===gesture.index?structuredClone(p):p)}}};
-  }
-  private beginTextPathPen(base:BaseGesture,layer:TextLayer,point:Point,zoom:number):boolean{
-    const record=layer._read();if(record.kind!=='text'||!record.textPath)return false;
-    const path=record.textPath,world=layerTransform(base.document._read(),layer.id)!,inputTransform=world.inverse(),local=inputTransform.point(point);
-    this.textPathPoint=null;
-    const start=(data:TextPathData,index:number,mode:TextPathGesture['mode'])=>{
-      const gesture:TextPathGesture={...base,kind:'text-path',layer,selection:base.document.getSnapshot().selectedIds,inputTransform,data,original:structuredClone(data.points[index]),index,mode,start:local,changed:mode==='insert'};
-      this.gesture=gesture;this.textPathPoint={document:base.document,layerId:layer.id,index};
-      this.publish({drawing:true,penTarget:null,selectedPath:null,...(gesture.changed?{preview:this.textPathPreview(gesture)}:{})});
+  private textPathPreview(gesture: TextPathGesture): EditorCommand {
+    return {
+      type: "layer.update",
+      id: gesture.layer.id,
+      patch: {
+        textPath: {
+          ...gesture.data,
+          points: gesture.data.points.map((p, i) =>
+            i === gesture.index ? structuredClone(p) : p,
+          ),
+        },
+      },
     };
-    for(let index=0;index<path.points.length;index++)for(const mode of ['in','out','anchor']as const){
-      const anchor=path.points[index],p=mode==='anchor'?anchor:anchor[mode];
-      if(mode!=='anchor'&&p.x===anchor.x&&p.y===anchor.y)continue;
-      const canvas=world.point(p);
-      if(Math.hypot(canvas.x-point.x,canvas.y-point.y)<=7/zoom){start({...path,points:[...path.points]},index,mode);return true;}
+  }
+  private beginTextPathPen(
+    base: BaseGesture,
+    layer: TextLayer,
+    point: Point,
+    zoom: number,
+  ): boolean {
+    const record = layer._read();
+    if (record.kind !== "text" || !record.textPath) return false;
+    const path = record.textPath,
+      world = layerTransform(base.document._read(), layer.id)!,
+      inputTransform = world.inverse(),
+      local = inputTransform.point(point);
+    this.textPathPoint = null;
+    const start = (
+      data: TextPathData,
+      index: number,
+      mode: TextPathGesture["mode"],
+    ) => {
+      const gesture: TextPathGesture = {
+        ...base,
+        kind: "text-path",
+        layer,
+        selection: base.document.getSnapshot().selectedIds,
+        inputTransform,
+        data,
+        original: structuredClone(data.points[index]),
+        index,
+        mode,
+        start: local,
+        changed: mode === "insert",
+      };
+      this.gesture = gesture;
+      this.textPathPoint = {
+        document: base.document,
+        layerId: layer.id,
+        index,
+      };
+      this.publish({
+        drawing: true,
+        penTarget: null,
+        selectedPath: null,
+        ...(gesture.changed ? { preview: this.textPathPreview(gesture) } : {}),
+      });
+    };
+    for (let index = 0; index < path.points.length; index++)
+      for (const mode of ["in", "out", "anchor"] as const) {
+        const anchor = path.points[index],
+          p = mode === "anchor" ? anchor : anchor[mode];
+        if (mode !== "anchor" && p.x === anchor.x && p.y === anchor.y) continue;
+        const canvas = world.point(p);
+        if (Math.hypot(canvas.x - point.x, canvas.y - point.y) <= 7 / zoom) {
+          start({ ...path, points: [...path.points] }, index, mode);
+          return true;
+        }
+      }
+    const hit = hitTestPath(
+      path.points.map((p) => ({
+        ...world.point(p),
+        in: world.point(p.in),
+        out: world.point(p.out),
+      })),
+      path.closed,
+      point,
+      zoom,
+    );
+    if (!hit) {
+      this.publish({});
+      return true;
     }
-    const hit=hitTestPath(path.points.map(p=>({...world.point(p),in:world.point(p.in),out:world.point(p.out)})),path.closed,point,zoom);
-    if(!hit){this.publish({});return true;}
-    if(path.points.length>=PATH_POINT_LIMIT)throw new Error('This baseline has reached its 20,000-anchor limit.');
-    start({...path,points:splitPathSegment(path.points,path.closed,hit.index,hit.t)},hit.index+1,'insert');
+    if (path.points.length >= PATH_POINT_LIMIT)
+      throw new Error("This baseline has reached its 20,000-anchor limit.");
+    start(
+      {
+        ...path,
+        points: splitPathSegment(path.points, path.closed, hit.index, hit.t),
+      },
+      hit.index + 1,
+      "insert",
+    );
     return true;
   }
   private beginPen(
@@ -1596,8 +2469,10 @@ export class ToolController {
     const target = this.state.penTarget;
     const layerData = layer._read();
     const paths = layerData.kind === "vector" ? layerData.paths : [];
-    let sourcePath = target?.layerId === layer.id
-      ? paths.find(candidate => candidate.id === target.pathId) ?? null : null;
+    let sourcePath =
+      target?.layerId === layer.id
+        ? (paths.find((candidate) => candidate.id === target.pathId) ?? null)
+        : null;
     let path = sourcePath ? layer.paths.get(sourcePath.id) : null;
     let contourId: string | undefined;
     let mode: PenGesture["mode"] = "new",
@@ -1607,30 +2482,34 @@ export class ToolController {
       const canvas = world.point(p);
       return Math.hypot(canvas.x - point.x, canvas.y - point.y) <= 7 / zoom;
     };
-    if (sourcePath && sourcePath.points.length >= 3 && near(sourcePath.points[0])) {
+    if (
+      sourcePath &&
+      sourcePath.points.length >= 3 &&
+      near(sourcePath.points[0])
+    ) {
       mode = "close";
       index = 0;
     } else {
       outer: for (const candidate of paths) {
         for (const contour of [candidate, ...(candidate.subpaths ?? [])]) {
-        const points = contour.points;
-        for (let i = 0; i < points.length; i++) {
-          const anchor = points[i];
-          for (const part of ["in", "out", "anchor"] as const) {
-            const p = part === "anchor" ? anchor : anchor[part];
-            if (part !== "anchor" && p.x === anchor.x && p.y === anchor.y)
-              continue;
-            if (near(p)) {
-              sourcePath = candidate;
-              contourId = contour === candidate ? undefined : contour.id;
-              path = layer.paths.get(candidate.id);
-              index = i;
-              mode = part;
-              newPath = false;
-              break outer;
+          const points = contour.points;
+          for (let i = 0; i < points.length; i++) {
+            const anchor = points[i];
+            for (const part of ["in", "out", "anchor"] as const) {
+              const p = part === "anchor" ? anchor : anchor[part];
+              if (part !== "anchor" && p.x === anchor.x && p.y === anchor.y)
+                continue;
+              if (near(p)) {
+                sourcePath = candidate;
+                contourId = contour === candidate ? undefined : contour.id;
+                path = layer.paths.get(candidate.id);
+                index = i;
+                mode = part;
+                newPath = false;
+                break outer;
+              }
             }
           }
-        }
         }
       }
     }
@@ -1644,10 +2523,19 @@ export class ToolController {
     // Existing path records are immutable document data. Clone only the active
     // anchor; public path getters remain defensive for external callers.
     const rootOriginal = sourcePath ?? freeze(path.toJSON());
-    const original = contourId ? { ...rootOriginal, points: rootOriginal.subpaths!.find(c => c.id === contourId)!.points, closed: true, subpaths: undefined } : rootOriginal,
+    const original = contourId
+        ? {
+            ...rootOriginal,
+            points: rootOriginal.subpaths!.find((c) => c.id === contourId)!
+              .points,
+            closed: true,
+            subpaths: undefined,
+          }
+        : rootOriginal,
       data = { ...original, points: [...original.points] };
     // Only the active anchor is mutable during a Pen gesture.
-    if (data.points[index]) data.points[index] = structuredClone(data.points[index]);
+    if (data.points[index])
+      data.points[index] = structuredClone(data.points[index]);
     if (mode === "new" && !newPath)
       data.points.push({ ...local, in: { ...local }, out: { ...local } });
     if (mode === "close") data.closed = true;
@@ -1677,21 +2565,35 @@ export class ToolController {
   }
   move(
     point: Point,
-    modifiers: { shift: boolean; alt: boolean; pressure: number;tilt?:PenTiltData },
+    modifiers: {
+      shift: boolean;
+      alt: boolean;
+      pressure: number;
+      tilt?: PenTiltData;
+    },
   ) {
     if (this.polygonLasso) {
       const draft = this.polygonLasso;
       this.assertPolygonLasso(draft);
       draft.pointer = { x: point.x, y: point.y };
-      if (this.paintFrame === null) this.paintFrame = requestAnimationFrame(() => {
-        this.paintFrame = null;
-        if (this.polygonLasso !== draft) return;
-        if (this.editor.document !== draft.document || draft.document.getSnapshot().revision !== draft.revision) {
-          this.cancel();
-          return;
-        }
-        this.publish({ lassoPoints: [...draft.points, ...(draft.pointer ? [draft.pointer] : [])] });
-      });
+      if (this.paintFrame === null)
+        this.paintFrame = requestAnimationFrame(() => {
+          this.paintFrame = null;
+          if (this.polygonLasso !== draft) return;
+          if (
+            this.editor.document !== draft.document ||
+            draft.document.getSnapshot().revision !== draft.revision
+          ) {
+            this.cancel();
+            return;
+          }
+          this.publish({
+            lassoPoints: [
+              ...draft.points,
+              ...(draft.pointer ? [draft.pointer] : []),
+            ],
+          });
+        });
       return;
     }
     if (this.crop.dragging) {
@@ -1700,59 +2602,148 @@ export class ToolController {
     }
     const gesture = this.gesture;
     if (!gesture || gesture.kind === "fill") return;
-    if(gesture.kind==='text-path'){
-      try{this.assertTextPathGesture(gesture);}catch(error){this.cancel();throw error;}
-      if(gesture.mode==='insert')return;
-      const local=gesture.inputTransform.point(point),dx=local.x-gesture.start.x,dy=local.y-gesture.start.y,p=gesture.original,anchor=structuredClone(p);
-      if(gesture.mode==='anchor'){
-        anchor.x+=dx;anchor.y+=dy;anchor.in.x+=dx;anchor.in.y+=dy;anchor.out.x+=dx;anchor.out.y+=dy;
-      }else if(dx||dy){
-        const handle={x:p[gesture.mode].x+dx,y:p[gesture.mode].y+dy};anchor[gesture.mode]=handle;
-        if(!modifiers.alt)anchor[gesture.mode==='in'?'out':'in']={x:anchor.x*2-handle.x,y:anchor.y*2-handle.y};
+    if (gesture.kind === "text-path") {
+      try {
+        this.assertTextPathGesture(gesture);
+      } catch (error) {
+        this.cancel();
+        throw error;
       }
-      gesture.data.points[gesture.index]=anchor;
-      gesture.changed=JSON.stringify(anchor)!==JSON.stringify(p);
-      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{
-        this.paintFrame=null;if(this.gesture!==gesture)return;
-        try{this.assertTextPathGesture(gesture);}catch{this.cancel();return;}
-        this.publish({preview:gesture.changed?this.textPathPreview(gesture):null});
-      });
+      if (gesture.mode === "insert") return;
+      const local = gesture.inputTransform.point(point),
+        dx = local.x - gesture.start.x,
+        dy = local.y - gesture.start.y,
+        p = gesture.original,
+        anchor = structuredClone(p);
+      if (gesture.mode === "anchor") {
+        anchor.x += dx;
+        anchor.y += dy;
+        anchor.in.x += dx;
+        anchor.in.y += dy;
+        anchor.out.x += dx;
+        anchor.out.y += dy;
+      } else if (dx || dy) {
+        const handle = { x: p[gesture.mode].x + dx, y: p[gesture.mode].y + dy };
+        anchor[gesture.mode] = handle;
+        if (!modifiers.alt)
+          anchor[gesture.mode === "in" ? "out" : "in"] = {
+            x: anchor.x * 2 - handle.x,
+            y: anchor.y * 2 - handle.y,
+          };
+      }
+      gesture.data.points[gesture.index] = anchor;
+      gesture.changed = JSON.stringify(anchor) !== JSON.stringify(p);
+      if (this.paintFrame === null)
+        this.paintFrame = requestAnimationFrame(() => {
+          this.paintFrame = null;
+          if (this.gesture !== gesture) return;
+          try {
+            this.assertTextPathGesture(gesture);
+          } catch {
+            this.cancel();
+            return;
+          }
+          this.publish({
+            preview: gesture.changed ? this.textPathPreview(gesture) : null,
+          });
+        });
       return;
     }
-    if(!this.textureCurrent(gesture)){this.cancel();throw new Error('The brush texture source changed during this gesture. Try again.');}
-    if(gesture.kind==='wet'){
-      if(gesture.finishing)return;
-      try{this.assertCurrent(gesture);}catch(error){this.cancel();throw error;}
-      let next=this.point(point,{x:0,y:0},modifiers.pressure,gesture.inputTransform,modifiers.tilt);
-      const last=gesture.points.at(-1)!,factor=1-Math.min(.9,gesture.settings.smoothing),tilt=interpolatePenTilt(last.tilt,next.tilt,factor);
-      next={x:last.x+(next.x-last.x)*factor,y:last.y+(next.y-last.y)*factor,pressure:last.pressure!+(next.pressure!-last.pressure!)*factor,...(tilt?{tilt}:{})};
-      if(next.x===last.x&&next.y===last.y&&next.pressure===last.pressure&&samePenTilt(next.tilt,last.tilt))return;
-      if(gesture.points.length>=gesture.maxPoints){this.cancel();throw new Error('This wet stroke has reached its target point limit.');}
+    if (!this.textureCurrent(gesture)) {
+      this.cancel();
+      throw new Error(
+        "The brush texture source changed during this gesture. Try again.",
+      );
+    }
+    if (gesture.kind === "wet") {
+      if (gesture.finishing) return;
+      try {
+        this.assertCurrent(gesture);
+      } catch (error) {
+        this.cancel();
+        throw error;
+      }
+      let next = this.point(
+        point,
+        { x: 0, y: 0 },
+        modifiers.pressure,
+        gesture.inputTransform,
+        modifiers.tilt,
+      );
+      const last = gesture.points.at(-1)!,
+        factor = 1 - Math.min(0.9, gesture.settings.smoothing),
+        tilt = interpolatePenTilt(last.tilt, next.tilt, factor);
+      next = {
+        x: last.x + (next.x - last.x) * factor,
+        y: last.y + (next.y - last.y) * factor,
+        pressure: last.pressure! + (next.pressure! - last.pressure!) * factor,
+        ...(tilt ? { tilt } : {}),
+      };
+      if (
+        next.x === last.x &&
+        next.y === last.y &&
+        next.pressure === last.pressure &&
+        samePenTilt(next.tilt, last.tilt)
+      )
+        return;
+      if (gesture.points.length >= gesture.maxPoints) {
+        this.cancel();
+        throw new Error("This wet stroke has reached its target point limit.");
+      }
       gesture.points.push(next);
-      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{this.paintFrame=null;if(this.gesture===gesture)void this.pumpWet(gesture).catch(()=>{});});
+      if (this.paintFrame === null)
+        this.paintFrame = requestAnimationFrame(() => {
+          this.paintFrame = null;
+          if (this.gesture === gesture)
+            void this.pumpWet(gesture).catch(() => {});
+        });
       return;
     }
-    if(gesture.kind==='quick-selection'){
-      try{this.assertCurrent(gesture);}catch(error){this.cancel();throw error;}
-      const last=gesture.points.at(-1)!;if(Math.hypot(point.x-last.x,point.y-last.y)<.25)return;
-      if(gesture.points.length>=20000)throw new Error('Finish this Quick Selection stroke before adding more points.');
-      gesture.points.push({...point});
-      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{this.paintFrame=null;if(this.gesture===gesture)this.publish({quickSelectionPoints:[...gesture.points]});});
+    if (gesture.kind === "quick-selection") {
+      try {
+        this.assertCurrent(gesture);
+      } catch (error) {
+        this.cancel();
+        throw error;
+      }
+      const last = gesture.points.at(-1)!;
+      if (Math.hypot(point.x - last.x, point.y - last.y) < 0.25) return;
+      if (gesture.points.length >= 20000)
+        throw new Error(
+          "Finish this Quick Selection stroke before adding more points.",
+        );
+      gesture.points.push({ ...point });
+      if (this.paintFrame === null)
+        this.paintFrame = requestAnimationFrame(() => {
+          this.paintFrame = null;
+          if (this.gesture === gesture)
+            this.publish({ quickSelectionPoints: [...gesture.points] });
+        });
       return;
     }
     if (gesture.kind === "heal") {
-      let next = this.point(point, { x: 0, y: 0 }, modifiers.pressure,undefined,modifiers.tilt);
+      let next = this.point(
+        point,
+        { x: 0, y: 0 },
+        modifiers.pressure,
+        undefined,
+        modifiers.tilt,
+      );
       const last = gesture.stroke.points.at(-1)!;
       const factor = 1 - Math.min(0.9, gesture.settings.smoothing);
-      const nextTilt=interpolatePenTilt(last.tilt,next.tilt,factor);
+      const nextTilt = interpolatePenTilt(last.tilt, next.tilt, factor);
       next = {
-        ...(nextTilt?{tilt:nextTilt}:{}),
+        ...(nextTilt ? { tilt: nextTilt } : {}),
         x: last.x + (next.x - last.x) * factor,
         y: last.y + (next.y - last.y) * factor,
         pressure: last.pressure + (next.pressure - last.pressure) * factor,
       };
-      if (Math.hypot(next.x - last.x, next.y - last.y) < 0.25&&
-          (!gesture.stroke.pressureCurve||next.pressure===last.pressure)&&samePenTilt(next.tilt,last.tilt)) return;
+      if (
+        Math.hypot(next.x - last.x, next.y - last.y) < 0.25 &&
+        (!gesture.stroke.pressureCurve || next.pressure === last.pressure) &&
+        samePenTilt(next.tilt, last.tilt)
+      )
+        return;
       if (gesture.stroke.points.length >= 20000)
         throw new Error(
           "Finish this healing stroke before adding more points.",
@@ -1777,7 +2768,13 @@ export class ToolController {
     if (gesture.kind === "mask-contour") {
       if (gesture.close) return;
       const anchor = gesture.points.at(-1)!;
-      let local:Point;try{local=gesture.draft.inputTransform.point(point);}catch(error){this.cancel();throw error;}
+      let local: Point;
+      try {
+        local = gesture.draft.inputTransform.point(point);
+      } catch (error) {
+        this.cancel();
+        throw error;
+      }
       anchor.out = local;
       anchor.in = { x: 2 * anchor.x - local.x, y: 2 * anchor.y - local.y };
       if (this.paintFrame === null)
@@ -1790,8 +2787,16 @@ export class ToolController {
     }
     if (gesture.kind === "mask-pen") {
       if (gesture.mode === "insert") return;
-      const offset=gesture.inputOffset;
-      let local:Point;try{local=gesture.inputTransform.point(offset?{x:point.x+offset.x,y:point.y+offset.y}:point);}catch(error){this.cancel();throw error;}
+      const offset = gesture.inputOffset;
+      let local: Point;
+      try {
+        local = gesture.inputTransform.point(
+          offset ? { x: point.x + offset.x, y: point.y + offset.y } : point,
+        );
+      } catch (error) {
+        this.cancel();
+        throw error;
+      }
       const anchor =
         gesture.data.paths[gesture.pathIndex].points[gesture.index];
       if (gesture.mode === "anchor") {
@@ -1850,16 +2855,20 @@ export class ToolController {
       const smoothing = this.state.settings.smoothing ?? 0;
       if (smoothing > 0) {
         const factor = 1 - Math.min(0.9, smoothing);
-        const nextTilt=interpolatePenTilt(last.tilt,p.tilt,factor);
+        const nextTilt = interpolatePenTilt(last.tilt, p.tilt, factor);
         p = {
-          ...(nextTilt?{tilt:nextTilt}:{}),
+          ...(nextTilt ? { tilt: nextTilt } : {}),
           x: last.x + (p.x - last.x) * factor,
           y: last.y + (p.y - last.y) * factor,
           pressure: last.pressure + (p.pressure - last.pressure) * factor,
         };
       }
-      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.25&&
-          (!gesture.stroke.pressureCurve||p.pressure===last.pressure)&&samePenTilt(p.tilt,last.tilt)) return;
+      if (
+        Math.hypot(p.x - last.x, p.y - last.y) < 0.25 &&
+        (!gesture.stroke.pressureCurve || p.pressure === last.pressure) &&
+        samePenTilt(p.tilt, last.tilt)
+      )
+        return;
       if (gesture.stroke.points.length >= gesture.maxPoints)
         throw new Error("This mask stroke has reached its point limit.");
       gesture.stroke.points.push(p);
@@ -1882,16 +2891,20 @@ export class ToolController {
       const smoothing = gesture.settings.smoothing ?? 0;
       if (smoothing > 0) {
         const factor = 1 - Math.min(0.9, smoothing);
-        const nextTilt=interpolatePenTilt(last.tilt,p.tilt,factor);
+        const nextTilt = interpolatePenTilt(last.tilt, p.tilt, factor);
         p = {
-          ...(nextTilt?{tilt:nextTilt}:{}),
+          ...(nextTilt ? { tilt: nextTilt } : {}),
           x: last.x + (p.x - last.x) * factor,
           y: last.y + (p.y - last.y) * factor,
           pressure: last.pressure + (p.pressure - last.pressure) * factor,
         };
       }
-      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.25&&
-          (!gesture.settings.pressureCurve||p.pressure===last.pressure)&&samePenTilt(p.tilt,last.tilt)) return;
+      if (
+        Math.hypot(p.x - last.x, p.y - last.y) < 0.25 &&
+        (!gesture.settings.pressureCurve || p.pressure === last.pressure) &&
+        samePenTilt(p.tilt, last.tilt)
+      )
+        return;
       if (gesture.points.length >= 20000)
         throw new Error("Finish this stroke before adding more points.");
       gesture.points.push(p);
@@ -1904,14 +2917,17 @@ export class ToolController {
       return;
     }
     if (gesture.kind === "lasso") {
-      const last=gesture.points.at(-1)!;
-      if(Math.hypot(point.x-last.x,point.y-last.y)<0.25)return;
-      if(gesture.points.length>=20000)throw new Error("Finish this lasso before adding more points.");
+      const last = gesture.points.at(-1)!;
+      if (Math.hypot(point.x - last.x, point.y - last.y) < 0.25) return;
+      if (gesture.points.length >= 20000)
+        throw new Error("Finish this lasso before adding more points.");
       gesture.points.push(point);
-      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{
-        this.paintFrame=null;
-        if(this.gesture===gesture)this.publish({lassoPoints:[...gesture.points]});
-      });
+      if (this.paintFrame === null)
+        this.paintFrame = requestAnimationFrame(() => {
+          this.paintFrame = null;
+          if (this.gesture === gesture)
+            this.publish({ lassoPoints: [...gesture.points] });
+        });
       return;
     }
     if (gesture.kind === "marquee") {
@@ -1976,71 +2992,154 @@ export class ToolController {
       spacing: gesture.settings.spacing,
       pressureSize: gesture.settings.pressureSize,
       pressureOpacity: gesture.settings.pressureOpacity,
-      ...(gesture.settings.pressureCurve?{pressureCurve:gesture.settings.pressureCurve}:{}),
-      ...(gesture.settings.tip?{tip:gesture.settings.tip}:{}),
-      ...(gesture.settings.symmetry?{symmetry:gesture.settings.symmetry}:{}),
-      ...(gesture.stroke.texture?{texture:gesture.stroke.texture}:{}),
+      ...(gesture.settings.pressureCurve
+        ? { pressureCurve: gesture.settings.pressureCurve }
+        : {}),
+      ...(gesture.settings.tip ? { tip: gesture.settings.tip } : {}),
+      ...(gesture.settings.symmetry
+        ? { symmetry: gesture.settings.symmetry }
+        : {}),
+      ...(gesture.stroke.texture ? { texture: gesture.stroke.texture } : {}),
       color: gesture.settings.color,
       clip: gesture.clip,
     };
     return gesture.tool === "pencil"
       ? new PencilStroke(options)
       : gesture.tool === "clone"
-        ? new CloneStroke({ ...options, tiles,...(gesture.document.precision==='float32'?{precision:'float32' as const}:{}) })
+        ? new CloneStroke({
+            ...options,
+            tiles,
+            ...(gesture.document.precision === "float32"
+              ? { precision: "float32" as const }
+              : {}),
+          })
         : gesture.tool === "eraser"
           ? new EraserStroke(options)
           : new BrushStroke(options);
   }
   private updateMaskPreview(gesture: MaskPaintGesture) {
-    if(!this.textureCurrent(gesture)){this.cancel();return;}
+    if (!this.textureCurrent(gesture)) {
+      this.cancel();
+      return;
+    }
     this.publish({
       paintPreview: {
         layerId: gesture.layer.id,
         filterMask: gesture.filterMask,
         maskMode: gesture.mode,
-        maskPlacement:gesture.placement,
+        maskPlacement: gesture.placement,
         stroke: { ...gesture.stroke, points: gesture.stroke.points.slice() },
       },
     });
   }
 
   private updatePaintPreview(gesture: PaintGesture) {
-    if(!this.textureCurrent(gesture)){this.cancel();return;}
-    if (gesture.tool === "clone" && gesture.document.precision==='float32' && !gesture.floatCloneSource) {
-      const snapshot=gesture.document.getSnapshot().document,root=gesture.inputTransform.multiply(AffineTransform.translation(-gesture.offset!.x,-gesture.offset!.y));
-      const capture=this.editor.renderer.captureFloatScene(snapshot,this.editor.assetStore,{isCancelled:()=>{this.assertCurrent(gesture);return false;}});
-      gesture.floatCloneSource=new FloatClonePreviewSource(capture,snapshot.width,snapshot.height,root,()=>this.assertCurrent(gesture));
+    if (!this.textureCurrent(gesture)) {
+      this.cancel();
+      return;
     }
-    if (gesture.tool === "clone" && gesture.document.precision!=='float32' && !gesture.cloneSource) {
-      const snapshot=gesture.document.getSnapshot().document,assets=this.editor.assetStore;
-      const inverse=gesture.inputTransform;
-      const affine=inverse.a!==1||inverse.b!==0||inverse.c!==0||inverse.d!==1;
-      const sampler=affine?new CanvasRenderer():null;
-      const root=inverse.multiply(AffineTransform.translation(-gesture.offset!.x,-gesture.offset!.y));
-      gesture.cloneSource=new ClonePreviewSource(async region=>{
-        this.assertCurrent(gesture);
-        const sx=region.x+gesture.origin.x+gesture.offset!.x,sy=region.y+gesture.origin.y+gesture.offset!.y;
-        const image=sampler?await sampler.render(snapshot,assets,{region,cache:false,rootTransform:root,documentTransform:root})
-          :await this.editor.renderer.render(snapshot,assets,{region:{...region,x:sx,y:sy},cache:false});
-        try { this.assertCurrent(gesture); } catch(error) { release(image); throw error; }
-        const c=image.getContext("2d")!;
-        c.save();c.globalCompositeOperation="destination-in";c.fillStyle="#fff";
-        if(sampler){
-          const corners=[{x:0,y:0},{x:snapshot.width,y:0},{x:snapshot.width,y:snapshot.height},{x:0,y:snapshot.height}].map(p=>root.point(p));
-          c.beginPath();c.moveTo(corners[0].x-region.x,corners[0].y-region.y);
-          for(const p of corners.slice(1))c.lineTo(p.x-region.x,p.y-region.y);c.closePath();c.fill();
-        }else c.fillRect(-sx,-sy,snapshot.width,snapshot.height);
-        c.restore();return image;
-      },()=>sampler?.dispose());
+    if (
+      gesture.tool === "clone" &&
+      gesture.document.precision === "float32" &&
+      !gesture.floatCloneSource
+    ) {
+      const snapshot = gesture.document.getSnapshot().document,
+        root = gesture.inputTransform.multiply(
+          AffineTransform.translation(-gesture.offset!.x, -gesture.offset!.y),
+        );
+      const capture = this.editor.renderer.captureFloatScene(
+        snapshot,
+        this.editor.assetStore,
+        {
+          isCancelled: () => {
+            this.assertCurrent(gesture);
+            return false;
+          },
+        },
+      );
+      gesture.floatCloneSource = new FloatClonePreviewSource(
+        capture,
+        snapshot.width,
+        snapshot.height,
+        root,
+        () => this.assertCurrent(gesture),
+      );
+    }
+    if (
+      gesture.tool === "clone" &&
+      gesture.document.precision !== "float32" &&
+      !gesture.cloneSource
+    ) {
+      const snapshot = gesture.document.getSnapshot().document,
+        assets = this.editor.assetStore;
+      const inverse = gesture.inputTransform;
+      const affine =
+        inverse.a !== 1 ||
+        inverse.b !== 0 ||
+        inverse.c !== 0 ||
+        inverse.d !== 1;
+      const sampler = affine ? new CanvasRenderer() : null;
+      const root = inverse.multiply(
+        AffineTransform.translation(-gesture.offset!.x, -gesture.offset!.y),
+      );
+      gesture.cloneSource = new ClonePreviewSource(
+        async (region) => {
+          this.assertCurrent(gesture);
+          const sx = region.x + gesture.origin.x + gesture.offset!.x,
+            sy = region.y + gesture.origin.y + gesture.offset!.y;
+          const image = sampler
+            ? await sampler.render(snapshot, assets, {
+                region,
+                cache: false,
+                rootTransform: root,
+                documentTransform: root,
+              })
+            : await this.editor.renderer.render(snapshot, assets, {
+                region: { ...region, x: sx, y: sy },
+                cache: false,
+              });
+          try {
+            this.assertCurrent(gesture);
+          } catch (error) {
+            release(image);
+            throw error;
+          }
+          const c = image.getContext("2d")!;
+          c.save();
+          c.globalCompositeOperation = "destination-in";
+          c.fillStyle = "#fff";
+          if (sampler) {
+            const corners = [
+              { x: 0, y: 0 },
+              { x: snapshot.width, y: 0 },
+              { x: snapshot.width, y: snapshot.height },
+              { x: 0, y: snapshot.height },
+            ].map((p) => root.point(p));
+            c.beginPath();
+            c.moveTo(corners[0].x - region.x, corners[0].y - region.y);
+            for (const p of corners.slice(1))
+              c.lineTo(p.x - region.x, p.y - region.y);
+            c.closePath();
+            c.fill();
+          } else c.fillRect(-sx, -sy, snapshot.width, snapshot.height);
+          c.restore();
+          return image;
+        },
+        () => sampler?.dispose(),
+      );
     }
     this.publish({
       paintPreview: {
         layerId: gesture.layer.id,
         cloneSource: gesture.cloneSource,
-        floatCloneSource:gesture.floatCloneSource,
-        nativeAssets:gesture.previewAssets,
-        erasurePlacement:gesture.erasurePlacement,
-        stroke: { ...gesture.stroke, color: gesture.tool === "clone" ? "#ffffff" : gesture.stroke.color, points: gesture.points.slice() },
+        floatCloneSource: gesture.floatCloneSource,
+        nativeAssets: gesture.previewAssets,
+        erasurePlacement: gesture.erasurePlacement,
+        stroke: {
+          ...gesture.stroke,
+          color: gesture.tool === "clone" ? "#ffffff" : gesture.stroke.color,
+          points: gesture.points.slice(),
+        },
         tonal:
           gesture.tool === "dodge" || gesture.tool === "burn"
             ? {
@@ -2076,68 +3175,107 @@ export class ToolController {
     return { type: "transaction", label: "Drawing preview", commands };
   }
   private assertCurrent(gesture: BaseGesture) {
-    if(!this.textureCurrent(gesture))throw new Error('The brush texture source changed during this gesture. Try again.');
+    if (!this.textureCurrent(gesture))
+      throw new Error(
+        "The brush texture source changed during this gesture. Try again.",
+      );
     if (
       gesture.generation !== this.generation ||
-      !!gesture.hostAssets&&this.editor.assetStore!==gesture.hostAssets ||
+      (!!gesture.hostAssets && this.editor.assetStore !== gesture.hostAssets) ||
       this.editor.document !== gesture.document ||
       gesture.document.getSnapshot().revision !== gesture.revision ||
-      !!gesture.selectionIds&&(gesture.document.getSnapshot().selectedIds.length!==gesture.selectionIds.length||gesture.document.getSnapshot().selectedIds.some((id,i)=>id!==gesture.selectionIds![i]))
+      (!!gesture.selectionIds &&
+        (gesture.document.getSnapshot().selectedIds.length !==
+          gesture.selectionIds.length ||
+          gesture.document
+            .getSnapshot()
+            .selectedIds.some((id, i) => id !== gesture.selectionIds![i])))
     )
       throw new Error("The document changed during this gesture. Try again.");
   }
   private releaseWet(gesture: WetGesture) {
-    gesture.unsubscribe?.();gesture.unsubscribe=undefined;
-    gesture.abort.abort(new Error('Wet stroke cancelled.'));
-    void gesture.ready.then(job=>job.dispose(),()=>{}).catch(()=>{});
+    gesture.unsubscribe?.();
+    gesture.unsubscribe = undefined;
+    gesture.abort.abort(new Error("Wet stroke cancelled."));
+    void gesture.ready
+      .then(
+        (job) => job.dispose(),
+        () => {},
+      )
+      .catch(() => {});
   }
   /** Preserve every accepted sample; only prefix publication is coalesced. */
   private pumpWet(gesture: WetGesture): Promise<void> {
-    if(gesture.running)return gesture.running;
-    const run=(async()=>{
-      const job=await gesture.ready;
-      while(this.gesture===gesture&&!gesture.abort.signal.aborted){
+    if (gesture.running) return gesture.running;
+    const run = (async () => {
+      const job = await gesture.ready;
+      while (this.gesture === gesture && !gesture.abort.signal.aborted) {
         this.assertCurrent(gesture);
-        const count=gesture.points.length;
-        if(gesture.processed<count){await job.append(gesture.points.slice(gesture.processed,count));gesture.processed=count;}
+        const count = gesture.points.length;
+        if (gesture.processed < count) {
+          await job.append(gesture.points.slice(gesture.processed, count));
+          gesture.processed = count;
+        }
         // Input can arrive while an earlier append is awaiting native work.
         // Pointer-up freezes input, then drains every still-buffered sample.
-        if(gesture.finishing){if(gesture.processed<gesture.points.length)continue;break;}
-        if(gesture.previewed===gesture.processed)break;
-        const frame=await job.preview();
-        if(this.gesture!==gesture||gesture.abort.signal.aborted){frame?.dispose();break;}
-        try{this.assertCurrent(gesture);}catch(error){frame?.dispose();throw error;}
-        gesture.previewed=gesture.processed;
-        const previous=this.state.wetPreview;
-        this.publish({wetPreview:frame});
+        if (gesture.finishing) {
+          if (gesture.processed < gesture.points.length) continue;
+          break;
+        }
+        if (gesture.previewed === gesture.processed) break;
+        const frame = await job.preview();
+        if (this.gesture !== gesture || gesture.abort.signal.aborted) {
+          frame?.dispose();
+          break;
+        }
+        try {
+          this.assertCurrent(gesture);
+        } catch (error) {
+          frame?.dispose();
+          throw error;
+        }
+        gesture.previewed = gesture.processed;
+        const previous = this.state.wetPreview;
+        this.publish({ wetPreview: frame });
         previous?.dispose();
       }
     })();
-    gesture.running=run;
-    void run.catch(error=>{
-      if(this.gesture===gesture&&!gesture.abort.signal.aborted){
-        this.cancel();this.publish({error:error instanceof Error?error.message:'Wet painting failed.'});
-      }
-    }).finally(()=>{if(gesture.running===run)gesture.running=null;});
+    gesture.running = run;
+    void run
+      .catch((error) => {
+        if (this.gesture === gesture && !gesture.abort.signal.aborted) {
+          this.cancel();
+          this.publish({
+            error:
+              error instanceof Error ? error.message : "Wet painting failed.",
+          });
+        }
+      })
+      .finally(() => {
+        if (gesture.running === run) gesture.running = null;
+      });
     return run;
   }
   private async endWet(gesture: WetGesture) {
-    gesture.finishing=true;
-    try{
+    gesture.finishing = true;
+    try {
       await this.pumpWet(gesture);
-      if(this.gesture!==gesture||gesture.abort.signal.aborted)return;
+      if (this.gesture !== gesture || gesture.abort.signal.aborted) return;
       this.assertCurrent(gesture);
-      const job=await gesture.ready;
+      const job = await gesture.ready;
       await job.commit();
-    }finally{
+    } finally {
       this.releaseWet(gesture);
-      if(this.gesture===gesture){
-        this.gesture=null;
-        const frame=this.state.wetPreview;
-        this.publish({wetPreview:null,drawing:false});
+      if (this.gesture === gesture) {
+        this.gesture = null;
+        const frame = this.state.wetPreview;
+        this.publish({ wetPreview: null, drawing: false });
         frame?.dispose();
       }
-      await gesture.ready.then(job=>job.dispose(),()=>{});
+      await gesture.ready.then(
+        (job) => job.dispose(),
+        () => {},
+      );
     }
   }
   async end() {
@@ -2148,7 +3286,10 @@ export class ToolController {
     this.cancelFrame();
     const gesture = this.gesture;
     if (!gesture) return;
-    if(gesture.kind==='wet'){await this.endWet(gesture);return;}
+    if (gesture.kind === "wet") {
+      await this.endWet(gesture);
+      return;
+    }
     this.gesture = null;
     gesture.stopChanges?.();
     // Keep the displayed frame, but stop source work for previews that can no
@@ -2156,29 +3297,63 @@ export class ToolController {
     if (gesture.kind === "paint") gesture.cloneSource?.dispose();
     const assets = this.editor.assetStore;
     let stagedTiles: CloneTile[] = [];
-    const stagedNative=new Map<string,ImageAsset>();
+    const stagedNative = new Map<string, ImageAsset>();
     let committed = false;
     try {
       this.assertCurrent(gesture);
       const doc = gesture.document;
-      if(gesture.kind==='text-path'){
+      if (gesture.kind === "text-path") {
         this.assertTextPathGesture(gesture);
-        if(gesture.changed)doc.transaction('Edit text baseline',()=>{gesture.layer.textPath=new TextPath(gesture.data);});
+        if (gesture.changed)
+          doc.transaction("Edit text baseline", () => {
+            gesture.layer.textPath = new TextPath(gesture.data);
+          });
         return;
       }
-      if(gesture.kind==='quick-selection'){
-        const abort=new AbortController();this.quickAbort=abort;this.publish({quickSelectionProgress:{completed:0,total:1}});
-        try{await doc.selectQuickSelection({...gesture.options,points:gesture.points},{signal:abort.signal,onProgress:progress=>this.publish({quickSelectionProgress:progress})});committed=true;}
-        catch(error){if(!abort.signal.aborted)throw error;}
-        finally{if(this.quickAbort===abort)this.quickAbort=null;}
+      if (gesture.kind === "quick-selection") {
+        const abort = new AbortController();
+        this.quickAbort = abort;
+        this.publish({ quickSelectionProgress: { completed: 0, total: 1 } });
+        try {
+          await doc.selectQuickSelection(
+            { ...gesture.options, points: gesture.points },
+            {
+              signal: abort.signal,
+              onProgress: (progress) =>
+                this.publish({ quickSelectionProgress: progress }),
+            },
+          );
+          committed = true;
+        } catch (error) {
+          if (!abort.signal.aborted) throw error;
+        } finally {
+          if (this.quickAbort === abort) this.quickAbort = null;
+        }
         return;
       }
       if (gesture.kind === "heal") {
         const abort = new AbortController();
         this.patchAbort = abort;
         try {
-          const brush=new BrushStroke(gesture.stroke),sampling={mode:gesture.settings.patchSampling},options={mode:gesture.settings.patchMode};
-          const layer=gesture.previewAssets?await this.editor._healStrokeWithAssets(brush,sampling,options,gesture.settings.healingRadius,abort.signal,gesture.previewAssets):await this.editor.healStroke(brush,sampling,options,gesture.settings.healingRadius,abort.signal);
+          const brush = new BrushStroke(gesture.stroke),
+            sampling = { mode: gesture.settings.patchSampling },
+            options = { mode: gesture.settings.patchMode };
+          const layer = gesture.previewAssets
+            ? await this.editor._healStrokeWithAssets(
+                brush,
+                sampling,
+                options,
+                gesture.settings.healingRadius,
+                abort.signal,
+                gesture.previewAssets,
+              )
+            : await this.editor.healStroke(
+                brush,
+                sampling,
+                options,
+                gesture.settings.healingRadius,
+                abort.signal,
+              );
           committed = true;
           doc.selectedLayer = layer;
         } catch (error) {
@@ -2237,14 +3412,30 @@ export class ToolController {
           throw new Error(
             "The mask target changed during this gesture. Try again.",
           );
-        gesture.layer.paintMask(PaintOperation.fromJSON(gesture.stroke) as BrushStroke | PencilStroke,gesture.mode,{space:gesture.placement?'placed':'local',filterMask:gesture.filterMask});
+        gesture.layer.paintMask(
+          PaintOperation.fromJSON(gesture.stroke) as BrushStroke | PencilStroke,
+          gesture.mode,
+          {
+            space: gesture.placement ? "placed" : "local",
+            filterMask: gesture.filterMask,
+          },
+        );
         return;
       }
       if (gesture.kind === "lasso") {
-        const selection=lassoSelection(gesture.points,doc.width,doc.height);
-        if(!selection.regions.length)return;
-        const region=selection.regions[0];
-        doc.selection=new MarqueeSelection(gesture.operation==='replace' ? selection : {regions:[...(gesture.previous?.regions??[]),{...region,operation:gesture.operation}]});
+        const selection = lassoSelection(gesture.points, doc.width, doc.height);
+        if (!selection.regions.length) return;
+        const region = selection.regions[0];
+        doc.selection = new MarqueeSelection(
+          gesture.operation === "replace"
+            ? selection
+            : {
+                regions: [
+                  ...(gesture.previous?.regions ?? []),
+                  { ...region, operation: gesture.operation },
+                ],
+              },
+        );
         return;
       }
       if (gesture.kind === "marquee") {
@@ -2257,8 +3448,7 @@ export class ToolController {
           if (gesture.newPath) {
             gesture.path.update(this.penPatch(gesture));
             gesture.layer.paths.add(gesture.path);
-          } else
-            gesture.path.update(this.penPatch(gesture));
+          } else gesture.path.update(this.penPatch(gesture));
         });
         doc.selectedLayer = gesture.layer;
         this.publish({
@@ -2283,12 +3473,26 @@ export class ToolController {
         return;
       }
       let tiles: CloneTile[] = [];
-      if (gesture.tool === "clone") tiles = gesture.document.precision==='float32'?await this.sampleFloatClone(gesture):await this.sampleClone(gesture);
-      if(gesture.previewAssets){
+      if (gesture.tool === "clone")
+        tiles =
+          gesture.document.precision === "float32"
+            ? await this.sampleFloatClone(gesture)
+            : await this.sampleClone(gesture);
+      if (gesture.previewAssets) {
         this.assertCurrent(gesture);
-        const ids=new Set([...tiles.map(tile=>tile.assetId),...(gesture.stroke.texture?[gesture.stroke.texture.assetId]:[])]);
-        for(const id of ids){if(assets.has(id))throw new Error('A native clone source ID collided with existing artwork.');const installed=gesture.previewAssets.shareTo(assets,id,id);stagedNative.set(id,installed);}
-      }else stagedTiles = tiles;
+        const ids = new Set([
+          ...tiles.map((tile) => tile.assetId),
+          ...(gesture.stroke.texture ? [gesture.stroke.texture.assetId] : []),
+        ]);
+        for (const id of ids) {
+          if (assets.has(id))
+            throw new Error(
+              "A native clone source ID collided with existing artwork.",
+            );
+          const installed = gesture.previewAssets.shareTo(assets, id, id);
+          stagedNative.set(id, installed);
+        }
+      } else stagedTiles = tiles;
       this.assertCurrent(gesture);
       doc.transaction(
         gesture.tool === "clone"
@@ -2314,7 +3518,10 @@ export class ToolController {
                 protectTones: gesture.settings.protectTones,
               }),
             );
-          } else if (gesture.layer instanceof RasterLayer) gesture.layer.erase(this.stroke(gesture) as EraserStroke,{space:gesture.erasurePlacement?'placed':'local'});
+          } else if (gesture.layer instanceof RasterLayer)
+            gesture.layer.erase(this.stroke(gesture) as EraserStroke, {
+              space: gesture.erasurePlacement ? "placed" : "local",
+            });
           else gesture.layer.strokes.add(this.stroke(gesture, tiles));
         },
       );
@@ -2323,16 +3530,27 @@ export class ToolController {
       if (gesture.offset && gesture.settings.cloneAligned)
         this.publish({ cloneOffset: gesture.offset });
     } finally {
-      if(gesture.kind === "paint"){gesture.cloneSource?.dispose();gesture.floatCloneSource?.dispose();}
+      if (gesture.kind === "paint") {
+        gesture.cloneSource?.dispose();
+        gesture.floatCloneSource?.dispose();
+      }
       this.releaseTexture(gesture);
-      if (!committed){
+      if (!committed) {
         stagedTiles.forEach((tile) => assets.remove(tile.assetId));
-        const state=gesture.document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(document=>[...referencedAssets(document)]));
-        for(const[id,record]of stagedNative)if(!retained.has(id)&&assets.has(id)&&assets.get(id)===record)assets.remove(id);
+        const state = gesture.document.getSnapshot(),
+          retained = new Set(
+            retainedDocuments(
+              state.document,
+              captureRetainedHistory(state),
+            ).flatMap((document) => [...referencedAssets(document)]),
+          );
+        for (const [id, record] of stagedNative)
+          if (!retained.has(id) && assets.has(id) && assets.get(id) === record)
+            assets.remove(id);
       }
       this.publish({
-        quickSelectionPoints:null,
-        quickSelectionProgress:null,
+        quickSelectionPoints: null,
+        quickSelectionProgress: null,
         preview: null,
         lassoPoints: null,
         paintPreview: null,
@@ -2351,18 +3569,49 @@ export class ToolController {
       }
     }
   }
-  private async sampleFloatClone(gesture:PaintGesture):Promise<CloneTile[]>{
-    const source=gesture.floatCloneSource;if(!source)throw new Error('Native clone sampling is unavailable.');
-    const stage=gesture.previewAssets;if(!stage)throw new Error('Native clone staging is unavailable.');const tiles:CloneTile[]=[],stroke={...gesture.stroke,points:gesture.points};
-    try{
-      for(const region of floatCloneCaptureRegions(stroke)){
+  private async sampleFloatClone(gesture: PaintGesture): Promise<CloneTile[]> {
+    const source = gesture.floatCloneSource;
+    if (!source) throw new Error("Native clone sampling is unavailable.");
+    const stage = gesture.previewAssets;
+    if (!stage) throw new Error("Native clone staging is unavailable.");
+    const tiles: CloneTile[] = [],
+      stroke = { ...gesture.stroke, points: gesture.points };
+    try {
+      for (const region of floatCloneCaptureRegions(stroke)) {
         source.check();
-        const pixels=await source.read(region);source.check();const blob=await encodeFloatWetTile(pixels,region.width,region.height,{check:()=>source.check()});source.check();
-        const asset=await stage.add(blob,'Native clone source',undefined,false,{tiff:{editingPrecision:'float32'}});source.check();tiles.push({...region,assetId:asset.id});
+        const pixels = await source.read(region);
+        source.check();
+        const blob = await encodeFloatWetTile(
+          pixels,
+          region.width,
+          region.height,
+          { check: () => source.check() },
+        );
+        source.check();
+        const asset = await stage.add(
+          blob,
+          "Native clone source",
+          undefined,
+          false,
+          { tiff: { editingPrecision: "float32" } },
+        );
+        source.check();
+        tiles.push({ ...region, assetId: asset.id });
       }
-      if(tiles.length){const validated=await captureFloatCloneAssets(tiles,wetBrowserAssets(stage,()=>source.check()));validated.dispose();}
-      source.check();return tiles;
-    }catch(error){stage.dispose();gesture.previewAssets=undefined;throw error;}
+      if (tiles.length) {
+        const validated = await captureFloatCloneAssets(
+          tiles,
+          wetBrowserAssets(stage, () => source.check()),
+        );
+        validated.dispose();
+      }
+      source.check();
+      return tiles;
+    } catch (error) {
+      stage.dispose();
+      gesture.previewAssets = undefined;
+      throw error;
+    }
   }
   private async sampleClone(gesture: PaintGesture): Promise<CloneTile[]> {
     const snapshot = gesture.document.toJSON(),
@@ -2386,7 +3635,12 @@ export class ToolController {
     try {
       for (let ty = top; ty < bottom; ty += 1024)
         for (let tx = left; tx < right; tx += 1024) {
-          const tile = { x: tx, y: ty, width: Math.min(1024, right-tx), height: Math.min(1024, bottom-ty) };
+          const tile = {
+            x: tx,
+            y: ty,
+            width: Math.min(1024, right - tx),
+            height: Math.min(1024, bottom - ty),
+          };
           if (!strokeIntersectsRegion(stroke, tile)) continue;
           const capture = strokeCaptureRegion(stroke, tile);
           if (!capture) continue;
@@ -2436,8 +3690,17 @@ export class ToolController {
             // Browser idle encoding can defer every tile for about a second.
             // Transfer the private readback to the worker for native encoding with direct fallback.
             const pixels = c.getImageData(0, 0, width, height).data;
-            const blob = await this.editor.renderer.processor.encodePng(pixels, width, height);
-            const asset = await assets.add(blob, "Clone source tile", undefined, false);
+            const blob = await this.editor.renderer.processor.encodePng(
+              pixels,
+              width,
+              height,
+            );
+            const asset = await assets.add(
+              blob,
+              "Clone source tile",
+              undefined,
+              false,
+            );
             created.push(asset.id);
             tiles.push({ assetId: asset.id, x, y, width, height });
           } finally {
@@ -2476,8 +3739,15 @@ export class ToolController {
   fillSelection(erase = false) {
     const { doc, selected } = this.unlocked();
     if (erase && selected instanceof RasterLayer) {
-      const local = transformSelection(doc.selection?.toJSON(), layerTransform(doc._read(), selected.id)!.inverse());
-      doc.transaction("Clear selected pixels", () => selected.clear(local ? new MarqueeSelection(local) : null,{space:'placed'}));
+      const local = transformSelection(
+        doc.selection?.toJSON(),
+        layerTransform(doc._read(), selected.id)!.inverse(),
+      );
+      doc.transaction("Clear selected pixels", () =>
+        selected.clear(local ? new MarqueeSelection(local) : null, {
+          space: "placed",
+        }),
+      );
       return;
     }
     if (erase && !(selected instanceof PaintLayer))

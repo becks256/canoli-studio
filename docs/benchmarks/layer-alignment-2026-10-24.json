@@ -94,10 +94,7 @@
       "pixels": [
         {
           "reference": "layer-alignment.e2e.ts-can-13377-ixels-and-reopened-projects/canvas-reference.png",
-          "dimensions": [
-            300,
-            200
-          ],
+          "dimensions": [300, 200],
           "rgbaSha256": "37099645d14bec8302251e26a61bf77224252859d799578f89b565be75221560",
           "equal": [
             "canvas-centered.png",
@@ -107,49 +104,27 @@
         },
         {
           "reference": "layer-alignment.e2e.ts-key-3f1fe-ine-geometry-and-exact-undo/key-reference.png",
-          "dimensions": [
-            400,
-            300
-          ],
+          "dimensions": [400, 300],
           "rgbaSha256": "32f8d131debaf059c0dda5d1148e076caf89a415c4248fbc989bacde7d44cc08",
-          "equal": [
-            "key-aligned.png",
-            "key-redo.png",
-            "key-reopened.png"
-          ]
+          "equal": ["key-aligned.png", "key-redo.png", "key-reopened.png"]
         },
         {
           "reference": "layer-alignment.e2e.ts-doc-77102-commands-with-one-host-undo/script-reference.png",
-          "dimensions": [
-            300,
-            200
-          ],
+          "dimensions": [300, 200],
           "rgbaSha256": "37099645d14bec8302251e26a61bf77224252859d799578f89b565be75221560",
-          "equal": [
-            "script-aligned.png"
-          ]
+          "equal": ["script-aligned.png"]
         },
         {
           "reference": "layer-alignment.e2e.ts-can-13377-ixels-and-reopened-projects/canvas-before.png",
-          "dimensions": [
-            300,
-            200
-          ],
+          "dimensions": [300, 200],
           "rgbaSha256": "86b92e60ddc1056a274d8ab0b8478f23617e8461d34f7a1276a257103b9e7daf",
-          "equal": [
-            "canvas-undo.png"
-          ]
+          "equal": ["canvas-undo.png"]
         },
         {
           "reference": "layer-alignment.e2e.ts-key-3f1fe-ine-geometry-and-exact-undo/key-before.png",
-          "dimensions": [
-            400,
-            300
-          ],
+          "dimensions": [400, 300],
           "rgbaSha256": "4efaad0e97e7007a127df9ddcb087e19c9d0ebf54d13baf72f72f75b87ed64e3",
-          "equal": [
-            "key-undo.png"
-          ]
+          "equal": ["key-undo.png"]
         }
       ],
       "projects": [
@@ -195,14 +170,8 @@
         "maximumError": 0,
         "originalBytes": 100000672,
         "projectOriginalSha256": "cfe25bed379735dfea685695e956838b284106e6527e6aff77e3901ef6ef9d85",
-        "position": [
-          4700,
-          2300
-        ],
-        "rectangle": [
-          600,
-          400
-        ]
+        "position": [4700, 2300],
+        "rectangle": [600, 400]
       }
     },
     "independentProduction": {
@@ -210,10 +179,7 @@
       "pixels": [
         {
           "reference": "production.e2e.ts-producti-62e1b-s-without-developer-globals/canvas-reference.png",
-          "dimensions": [
-            300,
-            200
-          ],
+          "dimensions": [300, 200],
           "rgbaSha256": "37099645d14bec8302251e26a61bf77224252859d799578f89b565be75221560",
           "equal": [
             "canvas-centered.png",
@@ -223,38 +189,21 @@
         },
         {
           "reference": "production.e2e.ts-producti-0c65a-tive-pixels-without-globals/key-reference.png",
-          "dimensions": [
-            400,
-            300
-          ],
+          "dimensions": [400, 300],
           "rgbaSha256": "32f8d131debaf059c0dda5d1148e076caf89a415c4248fbc989bacde7d44cc08",
-          "equal": [
-            "key-aligned.png",
-            "key-redo.png",
-            "key-reopened.png"
-          ]
+          "equal": ["key-aligned.png", "key-redo.png", "key-reopened.png"]
         },
         {
           "reference": "production.e2e.ts-producti-62e1b-s-without-developer-globals/canvas-before.png",
-          "dimensions": [
-            300,
-            200
-          ],
+          "dimensions": [300, 200],
           "rgbaSha256": "86b92e60ddc1056a274d8ab0b8478f23617e8461d34f7a1276a257103b9e7daf",
-          "equal": [
-            "canvas-undo.png"
-          ]
+          "equal": ["canvas-undo.png"]
         },
         {
           "reference": "production.e2e.ts-producti-0c65a-tive-pixels-without-globals/key-before.png",
-          "dimensions": [
-            400,
-            300
-          ],
+          "dimensions": [400, 300],
           "rgbaSha256": "4efaad0e97e7007a127df9ddcb087e19c9d0ebf54d13baf72f72f75b87ed64e3",
-          "equal": [
-            "key-undo.png"
-          ]
+          "equal": ["key-undo.png"]
         }
       ],
       "projects": [
@@ -3119,10 +3068,7 @@
           "review": "/tmp/canoli-alignment-accepted-native-alignment-controls.png",
           "sha256": "57d5d4806edec47a5ce7df11431c2f899b95f3f39fc343d7d6dc81199f70ae20",
           "bytes": 104954,
-          "dimensions": [
-            1280,
-            720
-          ],
+          "dimensions": [1280, 720],
           "reviewed": true
         },
         {
@@ -3130,10 +3076,7 @@
           "review": "/tmp/canoli-alignment-accepted-native-key-alignment-controls.png",
           "sha256": "4a8627378ab32041d6f8d1aa3c1341e1db777918a2567fb5f0408b8cc1466a7c",
           "bytes": 109621,
-          "dimensions": [
-            1280,
-            720
-          ],
+          "dimensions": [1280, 720],
           "reviewed": true
         },
         {
@@ -3141,10 +3084,7 @@
           "review": "/tmp/canoli-alignment-accepted-native-canvas-centered.png",
           "sha256": "eec83c58f7a68620dd141e027ecfac7422008db126b7d804775bd16156df7b65",
           "bytes": 395,
-          "dimensions": [
-            300,
-            200
-          ],
+          "dimensions": [300, 200],
           "reviewed": true
         },
         {
@@ -3152,10 +3092,7 @@
           "review": "/tmp/canoli-alignment-accepted-native-key-aligned.png",
           "sha256": "ac4349c79fe3ae4e9c8e31f4cffea17b4342e521c4aba4ee3ec1505de8291299",
           "bytes": 957,
-          "dimensions": [
-            400,
-            300
-          ],
+          "dimensions": [400, 300],
           "reviewed": true
         },
         {
@@ -3163,10 +3100,7 @@
           "review": "/tmp/canoli-alignment-accepted-production-alignment-controls.png",
           "sha256": "8591a25006af7ff65a444db7414c3b4e12c7bcf5b996070b3c822b5f6e4bbd4e",
           "bytes": 105011,
-          "dimensions": [
-            1280,
-            720
-          ],
+          "dimensions": [1280, 720],
           "reviewed": true
         },
         {
@@ -3174,10 +3108,7 @@
           "review": "/tmp/canoli-alignment-accepted-production-key-alignment-controls.png",
           "sha256": "59d52204615adb508fdbb35365dcaaaea388a12e02f7708af165caaa277cdc03",
           "bytes": 109706,
-          "dimensions": [
-            1280,
-            720
-          ],
+          "dimensions": [1280, 720],
           "reviewed": true
         },
         {
@@ -3185,10 +3116,7 @@
           "review": "/tmp/canoli-alignment-accepted-production-alignment-guide-mobile.png",
           "sha256": "20c9229c664ec153c2931ac810759a9472b1fc7a00ca994976a171a751b48ba3",
           "bytes": 64188,
-          "dimensions": [
-            390,
-            844
-          ],
+          "dimensions": [390, 844],
           "reviewed": true
         }
       ],
@@ -3211,10 +3139,7 @@
       "earlierRegression": {
         "observed": true,
         "before": {
-          "viewport": [
-            1280,
-            720
-          ],
+          "viewport": [1280, 720],
           "panel": {
             "top": 64,
             "bottom": 720,
@@ -3240,10 +3165,7 @@
           "documentScrollHeight": 720
         },
         "after": {
-          "viewport": [
-            1280,
-            720
-          ],
+          "viewport": [1280, 720],
           "panel": {
             "top": 64,
             "bottom": 720,
@@ -3281,10 +3203,7 @@
       ]
     },
     "sidebarBefore": {
-      "viewport": [
-        1280,
-        720
-      ],
+      "viewport": [1280, 720],
       "panel": {
         "top": 64,
         "bottom": 720,
@@ -3310,10 +3229,7 @@
       "documentScrollHeight": 720
     },
     "sidebarAfter": {
-      "viewport": [
-        1280,
-        720
-      ],
+      "viewport": [1280, 720],
       "panel": {
         "top": 64,
         "bottom": 720,

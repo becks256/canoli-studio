@@ -22,8 +22,10 @@ import type { EditPlan, Recipe } from "../ai/recipes/types";
 
 export interface RecipeDialogProps {
   editor: EditorApplication;
-  recordingOptions:{name:string;autoParameterizeTone:boolean};
-  onRecordingOptionsChange(options:RecipeDialogProps['recordingOptions']):void;
+  recordingOptions: { name: string; autoParameterizeTone: boolean };
+  onRecordingOptionsChange(
+    options: RecipeDialogProps["recordingOptions"],
+  ): void;
   onClose(): void;
   onRunSuccess?(recipeName: string): void;
 }
@@ -133,10 +135,13 @@ export function RecipeDialog({
 
   // Execution state
   const [executing, setExecuting] = useState(false);
-  const execution=useRef<AbortController|null>(null);
-  const [rawProgress,setRawProgress]=useState('');
-  useEffect(()=>()=>execution.current?.abort(),[]);
-  const close=()=>{execution.current?.abort();onClose();};
+  const execution = useRef<AbortController | null>(null);
+  const [rawProgress, setRawProgress] = useState("");
+  useEffect(() => () => execution.current?.abort(), []);
+  const close = () => {
+    execution.current?.abort();
+    onClose();
+  };
   const [executeStatus, setExecuteStatus] = useState<{
     success?: boolean;
     message?: string;
@@ -144,13 +149,25 @@ export function RecipeDialog({
 
   const handleRun = async () => {
     if (!selectedRecipe || !plan || !plan.valid) return;
-    if(execution.current)return;
-    const controller=new AbortController();execution.current=controller;
-    setExecuting(true);setRawProgress('Preparing recipe');
+    if (execution.current) return;
+    const controller = new AbortController();
+    execution.current = controller;
+    setExecuting(true);
+    setRawProgress("Preparing recipe");
     setExecuteStatus(null);
 
     try {
-      const result = await editor.recipes.executeAsync(selectedRecipe, paramValues,{signal:controller.signal,onProgress:value=>setRawProgress(`${value.phase}${value.fraction===null?"":` ${Math.round(value.fraction*100)}%`}`)});
+      const result = await editor.recipes.executeAsync(
+        selectedRecipe,
+        paramValues,
+        {
+          signal: controller.signal,
+          onProgress: (value) =>
+            setRawProgress(
+              `${value.phase}${value.fraction === null ? "" : ` ${Math.round(value.fraction * 100)}%`}`,
+            ),
+        },
+      );
       if (result.success) {
         setExecuteStatus({
           success: true,
@@ -170,8 +187,9 @@ export function RecipeDialog({
         message: `Execution error: ${msg}`,
       });
     } finally {
-      if(execution.current===controller)execution.current=null;
-      setExecuting(false);setRawProgress('');
+      if (execution.current === controller) execution.current = null;
+      setExecuting(false);
+      setRawProgress("");
     }
   };
 
@@ -194,7 +212,8 @@ export function RecipeDialog({
     });
   }, [editor]);
 
-  const {name:recordName,autoParameterizeTone:autoParamTone}=recordingOptions;
+  const { name: recordName, autoParameterizeTone: autoParamTone } =
+    recordingOptions;
 
   const handleStartRecord = () => {
     try {
@@ -815,8 +834,20 @@ export function RecipeDialog({
                   )}
                 </div>
 
-                {executing&&<div role="status">{rawProgress} <Button onClick={()=>execution.current?.abort()}>Cancel preparation</Button></div>}
-                {plan?.rawDevelopments?.length? <p>Develops the target RAW original into 8-bit sRGB. Source sensor bytes are retained; shared instances update together.</p>:null}
+                {executing && (
+                  <div role="status">
+                    {rawProgress}{" "}
+                    <Button onClick={() => execution.current?.abort()}>
+                      Cancel preparation
+                    </Button>
+                  </div>
+                )}
+                {plan?.rawDevelopments?.length ? (
+                  <p>
+                    Develops the target RAW original into 8-bit sRGB. Source
+                    sensor bytes are retained; shared instances update together.
+                  </p>
+                ) : null}
                 {/* Status message */}
                 {executeStatus && (
                   <div
@@ -925,7 +956,12 @@ export function RecipeDialog({
                   type="text"
                   className="input"
                   value={recordName}
-                  onChange={(e) => onRecordingOptionsChange({...recordingOptions,name:e.target.value})}
+                  onChange={(e) =>
+                    onRecordingOptionsChange({
+                      ...recordingOptions,
+                      name: e.target.value,
+                    })
+                  }
                   placeholder="e.g. Vintage Poster Color Grade"
                 />
               </label>
@@ -933,7 +969,12 @@ export function RecipeDialog({
                 <input
                   type="checkbox"
                   checked={autoParamTone}
-                  onChange={(e) => onRecordingOptionsChange({...recordingOptions,autoParameterizeTone:e.target.checked})}
+                  onChange={(e) =>
+                    onRecordingOptionsChange({
+                      ...recordingOptions,
+                      autoParameterizeTone: e.target.checked,
+                    })
+                  }
                 />
                 <span>
                   Auto-parameterize tone adjustments (exposure, contrast,

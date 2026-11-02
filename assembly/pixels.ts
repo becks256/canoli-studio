@@ -1,14 +1,23 @@
-export {convolveAlphaFloat} from './float-shadow';
-export {loadWetPaintFloat,mixWetPaintFloat,envelopeWetPaintFloat,compositeHdrWetFloat} from './float-wet';
-export {styleFloat} from './float-style';
-export {colorFloat} from "./float-color";
-export {tonalFloat} from "./float-tonal";
-export {gradientFloat} from './float-gradient';
-export {lookupFloat} from './float-lookup';
-export {transferFloat} from "./float-transfer";
+export { convolveAlphaFloat } from "./float-shadow";
+export {
+  loadWetPaintFloat,
+  mixWetPaintFloat,
+  envelopeWetPaintFloat,
+  compositeHdrWetFloat,
+} from "./float-wet";
+export { styleFloat } from "./float-style";
+export { colorFloat } from "./float-color";
+export { tonalFloat } from "./float-tonal";
+export { gradientFloat } from "./float-gradient";
+export { lookupFloat } from "./float-lookup";
+export { transferFloat } from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { sampleProjectiveFloat } from "./projective-sampling";
-export { sampleProjectiveFieldFloat,sampleProjectiveWetFloat,sampleProjectiveHdrWet } from "./projective-field";
+export {
+  sampleProjectiveFieldFloat,
+  sampleProjectiveWetFloat,
+  sampleProjectiveHdrWet,
+} from "./projective-field";
 export { encodeFrequencyBand } from "./frequency-band";
 export { medianFilter } from "./median-filter";
 export { bilateralFilter } from "./bilateral-filter";
@@ -20,13 +29,21 @@ export { adjustGradientMap } from "./gradient-map";
 export { adjustWhiteBalance } from "./white-balance";
 export { adjustLookup } from "./lookup";
 export { selectColorRange } from "./color-range";
-export { quickSelectionInit, quickSelectionSpan, quickSelectionAlpha } from './quick-selection';
-export { subjectModel, subjectMaximum, subjectAlpha } from './subject-selection';
+export {
+  quickSelectionInit,
+  quickSelectionSpan,
+  quickSelectionAlpha,
+} from "./quick-selection";
+export {
+  subjectModel,
+  subjectMaximum,
+  subjectAlpha,
+} from "./subject-selection";
 export { spatialFilter } from "./spatial-filter";
 export { donorValidity } from "./donor";
 // A small, allocation-free ABI. The host owns the RGBA buffer and memory growth.
 export { poissonSolve } from "./poisson";
-export { mattingMultiply, mattingCondition } from './matting';
+export { mattingMultiply, mattingCondition } from "./matting";
 // This module can be replaced by Rust/C++ without changing the document model.
 export function bufferOffset(): usize {
   return __heap_base;
@@ -147,15 +164,29 @@ export function selectionMask(
 ): void {
   // One native-resolution pixel region has constant coverage across all sixteen
   // subpixel samples. Decode it once, walking ordered RLE spans monotonically.
-  if (count == 1 && load<f64>(regions) == 0 && load<f64>(regions + 8) == 2 &&
-      stepX == 1 && stepY == 1 && stepXY == 0 && stepYX == 0 &&
-      load<f64>(regions + 48) == 1 && load<f64>(regions + 72) == 1 &&
-      load<f64>(regions + 56) == 0 && load<f64>(regions + 64) == 0) {
-    const rw = load<f64>(regions + 32), rh = load<f64>(regions + 40);
+  if (
+    count == 1 &&
+    load<f64>(regions) == 0 &&
+    load<f64>(regions + 8) == 2 &&
+    stepX == 1 &&
+    stepY == 1 &&
+    stepXY == 0 &&
+    stepYX == 0 &&
+    load<f64>(regions + 48) == 1 &&
+    load<f64>(regions + 72) == 1 &&
+    load<f64>(regions + 56) == 0 &&
+    load<f64>(regions + 64) == 0
+  ) {
+    const rw = load<f64>(regions + 32),
+      rh = load<f64>(regions + 40);
     const ox = x + load<f64>(regions + 80) - load<f64>(regions + 16);
     const oy = y + load<f64>(regions + 88) - load<f64>(regions + 24);
-    if (rw == load<f64>(regions + 96) && rh == load<f64>(regions + 104) &&
-        ox == Math.floor(ox) && oy == Math.floor(oy)) {
+    if (
+      rw == load<f64>(regions + 96) &&
+      rh == load<f64>(regions + 104) &&
+      ox == Math.floor(ox) &&
+      oy == Math.floor(oy)
+    ) {
       const data = <usize>load<f64>(regions + 112);
       const runs = <i32>load<f64>(regions + 120);
       let run: i32 = 0;
@@ -166,11 +197,17 @@ export function selectionMask(
           let alpha: u8 = 0;
           if (lx >= 0 && lx < rw && ly >= 0 && ly < rh) {
             const index = ly * rw + lx;
-            while (run + 1 < runs && index >= load<f64>(data + <usize>(run * 16))) run++;
+            while (
+              run + 1 < runs &&
+              index >= load<f64>(data + <usize>(run * 16))
+            )
+              run++;
             alpha = <u8>load<f64>(data + <usize>(run * 16 + 8));
           }
           const p = ptr + <usize>((py * width + px) * 4);
-          store<u8>(p, 255); store<u8>(p + 1, 255); store<u8>(p + 2, 255);
+          store<u8>(p, 255);
+          store<u8>(p + 1, 255);
+          store<u8>(p + 2, 255);
           store<u8>(p + 3, alpha);
         }
       }
@@ -180,25 +217,57 @@ export function selectionMask(
   // A single additive geometric region cannot cover pixels outside its local
   // rectangle. Bound the complete transformed pixel footprint conservatively;
   // edge pixels still use the original sixteen exact sample evaluations.
-  const geometric = count == 1 && load<f64>(regions) == 0 && load<f64>(regions + 8) < 2;
-  let a: f64 = 0, b: f64 = 0, c: f64 = 0, d: f64 = 0, e: f64 = 0, f: f64 = 0;
-  let rx: f64 = 0, ry: f64 = 0, right: f64 = 0, bottom: f64 = 0;
-  let extentX: f64 = 0, extentY: f64 = 0, slack: f64 = 0;
+  const geometric =
+    count == 1 && load<f64>(regions) == 0 && load<f64>(regions + 8) < 2;
+  let a: f64 = 0,
+    b: f64 = 0,
+    c: f64 = 0,
+    d: f64 = 0,
+    e: f64 = 0,
+    f: f64 = 0;
+  let rx: f64 = 0,
+    ry: f64 = 0,
+    right: f64 = 0,
+    bottom: f64 = 0;
+  let extentX: f64 = 0,
+    extentY: f64 = 0,
+    slack: f64 = 0;
   if (geometric) {
-    a = load<f64>(regions + 48); b = load<f64>(regions + 56);
-    c = load<f64>(regions + 64); d = load<f64>(regions + 72);
-    e = load<f64>(regions + 80); f = load<f64>(regions + 88);
-    rx = load<f64>(regions + 16); ry = load<f64>(regions + 24);
-    right = rx + load<f64>(regions + 32); bottom = ry + load<f64>(regions + 40);
-    extentX = (Math.abs(a * stepX + c * stepYX) + Math.abs(a * stepXY + c * stepY)) / 2;
-    extentY = (Math.abs(b * stepX + d * stepYX) + Math.abs(b * stepXY + d * stepY)) / 2;
+    a = load<f64>(regions + 48);
+    b = load<f64>(regions + 56);
+    c = load<f64>(regions + 64);
+    d = load<f64>(regions + 72);
+    e = load<f64>(regions + 80);
+    f = load<f64>(regions + 88);
+    rx = load<f64>(regions + 16);
+    ry = load<f64>(regions + 24);
+    right = rx + load<f64>(regions + 32);
+    bottom = ry + load<f64>(regions + 40);
+    extentX =
+      (Math.abs(a * stepX + c * stepYX) + Math.abs(a * stepXY + c * stepY)) / 2;
+    extentY =
+      (Math.abs(b * stepX + d * stepYX) + Math.abs(b * stepXY + d * stepY)) / 2;
     // Cover rounding/cancellation at large coordinates. Nonfinite bounds simply
     // disable rejection and leave the general sampler authoritative.
-    const maxX = Math.abs(x) + <f64>width * Math.abs(stepX) + <f64>height * Math.abs(stepXY);
-    const maxY = Math.abs(y) + <f64>width * Math.abs(stepYX) + <f64>height * Math.abs(stepY);
-    slack = 1e-10 * (1 + (Math.abs(a) + Math.abs(b)) * maxX +
-      (Math.abs(c) + Math.abs(d)) * maxY + Math.abs(e) + Math.abs(f) +
-      Math.abs(rx) + Math.abs(ry) + Math.abs(right) + Math.abs(bottom));
+    const maxX =
+      Math.abs(x) +
+      <f64>width * Math.abs(stepX) +
+      <f64>height * Math.abs(stepXY);
+    const maxY =
+      Math.abs(y) +
+      <f64>width * Math.abs(stepYX) +
+      <f64>height * Math.abs(stepY);
+    slack =
+      1e-10 *
+      (1 +
+        (Math.abs(a) + Math.abs(b)) * maxX +
+        (Math.abs(c) + Math.abs(d)) * maxY +
+        Math.abs(e) +
+        Math.abs(f) +
+        Math.abs(rx) +
+        Math.abs(ry) +
+        Math.abs(right) +
+        Math.abs(bottom));
   }
   for (let py: i32 = 0; py < height; py++) {
     for (let px: i32 = 0; px < width; px++) {
@@ -207,28 +276,45 @@ export function selectionMask(
         const sampleY = y + (<f64>py + 0.5) * stepY + (<f64>px + 0.5) * stepYX;
         const localX = a * sampleX + c * sampleY + e;
         const localY = b * sampleX + d * sampleY + f;
-        if (localX + extentX < rx - slack || localX - extentX > right + slack ||
-            localY + extentY < ry - slack || localY - extentY > bottom + slack) {
+        if (
+          localX + extentX < rx - slack ||
+          localX - extentX > right + slack ||
+          localY + extentY < ry - slack ||
+          localY - extentY > bottom + slack
+        ) {
           const p = ptr + <usize>((py * width + px) * 4);
-          store<u8>(p, 255); store<u8>(p + 1, 255); store<u8>(p + 2, 255); store<u8>(p + 3, 0);
+          store<u8>(p, 255);
+          store<u8>(p + 1, 255);
+          store<u8>(p + 2, 255);
+          store<u8>(p + 3, 0);
           continue;
         }
         // The whole affine pixel footprint lies within this conservative local
         // box. Interior pixels need no supersampling; retain the generic path
         // near boundaries and whenever floating-point bounds are uncertain.
-        if (localX - extentX > rx + slack && localX + extentX < right - slack &&
-            localY - extentY > ry + slack && localY + extentY < bottom - slack) {
+        if (
+          localX - extentX > rx + slack &&
+          localX + extentX < right - slack &&
+          localY - extentY > ry + slack &&
+          localY + extentY < bottom - slack
+        ) {
           let interior = load<f64>(regions + 8) == 0;
           if (!interior) {
             const halfWidth = load<f64>(regions + 32) / 2;
             const halfHeight = load<f64>(regions + 40) / 2;
-            const dx = (Math.abs(localX - rx - halfWidth) + extentX + slack) / halfWidth;
-            const dy = (Math.abs(localY - ry - halfHeight) + extentY + slack) / halfHeight;
+            const dx =
+              (Math.abs(localX - rx - halfWidth) + extentX + slack) / halfWidth;
+            const dy =
+              (Math.abs(localY - ry - halfHeight) + extentY + slack) /
+              halfHeight;
             interior = dx * dx + dy * dy < 1 - 1e-10;
           }
           if (interior) {
             const p = ptr + <usize>((py * width + px) * 4);
-            store<u8>(p, 255); store<u8>(p + 1, 255); store<u8>(p + 2, 255); store<u8>(p + 3, 255);
+            store<u8>(p, 255);
+            store<u8>(p + 1, 255);
+            store<u8>(p + 2, 255);
+            store<u8>(p + 3, 255);
             continue;
           }
         }
@@ -269,10 +355,14 @@ export function selectionMask(
             }
             let coverage: f64 = hit ? 1 : 0;
             if (hit && shape == 2) {
-              const pw = load<f64>(r + 96), ph = load<f64>(r + 104);
-              const index = Math.floor((localY - ry) * ph / rh) * pw + Math.floor((localX - rx) * pw / rw);
+              const pw = load<f64>(r + 96),
+                ph = load<f64>(r + 104);
+              const index =
+                Math.floor(((localY - ry) * ph) / rh) * pw +
+                Math.floor(((localX - rx) * pw) / rw);
               const data = <usize>load<f64>(r + 112);
-              let low: i32 = 0, high = <i32>load<f64>(r + 120);
+              let low: i32 = 0,
+                high = <i32>load<f64>(r + 120);
               while (low < high) {
                 const mid = (low + high) >> 1;
                 if (index < load<f64>(data + <usize>(mid * 16))) high = mid;
@@ -280,8 +370,12 @@ export function selectionMask(
               }
               coverage = load<f64>(data + <usize>(low * 16 + 8)) / 255;
             }
-            inside = operation == 0 ? Math.max(inside, coverage)
-              : operation == 1 ? inside * (1 - coverage) : Math.min(inside, coverage);
+            inside =
+              operation == 0
+                ? Math.max(inside, coverage)
+                : operation == 1
+                  ? inside * (1 - coverage)
+                  : Math.min(inside, coverage);
           }
           covered += inside;
         }
@@ -484,15 +578,28 @@ export function mixFiltered(
   }
 }
 /** Initialize a spatial paint reservoir. Hidden RGB contributes no pigment. */
-export function loadWetPaint(pixels: usize, carried: usize, length: i32, red: f64, green: f64, blue: f64, alpha: f64, amount: f64): void {
+export function loadWetPaint(
+  pixels: usize,
+  carried: usize,
+  length: i32,
+  red: f64,
+  green: f64,
+  blue: f64,
+  alpha: f64,
+  amount: f64,
+): void {
   const paintAlpha = alpha / 255.0;
   for (let i: i32 = 0; i < length; i += 4) {
-    const p = pixels + <usize>i, r = carried + <usize>i * 4;
+    const p = pixels + <usize>i,
+      r = carried + <usize>i * 4;
     const sourceAlpha = <f64>load<u8>(p + 3) / 255.0;
     const resultAlpha = sourceAlpha * (1.0 - amount) + paintAlpha * amount;
     for (let c: usize = 0; c < 3; c++) {
       const paint = c == 0 ? red : c == 1 ? green : blue;
-      const value = (<f64>load<u8>(p + c) * sourceAlpha * (1.0 - amount) + paint * paintAlpha * amount) / 255.0;
+      const value =
+        (<f64>load<u8>(p + c) * sourceAlpha * (1.0 - amount) +
+          paint * paintAlpha * amount) /
+        255.0;
       store<f32>(r + c * 4, <f32>min(resultAlpha, max(0.0, value)));
     }
     store<f32>(r + 12, <f32>resultAlpha);
@@ -502,10 +609,19 @@ export function loadWetPaint(pixels: usize, carried: usize, length: i32, red: f6
 /** One immutable-source dab tile. Reservoir pickup reads pre-deposit pixels,
  * so splitting a dab into output tiles cannot feed its own partial writes back.
  * Whole-stroke opacity/selection belong to the later original/result composite. */
-export function mixWetPaint(pixels: usize, carried: usize, coverage: usize, length: i32, flow: f64, wetness: f64, pickup: f64): void {
+export function mixWetPaint(
+  pixels: usize,
+  carried: usize,
+  coverage: usize,
+  length: i32,
+  flow: f64,
+  wetness: f64,
+  pickup: f64,
+): void {
   for (let i: i32 = 0; i < length; i += 4) {
-    const p = pixels + <usize>i, r = carried + <usize>i * 4;
-    const strength = flow * <f64>load<u8>(coverage + <usize>(i / 4)) / 255.0;
+    const p = pixels + <usize>i,
+      r = carried + <usize>i * 4;
+    const strength = (flow * <f64>load<u8>(coverage + <usize>(i / 4))) / 255.0;
     if (strength <= 0.0) continue;
     const sourceAlpha = <f64>load<u8>(p + 3) / 255.0;
     const carriedAlpha = <f64>load<f32>(r + 12);
@@ -515,10 +631,21 @@ export function mixWetPaint(pixels: usize, carried: usize, coverage: usize, leng
     const nextAlpha = carriedAlpha + (sourceAlpha - carriedAlpha) * acquire;
     const roundedAlpha = channel(resultAlpha * 255.0);
     for (let c: usize = 0; c < 3; c++) {
-      const source = <f64>load<u8>(p + c) / 255.0 * sourceAlpha;
+      const source = (<f64>load<u8>(p + c) / 255.0) * sourceAlpha;
       const paint = <f64>load<f32>(r + c * 4);
-      if (deposit > 0.0) store<u8>(p + c, roundedAlpha == 0 ? 0 : channel((source + (paint - source) * deposit) / resultAlpha * 255.0));
-      store<f32>(r + c * 4, <f32>min(nextAlpha, max(0.0, paint + (source - paint) * acquire)));
+      if (deposit > 0.0)
+        store<u8>(
+          p + c,
+          roundedAlpha == 0
+            ? 0
+            : channel(
+                ((source + (paint - source) * deposit) / resultAlpha) * 255.0,
+              ),
+        );
+      store<f32>(
+        r + c * 4,
+        <f32>min(nextAlpha, max(0.0, paint + (source - paint) * acquire)),
+      );
     }
     if (deposit > 0.0) store<u8>(p + 3, roundedAlpha);
     store<f32>(r + 12, <f32>nextAlpha);
@@ -526,15 +653,28 @@ export function mixWetPaint(pixels: usize, carried: usize, coverage: usize, leng
 }
 
 /** White coverage mask from owned, encoded-sRGB RGBA working pixels. */
-export function brushTextureMask(ptr: usize, length: i32, luminance: bool, invert: bool, support:usize): void {
+export function brushTextureMask(
+  ptr: usize,
+  length: i32,
+  luminance: bool,
+  invert: bool,
+  support: usize,
+): void {
   for (let i = 0; i < length; i += 4) {
     const pixel = ptr + <usize>i;
     let alpha = <i32>load<u8>(pixel + 3);
     if (luminance) {
-      const value = 2126 * <i32>load<u8>(pixel) + 7152 * <i32>load<u8>(pixel + 1) + 722 * <i32>load<u8>(pixel + 2);
+      const value =
+        2126 * <i32>load<u8>(pixel) +
+        7152 * <i32>load<u8>(pixel + 1) +
+        722 * <i32>load<u8>(pixel + 2);
       const ink = invert ? value : 2550000 - value;
       alpha = (alpha * ink + 1275000) / 2550000;
-    } else if (invert) alpha = max(0,(support ? <i32>load<u8>(support+<usize>i+3) : 255)-alpha);
+    } else if (invert)
+      alpha = max(
+        0,
+        (support ? <i32>load<u8>(support + <usize>i + 3) : 255) - alpha,
+      );
     store<u8>(pixel, 255);
     store<u8>(pixel + 1, 255);
     store<u8>(pixel + 2, 255);

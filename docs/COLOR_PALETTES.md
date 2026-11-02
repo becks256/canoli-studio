@@ -24,12 +24,14 @@ The UTF-8 `.canolipal` format is strict JSON:
 {
   "format": "canoli-color-palettes",
   "version": 1,
-  "palettes": [{
-    "name": "Botanical",
-    "description": "Reviewed print colors",
-    "tags": ["Print"],
-    "swatches": [{"name": "Leaf", "color": "#315b2a"}]
-  }]
+  "palettes": [
+    {
+      "name": "Botanical",
+      "description": "Reviewed print colors",
+      "tags": ["Print"],
+      "swatches": [{ "name": "Leaf", "color": "#315b2a" }]
+    }
+  ]
 }
 ```
 

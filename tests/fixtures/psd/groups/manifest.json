@@ -217,10 +217,7 @@
       "masked": false,
       "hidden": false,
       "locked": false,
-      "patchOrigin": [
-        120,
-        515
-      ],
+      "patchOrigin": [120, 515],
       "changedPixels": 60000,
       "sha256": "ad264a48b60bfd8599dd76b5d3d5e16c8d121324d8d91a2de4fdbfbb0d35ca41",
       "referenceSha256": "51209e536c882584664b9beacc792b6b22ff190df603a952a19d6948158af22c",

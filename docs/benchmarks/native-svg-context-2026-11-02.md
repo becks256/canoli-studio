@@ -14,13 +14,13 @@ the original failing case's −30 px. No artwork pixels or fitted coordinates
 determine these values. Documents remain identical and temporary fonts retire.
 
 | Source size | Transform | Native shaping em | Native raster em |
-| --- | --- | ---: | ---: |
-| 40 | Identity | 40 | 40 |
-| 33.333 | Identity | 33.330001831 | 33.328125 |
-| 64.5 | Identity | 64.5 | 64.5 |
-| 40 | Affine | 44.269989014 | 44.265625 |
-| 33.333 | Affine | 36.889999390 | 36.875 |
-| 64.5 | Affine | 71.389999390 | 71.375 |
+| ----------- | --------- | ----------------: | ---------------: |
+| 40          | Identity  |                40 |               40 |
+| 33.333      | Identity  |      33.330001831 |        33.328125 |
+| 64.5        | Identity  |              64.5 |             64.5 |
+| 40          | Affine    |      44.269989014 |        44.265625 |
+| 33.333      | Affine    |      36.889999390 |           36.875 |
+| 64.5        | Affine    |      71.389999390 |           71.375 |
 
 SVG/Canvas shaping differences are below 0.000009 physical pixels; raster-em
 differences are below 0.000002. Measured tracking differs from the requested

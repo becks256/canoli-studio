@@ -1,46 +1,594 @@
-import {test,expect} from '@playwright/test';
-import {readFile,writeFile} from 'node:fs/promises';
+import { test, expect } from "@playwright/test";
+import { readFile, writeFile } from "node:fs/promises";
 
-for(const fixture of ['fonts/Regular.ttf','shaping-font/Shaping.ttf','compressed-font/Shaping.woff2','fonts/CFF.otf','font-variations/Axes.ttf','optical-font/Optical.woff2','node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2'])test('source-owned glyphs retain complete native cubic path placement: '+fixture,async({page},info)=>{
- const bytes=[...await readFile(fixture.startsWith('node_modules/')?fixture:'tests/fixtures/'+fixture)];await page.goto('/');const result=await page.evaluate(async({bytes,fixture})=>{
-  const {captureStyledTextPlan}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');const {AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');
-  const assets=new AssetStore(),doc=new window.luma.Document({assets}),file=await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),before=JSON.stringify(doc.toJSON()),rows=[];
-  const points=[{x:24,y:150,in:{x:24,y:150},out:{x:100,y:30}},{x:420,y:150,in:{x:340,y:30},out:{x:420,y:150}}];
-  try{for(const align of ['left','center','right']as const)for(const affine of [false,true])for(const reverse of [false,true]){
-   const settings=fixture.includes('Axes.ttf')?'"TEST" 50,"wght" 600':'normal',text=fixture.includes('Shaping')?'AV fi a\u0301':fixture.includes('manrope')?'AV office ffi a\u0301':'AA A',input={width:640,height:320,transform:(affine?[1.25,.125,-.25,.9,15,14]:[1,0,0,1,0,0])as[number,number,number,number,number,number],style:{fontFamily:file.family,fontVariationSettings:settings,fontSize:affine?13.5:40,color:'color(srgb-linear 4 -.25 1.5 / .00000001)'},lines:[{x:12,y:24,align,path:{points:structuredClone(points),startOffset:210,baselineOffset:-7,reverse},spans:[{text}]}]},plan=await captureStyledTextPlan(input,doc.toJSON(),assets,{captureLinearPaint:true});
-   try{const font=await plan.captureGlyphFont(file.id,settings);plan.retireMeasurement();const match=await plan.matchGlyphLine(font,0);rows.push({align,affine,reverse,status:match.status,evidence:match.evidence,characters:plan.paint!.characters[0],...(match.status==='matched'?{glyphs:match.glyphs.map(g=>({id:g.glyphId,rotation:g.rotation,origin:g.origin,transform:g.transform})),colors:match.glyphs.map(g=>g.color)}:{reason:match.reason,colors:undefined,glyphs:undefined})});}finally{plan.release();}
-  }return{rows,modelUnchanged:JSON.stringify(doc.toJSON())===before,probes:document.querySelectorAll('[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]').length,privateFaces:[...document.fonts].filter(f=>f.family.startsWith('CanoliGlyph_')).length};}finally{assets.dispose();}
- },{bytes,fixture});await writeFile(info.outputPath('native-svg-path.json'),JSON.stringify(result,null,2));expect(result).toMatchObject({modelUnchanged:true,probes:0,privateFaces:0});expect(result.rows).toHaveLength(12);for(const row of result.rows){expect(row.status,JSON.stringify({align:row.align,affine:row.affine,reverse:row.reverse,evidence:row.evidence})).toBe('matched');expect(row.evidence!.svgMaxAlphaError).toBe(0);for(const color of row.colors!)expect(color).toEqual([4,-.25,1.5,Math.fround(1e-8)]);}
+for (const fixture of [
+  "fonts/Regular.ttf",
+  "shaping-font/Shaping.ttf",
+  "compressed-font/Shaping.woff2",
+  "fonts/CFF.otf",
+  "font-variations/Axes.ttf",
+  "optical-font/Optical.woff2",
+  "node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2",
+])
+  test(
+    "source-owned glyphs retain complete native cubic path placement: " +
+      fixture,
+    async ({ page }, info) => {
+      const bytes = [
+        ...(await readFile(
+          fixture.startsWith("node_modules/")
+            ? fixture
+            : "tests/fixtures/" + fixture,
+        )),
+      ];
+      await page.goto("/");
+      const result = await page.evaluate(
+        async ({ bytes, fixture }) => {
+          const { captureStyledTextPlan } = (await import(
+            /* @vite-ignore */ String("/src/engine/styled-text.ts")
+          )) as typeof import("../src/engine/styled-text");
+          const { AssetStore } = (await import(
+            /* @vite-ignore */ String("/src/core/assets.ts")
+          )) as typeof import("../src/core/assets");
+          const assets = new AssetStore(),
+            doc = new window.luma.Document({ assets }),
+            file = await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),
+            before = JSON.stringify(doc.toJSON()),
+            rows = [];
+          const points = [
+            { x: 24, y: 150, in: { x: 24, y: 150 }, out: { x: 100, y: 30 } },
+            { x: 420, y: 150, in: { x: 340, y: 30 }, out: { x: 420, y: 150 } },
+          ];
+          try {
+            for (const align of ["left", "center", "right"] as const)
+              for (const affine of [false, true])
+                for (const reverse of [false, true]) {
+                  const settings = fixture.includes("Axes.ttf")
+                      ? '"TEST" 50,"wght" 600'
+                      : "normal",
+                    text = fixture.includes("Shaping")
+                      ? "AV fi a\u0301"
+                      : fixture.includes("manrope")
+                        ? "AV office ffi a\u0301"
+                        : "AA A",
+                    input = {
+                      width: 640,
+                      height: 320,
+                      transform: (affine
+                        ? [1.25, 0.125, -0.25, 0.9, 15, 14]
+                        : [1, 0, 0, 1, 0, 0]) as [
+                        number,
+                        number,
+                        number,
+                        number,
+                        number,
+                        number,
+                      ],
+                      style: {
+                        fontFamily: file.family,
+                        fontVariationSettings: settings,
+                        fontSize: affine ? 13.5 : 40,
+                        color: "color(srgb-linear 4 -.25 1.5 / .00000001)",
+                      },
+                      lines: [
+                        {
+                          x: 12,
+                          y: 24,
+                          align,
+                          path: {
+                            points: structuredClone(points),
+                            startOffset: 210,
+                            baselineOffset: -7,
+                            reverse,
+                          },
+                          spans: [{ text }],
+                        },
+                      ],
+                    },
+                    plan = await captureStyledTextPlan(
+                      input,
+                      doc.toJSON(),
+                      assets,
+                      { captureLinearPaint: true },
+                    );
+                  try {
+                    const font = await plan.captureGlyphFont(file.id, settings);
+                    plan.retireMeasurement();
+                    const match = await plan.matchGlyphLine(font, 0);
+                    rows.push({
+                      align,
+                      affine,
+                      reverse,
+                      status: match.status,
+                      evidence: match.evidence,
+                      characters: plan.paint!.characters[0],
+                      ...(match.status === "matched"
+                        ? {
+                            glyphs: match.glyphs.map((g) => ({
+                              id: g.glyphId,
+                              rotation: g.rotation,
+                              origin: g.origin,
+                              transform: g.transform,
+                            })),
+                            colors: match.glyphs.map((g) => g.color),
+                          }
+                        : {
+                            reason: match.reason,
+                            colors: undefined,
+                            glyphs: undefined,
+                          }),
+                    });
+                  } finally {
+                    plan.release();
+                  }
+                }
+            return {
+              rows,
+              modelUnchanged: JSON.stringify(doc.toJSON()) === before,
+              probes: document.querySelectorAll(
+                "[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]",
+              ).length,
+              privateFaces: [...document.fonts].filter((f) =>
+                f.family.startsWith("CanoliGlyph_"),
+              ).length,
+            };
+          } finally {
+            assets.dispose();
+          }
+        },
+        { bytes, fixture },
+      );
+      await writeFile(
+        info.outputPath("native-svg-path.json"),
+        JSON.stringify(result, null, 2),
+      );
+      expect(result).toMatchObject({
+        modelUnchanged: true,
+        probes: 0,
+        privateFaces: 0,
+      });
+      expect(result.rows).toHaveLength(12);
+      for (const row of result.rows) {
+        expect(
+          row.status,
+          JSON.stringify({
+            align: row.align,
+            affine: row.affine,
+            reverse: row.reverse,
+            evidence: row.evidence,
+          }),
+        ).toBe("matched");
+        expect(row.evidence!.svgMaxAlphaError).toBe(0);
+        for (const color of row.colors!)
+          expect(color).toEqual([4, -0.25, 1.5, Math.fround(1e-8)]);
+      }
+    },
+  );
+
+test("native cubic and closed baselines retain RTL ligature ranges, reflection and clipped path ends", async ({
+  page,
+}, info) => {
+  const bytes = [
+    ...(await readFile("tests/fixtures/shaping-font/Shaping.ttf")),
+  ];
+  await page.goto("/");
+  const rows = await page.evaluate(async (bytes) => {
+    const { captureStyledTextPlan } = (await import(
+      /* @vite-ignore */ String("/src/engine/styled-text.ts")
+    )) as typeof import("../src/engine/styled-text");
+    const { AssetStore } = (await import(
+      /* @vite-ignore */ String("/src/core/assets.ts")
+    )) as typeof import("../src/core/assets");
+    const assets = new AssetStore(),
+      doc = new window.luma.Document({ assets }),
+      file = await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),
+      rows = [];
+    const points = [
+      { x: 24, y: 150, in: { x: 24, y: 150 }, out: { x: 100, y: 30 } },
+      { x: 420, y: 150, in: { x: 340, y: 30 }, out: { x: 420, y: 150 } },
+    ];
+    try {
+      for (const text of ["ببلا", "אב", "AV fi a\u0301"])
+        for (const variant of [
+          "closed",
+          "reverse",
+          "before",
+          "after",
+          "all-before",
+          "all-after",
+        ] as const) {
+          const rtl = text !== "AV fi a\u0301",
+            offset =
+              variant === "before"
+                ? -24
+                : variant === "after"
+                  ? 420
+                  : variant === "all-before"
+                    ? -1000
+                    : variant === "all-after"
+                      ? 1000
+                      : 210,
+            plan = await captureStyledTextPlan(
+              {
+                width: 640,
+                height: 320,
+                transform: [-1, 0, 0, 1, 600, 0],
+                style: { fontFamily: file.family, fontSize: 40 },
+                lines: [
+                  {
+                    x: 12,
+                    y: 24,
+                    direction: rtl ? "rtl" : "ltr",
+                    align: "center",
+                    path: {
+                      points,
+                      closed: variant === "closed",
+                      reverse: variant === "reverse",
+                      startOffset: offset,
+                      baselineOffset: 7,
+                    },
+                    spans: [{ text }],
+                  },
+                ],
+              },
+              doc.toJSON(),
+              assets,
+              { captureLinearPaint: true },
+            );
+          try {
+            const font = await plan.captureGlyphFont(file.id),
+              match = await plan.matchGlyphLine(font, 0);
+            rows.push({
+              text,
+              variant,
+              status: match.status,
+              evidence: match.evidence,
+              ...(match.status === "matched"
+                ? {
+                    sourceGlyphs: match.run.glyphs.map((g) => ({
+                      id: g.glyphId,
+                      cluster: g.cluster,
+                    })),
+                    paintGlyphs: match.glyphs.length,
+                  }
+                : { reason: match.reason, paintGlyphs: undefined }),
+            });
+          } finally {
+            plan.release();
+          }
+        }
+      return rows;
+    } finally {
+      assets.dispose();
+    }
+  }, bytes);
+  await writeFile(
+    info.outputPath("native-svg-path-rtl-ends.json"),
+    JSON.stringify(rows, null, 2),
+  );
+  for (const row of rows) {
+    expect(row.status, JSON.stringify(row)).toBe("matched");
+    expect(row.evidence!.svgMaxAlphaError).toBe(0);
+    if (row.variant.startsWith("all-")) {
+      expect(row.evidence!.hiddenGlyphs).toBeGreaterThan(0);
+      expect(row.paintGlyphs).toBe(0);
+    }
+  }
 });
 
-test('native cubic and closed baselines retain RTL ligature ranges, reflection and clipped path ends',async({page},info)=>{
- const bytes=[...await readFile('tests/fixtures/shaping-font/Shaping.ttf')];await page.goto('/');const rows=await page.evaluate(async bytes=>{
-  const {captureStyledTextPlan}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');const {AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');const assets=new AssetStore(),doc=new window.luma.Document({assets}),file=await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),rows=[];
-  const points=[{x:24,y:150,in:{x:24,y:150},out:{x:100,y:30}},{x:420,y:150,in:{x:340,y:30},out:{x:420,y:150}}];
-  try{for(const text of ['ببلا','אב','AV fi a\u0301'])for(const variant of ['closed','reverse','before','after','all-before','all-after']as const){const rtl=text!=='AV fi a\u0301',offset=variant==='before'?-24:variant==='after'?420:variant==='all-before'?-1000:variant==='all-after'?1000:210,plan=await captureStyledTextPlan({width:640,height:320,transform:[-1,0,0,1,600,0],style:{fontFamily:file.family,fontSize:40},lines:[{x:12,y:24,direction:rtl?'rtl':'ltr',align:'center',path:{points,closed:variant==='closed',reverse:variant==='reverse',startOffset:offset,baselineOffset:7},spans:[{text}]}]},doc.toJSON(),assets,{captureLinearPaint:true});
-   try{const font=await plan.captureGlyphFont(file.id),match=await plan.matchGlyphLine(font,0);rows.push({text,variant,status:match.status,evidence:match.evidence,...(match.status==='matched'?{sourceGlyphs:match.run.glyphs.map(g=>({id:g.glyphId,cluster:g.cluster})),paintGlyphs:match.glyphs.length}:{reason:match.reason,paintGlyphs:undefined})});}finally{plan.release();}}
-   return rows;}finally{assets.dispose();}
- },bytes);await writeFile(info.outputPath('native-svg-path-rtl-ends.json'),JSON.stringify(rows,null,2));for(const row of rows){expect(row.status,JSON.stringify(row)).toBe('matched');expect(row.evidence!.svgMaxAlphaError).toBe(0);if(row.variant.startsWith('all-')){expect(row.evidence!.hiddenGlyphs).toBeGreaterThan(0);expect(row.paintGlyphs).toBe(0);}}
+test("native baseline glyph fields retain independent original-font coverage, HDR, tiny alpha and exact partitions", async ({
+  page,
+}, info) => {
+  const bytes = [...(await readFile("tests/fixtures/fonts/Regular.ttf"))];
+  await page.goto("/");
+  const rows = await page.evaluate(async (bytes) => {
+    const { captureStyledTextPlan, prepareStyledTextSurface } = (await import(
+      /* @vite-ignore */ String("/src/engine/styled-text.ts")
+    )) as typeof import("../src/engine/styled-text");
+    const { AssetStore } = (await import(
+      /* @vite-ignore */ String("/src/core/assets.ts")
+    )) as typeof import("../src/core/assets");
+    const { FloatPixelProcessor } = (await import(
+      /* @vite-ignore */ String("/src/engine/float-pixels.ts")
+    )) as typeof import("../src/engine/float-pixels");
+    const { instantiateKernel } = (await import(
+      /* @vite-ignore */ String("/src/engine/wasm.ts")
+    )) as typeof import("../src/engine/wasm");
+    const assets = new AssetStore(),
+      doc = new window.luma.Document({ assets }),
+      file = await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),
+      native = new FloatPixelProcessor(
+        await instantiateKernel(
+          new Uint8Array(
+            await (await fetch("/wasm/pixels.wasm")).arrayBuffer(),
+          ),
+        ),
+      ),
+      processor = {
+        floatComposite: async (...args: Parameters<typeof native.composite>) =>
+          native.composite(...args),
+      },
+      points = [
+        { x: 24, y: 150, in: { x: 24, y: 150 }, out: { x: 100, y: 30 } },
+        { x: 420, y: 150, in: { x: 340, y: 30 }, out: { x: 420, y: 150 } },
+      ],
+      rows = [];
+    try {
+      for (const reflect of [false, true])
+        for (const tracking of [0, -15])
+          for (const alpha of [0.5, 0.64123012345, 1e-8]) {
+            const transform = (
+                reflect ? [-1, 0, 0, 1, 600, 0] : [1, 0, 0, 1, 0, 0]
+              ) as [number, number, number, number, number, number],
+              input = {
+                width: 640,
+                height: 320,
+                transform,
+                style: {
+                  fontFamily: file.family,
+                  fontSize: 40,
+                  letterSpacing: tracking,
+                  color: `color(srgb-linear 4 -.25 1.5 / ${alpha})`,
+                },
+                lines: [
+                  {
+                    x: 12,
+                    y: 24,
+                    path: { points, startOffset: 210, baselineOffset: -7 },
+                    spans: [{ text: "AA" }],
+                  },
+                ],
+              },
+              plan = await captureStyledTextPlan(input, doc.toJSON(), assets, {
+                captureLinearPaint: true,
+              });
+            try {
+              const font = await plan.captureGlyphFont(file.id),
+                match = await plan.matchGlyphLine(font, 0);
+              if (match.status !== "matched") {
+                rows.push({
+                  reflect,
+                  tracking,
+                  alpha,
+                  status: match.status,
+                  evidence: match.evidence,
+                });
+                continue;
+              }
+              const expected = new Float32Array(640 * 320);
+              for (let i = 0; i < 2; i++) {
+                const reference = await prepareStyledTextSurface(
+                  {
+                    ...input,
+                    style: { ...input.style, color: "#fff" },
+                    lines: [
+                      {
+                        ...input.lines[0],
+                        path: {
+                          ...input.lines[0].path,
+                          startOffset: 210 + i * (24 + tracking),
+                        },
+                        spans: [{ text: "A" }],
+                      },
+                    ],
+                  },
+                  doc.toJSON(),
+                  assets,
+                );
+                try {
+                  const canvas = document.createElement("canvas");
+                  canvas.width = 640;
+                  canvas.height = 320;
+                  const c = canvas.getContext("2d")!;
+                  c.drawImage(reference.bitmap, 0, 0);
+                  const rgba = c.getImageData(0, 0, 640, 320).data;
+                  for (let p = 0; p < expected.length; p++) {
+                    const a = Math.fround(
+                      Math.fround(alpha) * Math.fround(rgba[p * 4 + 3] / 255),
+                    );
+                    expected[p] = a + expected[p] * (1 - a);
+                  }
+                } finally {
+                  reference.release();
+                }
+              }
+              const area = { x: 0, y: 0, width: 640, height: 320 },
+                actual = await plan.renderGlyphs(match.glyphs, area, processor),
+                parts = new Float32Array(actual.length);
+              let alphaError = 0,
+                rgbError = 0,
+                ink = 0,
+                maxAlpha = 0;
+              for (let p = 0; p < expected.length; p++) {
+                alphaError = Math.max(
+                  alphaError,
+                  Math.abs(actual[p * 4 + 3] - expected[p]),
+                );
+                if (actual[p * 4 + 3]) {
+                  ink++;
+                  maxAlpha = Math.max(maxAlpha, actual[p * 4 + 3]);
+                  rgbError = Math.max(
+                    rgbError,
+                    Math.abs(actual[p * 4] - 4),
+                    Math.abs(actual[p * 4 + 1] + 0.25),
+                    Math.abs(actual[p * 4 + 2] - 1.5),
+                  );
+                }
+              }
+              for (let x = 0; x < 640; x += 137) {
+                const width = Math.min(137, 640 - x),
+                  part = await plan.renderGlyphs(
+                    match.glyphs,
+                    { ...area, x, width },
+                    processor,
+                  );
+                for (let y = 0; y < 320; y++)
+                  parts.set(
+                    part.subarray(y * width * 4, (y + 1) * width * 4),
+                    (y * 640 + x) * 4,
+                  );
+              }
+              rows.push({
+                reflect,
+                tracking,
+                alpha,
+                status: match.status,
+                projection: match.evidence.projection,
+                alphaError,
+                rgbError,
+                ink,
+                maxAlpha,
+                paths: match.glyphs.filter((g) => g.path).length,
+                partitions: new Uint32Array(actual.buffer).every(
+                  (v, i) => v === new Uint32Array(parts.buffer)[i],
+                ),
+              });
+            } finally {
+              plan.release();
+            }
+          }
+      return rows;
+    } finally {
+      assets.dispose();
+    }
+  }, bytes);
+  await writeFile(
+    info.outputPath("native-svg-path-float.json"),
+    JSON.stringify(rows, null, 2),
+  );
+  expect(rows).toHaveLength(12);
+  for (const row of rows) {
+    expect(row).toMatchObject({
+      status: "matched",
+      alphaError: 0,
+      rgbError: 0,
+      partitions: true,
+    });
+    expect(row.ink!).toBeGreaterThan(0);
+    if (row.tracking === 0) expect(row.paths).toBe(2);
+    else expect(row.maxAlpha).toBeGreaterThan(row.alpha);
+  }
 });
 
-test('native baseline glyph fields retain independent original-font coverage, HDR, tiny alpha and exact partitions',async({page},info)=>{
- const bytes=[...await readFile('tests/fixtures/fonts/Regular.ttf')];await page.goto('/');const rows=await page.evaluate(async bytes=>{
-  const {captureStyledTextPlan,prepareStyledTextSurface}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');const {AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');const {FloatPixelProcessor}=await import(/* @vite-ignore */String('/src/engine/float-pixels.ts'))as typeof import('../src/engine/float-pixels');const {instantiateKernel}=await import(/* @vite-ignore */String('/src/engine/wasm.ts'))as typeof import('../src/engine/wasm');
-  const assets=new AssetStore(),doc=new window.luma.Document({assets}),file=await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),native=new FloatPixelProcessor(await instantiateKernel(new Uint8Array(await(await fetch('/wasm/pixels.wasm')).arrayBuffer()))),processor={floatComposite:async(...args:Parameters<typeof native.composite>)=>native.composite(...args)},points=[{x:24,y:150,in:{x:24,y:150},out:{x:100,y:30}},{x:420,y:150,in:{x:340,y:30},out:{x:420,y:150}}],rows=[];
-  try{for(const reflect of [false,true])for(const tracking of [0,-15])for(const alpha of [.5,.64123012345,1e-8]){const transform=(reflect?[-1,0,0,1,600,0]:[1,0,0,1,0,0])as[number,number,number,number,number,number],input={width:640,height:320,transform,style:{fontFamily:file.family,fontSize:40,letterSpacing:tracking,color:`color(srgb-linear 4 -.25 1.5 / ${alpha})`},lines:[{x:12,y:24,path:{points,startOffset:210,baselineOffset:-7},spans:[{text:'AA'}]}]},plan=await captureStyledTextPlan(input,doc.toJSON(),assets,{captureLinearPaint:true});
-   try{const font=await plan.captureGlyphFont(file.id),match=await plan.matchGlyphLine(font,0);if(match.status!=='matched'){rows.push({reflect,tracking,alpha,status:match.status,evidence:match.evidence});continue;}const expected=new Float32Array(640*320);for(let i=0;i<2;i++){const reference=await prepareStyledTextSurface({...input,style:{...input.style,color:'#fff'},lines:[{...input.lines[0],path:{...input.lines[0].path,startOffset:210+i*(24+tracking)},spans:[{text:'A'}]}]},doc.toJSON(),assets);try{const canvas=document.createElement('canvas');canvas.width=640;canvas.height=320;const c=canvas.getContext('2d')!;c.drawImage(reference.bitmap,0,0);const rgba=c.getImageData(0,0,640,320).data;for(let p=0;p<expected.length;p++){const a=Math.fround(Math.fround(alpha)*Math.fround(rgba[p*4+3]/255));expected[p]=a+expected[p]*(1-a);}}finally{reference.release();}}
-    const area={x:0,y:0,width:640,height:320},actual=await plan.renderGlyphs(match.glyphs,area,processor),parts=new Float32Array(actual.length);let alphaError=0,rgbError=0,ink=0,maxAlpha=0;for(let p=0;p<expected.length;p++){alphaError=Math.max(alphaError,Math.abs(actual[p*4+3]-expected[p]));if(actual[p*4+3]){ink++;maxAlpha=Math.max(maxAlpha,actual[p*4+3]);rgbError=Math.max(rgbError,Math.abs(actual[p*4]-4),Math.abs(actual[p*4+1]+.25),Math.abs(actual[p*4+2]-1.5));}}
-    for(let x=0;x<640;x+=137){const width=Math.min(137,640-x),part=await plan.renderGlyphs(match.glyphs,{...area,x,width},processor);for(let y=0;y<320;y++)parts.set(part.subarray(y*width*4,(y+1)*width*4),(y*640+x)*4);}rows.push({reflect,tracking,alpha,status:match.status,projection:match.evidence.projection,alphaError,rgbError,ink,maxAlpha,paths:match.glyphs.filter(g=>g.path).length,partitions:new Uint32Array(actual.buffer).every((v,i)=>v===new Uint32Array(parts.buffer)[i])});
-   }finally{plan.release();}}
-   return rows;}finally{assets.dispose();}
- },bytes);await writeFile(info.outputPath('native-svg-path-float.json'),JSON.stringify(rows,null,2));expect(rows).toHaveLength(12);for(const row of rows){expect(row).toMatchObject({status:'matched',alphaError:0,rgbError:0,partitions:true});expect(row.ink!).toBeGreaterThan(0);if(row.tracking===0)expect(row.paths).toBe(2);else expect(row.maxAlpha).toBeGreaterThan(row.alpha);}
-});
-
-for(const fault of ['abort','remove','nonfinite']as const)test('unfolded native path '+fault+' cannot publish and retires all measurement probes',async({page},info)=>{
- const bytes=[...await readFile('tests/fixtures/fonts/Regular.ttf')];await page.goto('/');const result=await page.evaluate(async({bytes,fault})=>{
-  const {captureStyledTextPlan}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');const {AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');const assets=new AssetStore(),doc=new window.luma.Document({assets}),file=await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),input={width:640,height:320,style:{fontFamily:file.family,fontSize:40},lines:[{path:{points:[{x:24,y:150,in:{x:24,y:150},out:{x:100,y:30}},{x:420,y:150,in:{x:340,y:30},out:{x:420,y:150}}],startOffset:210},spans:[{text:'AA'}]}]},abort=new AbortController(),method=SVGTextContentElement.prototype.getStartPositionOfChar;let error='',triggered=false;
-  SVGTextContentElement.prototype.getStartPositionOfChar=function(index){const value=method.call(this,index);if(this.querySelector('textPath')?.getAttribute('href')?.startsWith('#canoli-unfolded-path-')){triggered=true;if(fault==='abort')abort.abort(new Error('Expected unfolded path abort'));else if(fault==='remove')document.querySelector('[data-canoli-styled-text-probe]')!.remove();else return{x:NaN,y:value.y}as DOMPoint;}return value;};
-  try{try{const plan=await captureStyledTextPlan(input,doc.toJSON(),assets,{captureLinearPaint:true,signal:abort.signal});plan.release();error='unexpected success';}catch(e){error=String(e);}SVGTextContentElement.prototype.getStartPositionOfChar=method;const afterFailure=document.querySelectorAll('[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]').length,retry=await captureStyledTextPlan(input,doc.toJSON(),assets,{captureLinearPaint:true});try{const font=await retry.captureGlyphFont(file.id),match=await retry.matchGlyphLine(font,0);return{triggered,error,afterFailure,retry:match.status};}finally{retry.release();}}
-  finally{SVGTextContentElement.prototype.getStartPositionOfChar=method;assets.dispose();}
- },{bytes,fault});await writeFile(info.outputPath('native-svg-path-'+fault+'.json'),JSON.stringify(result,null,2));expect(result).toMatchObject({triggered:true,afterFailure:0,retry:'matched'});expect(result.error).toContain(fault==='abort'?'Expected unfolded path abort':fault==='remove'?'host was removed':'geometry is invalid');
-});
+for (const fault of ["abort", "remove", "nonfinite"] as const)
+  test(
+    "unfolded native path " +
+      fault +
+      " cannot publish and retires all measurement probes",
+    async ({ page }, info) => {
+      const bytes = [...(await readFile("tests/fixtures/fonts/Regular.ttf"))];
+      await page.goto("/");
+      const result = await page.evaluate(
+        async ({ bytes, fault }) => {
+          const { captureStyledTextPlan } = (await import(
+            /* @vite-ignore */ String("/src/engine/styled-text.ts")
+          )) as typeof import("../src/engine/styled-text");
+          const { AssetStore } = (await import(
+            /* @vite-ignore */ String("/src/core/assets.ts")
+          )) as typeof import("../src/core/assets");
+          const assets = new AssetStore(),
+            doc = new window.luma.Document({ assets }),
+            file = await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),
+            input = {
+              width: 640,
+              height: 320,
+              style: { fontFamily: file.family, fontSize: 40 },
+              lines: [
+                {
+                  path: {
+                    points: [
+                      {
+                        x: 24,
+                        y: 150,
+                        in: { x: 24, y: 150 },
+                        out: { x: 100, y: 30 },
+                      },
+                      {
+                        x: 420,
+                        y: 150,
+                        in: { x: 340, y: 30 },
+                        out: { x: 420, y: 150 },
+                      },
+                    ],
+                    startOffset: 210,
+                  },
+                  spans: [{ text: "AA" }],
+                },
+              ],
+            },
+            abort = new AbortController(),
+            method = SVGTextContentElement.prototype.getStartPositionOfChar;
+          let error = "",
+            triggered = false;
+          SVGTextContentElement.prototype.getStartPositionOfChar = function (
+            index,
+          ) {
+            const value = method.call(this, index);
+            if (
+              this.querySelector("textPath")
+                ?.getAttribute("href")
+                ?.startsWith("#canoli-unfolded-path-")
+            ) {
+              triggered = true;
+              if (fault === "abort")
+                abort.abort(new Error("Expected unfolded path abort"));
+              else if (fault === "remove")
+                document
+                  .querySelector("[data-canoli-styled-text-probe]")!
+                  .remove();
+              else return { x: NaN, y: value.y } as DOMPoint;
+            }
+            return value;
+          };
+          try {
+            try {
+              const plan = await captureStyledTextPlan(
+                input,
+                doc.toJSON(),
+                assets,
+                { captureLinearPaint: true, signal: abort.signal },
+              );
+              plan.release();
+              error = "unexpected success";
+            } catch (e) {
+              error = String(e);
+            }
+            SVGTextContentElement.prototype.getStartPositionOfChar = method;
+            const afterFailure = document.querySelectorAll(
+                "[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]",
+              ).length,
+              retry = await captureStyledTextPlan(input, doc.toJSON(), assets, {
+                captureLinearPaint: true,
+              });
+            try {
+              const font = await retry.captureGlyphFont(file.id),
+                match = await retry.matchGlyphLine(font, 0);
+              return { triggered, error, afterFailure, retry: match.status };
+            } finally {
+              retry.release();
+            }
+          } finally {
+            SVGTextContentElement.prototype.getStartPositionOfChar = method;
+            assets.dispose();
+          }
+        },
+        { bytes, fault },
+      );
+      await writeFile(
+        info.outputPath("native-svg-path-" + fault + ".json"),
+        JSON.stringify(result, null, 2),
+      );
+      expect(result).toMatchObject({
+        triggered: true,
+        afterFailure: 0,
+        retry: "matched",
+      });
+      expect(result.error).toContain(
+        fault === "abort"
+          ? "Expected unfolded path abort"
+          : fault === "remove"
+            ? "host was removed"
+            : "geometry is invalid",
+      );
+    },
+  );

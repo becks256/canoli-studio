@@ -12,7 +12,7 @@ import {
 } from "../model";
 import { layerTransform, localBounds, parentId, unionBounds } from "../spatial";
 import { ComponentRegistry } from "./manager";
-import {captureFrequencyRadius} from '../frequency-separation';
+import { captureFrequencyRadius } from "../frequency-separation";
 
 /** Move a contiguous sibling selection into an editable embedded document. */
 export function convertLayers(
@@ -88,16 +88,19 @@ export function convertLayers(
     height,
   );
   master.id = componentId;
-  if(document.paragraphStyles)master.paragraphStyles=structuredClone(document.paragraphStyles);
-  master.children = structuredClone(selected.map(layer=>captureFrequencyRadius(document,layer)));
+  if (document.paragraphStyles)
+    master.paragraphStyles = structuredClone(document.paragraphStyles);
+  master.children = structuredClone(
+    selected.map((layer) => captureFrequencyRadius(document, layer)),
+  );
   const registry = new ComponentRegistry(document.components);
-  const toParent=parentWorld.inverse();
+  const toParent = parentWorld.inverse();
   for (const node of allLayers(master.children)) {
     if (node.mask?.linked === false) {
-      node.mask = rebaseUnlinkedMask(node.mask,toParent);
+      node.mask = rebaseUnlinkedMask(node.mask, toParent);
     }
     if (node.kind === "smart-object" && node.filterMask?.linked === false) {
-      node.filterMask = rebaseUnlinkedMask(node.filterMask,toParent);
+      node.filterMask = rebaseUnlinkedMask(node.filterMask, toParent);
     }
   }
   cropDocument(master, { x, y, width, height });

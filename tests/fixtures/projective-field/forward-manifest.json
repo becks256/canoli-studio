@@ -3,7 +3,7 @@
   "reference": "Independent NumPy homography solve and SciPy grid-constant bilinear interpolation, with separately rebased coverage field.",
   "numpy": "1.26.4",
   "scipy": "1.13.0",
-  "absoluteError": 4.76837158203125e-07,
+  "absoluteError": 4.76837158203125e-7,
   "sourceSha256": "69814fa82f6faa69c8f0eb7f7728655b92b2068fe504fe819bdcfc4ee3a8432d",
   "cases": [
     {

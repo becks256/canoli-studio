@@ -36,7 +36,6 @@ plugin/independent REST commits and source-bearing persistence. Trusted Clone ge
 native previews, and stage linear TIFF tiles before one-Undo publication.
 [Signatures, defaults, errors, coordinates and limits](FLOAT_CLONE.md).
 
-
 ## Prepared HDR raster values (schema 57)
 
 Existing `WetPaintStroke` values accept `precision:"float32"` and linear native
@@ -59,7 +58,6 @@ workers, files, network or host wet preparation. Zero-opacity mapped metadata do
 not select a new reconstruction path. Broader integration acceptance remains open;
 [exact contracts, defaults, examples and current limits](MASK_PLANES.md).
 
-
 ## Captured wet fields (document schema 55)
 
 The existing isolated `WetPaintStroke` constructor accepts optional captured
@@ -73,7 +71,6 @@ host file/network/pixel capabilities are unchanged. Trusted browser wet
 preparation is not an isolated plugin service.
 [Prepared contract and runnable example](SCRIPTING_API.md#captured-perspective-wet-fields-schema-55).
 
-
 ## Bidirectional coverage stays host-owned
 
 The private original/placed scalar sampler adds no plugin permission, package
@@ -82,7 +79,6 @@ Existing document grants, isolation, revision/source/asset validation and Undo
 remain authoritative. Projected brush/mask controller integration remains
 required. [Engine boundary](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
 
-
 ## Image perspective uses existing document grants
 
 PerspectiveTransform and shared layer.update commands require existing document
@@ -90,7 +86,6 @@ read/write grants. Installation stays inert and third-party execution remains
 isolated with current grant, source, revision and lock validation and one Undo.
 No native pixel, worker, file, profile or network authority is added. Sampling
 and export remain host-owned. [Contract and editing limits](PERSPECTIVE_ENGINE.md).
-
 
 ## Float tonal edits keep existing grants
 
@@ -179,13 +174,11 @@ Design checks now accept optional explicit alignment rules against a canvas or i
 
 Omitted alignment policies retain strict version-1 reports; explicit policies use version 2 with measured evidence and complete matched/mismatched/unavailable/excluded coverage. The custom dialog exposes reviewable rules, stale-result protection, download/navigation and document-instance binding. Document schema 47 and existing native project/workspace/permission contracts are unchanged. Inferred alignment intent, bleed, rendered visibility, contrast/legibility and broader A12/roadmap gates remain required. See [DESIGN_CHECKS.md](DESIGN_CHECKS.md) for signatures, defaults, errors, limits and the dated verification boundary.
 
-
 ## Public vertical text (F08)
 
 Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
 
 The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
-
 
 ## Vertical preparation grants no capability
 
@@ -226,7 +219,6 @@ Portable recipe font resources belong to the existing trusted host recipe/packag
 ## Font lifetime and relinking boundaries
 
 The host collects staged sources and retains model/history/view/operation ownership independently of plugin package lifecycle. Existing metadata rename/remove commands retain their document permissions and shared undo checks. FontFile.relink and Document.fonts.relink are trusted asynchronous source-admission operations requiring a configured source store; the ordinary isolated context has no such store or source chooser. Private native preloading for script text remains unchanged. No manifest version, permission or installation execution behavior changes.
-
 
 ## Font-file binding (F08)
 
@@ -329,7 +321,6 @@ Isolated commands receive FrequencyBandFilter, NativeCompositionFilter and Docum
 ## Prepared wet mask values (schema34)
 
 Existing isolated commands may assign immutable LayerMask.applyWetPaint results using prepared PNG assets already available to the document. Ordinary/filter/embedded masks use shared model, locks, assets, alpha validation and atomic history. Permissions and file/network boundaries are unchanged; no brush simulation, direct pixel/file access or new host service is granted. Invalid alpha, including inert metadata, rejects the complete command run before publication. Installation remains inert.
-
 
 Retained wet-stroke sessions are internal host engine workspaces, not new plugin bindings or permissions. Prepared WetPaintStroke remains the isolated value surface. Explicit null opacity/nativeTransform reject before staged edits commit. Zero operation opacity retains valid source references/history while remaining inactive for rendering routes and SVG baking. Installation and existing document/asset grants keep their current behavior.
 
@@ -460,28 +451,21 @@ Smart-object `await layer.rasterize()` uses the private host asset preparation b
 
 Color Balance and Vibrance use normal `AdjustmentLayer` construction and `.adjustment` replacement through the shared isolated DOM/command boundary. The strict schema-17 parameter contracts are documented in SCRIPTING_API.md. They require current `document:write` permission, introduce no new capability and do not run code on installation. Source assets remain immutable and final script commits retain shared revision/undo validation.
 
-
 Gradient map layers use the existing `AdjustmentLayer` constructor with `{kind: "gradient-map", stops, reverse}` and the documented 2–32 ordered stops. They need ordinary `document:write` at host commit, no new permission or package version. Installation stays inert; edits remain isolated, revision-checked and atomic, including invalid-stop rollback. No image bytes or external LUT access is added to scripts.
 
 After an isolated command returns, the host rechecks installation and current `document:write` permission before committing staged document commands or selection changes. Removing a plugin or revoking write while its command is pending discards those staged edits. Re-granting write permits later runs. This commit check does not undo host jobs or other already completed in-band operations.
 
-
 White Balance commands construct `AdjustmentLayer` with the strict `{kind:"white-balance", temperature, tint}` DTO and use existing document-write grants. No package version, permission, network access or raw-image exposure is added. Installation remains inert, and current host commit checks discard revoked/removed-plugin edits. Exact bounds/defaults/processing and schema-19 compatibility are in SCRIPTING_API.md.
-
 
 Color Lookup commands can call `AdjustmentLayer.setLut(cubeText, {amount?, interpolation?})` or use the strict packed DTO through existing document-write grants. Tables are inert document data, without network/file-read capability or new sandbox globals. Installation remains inert; pending revoked/removed commands cannot commit. Schema-20 records are portable in command recipes/projects; format, parsing, processing and script/request limits are in SCRIPTING_API.md.
 
-
 Color Range adds `await document.selectColorRange(options)` through the existing isolated scripting boundary. Packages need apiVersion 2 and current document:read, document:write and assets:read grants. This authorizes reading source appearance for selection coverage, without exposing pixel buffers, adding network access or changing asset data. Install remains inert. The host rechecks grants during native preparation and at final staged script commit, including asset-read revocation after preparation finishes. Current source modes/limits, stale-result behavior and runnable examples are in SCRIPTING_API.md.
 
-
 Saved alpha channels use AlphaChannel/AlphaChannelCollection plus awaited channel.load through the same isolated scripting boundary. apiVersion 1 or 2 packages need currently granted document-read/write permission; no image/asset permission is added because coverage is document metadata. Installation remains inert. Native preparation and final staged commit enforce revocation/removal, stale revisions and shared selection-preparation limits. Source image buffers never cross the bridge. Complete signatures/defaults, errors and the runnable example are in SCRIPTING_API.md.
-
 
 Quick Selection adds awaited Document.selectQuickSelection(options) through the isolated selection host bridge. Packages require apiVersion 2 and current document-read/write/assets-read grants during source preparation and final staged commit, including revocation after native output. Installation is inert; source pixel buffers and workers are not exposed. Shared script preparation/time/result limits remain. Returned final selection coverage supports ordinary masks and undo, with errors/algorithm/source/memory limits in SCRIPTING_API.md.
 
 Select Subject now uses awaited Document.selectSubject(options) through that same isolated host boundary, resolving original raster geometry from validated staged commands and preserving native coverage/full placement. apiVersion-2 document-read/write/assets-read grants are checked during preparation and final staged commit. Empty/unsupported targets reject without fabricated output. Source pixels stay outside the sandbox; panel cancellation terminates private native work. The shared sequential 32-selection budget, runtime/result limits, inert installation and one-transaction rollback/undo remain. Native Refine Edge/removeBackground use the separate retouch asset-preparation boundary below.
-
 
 ### Native matte and corrected foreground preparation
 
@@ -489,16 +473,13 @@ Select Subject now uses awaited Document.selectSubject(options) through that sam
 
 Matte and optional corrected RGB assets stay private until the complete script validates and commits once; later script errors discard them. The shared sequential retouch budget is 32 owned assets, with corrected output using two slots and mask-only one. Existing runtime/result/command limits remain. New-layer output hides the source and retains its original bytes; default mask output changes no RGB. Exact signatures, defaults, source/coordinate precedence, errors, resampling and local-solver limitations are in SCRIPTING_API.md. This adds no permission, network access or package-format change.
 
-
 Native refinement now defaults to the global closed-form solver; `solver:"color-line"` retains the local estimator explicitly. Both use the same isolated retouch/asset/grant boundary. Graph-budget, covariance or convergence failures discard the staged job and subsequent script commit; no approximate matte or silent solver downgrade is installed. Trusted progress/cancellation remain host-only. See SCRIPTING_API.md for exact solver defaults, numerical limits and the tested example.
-
 
 IC(0) matting preconditioning and proportional Smooth values change numerical preparation without changing package grants, inert installation, private assets, rollback or final commit validation. The existing five-second isolated script wall limit includes host work; a large native photo operation may time out and must discard its staged work. Trusted UI/REST calls retain their independent lifetime controls. No network access, new package permission or silent local-matte fallback is introduced.
 
 Budgeted RGB-aware Galerkin correction is another private numerical stage under that same contract. It never exposes raw source colors or coarse arrays to plugin code and does not grant additional runtime time. Native convergence, current grants, owned assets, stale-revision checks and the single staged history commit remain required. Optional correction failure retains the original global solve; it does not substitute a coarse image or waive validation.
 
 Optional private WASM sparse matting iterations change only trusted host preparation. Installation remains inert; scripts cannot supply a kernel/backend or access graph memory. Existing document/asset grants, revision checks, private staging, one-step undo and the five-second isolated wall deadline remain unchanged. Optional memory/capacity failure retains the same global JavaScript numerical route, not an approximate matte or an expanded sandbox permission.
-
 
 `await document.preflight(options)` adds read-only local metadata/geometry design checks. Active plugin documents require `document:read` and `assets:read`, using the existing asset-list host service; no new permission or host capability is added. Current asset grants are rechecked at dispatch, including revocation between calls. The analysis runs in the isolated script worker and leaves font availability unverified, without probing the host's fonts. It does not access pixels, read font files, enumerate fonts, upload data or mutate history. Other staged script edits still require ordinary commit grants and roll back on failure. Installation remains inert and the five-second execution/payload limits are unchanged. See [Design checks](SCRIPTING_API.md#design-checks) for defaults, snapshot revision semantics, report truncation and inspection limits.
 
@@ -512,31 +493,23 @@ Editable SVG text also uses trusted host font measurement. Plugins may create or
 
 Smart-master SVG expansion/native-filter preparation likewise belongs to trusted host export. Plugin-authored shared masters and filter stacks retain their ordinary command/history model in the project; a later SVG file may independently expand or bake them as reported. No component-export host call, asset-byte/font-file/download grant, background execution or linked-file access is added. Installation remains inert and current host commit validation still applies.
 
-
 SVG paint export also remains a trusted host operation. Plugins can create ordinary validated paint commands using existing constructors; a later host export serializes supported dab/fill/eraser geometry and prepares clone pixels/stroke clips outside isolation. There is no new paint-export method, asset-byte/download permission or background execution. Original project command/history and inert installation/commit-validation rules remain unchanged.
-
 
 Native SVG adjustment/Blend If backdrop preparation is likewise host-only. Plugin-authored layers retain their existing validated command/history model; a later host export may bake an affected sibling prefix with reported losses. Synchronous VectorLayer.toSvg rejects enabled Blend If rather than reading a native backdrop. No source-byte/font-file/export/download service, grant or background execution is added, and installation/commit validation remain unchanged.
 
-
 SVG import is a trusted browser file service, not a plugin permission. Inspection, files, image decoding, native rendering and publication remain outside isolated commands. The shared pure `VectorPath.fromSvgPath` helper supports all SVG path command families with reported cubic arc approximation in the import workflow; it rejects malformed or compound single-path input. Installation remains inert; these changes add no code execution or file/network grants.
-
 
 Schema-22 VectorPath stroke setters and factory options are available through the existing isolated command boundary. They share host validation for enum/range/dash complexity, immutable ownership, locks and one successful script transaction. No manifest permission, file/network service or install-time code execution is added. See the VectorPath stroke example in the scripting guide.
 
-
 Schema-23 VectorPath gradient constructor/factory options and attached `fillGradient` setters share the existing isolated scripting boundary. Gradient descriptors are copied values, not live mutable document objects. Existing current document-write validation/permissions, shared locks/undo/revisions, commit validation and inert installation apply; no new network/file/asset-byte permission is introduced. See the scripting guide's gradient-fill example.
-
 
 ### Native compound geometry
 
 Schema-24 `VectorContour`, `VectorPath.subpaths` and fill-rule edits use the existing isolated constructor runtime, shared path.update validation/locks/history, and current document-write permission checks. No file/network/asset capability or manifest change is introduced. Installation remains inert. Geometry and nested arrays are defensive values; live edits use owner-backed methods. See the documented compound-path example. Boolean preparation uses the isolated host boundary described below.
 
-
 ### Boolean path preparation
 
 The isolated `Document.combinePaths` / `VectorLayer.combinePaths` methods await a native curve worker through the host bridge, then emit ordinary validated `paths.replace` geometry. The host reconstructs validated staged commands before geometry capture. Current document-read/write grants are checked during preparation and final commit; revocation/removal aborts active work. There is no new permission, source-image access, file/network operation, background plugin code or install-time execution. Plugins use panel cancellation, while AbortSignal and progress callbacks belong to trusted application code. Native preparation remains sequential and shares the 32-operation script budget. Failure/cancellation/stale revision rolls back the complete staged script. See the [Boolean example](SCRIPTING_API.md#boolean-path-operations). Existing layer-add recipes can retain results, but standalone path replacement recording remains unsupported.
-
 
 ## Paragraph text boundary
 
@@ -550,20 +523,15 @@ TextLayer paragraphJustify none/inter-word uses schema-27 shared strict commands
 
 Whitespace-only SVG calibration remains a trusted host export operation. Plugin-created text uses ordinary validated constructors/commands; this adds no export, font-file, measurement, download or network privilege. Native grapheme checks and transient spans do not change authored project data, inert installation, grants, host commit validation or atomic undo.
 
-
 TIFF export is trusted browser-host/UI functionality. Plugins may author ordinary editable content using their existing granted constructors/commands; they do not receive `editor.export`, downloads, filesystem, font enumeration or a new permission. Installation remains inert. User-initiated TIFF output flattens current native pixels, excludes source metadata/font files and preserves native project sources/editability separately. See SCRIPTING_API.md for the host-only export contract.
-
 
 ### PSB host delivery boundary
 
 Trusted browser PSB export shares the rendered PSD plan and existing host progress/cancel controls. It grants no isolated plugin file/download/export/font access, no new permission or package version, and no REST/browser synchronization. Plugins can create ordinary artwork through granted OO commands; user-initiated host export owns output/source/font validation. Existing inert installation, permission rechecks, isolated execution, assets/revisions and undo remain unchanged.
 
-
 Private PSD/PSB encoding workers are trusted host implementation details. They expose no new plugin worker/raw-pixel/file/font/network/download permission, command surface or package/schema revision. Installation stays inert and isolated command commits retain grant/revision/asset validation and shared undo.
 
-
 Photoshop inspection/import workers are trusted host file services, not isolated plugin capabilities. The new source/progress/abort overloads do not grant sandbox file, raw-buffer, font, network or download access and add no package/schema revision. Inert installation, permissions, isolated command commits and shared undo/revision/asset validation remain unchanged.
-
 
 ### Schema-28 group compatibility
 
@@ -576,7 +544,6 @@ User-initiated host export can retain supported folder records and separate user
 ### Schema-29 pressure values
 
 The isolated constructor runtime exposes pure PressureCurve values for existing BrushStroke/PencilStroke/EraserStroke/CloneStroke and tonal brush commands. Existing document-write grants, host result/asset/revision validation, locks and atomic undo apply; invalid fields or revoked permissions cannot publish edits. Installation stays inert and no new permission/package version, file/export/network or browser/REST bridge is added. Projects retain optional pressure-curve brush data under document schema 29. Plugins requiring it must use a compatible runtime; older readers reject the field rather than silently discard it. See SCRIPTING_API.md for precise defaults and limits.
-
 
 ### Data-only brush packs
 
@@ -592,16 +559,13 @@ The pure immutable BrushSymmetry constructor joins brush values in the isolated 
 
 Schema-41 ParagraphStyle basedOn/setBase/overrides/resetOverrides uses existing isolated constructors, document-write permissions and shared host graph/lock/revision/atomic validation. Base handles must belong to the same document; cycles and stale resolved data reject. No source/font bytes, file/network/export capability or package permission is added. Installation remains inert. See SCRIPTING_API.md for signatures, defaults, errors and limits.
 
-
 ## RAW development through existing grants
 
 `RawDevelopment` is a pure isolated constructor. `await smartObject.getRawDevelopment()` reads normalized settings with currently granted `document:read` and `assets:read`. `await smartObject.developRaw(value,{allowPrecisionLoss:true})` additionally requires `document:write` and `assets:write`. Native output stays in the same private repair scope as patch/heal/matting/rasterization, shares its 32-asset budget and 5-second script deadline, and publishes only with the complete successful command list. Source bytes, bitmaps, workers and file access never enter plugin code. Locks, normalized options/results, captured original identity/content/geometry/surface lifetime, revision/session and grants are rechecked at commit. Failure, revocation/removal, Stop or human edits discard staged outputs; accepted undo/redo is decoder-independent. Installation remains inert, package/API versions and permission names stay unchanged, and no browser/REST synchronization or network capability is added. See SCRIPTING_API.md for exact signatures, defaults, examples and limits.
 
 LensCorrection is a pure isolated value usable inside RawDevelopment under the existing RAW document/assets grants. It provides no calibration file, image bytes, native handles or network capability. Corrected output uses the existing private preparation/atomic commit and script deadline/budget; cancellation/revocation/stale sources discard it. Installation stays inert. See SCRIPTING_API.md for strict versioned settings and the executable example.
 
-
 Native RAW development results may include immutable optional `report.shooting` lens/exposure declarations through the existing grants and isolated return-value validation. This adds no file/native/network service, serial/location/time field, profile lookup or new permission. Original retained files still contain their complete metadata. Native protocol 2 is private; saved report version 1 remains compatible without shooting metadata. Installation stays inert. Exact fields and the exercised example are in SCRIPTING_API.md.
-
 
 ## Per-run direct scripting channels (F14)
 
@@ -636,11 +600,9 @@ Schema-51 placed eraser records and `RasterLayer.erase(stroke,{space:"placed"})`
 
 `Layer.paintMask` and immutable `LayerMask.paint` placement values emit existing shared mask updates. Isolated code captures geometry without reading source pixels or obtaining a new host call. Host commit still validates strict mask DTOs, schema, sources, locks, revisions and atomic Undo. Placement is limited to Hide/Reveal brush/pencil entries; prepared Wet entries reject it. Existing package/lifecycle/permission formats and inert installation remain unchanged. No pixel/file/network/export capability is added.
 
-
 ## Perspective mask path editing
 
 Perspective mask path authoring uses existing native LayerMask/VectorPath values and shared layer updates. It adds no permission or host service: installation stays inert and third-party code remains inside the existing isolated scripting boundary.
-
 
 ## Mask placement and canvas translation
 

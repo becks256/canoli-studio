@@ -75,10 +75,14 @@ settings when reproducing delivery.
 For example, in the trusted browser host (not the isolated Scripts panel):
 
 ```ts
-const result = await editor.exportRawTiff(selectedRawFile, {
-  sampleFormat: 'rgba16',
-  color: {profile: 'display-p3', intent: 'relative-colorimetric'},
-}, {signal: abortController.signal});
+const result = await editor.exportRawTiff(
+  selectedRawFile,
+  {
+    sampleFormat: "rgba16",
+    color: { profile: "display-p3", intent: "relative-colorimetric" },
+  },
+  { signal: abortController.signal },
+);
 // result.tiff can now be saved by an explicit host download.
 ```
 

@@ -8,12 +8,7 @@
   "orientation": "any",
   "background_color": "#181c1b",
   "theme_color": "#181c1b",
-  "categories": [
-    "photo",
-    "graphics",
-    "productivity",
-    "utilities"
-  ],
+  "categories": ["photo", "graphics", "productivity", "utilities"],
   "icons": [
     {
       "src": "/favicon.svg",

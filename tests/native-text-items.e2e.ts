@@ -1,26 +1,307 @@
-import {test,expect} from '@playwright/test';
-import {readFile,writeFile,appendFile} from 'node:fs/promises';
+import { test, expect } from "@playwright/test";
+import { readFile, writeFile, appendFile } from "node:fs/promises";
 
-test('original mixed scripts and native bidi ranges preserve complete source glyph paint',async({page},info)=>{
- test.setTimeout(360000);const bytes=[...await readFile('tests/fixtures/shaping-font/Shaping.ttf')];await page.exposeFunction('__canoliKeepItem',async(row:unknown)=>appendFile(info.outputPath('native-text-items-progress.jsonl'),JSON.stringify(row)+'\n'));await page.goto('/');
- const result=await page.evaluate(async bytes=>{
-  const{captureStyledTextPlan}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');
-  const{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');
-  const assets=new AssetStore(),doc=new window.luma.Document({assets}),file=await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),before=JSON.stringify(doc.toJSON()),rows=[];
-  try{for(const text of ['A אב V','AV ببلا fi','ببאב','a\u0301 אב fi','AVfi','אבبب'])for(const direction of ['ltr','rtl']as const)for(const path of [false,true])for(const affine of [false,true])for(const letterSpacing of [0,-30]){
-   const plan=await captureStyledTextPlan({width:512,height:512,transform:affine?[1.25,.125,-.25,.9,15,14]:[1,0,0,1,0,0],style:{fontFamily:file.family,fontSize:40,letterSpacing,color:'color(srgb-linear 4 -.25 1.5 / .00000001)'},lines:[{x:220,y:160,direction,align:'center',...(path?{path:{points:[{x:24,y:150,in:{x:24,y:150},out:{x:100,y:30}},{x:420,y:150,in:{x:340,y:30},out:{x:420,y:150}}],startOffset:210,baselineOffset:7}}:{}),spans:[{text}]}]},doc.toJSON(),assets,{captureLinearPaint:true});
-   try{plan.retireMeasurement();const font=await plan.captureGlyphFont(file.id),match=await plan.matchGlyphLine(font,0);rows.push({text,direction,path,affine,letterSpacing,status:match.status,evidence:match.evidence,...(match.status==='matched'?{runs:match.runs!.map(run=>({request:run.request,glyphs:run.glyphs})),glyphs:match.glyphs.map(glyph=>({id:glyph.glyphId,color:glyph.color,origin:glyph.origin,path:glyph.path,rotation:glyph.rotation,paintLetterSpacing:glyph.paintLetterSpacing}))}:{reason:match.reason,runs:undefined,glyphs:undefined})});await(globalThis as unknown as{__canoliKeepItem(row:unknown):Promise<void>}).__canoliKeepItem(rows.at(-1));}finally{plan.release();}
-  }return{rows,unchanged:JSON.stringify(doc.toJSON())===before,probes:document.querySelectorAll('[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]').length,faces:[...document.fonts].filter(face=>face.family.startsWith('CanoliGlyph_')).length};}finally{assets.dispose();}
- },bytes);
- await writeFile(info.outputPath('native-text-items.json'),JSON.stringify(result,null,2));expect(result).toMatchObject({unchanged:true,probes:0,faces:0});expect(result.rows).toHaveLength(96);
- for(const row of result.rows){expect(row.status,JSON.stringify({text:row.text,direction:row.direction,path:row.path,affine:row.affine,letterSpacing:row.letterSpacing,evidence:row.evidence})).toBe('matched');expect(row.evidence!.svgMaxAlphaError).toBe(0);for(const run of row.runs!)expect(run.request.text).toBe(row.text);}
+test("original mixed scripts and native bidi ranges preserve complete source glyph paint", async ({
+  page,
+}, info) => {
+  test.setTimeout(360000);
+  const bytes = [
+    ...(await readFile("tests/fixtures/shaping-font/Shaping.ttf")),
+  ];
+  await page.exposeFunction("__canoliKeepItem", async (row: unknown) =>
+    appendFile(
+      info.outputPath("native-text-items-progress.jsonl"),
+      JSON.stringify(row) + "\n",
+    ),
+  );
+  await page.goto("/");
+  const result = await page.evaluate(async (bytes) => {
+    const { captureStyledTextPlan } = (await import(
+      /* @vite-ignore */ String("/src/engine/styled-text.ts")
+    )) as typeof import("../src/engine/styled-text");
+    const { AssetStore } = (await import(
+      /* @vite-ignore */ String("/src/core/assets.ts")
+    )) as typeof import("../src/core/assets");
+    const assets = new AssetStore(),
+      doc = new window.luma.Document({ assets }),
+      file = await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),
+      before = JSON.stringify(doc.toJSON()),
+      rows = [];
+    try {
+      for (const text of [
+        "A אב V",
+        "AV ببلا fi",
+        "ببאב",
+        "a\u0301 אב fi",
+        "AVfi",
+        "אבبب",
+      ])
+        for (const direction of ["ltr", "rtl"] as const)
+          for (const path of [false, true])
+            for (const affine of [false, true])
+              for (const letterSpacing of [0, -30]) {
+                const plan = await captureStyledTextPlan(
+                  {
+                    width: 512,
+                    height: 512,
+                    transform: affine
+                      ? [1.25, 0.125, -0.25, 0.9, 15, 14]
+                      : [1, 0, 0, 1, 0, 0],
+                    style: {
+                      fontFamily: file.family,
+                      fontSize: 40,
+                      letterSpacing,
+                      color: "color(srgb-linear 4 -.25 1.5 / .00000001)",
+                    },
+                    lines: [
+                      {
+                        x: 220,
+                        y: 160,
+                        direction,
+                        align: "center",
+                        ...(path
+                          ? {
+                              path: {
+                                points: [
+                                  {
+                                    x: 24,
+                                    y: 150,
+                                    in: { x: 24, y: 150 },
+                                    out: { x: 100, y: 30 },
+                                  },
+                                  {
+                                    x: 420,
+                                    y: 150,
+                                    in: { x: 340, y: 30 },
+                                    out: { x: 420, y: 150 },
+                                  },
+                                ],
+                                startOffset: 210,
+                                baselineOffset: 7,
+                              },
+                            }
+                          : {}),
+                        spans: [{ text }],
+                      },
+                    ],
+                  },
+                  doc.toJSON(),
+                  assets,
+                  { captureLinearPaint: true },
+                );
+                try {
+                  plan.retireMeasurement();
+                  const font = await plan.captureGlyphFont(file.id),
+                    match = await plan.matchGlyphLine(font, 0);
+                  rows.push({
+                    text,
+                    direction,
+                    path,
+                    affine,
+                    letterSpacing,
+                    status: match.status,
+                    evidence: match.evidence,
+                    ...(match.status === "matched"
+                      ? {
+                          runs: match.runs!.map((run) => ({
+                            request: run.request,
+                            glyphs: run.glyphs,
+                          })),
+                          glyphs: match.glyphs.map((glyph) => ({
+                            id: glyph.glyphId,
+                            color: glyph.color,
+                            origin: glyph.origin,
+                            path: glyph.path,
+                            rotation: glyph.rotation,
+                            paintLetterSpacing: glyph.paintLetterSpacing,
+                          })),
+                        }
+                      : {
+                          reason: match.reason,
+                          runs: undefined,
+                          glyphs: undefined,
+                        }),
+                  });
+                  await (
+                    globalThis as unknown as {
+                      __canoliKeepItem(row: unknown): Promise<void>;
+                    }
+                  ).__canoliKeepItem(rows.at(-1));
+                } finally {
+                  plan.release();
+                }
+              }
+      return {
+        rows,
+        unchanged: JSON.stringify(doc.toJSON()) === before,
+        probes: document.querySelectorAll(
+          "[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]",
+        ).length,
+        faces: [...document.fonts].filter((face) =>
+          face.family.startsWith("CanoliGlyph_"),
+        ).length,
+      };
+    } finally {
+      assets.dispose();
+    }
+  }, bytes);
+  await writeFile(
+    info.outputPath("native-text-items.json"),
+    JSON.stringify(result, null, 2),
+  );
+  expect(result).toMatchObject({ unchanged: true, probes: 0, faces: 0 });
+  expect(result.rows).toHaveLength(96);
+  for (const row of result.rows) {
+    expect(
+      row.status,
+      JSON.stringify({
+        text: row.text,
+        direction: row.direction,
+        path: row.path,
+        affine: row.affine,
+        letterSpacing: row.letterSpacing,
+        evidence: row.evidence,
+      }),
+    ).toBe("matched");
+    expect(row.evidence!.svgMaxAlphaError).toBe(0);
+    for (const run of row.runs!) expect(run.request.text).toBe(row.text);
+  }
 });
 
-for(const fault of ['abort','remove','nonfinite']as const)test('native visual-order probe '+fault+' rejects without publication and permits a healthy retry',async({page},info)=>{
- const bytes=[...await readFile('tests/fixtures/shaping-font/Shaping.ttf')];await page.goto('/');const result=await page.evaluate(async({bytes,fault})=>{
-  const{captureStyledTextPlan}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');const{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');const assets=new AssetStore(),doc=new window.luma.Document({assets}),file=await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),before=JSON.stringify(doc.toJSON()),abort=new AbortController(),get=SVGTextContentElement.prototype.getStartPositionOfChar,input={width:512,height:512,style:{fontFamily:file.family,fontSize:40,letterSpacing:-30},lines:[{x:220,y:160,direction:'rtl'as const,align:'center'as const,spans:[{text:'A אב V'}]}]};let triggered=false,error='',returned=false;
-  SVGTextContentElement.prototype.getStartPositionOfChar=function(...args:Parameters<typeof get>){const value=get.apply(this,args);if(!triggered&&this.localName==='text'&&this.style.letterSpacing==='0px'&&this.style.fontKerning==='none'){triggered=true;if(fault==='abort')abort.abort(new Error('Expected native visual abort'));else if(fault==='remove')document.querySelector('[data-canoli-styled-text-probe]')?.remove();else return{x:NaN,y:value.y}as DOMPoint;}return value;};
-  try{try{const plan=await captureStyledTextPlan(input,doc.toJSON(),assets,{captureLinearPaint:true,signal:abort.signal});returned=true;plan.release();}catch(e){error=String(e);}finally{SVGTextContentElement.prototype.getStartPositionOfChar=get;}const afterFailure=document.querySelectorAll('[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]').length,retry=await captureStyledTextPlan(input,doc.toJSON(),assets,{captureLinearPaint:true});let status;try{const font=await retry.captureGlyphFont(file.id);status=(await retry.matchGlyphLine(font,0)).status;}finally{retry.release();}return{triggered,error,returned,afterFailure,retry:status,afterRetry:document.querySelectorAll('[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]').length,faces:[...document.fonts].filter(face=>face.family.startsWith('CanoliGlyph_')).length,unchanged:JSON.stringify(doc.toJSON())===before};}
-  finally{SVGTextContentElement.prototype.getStartPositionOfChar=get;assets.dispose();}
- },{bytes,fault});await writeFile(info.outputPath('native-visual-'+fault+'.json'),JSON.stringify(result,null,2));expect(result).toMatchObject({triggered:true,returned:false,afterFailure:0,afterRetry:0,faces:0,retry:'matched',unchanged:true});expect(result.error).toContain(fault==='abort'?'Expected native visual abort':fault==='remove'?'removed':'visual text geometry is invalid');
-});
+for (const fault of ["abort", "remove", "nonfinite"] as const)
+  test(
+    "native visual-order probe " +
+      fault +
+      " rejects without publication and permits a healthy retry",
+    async ({ page }, info) => {
+      const bytes = [
+        ...(await readFile("tests/fixtures/shaping-font/Shaping.ttf")),
+      ];
+      await page.goto("/");
+      const result = await page.evaluate(
+        async ({ bytes, fault }) => {
+          const { captureStyledTextPlan } = (await import(
+            /* @vite-ignore */ String("/src/engine/styled-text.ts")
+          )) as typeof import("../src/engine/styled-text");
+          const { AssetStore } = (await import(
+            /* @vite-ignore */ String("/src/core/assets.ts")
+          )) as typeof import("../src/core/assets");
+          const assets = new AssetStore(),
+            doc = new window.luma.Document({ assets }),
+            file = await doc.fonts.embed(new Blob([new Uint8Array(bytes)])),
+            before = JSON.stringify(doc.toJSON()),
+            abort = new AbortController(),
+            get = SVGTextContentElement.prototype.getStartPositionOfChar,
+            input = {
+              width: 512,
+              height: 512,
+              style: {
+                fontFamily: file.family,
+                fontSize: 40,
+                letterSpacing: -30,
+              },
+              lines: [
+                {
+                  x: 220,
+                  y: 160,
+                  direction: "rtl" as const,
+                  align: "center" as const,
+                  spans: [{ text: "A אב V" }],
+                },
+              ],
+            };
+          let triggered = false,
+            error = "",
+            returned = false;
+          SVGTextContentElement.prototype.getStartPositionOfChar = function (
+            ...args: Parameters<typeof get>
+          ) {
+            const value = get.apply(this, args);
+            if (
+              !triggered &&
+              this.localName === "text" &&
+              this.style.letterSpacing === "0px" &&
+              this.style.fontKerning === "none"
+            ) {
+              triggered = true;
+              if (fault === "abort")
+                abort.abort(new Error("Expected native visual abort"));
+              else if (fault === "remove")
+                document
+                  .querySelector("[data-canoli-styled-text-probe]")
+                  ?.remove();
+              else return { x: NaN, y: value.y } as DOMPoint;
+            }
+            return value;
+          };
+          try {
+            try {
+              const plan = await captureStyledTextPlan(
+                input,
+                doc.toJSON(),
+                assets,
+                { captureLinearPaint: true, signal: abort.signal },
+              );
+              returned = true;
+              plan.release();
+            } catch (e) {
+              error = String(e);
+            } finally {
+              SVGTextContentElement.prototype.getStartPositionOfChar = get;
+            }
+            const afterFailure = document.querySelectorAll(
+                "[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]",
+              ).length,
+              retry = await captureStyledTextPlan(input, doc.toJSON(), assets, {
+                captureLinearPaint: true,
+              });
+            let status;
+            try {
+              const font = await retry.captureGlyphFont(file.id);
+              status = (await retry.matchGlyphLine(font, 0)).status;
+            } finally {
+              retry.release();
+            }
+            return {
+              triggered,
+              error,
+              returned,
+              afterFailure,
+              retry: status,
+              afterRetry: document.querySelectorAll(
+                "[data-canoli-styled-text-probe],[data-canoli-svg-glyph-probe]",
+              ).length,
+              faces: [...document.fonts].filter((face) =>
+                face.family.startsWith("CanoliGlyph_"),
+              ).length,
+              unchanged: JSON.stringify(doc.toJSON()) === before,
+            };
+          } finally {
+            SVGTextContentElement.prototype.getStartPositionOfChar = get;
+            assets.dispose();
+          }
+        },
+        { bytes, fault },
+      );
+      await writeFile(
+        info.outputPath("native-visual-" + fault + ".json"),
+        JSON.stringify(result, null, 2),
+      );
+      expect(result).toMatchObject({
+        triggered: true,
+        returned: false,
+        afterFailure: 0,
+        afterRetry: 0,
+        faces: 0,
+        retry: "matched",
+        unchanged: true,
+      });
+      expect(result.error).toContain(
+        fault === "abort"
+          ? "Expected native visual abort"
+          : fault === "remove"
+            ? "removed"
+            : "visual text geometry is invalid",
+      );
+    },
+  );

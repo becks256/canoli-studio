@@ -91,10 +91,16 @@ Open the independently generated damaged float fixture, then run:
 <!-- example: float-retouch-patch -->
 
 ```js
-const region = new MarqueeSelection({shape:'rectangle', x:122, y:90, width:13, height:13});
-const repair = await document.patchRegion(region, {x:16, y:0});
-repair.name = 'Native Patch repair';
-print('Native Patch prepared');
+const region = new MarqueeSelection({
+  shape: "rectangle",
+  x: 122,
+  y: 90,
+  width: 13,
+  height: 13,
+});
+const repair = await document.patchRegion(region, { x: 16, y: 0 });
+repair.name = "Native Patch repair";
+print("Native Patch prepared");
 ```
 
 Alternatively, on the same unrepaired source:
@@ -103,11 +109,13 @@ Alternatively, on the same unrepaired source:
 
 ```js
 const source = document.layers.at(0);
-if (!source) throw new Error('Import the damaged native source first');
-const repair = await source.healSpot({x:128.5, y:96.5}, 6,
-  {hardness:1, searchRadius:24});
-repair.name = 'Native Healing repair';
-print('Native Healing prepared');
+if (!source) throw new Error("Import the damaged native source first");
+const repair = await source.healSpot({ x: 128.5, y: 96.5 }, 6, {
+  hardness: 1,
+  searchRadius: 24,
+});
+repair.name = "Native Healing repair";
+print("Native Healing prepared");
 ```
 
 Await repairs sequentially outside synchronous transactions. Earlier private

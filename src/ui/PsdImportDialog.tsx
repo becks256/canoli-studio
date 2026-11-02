@@ -10,23 +10,64 @@ import type {
   PsdParsedDocument,
   PsdCapabilityReport,
 } from "../core/interchange/psd/types";
-import type {PhotoshopInspection,PhotoshopImportProgress} from '../core/photoshop-import';
+import type {
+  PhotoshopInspection,
+  PhotoshopImportProgress,
+} from "../core/photoshop-import";
 
-function PsdMessages({items,className,label}:{items:string[];className:string;label:string}){
- const [page,setPage]=useState(0);
- return <><ul className={className}>{items.slice(page*100,(page+1)*100).map((value,index)=><li key={index}>{value}</li>)}</ul>{items.length>100&&<div><p>{label} {page*100+1}–{Math.min(items.length,(page+1)*100)} of {items.length}</p><Button disabled={page===0} onClick={()=>setPage(value=>value-1)}>Previous {label.toLowerCase()}</Button><Button disabled={(page+1)*100>=items.length} onClick={()=>setPage(value=>value+1)}>Next {label.toLowerCase()}</Button></div>}</>;
+function PsdMessages({
+  items,
+  className,
+  label,
+}: {
+  items: string[];
+  className: string;
+  label: string;
+}) {
+  const [page, setPage] = useState(0);
+  return (
+    <>
+      <ul className={className}>
+        {items.slice(page * 100, (page + 1) * 100).map((value, index) => (
+          <li key={index}>{value}</li>
+        ))}
+      </ul>
+      {items.length > 100 && (
+        <div>
+          <p>
+            {label} {page * 100 + 1}–{Math.min(items.length, (page + 1) * 100)}{" "}
+            of {items.length}
+          </p>
+          <Button
+            disabled={page === 0}
+            onClick={() => setPage((value) => value - 1)}
+          >
+            Previous {label.toLowerCase()}
+          </Button>
+          <Button
+            disabled={(page + 1) * 100 >= items.length}
+            onClick={() => setPage((value) => value + 1)}
+          >
+            Next {label.toLowerCase()}
+          </Button>
+        </div>
+      )}
+    </>
+  );
 }
 
 export interface PsdImportDialogProps {
   fileName: string;
-  parsedPsd: Pick<PsdParsedDocument,'header'|'resolution'|'layers'>|PhotoshopInspection;
+  parsedPsd:
+    | Pick<PsdParsedDocument, "header" | "resolution" | "layers">
+    | PhotoshopInspection;
   report: PsdCapabilityReport;
   onImportLayers(): void;
   onImportFlattened(): void;
   onClose(): void;
   busy?: boolean;
-  progress?:PhotoshopImportProgress|null;
-  error?:string;
+  progress?: PhotoshopImportProgress | null;
+  error?: string;
 }
 
 export function PsdImportDialog({
@@ -37,14 +78,15 @@ export function PsdImportDialog({
   onImportFlattened,
   onClose,
   busy = false,
-  progress=null,error='',
+  progress = null,
+  error = "",
 }: PsdImportDialogProps) {
   const [selectedMode, setSelectedMode] = useState<"layered" | "flatten">(
     report.canImportAsLayers ? "layered" : "flatten",
   );
 
   const { header, layers, resolution } = parsedPsd;
-  const [layerPage,setLayerPage]=useState(0);
+  const [layerPage, setLayerPage] = useState(0);
 
   return (
     <Dialog
@@ -58,7 +100,7 @@ export function PsdImportDialog({
             size={18}
             style={{ marginRight: 8, verticalAlign: "middle" }}
           />
-          Import {header.version===2?'PSB':'PSD'} — Preflight Inspection
+          Import {header.version === 2 ? "PSB" : "PSD"} — Preflight Inspection
         </h2>
         <IconButton label="Close" onClick={onClose}>
           <X size={18} />
@@ -115,7 +157,11 @@ export function PsdImportDialog({
             <div className="psd-warnings-title">
               <AlertTriangle size={15} /> Format Warnings & Degradation Notice
             </div>
-            <PsdMessages items={report.warnings} className="psd-warnings-list" label="Warnings"/>
+            <PsdMessages
+              items={report.warnings}
+              className="psd-warnings-list"
+              label="Warnings"
+            />
           </div>
         )}
 
@@ -125,7 +171,11 @@ export function PsdImportDialog({
             <h4 className="psd-cap-heading preserved">
               <CheckCircle size={13} /> Preserved Features
             </h4>
-            <PsdMessages items={report.supportedConstructs} className="psd-cap-list" label="Reported features"/>
+            <PsdMessages
+              items={report.supportedConstructs}
+              className="psd-cap-list"
+              label="Reported features"
+            />
           </div>
 
           <div className="psd-cap-col">
@@ -133,9 +183,15 @@ export function PsdImportDialog({
               <AlertTriangle size={13} /> Degraded / Omitted
             </h4>
             {report.degradedFeatures.length === 0 ? (
-              <span className="psd-cap-empty">No additional reported losses in this supported subset</span>
+              <span className="psd-cap-empty">
+                No additional reported losses in this supported subset
+              </span>
             ) : (
-              <PsdMessages items={report.degradedFeatures} className="psd-cap-list muted" label="Reported losses"/>
+              <PsdMessages
+                items={report.degradedFeatures}
+                className="psd-cap-list muted"
+                label="Reported losses"
+              />
             )}
           </div>
         </div>
@@ -147,24 +203,46 @@ export function PsdImportDialog({
               <Layers size={14} /> Layer Records ({layers.length})
             </h4>
             <div className="psd-layers-list">
-              {layers.slice(layerPage*100,(layerPage+1)*100).map((l, i) => (
-                <div key={i} className="psd-layer-row">
-                  <span className="psd-layer-name">{l.name}</span>
-                  <div className="psd-layer-badges">
-                    <span className="psd-badge">
-                      {l.width}×{l.height}
-                    </span>
-                    <span className="psd-badge blend">
-                      {l.blendModeKey || "norm"}
-                    </span>
-                    <span className="psd-badge">
-                      {Math.round((l.opacity / 255) * 100)}%
-                    </span>
+              {layers
+                .slice(layerPage * 100, (layerPage + 1) * 100)
+                .map((l, i) => (
+                  <div key={i} className="psd-layer-row">
+                    <span className="psd-layer-name">{l.name}</span>
+                    <div className="psd-layer-badges">
+                      <span className="psd-badge">
+                        {l.width}×{l.height}
+                      </span>
+                      <span className="psd-badge blend">
+                        {l.blendModeKey || "norm"}
+                      </span>
+                      <span className="psd-badge">
+                        {Math.round((l.opacity / 255) * 100)}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
-            {layers.length>100&&<div><p>Layer records {layerPage*100+1}–{Math.min(layers.length,(layerPage+1)*100)} of {layers.length}</p><Button disabled={layerPage===0||busy} onClick={()=>setLayerPage(value=>value-1)}>Previous layer records</Button><Button disabled={(layerPage+1)*100>=layers.length||busy} onClick={()=>setLayerPage(value=>value+1)}>Next layer records</Button></div>}
+            {layers.length > 100 && (
+              <div>
+                <p>
+                  Layer records {layerPage * 100 + 1}–
+                  {Math.min(layers.length, (layerPage + 1) * 100)} of{" "}
+                  {layers.length}
+                </p>
+                <Button
+                  disabled={layerPage === 0 || busy}
+                  onClick={() => setLayerPage((value) => value - 1)}
+                >
+                  Previous layer records
+                </Button>
+                <Button
+                  disabled={(layerPage + 1) * 100 >= layers.length || busy}
+                  onClick={() => setLayerPage((value) => value + 1)}
+                >
+                  Next layer records
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -191,7 +269,7 @@ export function PsdImportDialog({
               value="flatten"
               checked={selectedMode === "flatten"}
               onChange={() => setSelectedMode("flatten")}
-              disabled={busy||!report.hasComposite}
+              disabled={busy || !report.hasComposite}
             />
             <span>
               <strong>Flatten to Single Composite</strong> — Import the
@@ -201,8 +279,23 @@ export function PsdImportDialog({
         </div>
       </div>
 
-      {busy&&<div role="status"><p>{progress?.phase==='encoding'?'Preparing editing pixels…':progress?.phase==='installing'?'Opening image sources…':'Decoding Photoshop pixels…'}</p><progress aria-label="Photoshop import progress" max={1} value={progress?.fraction??undefined}/></div>}
-      {error&&<p role="alert">{error}</p>}
+      {busy && (
+        <div role="status">
+          <p>
+            {progress?.phase === "encoding"
+              ? "Preparing editing pixels…"
+              : progress?.phase === "installing"
+                ? "Opening image sources…"
+                : "Decoding Photoshop pixels…"}
+          </p>
+          <progress
+            aria-label="Photoshop import progress"
+            max={1}
+            value={progress?.fraction ?? undefined}
+          />
+        </div>
+      )}
+      {error && <p role="alert">{error}</p>}
 
       <div className="dialog-footer psd-import-dialog-footer">
         <Button variant="secondary" onClick={onClose}>
@@ -217,7 +310,12 @@ export function PsdImportDialog({
               onImportFlattened();
             }
           }}
-          disabled={busy||(selectedMode==='flatten'?!report.hasComposite:!report.canImportAsLayers)}
+          disabled={
+            busy ||
+            (selectedMode === "flatten"
+              ? !report.hasComposite
+              : !report.canImportAsLayers)
+          }
         >
           {selectedMode === "layered" ? "Import Layers" : "Import Flattened"}
         </Button>

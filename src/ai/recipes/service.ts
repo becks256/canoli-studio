@@ -1,9 +1,9 @@
-import {computeSha256} from '../batch/manifest';
-import type {FontResourceInput} from '../../fonts/resources';
-import {executeRecipeAsync} from './async-executor';
-import {compileRecipePackagePlan} from './package-plan';
-import type {RawImportControl} from '../../core/interchange/raw/types';
-import {ownRawSource} from "../../core/interchange/raw/source";
+import { computeSha256 } from "../batch/manifest";
+import type { FontResourceInput } from "../../fonts/resources";
+import { executeRecipeAsync } from "./async-executor";
+import { compileRecipePackagePlan } from "./package-plan";
+import type { RawImportControl } from "../../core/interchange/raw/types";
+import { ownRawSource } from "../../core/interchange/raw/source";
 import { RecipePackageStorage } from "./package-storage";
 import { executeRecipePackage } from "./package-executor";
 import {
@@ -27,20 +27,29 @@ import {
 export class RecipeService {
   readonly storage = new RecipeStorage();
   readonly packages = new RecipePackageStorage();
-  readonly recorder = new RecipeRecorder((assetId)=>this.editor.assetStore.get(assetId));
+  readonly recorder = new RecipeRecorder((assetId) =>
+    this.editor.assetStore.get(assetId),
+  );
   private unsavedRecording?: Recipe;
   private recordingSources = new Map<string, RecipeAsset>();
-  private recordingFonts=new Map<string,FontResourceInput>();
+  private recordingFonts = new Map<string, FontResourceInput>();
   lastSavedRecordingFormat: "json" | "package" = "json";
 
   get pendingRecordingHasAssets(): boolean {
     return (
-      !!this.unsavedRecording && (recipeAssetIds(this.unsavedRecording).size > 0||!!this.unsavedRecording.fontFiles?.length)
+      !!this.unsavedRecording &&
+      (recipeAssetIds(this.unsavedRecording).size > 0 ||
+        !!this.unsavedRecording.fontFiles?.length)
     );
   }
 
   private captureRecordingSources(document: Document): void {
-    for(const resource of document.assetStore?.fonts.values()??[])this.recordingFonts.set(resource.id,{descriptor:resource.descriptor,original:resource.original,renderBlob:resource.renderBlob});
+    for (const resource of document.assetStore?.fonts.values() ?? [])
+      this.recordingFonts.set(resource.id, {
+        descriptor: resource.descriptor,
+        original: resource.original,
+        renderBlob: resource.renderBlob,
+      });
     for (const asset of document.assetStore?.values() ?? []) {
       this.recordingSources.set(asset.id, {
         id: asset.id,
@@ -48,7 +57,9 @@ export class RecipeService {
         width: asset.width,
         height: asset.height,
         blob: asset.blob,
-        ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{}),
+        ...(asset.tiff ? { tiff: { ...asset.tiff } } : {}),
+        ...(asset.avif ? { avif: { ...asset.avif } } : {}),
+        ...(asset.raw ? { raw: ownRawSource(asset.raw) } : {}),
       });
     }
   }
@@ -57,7 +68,14 @@ export class RecipeService {
     if (!this.unsavedRecording)
       throw new Error("No unsaved recording is available.");
     return serializeRecipePackage(this.unsavedRecording, {
-      fonts:{get:id=>{const source=this.recordingFonts.get(id);if(!source)throw new Error(`Recorded font source is unavailable: ${id}`);return source;}},
+      fonts: {
+        get: (id) => {
+          const source = this.recordingFonts.get(id);
+          if (!source)
+            throw new Error(`Recorded font source is unavailable: ${id}`);
+          return source;
+        },
+      },
       get: (id) => {
         const asset = this.recordingSources.get(id);
         if (!asset)
@@ -84,7 +102,8 @@ export class RecipeService {
       await this.storage.save(recipe);
       this.lastSavedRecordingFormat = "json";
     }
-    this.recordingSources.clear();this.recordingFonts.clear();
+    this.recordingSources.clear();
+    this.recordingFonts.clear();
     this.unsavedRecording = undefined;
     return recipe;
   }
@@ -130,7 +149,11 @@ export class RecipeService {
     let unhookCommands: (() => void) | null = null;
     const syncRecordingSubscription = () => {
       const observing = this.recorder.isRecording() || this.recorder.isPaused();
-      if (!observing) { unhookCommands?.(); unhookCommands = null; return; }
+      if (!observing) {
+        unhookCommands?.();
+        unhookCommands = null;
+        return;
+      }
       if (unhookCommands) return;
       unhookCommands = doc.onCommand((command, before, after) => {
         if (
@@ -148,7 +171,11 @@ export class RecipeService {
     const unhookHistory = doc.onHistoryNavigation((direction) =>
       this.recorder.navigateHistory(direction),
     );
-    const unhookBranch = doc.onHistoryBranchSwitch(() => this.recorder.invalidateHistory('History branch switched; start a new recording.'));
+    const unhookBranch = doc.onHistoryBranchSwitch(() =>
+      this.recorder.invalidateHistory(
+        "History branch switched; start a new recording.",
+      ),
+    );
     this.unhookRecorder = () => {
       unhookState();
       unhookCommands?.();
@@ -214,35 +241,98 @@ export class RecipeService {
     );
   }
 
-  async exportRecipePackage(input:Recipe):Promise<Blob>{
-    const recipe=structuredClone(input),assets=this.editor.assetStore;
-    const captured=new Map([...recipeAssetIds(recipe)].map(id=>[id,assets.has(id)?{...assets.get(id)}:undefined]as const));
-    const previous=recipe.delivery?await this.packages.get(recipe.id):undefined;
-    const contents=previous?await readRecipePackage(previous):undefined;
-    if(recipe.delivery&&!contents?.deliveryPreset)throw new Error('Recipe delivery sources are unavailable. Import the complete package.');
-    return serializeRecipePackage(recipe,{
-      get:id=>{const source=contents?.assets.find(asset=>asset.id===id)??captured.get(id);if(!source)throw new Error(`Recipe source is unavailable: ${id}`);return source;},
-      fonts:{get:id=>contents?.fonts.find(font=>font.descriptor.report.faces[0].id===id)??assets.fonts.get(id)},
-      deliveryPreset:contents?.deliveryPreset,
+  async exportRecipePackage(input: Recipe): Promise<Blob> {
+    const recipe = structuredClone(input),
+      assets = this.editor.assetStore;
+    const captured = new Map(
+      [...recipeAssetIds(recipe)].map(
+        (id) =>
+          [id, assets.has(id) ? { ...assets.get(id) } : undefined] as const,
+      ),
+    );
+    const previous = recipe.delivery
+      ? await this.packages.get(recipe.id)
+      : undefined;
+    const contents = previous ? await readRecipePackage(previous) : undefined;
+    if (recipe.delivery && !contents?.deliveryPreset)
+      throw new Error(
+        "Recipe delivery sources are unavailable. Import the complete package.",
+      );
+    return serializeRecipePackage(recipe, {
+      get: (id) => {
+        const source =
+          contents?.assets.find((asset) => asset.id === id) ?? captured.get(id);
+        if (!source) throw new Error(`Recipe source is unavailable: ${id}`);
+        return source;
+      },
+      fonts: {
+        get: (id) =>
+          contents?.fonts.find(
+            (font) => font.descriptor.report.faces[0].id === id,
+          ) ?? assets.fonts.get(id),
+      },
+      deliveryPreset: contents?.deliveryPreset,
     });
   }
   /** File-only operation: attach reusable delivery settings without editing artwork. */
-  async attachDeliveryPreset(input:Recipe|Blob,presetFile:Blob,control:import('../../core/color/icc-client').IccControl={}):Promise<Blob>{
-    const original=input instanceof Blob?new Blob([input]):structuredClone(input),assets=this.editor.assetStore;
-    const captured=original instanceof Blob?undefined:new Map([...recipeAssetIds(original)].map(id=>[id,{...assets.get(id)}]as const));
-    const file=new Blob([presetFile],{type:'application/x-canoli-delivery'}),preset=await this.editor.batch.importDeliveryPreset(file,control);
-    const contents=original instanceof Blob?await readRecipePackage(original):undefined,recipe=structuredClone(contents?.recipe??original)as Recipe;control.signal?.throwIfAborted();
-    recipe.schemaVersion=3;recipe.delivery={version:1,name:preset.name,sha256:await computeSha256(await file.arrayBuffer()),byteLength:file.size};control.signal?.throwIfAborted();
-    const result=await serializeRecipePackage(recipe,{
-      get:id=>{const source=contents?.assets.find(asset=>asset.id===id)??captured?.get(id);if(!source)throw new Error(`Recipe source is unavailable: ${id}`);return source;},
-      fonts:{get:id=>contents?.fonts.find(font=>font.descriptor.report.faces[0].id===id)??assets.fonts.get(id)},deliveryPreset:file,
-    });control.signal?.throwIfAborted();return result;
+  async attachDeliveryPreset(
+    input: Recipe | Blob,
+    presetFile: Blob,
+    control: import("../../core/color/icc-client").IccControl = {},
+  ): Promise<Blob> {
+    const original =
+        input instanceof Blob ? new Blob([input]) : structuredClone(input),
+      assets = this.editor.assetStore;
+    const captured =
+      original instanceof Blob
+        ? undefined
+        : new Map(
+            [...recipeAssetIds(original)].map(
+              (id) => [id, { ...assets.get(id) }] as const,
+            ),
+          );
+    const file = new Blob([presetFile], {
+        type: "application/x-canoli-delivery",
+      }),
+      preset = await this.editor.batch.importDeliveryPreset(file, control);
+    const contents =
+        original instanceof Blob
+          ? await readRecipePackage(original)
+          : undefined,
+      recipe = structuredClone(contents?.recipe ?? original) as Recipe;
+    control.signal?.throwIfAborted();
+    recipe.schemaVersion = 3;
+    recipe.delivery = {
+      version: 1,
+      name: preset.name,
+      sha256: await computeSha256(await file.arrayBuffer()),
+      byteLength: file.size,
+    };
+    control.signal?.throwIfAborted();
+    const result = await serializeRecipePackage(recipe, {
+      get: (id) => {
+        const source =
+          contents?.assets.find((asset) => asset.id === id) ??
+          captured?.get(id);
+        if (!source) throw new Error(`Recipe source is unavailable: ${id}`);
+        return source;
+      },
+      fonts: {
+        get: (id) =>
+          contents?.fonts.find(
+            (font) => font.descriptor.report.faces[0].id === id,
+          ) ?? assets.fonts.get(id),
+      },
+      deliveryPreset: file,
+    });
+    control.signal?.throwIfAborted();
+    return result;
   }
 
   executeRecipePackage(
     file: Blob,
     params: Record<string, unknown> = {},
-    control:RawImportControl={},
+    control: RawImportControl = {},
   ): Promise<ExecuteRecipeResult> {
     const document = this.editor.document;
     return executeRecipePackage(
@@ -274,8 +364,19 @@ export class RecipeService {
     );
   }
 
-  compilePackagePlan(file:Blob,params:Record<string,unknown>={},control:RawImportControl={}):Promise<EditPlan>{
-    const document=this.editor.document;return compileRecipePackagePlan(file,document,params,control,this.captureTargetGuard(document));
+  compilePackagePlan(
+    file: Blob,
+    params: Record<string, unknown> = {},
+    control: RawImportControl = {},
+  ): Promise<EditPlan> {
+    const document = this.editor.document;
+    return compileRecipePackagePlan(
+      file,
+      document,
+      params,
+      control,
+      this.captureTargetGuard(document),
+    );
   }
 
   execute(
@@ -285,9 +386,19 @@ export class RecipeService {
     return executeRecipe(recipe, this.editor.document, params);
   }
 
-  executeAsync(recipe:Recipe,params:Record<string,unknown>={},control:RawImportControl={}):Promise<ExecuteRecipeResult>{
-    const document=this.editor.document;
-    return executeRecipeAsync(recipe,document,params,control,this.captureTargetGuard(document));
+  executeAsync(
+    recipe: Recipe,
+    params: Record<string, unknown> = {},
+    control: RawImportControl = {},
+  ): Promise<ExecuteRecipeResult> {
+    const document = this.editor.document;
+    return executeRecipeAsync(
+      recipe,
+      document,
+      params,
+      control,
+      this.captureTargetGuard(document),
+    );
   }
 
   startRecording(): void {
@@ -295,7 +406,8 @@ export class RecipeService {
       throw new Error(
         "Save the pending recording before starting another recording.",
       );
-    this.recordingSources.clear();this.recordingFonts.clear();
+    this.recordingSources.clear();
+    this.recordingFonts.clear();
     this.captureRecordingSources(this.editor.document);
     this.recorder.start(this.editor.document.selectedLayer?.id ?? null);
   }
@@ -316,7 +428,8 @@ export class RecipeService {
   dispose(): void {
     this.disposed = true;
     this.targetGeneration++;
-    this.recordingSources.clear();this.recordingFonts.clear();
+    this.recordingSources.clear();
+    this.recordingFonts.clear();
     if (this.unhookRecorder) {
       this.unhookRecorder();
       this.unhookRecorder = null;

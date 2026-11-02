@@ -73,11 +73,11 @@ and retain actual transported alpha. Readback instrumentation is included.
 Long-task observation covers the gesture. This is headless Chromium on this
 host, not physical display/OS presentation or device acceptance.
 
-| Target | Median | P95 / maximum | Long tasks | Longest task |
-| --- | ---: | ---: | ---: | ---: |
-| Raster pixels | 149.1 ms | 268.0 ms | 5 | 76 ms |
-| Ordinary mask | 148.4 ms | 279.2 ms | 6 | 111 ms |
-| Filter mask | 212.0 ms | 348.6 ms | 6 | 98 ms |
+| Target        |   Median | P95 / maximum | Long tasks | Longest task |
+| ------------- | -------: | ------------: | ---------: | -----------: |
+| Raster pixels | 149.1 ms |      268.0 ms |          5 |        76 ms |
+| Ordinary mask | 148.4 ms |      279.2 ms |          6 |       111 ms |
+| Filter mask   | 212.0 ms |      348.6 ms |          6 |        98 ms |
 
 These measurements **do not meet a 60 fps claim**. Incremental input latency,
 long tasks and the full sustained editor-wide performance goal remain required

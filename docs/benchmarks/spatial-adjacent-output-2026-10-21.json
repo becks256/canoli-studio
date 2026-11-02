@@ -4687,9 +4687,7 @@
       "samples": 26,
       "p95Ms": 16.399999976158142,
       "maximumMs": 51.59999996423721,
-      "longTasks": [
-        121
-      ],
+      "longTasks": [121],
       "limit": "Unpaired native regression diagnostics without proof that each timed frame contains its input; not production/editor-wide latency acceptance."
     },
     {
@@ -4698,10 +4696,7 @@
       "samples": 24,
       "p95Ms": 56.30000001192093,
       "maximumMs": 56.60000002384186,
-      "longTasks": [
-        52,
-        98
-      ],
+      "longTasks": [52, 98],
       "limit": "Unpaired native regression diagnostics without proof that each timed frame contains its input; not production/editor-wide latency acceptance."
     },
     {
@@ -4710,10 +4705,7 @@
       "samples": 24,
       "p95Ms": 73.80000001192093,
       "maximumMs": 74.30000001192093,
-      "longTasks": [
-        65,
-        115
-      ],
+      "longTasks": [65, 115],
       "limit": "Unpaired native regression diagnostics without proof that each timed frame contains its input; not production/editor-wide latency acceptance."
     }
   ],

@@ -77,10 +77,7 @@
         "preconditioner": "ic0",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -104,7 +101,7 @@
             "unknownPixels": 38573,
             "unresolvedPixels": 0,
             "iterations": 236,
-            "relativeResidual": 9.730357822424051e-08,
+            "relativeResidual": 9.730357822424051e-8,
             "estimatedGraphBytes": 25059328,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -157,7 +154,7 @@
             "unknownPixels": 67603,
             "unresolvedPixels": 0,
             "iterations": 435,
-            "relativeResidual": 9.452461477193364e-08,
+            "relativeResidual": 9.452461477193364e-8,
             "estimatedGraphBytes": 44843008,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -210,7 +207,7 @@
             "unknownPixels": 57461,
             "unresolvedPixels": 0,
             "iterations": 515,
-            "relativeResidual": 9.807945896434677e-08,
+            "relativeResidual": 9.807945896434677e-8,
             "estimatedGraphBytes": 38248448,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -263,7 +260,7 @@
             "unknownPixels": 111308,
             "unresolvedPixels": 0,
             "iterations": 873,
-            "relativeResidual": 9.840603868234577e-08,
+            "relativeResidual": 9.840603868234577e-8,
             "estimatedGraphBytes": 72540160,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -316,7 +313,7 @@
             "unknownPixels": 178728,
             "unresolvedPixels": 0,
             "iterations": 636,
-            "relativeResidual": 9.788217782992555e-08,
+            "relativeResidual": 9.788217782992555e-8,
             "estimatedGraphBytes": 116064256,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -369,7 +366,7 @@
             "unknownPixels": 218709,
             "unresolvedPixels": 0,
             "iterations": 797,
-            "relativeResidual": 9.939132918623136e-08,
+            "relativeResidual": 9.939132918623136e-8,
             "estimatedGraphBytes": 141123584,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -422,7 +419,7 @@
             "unknownPixels": 29357,
             "unresolvedPixels": 0,
             "iterations": 210,
-            "relativeResidual": 9.101644827865377e-08,
+            "relativeResidual": 9.101644827865377e-8,
             "estimatedGraphBytes": 19783680,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -475,7 +472,7 @@
             "unknownPixels": 50092,
             "unresolvedPixels": 0,
             "iterations": 306,
-            "relativeResidual": 9.322306680683413e-08,
+            "relativeResidual": 9.322306680683413e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -528,7 +525,7 @@
             "unknownPixels": 52970,
             "unresolvedPixels": 0,
             "iterations": 241,
-            "relativeResidual": 9.13542445995549e-08,
+            "relativeResidual": 9.13542445995549e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -581,7 +578,7 @@
             "unknownPixels": 81857,
             "unresolvedPixels": 0,
             "iterations": 314,
-            "relativeResidual": 9.845719121846429e-08,
+            "relativeResidual": 9.845719121846429e-8,
             "estimatedGraphBytes": 52756480,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -634,7 +631,7 @@
             "unknownPixels": 142232,
             "unresolvedPixels": 0,
             "iterations": 636,
-            "relativeResidual": 9.78721652695106e-08,
+            "relativeResidual": 9.78721652695106e-8,
             "estimatedGraphBytes": 92323840,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -687,7 +684,7 @@
             "unknownPixels": 177134,
             "unresolvedPixels": 0,
             "iterations": 987,
-            "relativeResidual": 9.81524905557495e-08,
+            "relativeResidual": 9.81524905557495e-8,
             "estimatedGraphBytes": 114745344,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -740,7 +737,7 @@
             "unknownPixels": 51540,
             "unresolvedPixels": 0,
             "iterations": 263,
-            "relativeResidual": 9.301674885507688e-08,
+            "relativeResidual": 9.301674885507688e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -793,7 +790,7 @@
             "unknownPixels": 78358,
             "unresolvedPixels": 0,
             "iterations": 281,
-            "relativeResidual": 9.449914247822428e-08,
+            "relativeResidual": 9.449914247822428e-8,
             "estimatedGraphBytes": 51437568,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -846,7 +843,7 @@
             "unknownPixels": 61930,
             "unresolvedPixels": 0,
             "iterations": 284,
-            "relativeResidual": 9.821772403916338e-08,
+            "relativeResidual": 9.821772403916338e-8,
             "estimatedGraphBytes": 40886272,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -899,7 +896,7 @@
             "unknownPixels": 92540,
             "unresolvedPixels": 0,
             "iterations": 389,
-            "relativeResidual": 9.584192017620666e-08,
+            "relativeResidual": 9.584192017620666e-8,
             "estimatedGraphBytes": 60669952,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -952,7 +949,7 @@
             "unknownPixels": 143935,
             "unresolvedPixels": 0,
             "iterations": 1797,
-            "relativeResidual": 9.825817431178149e-08,
+            "relativeResidual": 9.825817431178149e-8,
             "estimatedGraphBytes": 93642752,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -1008,7 +1005,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 7.224678958248489e-07
+            "relativeResidual": 7.224678958248489e-7
           },
           "elapsedMs": 108325.913528
         },
@@ -1029,7 +1026,7 @@
             "unknownPixels": 37039,
             "unresolvedPixels": 0,
             "iterations": 150,
-            "relativeResidual": 9.987222908586434e-08,
+            "relativeResidual": 9.987222908586434e-8,
             "estimatedGraphBytes": 25059328,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -1082,7 +1079,7 @@
             "unknownPixels": 55759,
             "unresolvedPixels": 0,
             "iterations": 236,
-            "relativeResidual": 9.758472490798238e-08,
+            "relativeResidual": 9.758472490798238e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -1135,7 +1132,7 @@
             "unknownPixels": 87834,
             "unresolvedPixels": 0,
             "iterations": 716,
-            "relativeResidual": 9.670577458572506e-08,
+            "relativeResidual": 9.670577458572506e-8,
             "estimatedGraphBytes": 56713216,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1188,7 +1185,7 @@
             "unknownPixels": 109718,
             "unresolvedPixels": 0,
             "iterations": 898,
-            "relativeResidual": 9.53531213651368e-08,
+            "relativeResidual": 9.53531213651368e-8,
             "estimatedGraphBytes": 71221248,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1241,7 +1238,7 @@
             "unknownPixels": 51098,
             "unresolvedPixels": 0,
             "iterations": 241,
-            "relativeResidual": 9.602178971360096e-08,
+            "relativeResidual": 9.602178971360096e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1294,7 +1291,7 @@
             "unknownPixels": 72743,
             "unresolvedPixels": 0,
             "iterations": 278,
-            "relativeResidual": 9.350063122887908e-08,
+            "relativeResidual": 9.350063122887908e-8,
             "estimatedGraphBytes": 47480832,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1347,7 +1344,7 @@
             "unknownPixels": 25462,
             "unresolvedPixels": 0,
             "iterations": 81,
-            "relativeResidual": 7.933486776352193e-08,
+            "relativeResidual": 7.933486776352193e-8,
             "estimatedGraphBytes": 17145856,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1400,7 +1397,7 @@
             "unknownPixels": 47105,
             "unresolvedPixels": 0,
             "iterations": 158,
-            "relativeResidual": 9.66093073057121e-08,
+            "relativeResidual": 9.66093073057121e-8,
             "estimatedGraphBytes": 31653888,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1453,7 +1450,7 @@
             "unknownPixels": 49105,
             "unresolvedPixels": 0,
             "iterations": 193,
-            "relativeResidual": 9.367493430031215e-08,
+            "relativeResidual": 9.367493430031215e-8,
             "estimatedGraphBytes": 31653888,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1506,7 +1503,7 @@
             "unknownPixels": 73816,
             "unresolvedPixels": 0,
             "iterations": 281,
-            "relativeResidual": 9.922697518232908e-08,
+            "relativeResidual": 9.922697518232908e-8,
             "estimatedGraphBytes": 48799744,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1559,7 +1556,7 @@
             "unknownPixels": 65605,
             "unresolvedPixels": 0,
             "iterations": 184,
-            "relativeResidual": 9.826237953721452e-08,
+            "relativeResidual": 9.826237953721452e-8,
             "estimatedGraphBytes": 43524096,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1612,7 +1609,7 @@
             "unknownPixels": 98345,
             "unresolvedPixels": 0,
             "iterations": 404,
-            "relativeResidual": 9.557767876470168e-08,
+            "relativeResidual": 9.557767876470168e-8,
             "estimatedGraphBytes": 64626688,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1665,7 +1662,7 @@
             "unknownPixels": 63437,
             "unresolvedPixels": 0,
             "iterations": 187,
-            "relativeResidual": 9.108563307684159e-08,
+            "relativeResidual": 9.108563307684159e-8,
             "estimatedGraphBytes": 40886272,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1718,7 +1715,7 @@
             "unknownPixels": 90987,
             "unresolvedPixels": 0,
             "iterations": 247,
-            "relativeResidual": 9.63826057788625e-08,
+            "relativeResidual": 9.63826057788625e-8,
             "estimatedGraphBytes": 59351040,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1771,7 +1768,7 @@
             "unknownPixels": 59459,
             "unresolvedPixels": 0,
             "iterations": 220,
-            "relativeResidual": 9.795658648817884e-08,
+            "relativeResidual": 9.795658648817884e-8,
             "estimatedGraphBytes": 39567360,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1824,7 +1821,7 @@
             "unknownPixels": 80337,
             "unresolvedPixels": 0,
             "iterations": 340,
-            "relativeResidual": 9.469901758486465e-08,
+            "relativeResidual": 9.469901758486465e-8,
             "estimatedGraphBytes": 52756480,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1877,7 +1874,7 @@
             "unknownPixels": 153224,
             "unresolvedPixels": 0,
             "iterations": 504,
-            "relativeResidual": 9.871051227118185e-08,
+            "relativeResidual": 9.871051227118185e-8,
             "estimatedGraphBytes": 98918400,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -1930,7 +1927,7 @@
             "unknownPixels": 210628,
             "unresolvedPixels": 0,
             "iterations": 1021,
-            "relativeResidual": 9.811424747383478e-08,
+            "relativeResidual": 9.811424747383478e-8,
             "estimatedGraphBytes": 135847936,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -1985,9 +1982,7 @@
         "expectedCases": 36,
         "completedCases": 36,
         "successes": 35,
-        "failures": [
-          "GT13-Trimap2"
-        ]
+        "failures": ["GT13-Trimap2"]
       },
       "qualityMeans": {
         "0": {
@@ -2086,10 +2081,7 @@
         "preconditioner": "ic0",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -2113,7 +2105,7 @@
             "unknownPixels": 38573,
             "unresolvedPixels": 0,
             "iterations": 236,
-            "relativeResidual": 9.730174509213579e-08,
+            "relativeResidual": 9.730174509213579e-8,
             "estimatedGraphBytes": 25059328,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2166,7 +2158,7 @@
             "unknownPixels": 67603,
             "unresolvedPixels": 0,
             "iterations": 435,
-            "relativeResidual": 9.423955851024622e-08,
+            "relativeResidual": 9.423955851024622e-8,
             "estimatedGraphBytes": 44843008,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2219,7 +2211,7 @@
             "unknownPixels": 57461,
             "unresolvedPixels": 0,
             "iterations": 514,
-            "relativeResidual": 9.927889927304085e-08,
+            "relativeResidual": 9.927889927304085e-8,
             "estimatedGraphBytes": 38248448,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2272,7 +2264,7 @@
             "unknownPixels": 111308,
             "unresolvedPixels": 0,
             "iterations": 873,
-            "relativeResidual": 9.56218458290332e-08,
+            "relativeResidual": 9.56218458290332e-8,
             "estimatedGraphBytes": 72540160,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2325,7 +2317,7 @@
             "unknownPixels": 178728,
             "unresolvedPixels": 0,
             "iterations": 636,
-            "relativeResidual": 9.963125950256077e-08,
+            "relativeResidual": 9.963125950256077e-8,
             "estimatedGraphBytes": 116064256,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2378,7 +2370,7 @@
             "unknownPixels": 218709,
             "unresolvedPixels": 0,
             "iterations": 797,
-            "relativeResidual": 9.866888524811256e-08,
+            "relativeResidual": 9.866888524811256e-8,
             "estimatedGraphBytes": 141123584,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2431,7 +2423,7 @@
             "unknownPixels": 29357,
             "unresolvedPixels": 0,
             "iterations": 210,
-            "relativeResidual": 9.187667710532548e-08,
+            "relativeResidual": 9.187667710532548e-8,
             "estimatedGraphBytes": 19783680,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2484,7 +2476,7 @@
             "unknownPixels": 50092,
             "unresolvedPixels": 0,
             "iterations": 306,
-            "relativeResidual": 9.358913648951476e-08,
+            "relativeResidual": 9.358913648951476e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2537,7 +2529,7 @@
             "unknownPixels": 52970,
             "unresolvedPixels": 0,
             "iterations": 241,
-            "relativeResidual": 9.42268559322996e-08,
+            "relativeResidual": 9.42268559322996e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2590,7 +2582,7 @@
             "unknownPixels": 81857,
             "unresolvedPixels": 0,
             "iterations": 314,
-            "relativeResidual": 9.83407709198182e-08,
+            "relativeResidual": 9.83407709198182e-8,
             "estimatedGraphBytes": 52756480,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2643,7 +2635,7 @@
             "unknownPixels": 142232,
             "unresolvedPixels": 0,
             "iterations": 635,
-            "relativeResidual": 9.996805581066287e-08,
+            "relativeResidual": 9.996805581066287e-8,
             "estimatedGraphBytes": 92323840,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2696,7 +2688,7 @@
             "unknownPixels": 177134,
             "unresolvedPixels": 0,
             "iterations": 987,
-            "relativeResidual": 9.909965721120571e-08,
+            "relativeResidual": 9.909965721120571e-8,
             "estimatedGraphBytes": 114745344,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2749,7 +2741,7 @@
             "unknownPixels": 51540,
             "unresolvedPixels": 0,
             "iterations": 264,
-            "relativeResidual": 8.991017263157041e-08,
+            "relativeResidual": 8.991017263157041e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -2802,7 +2794,7 @@
             "unknownPixels": 78358,
             "unresolvedPixels": 0,
             "iterations": 281,
-            "relativeResidual": 9.585010513808224e-08,
+            "relativeResidual": 9.585010513808224e-8,
             "estimatedGraphBytes": 51437568,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2855,7 +2847,7 @@
             "unknownPixels": 61930,
             "unresolvedPixels": 0,
             "iterations": 284,
-            "relativeResidual": 9.821208913136834e-08,
+            "relativeResidual": 9.821208913136834e-8,
             "estimatedGraphBytes": 40886272,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2908,7 +2900,7 @@
             "unknownPixels": 92540,
             "unresolvedPixels": 0,
             "iterations": 389,
-            "relativeResidual": 9.588914786113145e-08,
+            "relativeResidual": 9.588914786113145e-8,
             "estimatedGraphBytes": 60669952,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2961,7 +2953,7 @@
             "unknownPixels": 143935,
             "unresolvedPixels": 0,
             "iterations": 1800,
-            "relativeResidual": 9.878677578438083e-08,
+            "relativeResidual": 9.878677578438083e-8,
             "estimatedGraphBytes": 93642752,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3017,7 +3009,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 7.226561432336941e-07
+            "relativeResidual": 7.226561432336941e-7
           },
           "elapsedMs": 77964.67636400001
         },
@@ -3038,7 +3030,7 @@
             "unknownPixels": 37039,
             "unresolvedPixels": 0,
             "iterations": 150,
-            "relativeResidual": 9.458549801897616e-08,
+            "relativeResidual": 9.458549801897616e-8,
             "estimatedGraphBytes": 25059328,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -3091,7 +3083,7 @@
             "unknownPixels": 55759,
             "unresolvedPixels": 0,
             "iterations": 235,
-            "relativeResidual": 9.930576825936262e-08,
+            "relativeResidual": 9.930576825936262e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -3144,7 +3136,7 @@
             "unknownPixels": 87834,
             "unresolvedPixels": 0,
             "iterations": 717,
-            "relativeResidual": 9.301003751588602e-08,
+            "relativeResidual": 9.301003751588602e-8,
             "estimatedGraphBytes": 56713216,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3197,7 +3189,7 @@
             "unknownPixels": 109718,
             "unresolvedPixels": 0,
             "iterations": 896,
-            "relativeResidual": 9.970799969570518e-08,
+            "relativeResidual": 9.970799969570518e-8,
             "estimatedGraphBytes": 71221248,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3250,7 +3242,7 @@
             "unknownPixels": 51098,
             "unresolvedPixels": 0,
             "iterations": 242,
-            "relativeResidual": 8.89813444506732e-08,
+            "relativeResidual": 8.89813444506732e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3303,7 +3295,7 @@
             "unknownPixels": 72743,
             "unresolvedPixels": 0,
             "iterations": 278,
-            "relativeResidual": 9.350299414963425e-08,
+            "relativeResidual": 9.350299414963425e-8,
             "estimatedGraphBytes": 47480832,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3356,7 +3348,7 @@
             "unknownPixels": 25462,
             "unresolvedPixels": 0,
             "iterations": 81,
-            "relativeResidual": 7.939535600741961e-08,
+            "relativeResidual": 7.939535600741961e-8,
             "estimatedGraphBytes": 17145856,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3409,7 +3401,7 @@
             "unknownPixels": 47105,
             "unresolvedPixels": 0,
             "iterations": 158,
-            "relativeResidual": 9.710527513587793e-08,
+            "relativeResidual": 9.710527513587793e-8,
             "estimatedGraphBytes": 31653888,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3462,7 +3454,7 @@
             "unknownPixels": 49105,
             "unresolvedPixels": 0,
             "iterations": 193,
-            "relativeResidual": 9.431163801829545e-08,
+            "relativeResidual": 9.431163801829545e-8,
             "estimatedGraphBytes": 31653888,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3515,7 +3507,7 @@
             "unknownPixels": 73816,
             "unresolvedPixels": 0,
             "iterations": 281,
-            "relativeResidual": 9.592877211046312e-08,
+            "relativeResidual": 9.592877211046312e-8,
             "estimatedGraphBytes": 48799744,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3568,7 +3560,7 @@
             "unknownPixels": 65605,
             "unresolvedPixels": 0,
             "iterations": 184,
-            "relativeResidual": 9.790493642346164e-08,
+            "relativeResidual": 9.790493642346164e-8,
             "estimatedGraphBytes": 43524096,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3621,7 +3613,7 @@
             "unknownPixels": 98345,
             "unresolvedPixels": 0,
             "iterations": 402,
-            "relativeResidual": 9.573218672711326e-08,
+            "relativeResidual": 9.573218672711326e-8,
             "estimatedGraphBytes": 64626688,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3674,7 +3666,7 @@
             "unknownPixels": 63437,
             "unresolvedPixels": 0,
             "iterations": 187,
-            "relativeResidual": 9.355523439515233e-08,
+            "relativeResidual": 9.355523439515233e-8,
             "estimatedGraphBytes": 40886272,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3727,7 +3719,7 @@
             "unknownPixels": 90987,
             "unresolvedPixels": 0,
             "iterations": 247,
-            "relativeResidual": 9.563880966687102e-08,
+            "relativeResidual": 9.563880966687102e-8,
             "estimatedGraphBytes": 59351040,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3780,7 +3772,7 @@
             "unknownPixels": 59459,
             "unresolvedPixels": 0,
             "iterations": 220,
-            "relativeResidual": 9.795661479938897e-08,
+            "relativeResidual": 9.795661479938897e-8,
             "estimatedGraphBytes": 39567360,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3833,7 +3825,7 @@
             "unknownPixels": 80337,
             "unresolvedPixels": 0,
             "iterations": 339,
-            "relativeResidual": 9.226584047473268e-08,
+            "relativeResidual": 9.226584047473268e-8,
             "estimatedGraphBytes": 52756480,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3886,7 +3878,7 @@
             "unknownPixels": 153224,
             "unresolvedPixels": 0,
             "iterations": 504,
-            "relativeResidual": 9.882120071718243e-08,
+            "relativeResidual": 9.882120071718243e-8,
             "estimatedGraphBytes": 98918400,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3939,7 +3931,7 @@
             "unknownPixels": 210628,
             "unresolvedPixels": 0,
             "iterations": 1021,
-            "relativeResidual": 9.815063354471717e-08,
+            "relativeResidual": 9.815063354471717e-8,
             "estimatedGraphBytes": 135847936,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3994,9 +3986,7 @@
         "expectedCases": 36,
         "completedCases": 36,
         "successes": 35,
-        "failures": [
-          "GT13-Trimap2"
-        ]
+        "failures": ["GT13-Trimap2"]
       },
       "qualityMeans": {
         "0": {
@@ -4095,10 +4085,7 @@
         "preconditioner": "ic0",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -4122,7 +4109,7 @@
             "unknownPixels": 121014,
             "unresolvedPixels": 0,
             "iterations": 465,
-            "relativeResidual": 9.676088638142334e-08,
+            "relativeResidual": 9.676088638142334e-8,
             "estimatedGraphBytes": 79134720,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4175,7 +4162,7 @@
             "unknownPixels": 151510,
             "unresolvedPixels": 0,
             "iterations": 586,
-            "relativeResidual": 9.763828539219233e-08,
+            "relativeResidual": 9.763828539219233e-8,
             "estimatedGraphBytes": 97599488,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4228,7 +4215,7 @@
             "unknownPixels": 55831,
             "unresolvedPixels": 0,
             "iterations": 151,
-            "relativeResidual": 8.957708568300656e-08,
+            "relativeResidual": 8.957708568300656e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4281,7 +4268,7 @@
             "unknownPixels": 88082,
             "unresolvedPixels": 0,
             "iterations": 251,
-            "relativeResidual": 9.91064727299714e-08,
+            "relativeResidual": 9.91064727299714e-8,
             "estimatedGraphBytes": 58032128,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4334,7 +4321,7 @@
             "unknownPixels": 90208,
             "unresolvedPixels": 0,
             "iterations": 314,
-            "relativeResidual": 9.391964827032419e-08,
+            "relativeResidual": 9.391964827032419e-8,
             "estimatedGraphBytes": 59351040,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4387,7 +4374,7 @@
             "unknownPixels": 123891,
             "unresolvedPixels": 0,
             "iterations": 466,
-            "relativeResidual": 9.639902862648609e-08,
+            "relativeResidual": 9.639902862648609e-8,
             "estimatedGraphBytes": 80453632,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4440,7 +4427,7 @@
             "unknownPixels": 33836,
             "unresolvedPixels": 0,
             "iterations": 305,
-            "relativeResidual": 9.921462618167205e-08,
+            "relativeResidual": 9.921462618167205e-8,
             "estimatedGraphBytes": 22421504,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4493,7 +4480,7 @@
             "unknownPixels": 52464,
             "unresolvedPixels": 0,
             "iterations": 488,
-            "relativeResidual": 9.999980754993342e-08,
+            "relativeResidual": 9.999980754993342e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4546,7 +4533,7 @@
             "unknownPixels": 43538,
             "unresolvedPixels": 0,
             "iterations": 247,
-            "relativeResidual": 9.708836796684751e-08,
+            "relativeResidual": 9.708836796684751e-8,
             "estimatedGraphBytes": 29016064,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -4599,7 +4586,7 @@
             "unknownPixels": 61104,
             "unresolvedPixels": 0,
             "iterations": 216,
-            "relativeResidual": 9.414402233127247e-08,
+            "relativeResidual": 9.414402233127247e-8,
             "estimatedGraphBytes": 39567360,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4652,7 +4639,7 @@
             "unknownPixels": 56751,
             "unresolvedPixels": 0,
             "iterations": 313,
-            "relativeResidual": 9.609947717854475e-08,
+            "relativeResidual": 9.609947717854475e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4705,7 +4692,7 @@
             "unknownPixels": 93433,
             "unresolvedPixels": 0,
             "iterations": 402,
-            "relativeResidual": 9.578183800597916e-08,
+            "relativeResidual": 9.578183800597916e-8,
             "estimatedGraphBytes": 60669952,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4758,7 +4745,7 @@
             "unknownPixels": 121177,
             "unresolvedPixels": 0,
             "iterations": 903,
-            "relativeResidual": 9.608621604809358e-08,
+            "relativeResidual": 9.608621604809358e-8,
             "estimatedGraphBytes": 79134720,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4811,7 +4798,7 @@
             "unknownPixels": 194674,
             "unresolvedPixels": 0,
             "iterations": 1458,
-            "relativeResidual": 9.437490595084268e-08,
+            "relativeResidual": 9.437490595084268e-8,
             "estimatedGraphBytes": 126615552,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4864,7 +4851,7 @@
             "unknownPixels": 49174,
             "unresolvedPixels": 0,
             "iterations": 226,
-            "relativeResidual": 9.666569004814193e-08,
+            "relativeResidual": 9.666569004814193e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4917,7 +4904,7 @@
             "unknownPixels": 68323,
             "unresolvedPixels": 0,
             "iterations": 313,
-            "relativeResidual": 9.878882596441632e-08,
+            "relativeResidual": 9.878882596441632e-8,
             "estimatedGraphBytes": 44843008,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4970,7 +4957,7 @@
             "unknownPixels": 102471,
             "unresolvedPixels": 0,
             "iterations": 567,
-            "relativeResidual": 9.926646035441276e-08,
+            "relativeResidual": 9.926646035441276e-8,
             "estimatedGraphBytes": 67264512,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -5023,7 +5010,7 @@
             "unknownPixels": 141224,
             "unresolvedPixels": 0,
             "iterations": 1076,
-            "relativeResidual": 9.79006085250483e-08,
+            "relativeResidual": 9.79006085250483e-8,
             "estimatedGraphBytes": 91004928,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -5882,19 +5869,19 @@
         "pairedCases": 35,
         "baselineMean": 0.06549837690913059,
         "candidateMean": 0.06549838315955701,
-        "relativeChangePercent": 9.54287224796957e-06
+        "relativeChangePercent": 9.54287224796957e-6
       },
       "unknownMSE": {
         "pairedCases": 35,
         "baselineMean": 0.02561210107099236,
         "candidateMean": 0.02561211210300744,
-        "relativeChangePercent": 4.307344816378844e-05
+        "relativeChangePercent": 4.307344816378844e-5
       },
       "unknownSADDiv1000": {
         "pairedCases": 35,
         "baselineMean": 6.744820056022409,
         "candidateMean": 6.744821288515406,
-        "relativeChangePercent": 1.827317834823816e-05
+        "relativeChangePercent": 1.827317834823816e-5
       },
       "gaussianVectorGradientDiv1000": {
         "pairedCases": 35,
@@ -5906,7 +5893,7 @@
         "pairedCases": 35,
         "baselineMean": 0.5644266666666666,
         "candidateMean": 0.5644267787114846,
-        "relativeChangePercent": 1.9851085109046096e-05
+        "relativeChangePercent": 1.9851085109046096e-5
       }
     },
     "interpretation": "Per-metric changes use only matched successes; no universal quality improvement. Different successful populations must not be compared as aggregate quality gains."
@@ -5931,7 +5918,7 @@
       "reportSha256": "352c2b38a12898e08d01e87ce9956fecaa385e8b0d593265dbb3ada557d7ca46",
       "candidateAlphaSha256": "e64156d2e7e429acc76af09a9a870fafe69acf6e42df232b6f9179eb3deefe5a",
       "maximumByteError": 1,
-      "meanByteError": 3.5211267605633805e-05
+      "meanByteError": 3.5211267605633805e-5
     },
     {
       "case": "GT04-Trimap2",
@@ -5973,7 +5960,7 @@
       "reportSha256": "02ffe9c0a5c965d5a02d8ff1a03fb0d52094a5d6935de1bb4bdbe7a50d28f54b",
       "candidateAlphaSha256": "6ca923bcaa2287dea182a620d1c3a63888be629e8c1e57f92fad62e11b268ea2",
       "maximumByteError": 1,
-      "meanByteError": 6.343984962406015e-05
+      "meanByteError": 6.343984962406015e-5
     }
   ],
   "remaining": [
@@ -5990,16 +5977,13 @@
       "elapsedMs": 2831.7000000001863,
       "responseMs": 1,
       "revisionDelta": 1,
-      "longTasks": [
-        100,
-        73
-      ],
+      "longTasks": [100, 73],
       "solveLast": {
         "completed": 16,
         "total": 33,
         "phase": "solve",
         "iteration": 236,
-        "relativeResidual": 9.730174509213579e-08
+        "relativeResidual": 9.730174509213579e-8
       },
       "sourceUnchanged": true,
       "maximumByteError": 0,
@@ -6011,17 +5995,13 @@
       "elapsedMs": 46252.69999999995,
       "responseMs": 1.900000000023283,
       "revisionDelta": 1,
-      "longTasks": [
-        54,
-        129,
-        107
-      ],
+      "longTasks": [54, 129, 107],
       "solveLast": {
         "completed": 18,
         "total": 37,
         "phase": "solve",
         "iteration": 797,
-        "relativeResidual": 9.866888524811256e-08
+        "relativeResidual": 9.866888524811256e-8
       },
       "sourceUnchanged": true,
       "maximumByteError": 0,
@@ -6033,16 +6013,13 @@
       "elapsedMs": 6428.59999999986,
       "responseMs": 1.3000000000465661,
       "revisionDelta": 1,
-      "longTasks": [
-        87,
-        92
-      ],
+      "longTasks": [87, 92],
       "solveLast": {
         "completed": 18,
         "total": 37,
         "phase": "solve",
         "iteration": 339,
-        "relativeResidual": 9.226584047473268e-08
+        "relativeResidual": 9.226584047473268e-8
       },
       "sourceUnchanged": true,
       "maximumByteError": 0,
@@ -6139,7 +6116,7 @@
                   "unknownPixels": 218709,
                   "unresolvedPixels": 0,
                   "iterations": 797,
-                  "relativeResidual": 9.939132918623136e-08,
+                  "relativeResidual": 9.939132918623136e-8,
                   "estimatedGraphBytes": 141123584,
                   "preconditioner": "ic0",
                   "preconditionerShift": 0.1
@@ -6206,7 +6183,7 @@
                   "unknownPixels": 218709,
                   "unresolvedPixels": 0,
                   "iterations": 797,
-                  "relativeResidual": 9.939132918623136e-08,
+                  "relativeResidual": 9.939132918623136e-8,
                   "estimatedGraphBytes": 141123584,
                   "preconditioner": "ic0",
                   "preconditionerShift": 0.1
@@ -6273,7 +6250,7 @@
                   "unknownPixels": 218709,
                   "unresolvedPixels": 0,
                   "iterations": 797,
-                  "relativeResidual": 9.939132918623136e-08,
+                  "relativeResidual": 9.939132918623136e-8,
                   "estimatedGraphBytes": 141123584,
                   "preconditioner": "ic0",
                   "preconditionerShift": 0.1
@@ -6346,7 +6323,7 @@
                   "unknownPixels": 218709,
                   "unresolvedPixels": 0,
                   "iterations": 797,
-                  "relativeResidual": 9.866888524811256e-08,
+                  "relativeResidual": 9.866888524811256e-8,
                   "estimatedGraphBytes": 141123584,
                   "preconditioner": "ic0",
                   "preconditionerShift": 0.1
@@ -6413,7 +6390,7 @@
                   "unknownPixels": 218709,
                   "unresolvedPixels": 0,
                   "iterations": 797,
-                  "relativeResidual": 9.866888524811256e-08,
+                  "relativeResidual": 9.866888524811256e-8,
                   "estimatedGraphBytes": 141123584,
                   "preconditioner": "ic0",
                   "preconditionerShift": 0.1
@@ -6480,7 +6457,7 @@
                   "unknownPixels": 218709,
                   "unresolvedPixels": 0,
                   "iterations": 797,
-                  "relativeResidual": 9.866888524811256e-08,
+                  "relativeResidual": 9.866888524811256e-8,
                   "estimatedGraphBytes": 141123584,
                   "preconditioner": "ic0",
                   "preconditionerShift": 0.1
@@ -6538,9 +6515,7 @@
     "corpusMatteComparison": {
       "complete": true,
       "pairedOutputs": 106,
-      "candidateFailures": [
-        "GT13-Trimap2"
-      ],
+      "candidateFailures": ["GT13-Trimap2"],
       "maximumByteDifference": 1,
       "maximumImageMeanByteDifference": 0.00048453996983408747,
       "rows": [
@@ -6584,7 +6559,7 @@
           "id": "GT02-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.770992366412214e-06,
+          "meanByteDifference": 4.770992366412214e-6,
           "changedPixels": 2,
           "baselineSha256": "dfb65b0bdb30d8258d30f234f2a68bd1607bf478c2ecec5e27e6ab5d75405cc6",
           "candidateSha256": "a773cb419bc2ba099f855cc70de7aca87d897cf86aeeee5e95f22afcabe906eb"
@@ -6593,7 +6568,7 @@
           "id": "GT02-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.770992366412214e-06,
+          "meanByteDifference": 4.770992366412214e-6,
           "changedPixels": 2,
           "baselineSha256": "3d32cf63b0c6759dc3ac7c5b3a1ec80d552f8d9e1245e97aa627884c3de646c6",
           "candidateSha256": "071830b7fd9a50da4735022ed6ff7e6f9031c06876118d60534b976fe633588f"
@@ -6602,7 +6577,7 @@
           "id": "GT02-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.770992366412214e-06,
+          "meanByteDifference": 4.770992366412214e-6,
           "changedPixels": 2,
           "baselineSha256": "106fe759db27ae6d0d59fac6763216cdc093afaa27e8a26504d4066e6b2a8f05",
           "candidateSha256": "205c41200c30ab065a294f819a2fef700090dafe9d0f9ab08d781c6f967f9e68"
@@ -6611,7 +6586,7 @@
           "id": "GT02-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.770992366412214e-06,
+          "meanByteDifference": 4.770992366412214e-6,
           "changedPixels": 2,
           "baselineSha256": "524dd52a3fd0871e3590beefe5fa7dd904c8aa2c60024729daa22843794a5f7e",
           "candidateSha256": "eb15920d7ae3c2ce5d649f2df12ea4b88893ca0d8c8f3a056124401c594cd8f9"
@@ -6692,7 +6667,7 @@
           "id": "GT07-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.0453074433656955e-06,
+          "meanByteDifference": 4.0453074433656955e-6,
           "changedPixels": 2,
           "baselineSha256": "8d213d06293cea2f9d5a829d549138d4708e8ff5302c76f384855cd1a339eb28",
           "candidateSha256": "d8e2b5de0c5373005bd647ba8e942561c662e00c7dabc12de12d0f83c7692caf"
@@ -6701,7 +6676,7 @@
           "id": "GT07-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.0453074433656955e-06,
+          "meanByteDifference": 4.0453074433656955e-6,
           "changedPixels": 2,
           "baselineSha256": "3bfb9b81a9906e7a9f66c4baa8a63ad151e9fe620f4ec8d1ba852762ec47105e",
           "candidateSha256": "9010253e2c804895317bedbb421a6f6e69cef50b787b99029b25b7d6bb028ebd"
@@ -6728,7 +6703,7 @@
           "id": "GT08-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 7.727975270479134e-06,
+          "meanByteDifference": 7.727975270479134e-6,
           "changedPixels": 4,
           "baselineSha256": "8532eb7c50ccb876e989248ae6bc579e7076cf461eb784e20ec42b813ee8acdd",
           "candidateSha256": "3c33e6715b2fe05c9f1cb4386f7b60757388c54f2832841ca77006757b1bf0b9"
@@ -6737,7 +6712,7 @@
           "id": "GT08-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 7.727975270479134e-06,
+          "meanByteDifference": 7.727975270479134e-6,
           "changedPixels": 4,
           "baselineSha256": "902633c81adcdbf627f46d7190aff215699cdbfb7a52057ef5eeb78f44bb9aa1",
           "candidateSha256": "852db3e5fef490fe4e2bdf8ef943105599010aac75377e706634eabd3e8c658e"
@@ -6764,7 +6739,7 @@
           "id": "GT10-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.189141856392294e-06,
+          "meanByteDifference": 2.189141856392294e-6,
           "changedPixels": 1,
           "baselineSha256": "1acadc1d30e47e85d419ec499f4c35c08e0462103c1d72a4f7e39c2ce1835738",
           "candidateSha256": "84f4bfd38650a1d91c5a3e06215b317c564a341d9f5e154da3282ce0f998cf20"
@@ -6773,7 +6748,7 @@
           "id": "GT10-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.189141856392294e-06,
+          "meanByteDifference": 2.189141856392294e-6,
           "changedPixels": 1,
           "baselineSha256": "29b4d40f4a40a33fd312774418fc9c35ff2efe6067dc3b4c7e5d156b80db60ae",
           "candidateSha256": "850ca78779f7be28183fe9c7a6856804a9ed92df341b1821da03cc7e5404ba96"
@@ -6782,7 +6757,7 @@
           "id": "GT10-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.189141856392294e-06,
+          "meanByteDifference": 2.189141856392294e-6,
           "changedPixels": 1,
           "baselineSha256": "4f42b1c49ac0f4f3e44306805d2bd20e0467825b700ab6240b79a88c41af8d3c",
           "candidateSha256": "6610ebaf12361bedf288b9aeb1c6726807c0ea57f4b920d78d8b26b9789d8008"
@@ -6791,7 +6766,7 @@
           "id": "GT10-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.189141856392294e-06,
+          "meanByteDifference": 2.189141856392294e-6,
           "changedPixels": 1,
           "baselineSha256": "1dfa9df241b6cbbf800a8e3190d26d26fd11c49b56d4a4a8bbee5603de77c12d",
           "candidateSha256": "1052e4c4caf06315c4c4a7430ab5c11c12a8663c837311e2fb805ed9bfeba711"
@@ -6836,7 +6811,7 @@
           "id": "GT13-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 6.722689075630252e-05,
+          "meanByteDifference": 6.722689075630252e-5,
           "changedPixels": 32,
           "baselineSha256": "61f0571b9642a51771e5baceea972f95f112a6c2a6ed39ba25697b1db45cf2dd",
           "candidateSha256": "605e8da79036bca0b9c6b7b95126d3fed402dc386734a68e3107f3f23e87c6e8"
@@ -6845,7 +6820,7 @@
           "id": "GT13-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 7.142857142857143e-05,
+          "meanByteDifference": 7.142857142857143e-5,
           "changedPixels": 34,
           "baselineSha256": "77568ac61f8d304cdc5bc3d8861678edfa86ee746e6a98a60eeb9732f2a9f5c5",
           "candidateSha256": "48e1372125288a122c7d4bd9f5ffae212a2f60d3eb485de9bb5747dfe919cabe"
@@ -6890,7 +6865,7 @@
           "id": "GT16-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.332089552238806e-06,
+          "meanByteDifference": 2.332089552238806e-6,
           "changedPixels": 1,
           "baselineSha256": "8010c66e99307a7c06c251da50012f31128033f5d4f9619128bfd894f359f4c3",
           "candidateSha256": "1fd4347fed83f403c4a38659e6865e69796fd236779bcac90173fed26c65200a"
@@ -6899,7 +6874,7 @@
           "id": "GT16-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.332089552238806e-06,
+          "meanByteDifference": 2.332089552238806e-6,
           "changedPixels": 1,
           "baselineSha256": "8790fb7f5b0d8f3d8dd49a57a208c3ad60610c52372777b5afe962b00b6a322c",
           "candidateSha256": "06ac139da05f0cbd2c2f6522ae213c5dcec108c70665892f53d966b00c5f5961"
@@ -6908,7 +6883,7 @@
           "id": "GT16-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.632462686567164e-05,
+          "meanByteDifference": 1.632462686567164e-5,
           "changedPixels": 7,
           "baselineSha256": "e56a29ec937c791245ac6970509507dde7bf5f99929745837ba271f592c56758",
           "candidateSha256": "90e3d9340902b0adc9b4499005f2bf027d8da1994affc84aea735583ae407687"
@@ -6917,7 +6892,7 @@
           "id": "GT16-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.632462686567164e-05,
+          "meanByteDifference": 1.632462686567164e-5,
           "changedPixels": 7,
           "baselineSha256": "e032b74d6f8b0e26bd413b661efe5942622f90a31b15323b243b8775ea8eb434",
           "candidateSha256": "07ac8313fe31c9baabafcec9cc34334970640e2f31fd6aedea4fc148c3f9fd05"
@@ -7034,7 +7009,7 @@
           "id": "GT22-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.7385257301808067e-06,
+          "meanByteDifference": 1.7385257301808067e-6,
           "changedPixels": 1,
           "baselineSha256": "e0f8ea2c37657caf7b34d452a907575656a5bfe965b98545b763606a873d8820",
           "candidateSha256": "14dc7e060345a044caead70ba0994dc5febf90f7f8d65a2367378b2ff65d2ace"
@@ -7043,7 +7018,7 @@
           "id": "GT22-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.7385257301808067e-06,
+          "meanByteDifference": 1.7385257301808067e-6,
           "changedPixels": 1,
           "baselineSha256": "90b3e8ab423fec71971ca0b57c74dc0aa7b3aca86c67ee12feac9b8f98d90243",
           "candidateSha256": "3006760ebb6803441f8cd8736f830b280c9c6d2c66af63dede564afc3627048a"
@@ -7052,7 +7027,7 @@
           "id": "GT22-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.7385257301808067e-06,
+          "meanByteDifference": 1.7385257301808067e-6,
           "changedPixels": 1,
           "baselineSha256": "e3ebcf5ea5752ef864b62dedd81bf9d58746c7bc4e72aad8ae0ac6f13087114e",
           "candidateSha256": "8a7b1d20d68ccdc2d217b428c4de2805e78583bfd66c96b905f79d470d6c9e24"
@@ -7061,7 +7036,7 @@
           "id": "GT22-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.7385257301808067e-06,
+          "meanByteDifference": 1.7385257301808067e-6,
           "changedPixels": 1,
           "baselineSha256": "36ceddc8b77a7775c810018d85fb2bc8a3df8e24258d53f40a336dda689898cd",
           "candidateSha256": "269091f9f4062d6b47512cec6d4bce78d15ebf8ce3dfa363c0731adcaf832e5e"
@@ -7088,7 +7063,7 @@
           "id": "GT23-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 3.4965034965034966e-06,
+          "meanByteDifference": 3.4965034965034966e-6,
           "changedPixels": 2,
           "baselineSha256": "dba289932341fabc08f69eb16eda2138a6cb7e4d1f45755bca727291f181fc7d",
           "candidateSha256": "81cb3e3ba03f9c9ae1ce9196064e489d3115554d87c86b73ee92ebafaedf767f"
@@ -7097,7 +7072,7 @@
           "id": "GT23-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 3.4965034965034966e-06,
+          "meanByteDifference": 3.4965034965034966e-6,
           "changedPixels": 2,
           "baselineSha256": "6c9aa4b4b0a7c3ac4f75369a5fd1a42e87d2526059e099b1a06b72286108bd61",
           "candidateSha256": "06208df54e96956178ffef6d9dc636f27cd6ef65d48019303cb79bcb44e75356"
@@ -7124,7 +7099,7 @@
           "id": "GT25-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.349624060150376e-06,
+          "meanByteDifference": 2.349624060150376e-6,
           "changedPixels": 1,
           "baselineSha256": "0b3e964d2fe50b9ddefe614c2e682c802fccdee74c4499d7290fe00d0e6c57e5",
           "candidateSha256": "6ca923bcaa2287dea182a620d1c3a63888be629e8c1e57f92fad62e11b268ea2"
@@ -7133,7 +7108,7 @@
           "id": "GT25-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.349624060150376e-06,
+          "meanByteDifference": 2.349624060150376e-6,
           "changedPixels": 1,
           "baselineSha256": "011c98b83a1b25a8789242534d7a25cd378bb1212576f8f457f62b29ee062e09",
           "candidateSha256": "8eb05bd4c7e7d7a1436b5fc3c4b5bb822d688d1862426d14c9aab53b182dff42"
@@ -7304,7 +7279,7 @@
           "id": "GT12-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.743833017077799e-06,
+          "meanByteDifference": 4.743833017077799e-6,
           "changedPixels": 2,
           "baselineSha256": "f46234483c8e98ab4e7146d3883ad83701948d5f532ee2b75b46828a275bb936",
           "candidateSha256": "2ed1914413fc94875275192a7f250e5673b4c40d18ec57498b80c3061f23fa7c"
@@ -7313,7 +7288,7 @@
           "id": "GT12-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 4.743833017077799e-06,
+          "meanByteDifference": 4.743833017077799e-6,
           "changedPixels": 2,
           "baselineSha256": "e5a2642783f0a9e5b7a4371f949e4fe384713272a4e6bff428297f4632c572df",
           "candidateSha256": "42a01802e98a1b14574c1ead8e8a4a0562734263047a2841ec7d5c77f4f158d4"
@@ -7322,7 +7297,7 @@
           "id": "GT15-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.5510204081632653e-06,
+          "meanByteDifference": 2.5510204081632653e-6,
           "changedPixels": 1,
           "baselineSha256": "f42e065e1f5d2c8772f7fd96a02bd978e2a3a0d73e889f9fb0c1ddb7539a3f22",
           "candidateSha256": "68163b9db02dfa968bc76172b77d35587ea2a21d162eaa54c2ae6184249f3839"
@@ -7331,7 +7306,7 @@
           "id": "GT15-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 2.5510204081632653e-06,
+          "meanByteDifference": 2.5510204081632653e-6,
           "changedPixels": 1,
           "baselineSha256": "a6bcc53a5465e761d5c2e5cfdc8b749b3b24e8a22798b8ba1543c1cfe86b5f26",
           "candidateSha256": "2e06e25239ce293c59daa716aa6524565ab65f7612de8c46e071f0985484550f"
@@ -7376,7 +7351,7 @@
           "id": "GT18-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.1609907120743033e-05,
+          "meanByteDifference": 1.1609907120743033e-5,
           "changedPixels": 6,
           "baselineSha256": "8ae8c59310c1c6441c92318ae572e9b806cd6d6a56e1fcd54bb2e72847b5d26d",
           "candidateSha256": "244b194579c55a10dd35a824cfd3ee7fc204f5eef8e147a16b71b6d1f525aaf3"
@@ -7385,7 +7360,7 @@
           "id": "GT18-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.1609907120743033e-05,
+          "meanByteDifference": 1.1609907120743033e-5,
           "changedPixels": 6,
           "baselineSha256": "45269e4e972e2fe8630ea3ca26c6f484389cb714d3cc4cb1b7daef2fbe4a5d8c",
           "candidateSha256": "4df70dad9511d7b44405b2ad924400a040758bbd71281737c927aafc861179ed"
@@ -7394,7 +7369,7 @@
           "id": "GT21-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.5082956259426848e-05,
+          "meanByteDifference": 1.5082956259426848e-5,
           "changedPixels": 8,
           "baselineSha256": "f57cff04df05275a9b6bb83cd1d63c60e9e69c667ec7f31d5adb0597f0978063",
           "candidateSha256": "a9c4b718004f38560fdc1e901f7a7a825cee1149de56d57732420ae2ff53e368"
@@ -7403,7 +7378,7 @@
           "id": "GT21-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.3197586726998491e-05,
+          "meanByteDifference": 1.3197586726998491e-5,
           "changedPixels": 7,
           "baselineSha256": "e987d0cfaf9869c268440bbc8726df97d2cdfdec8db0bf060c05a4e2b1c1e717",
           "candidateSha256": "e1d3fd5e90eb56548f9b98f43412fe823811671a3017083f94d521b461e19f86"
@@ -7430,7 +7405,7 @@
           "id": "GT24-Trimap1",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 9.208103130755064e-06,
+          "meanByteDifference": 9.208103130755064e-6,
           "changedPixels": 4,
           "baselineSha256": "4e2a373b109570a1b18f80e492a7204afaba8573d84b62a99db8fa6b0af295c6",
           "candidateSha256": "94fd832ba8596cd3e21cd48d20f611682212f9267b4a353f8f93019d2db0b673"
@@ -7439,7 +7414,7 @@
           "id": "GT24-Trimap1",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 9.208103130755064e-06,
+          "meanByteDifference": 9.208103130755064e-6,
           "changedPixels": 4,
           "baselineSha256": "6aa017c8f2367b93ec44b3cb11d69422ba0c5bfc2e39c389892b8e6d94776732",
           "candidateSha256": "ed1698b777409a61d155081c60fab6a980df6ccaf6da7937ab2f2c30d1a91a28"
@@ -7448,7 +7423,7 @@
           "id": "GT24-Trimap2",
           "smoothness": 0,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.151012891344383e-05,
+          "meanByteDifference": 1.151012891344383e-5,
           "changedPixels": 5,
           "baselineSha256": "a9676903b325dd07767474d3ca6071282e341794d2d8391681622b1e34ea0659",
           "candidateSha256": "b73c2652811a7e4e33731acd9a838fe8775905df37360f519a13c4e7c0bae783"
@@ -7457,7 +7432,7 @@
           "id": "GT24-Trimap2",
           "smoothness": 10,
           "maximumByteDifference": 1,
-          "meanByteDifference": 1.151012891344383e-05,
+          "meanByteDifference": 1.151012891344383e-5,
           "changedPixels": 5,
           "baselineSha256": "5cb0422991c8784a76ea44348077b9ac89736f28a4976fef974904ce444f4796",
           "candidateSha256": "dd618f94faa20105f1b396e7db7a24f2a0219e707843be8518212faf6c046701"
@@ -7548,7 +7523,7 @@
         "total": 3161,
         "phase": "solve",
         "iteration": 209,
-        "relativeResidual": 4.3791887041804874e-08
+        "relativeResidual": 4.3791887041804874e-8
       },
       "longTasks": [
         {
@@ -7580,7 +7555,7 @@
               "unknownPixels": 143935,
               "unresolvedPixels": 0,
               "iterations": 1506,
-              "relativeResidual": 9.777129000333398e-08,
+              "relativeResidual": 9.777129000333398e-8,
               "estimatedGraphBytes": 93642752,
               "preconditioner": "ic0",
               "preconditionerShift": 0.02
@@ -7596,7 +7571,7 @@
               "total": 41,
               "phase": "solve",
               "iteration": 2000,
-              "relativeResidual": 1.725221192189556e-07
+              "relativeResidual": 1.725221192189556e-7
             },
             "elapsedMs": 106709.52893000001
           }
@@ -7612,7 +7587,7 @@
               "unknownPixels": 143935,
               "unresolvedPixels": 0,
               "iterations": 1652,
-              "relativeResidual": 9.634897723382966e-08,
+              "relativeResidual": 9.634897723382966e-8,
               "estimatedGraphBytes": 93642752,
               "preconditioner": "ic0",
               "preconditionerShift": 0.01333521432163324
@@ -7628,7 +7603,7 @@
               "total": 41,
               "phase": "solve",
               "iteration": 2000,
-              "relativeResidual": 6.317741105637142e-07
+              "relativeResidual": 6.317741105637142e-7
             },
             "elapsedMs": 79793.638396
           }

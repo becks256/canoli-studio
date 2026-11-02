@@ -1,17 +1,17 @@
 import { LutControls } from "./LutControls";
-import {PerspectiveControls} from './PerspectiveControls';
-import {clippingBaseFor} from '../core/clipping';
+import { PerspectiveControls } from "./PerspectiveControls";
+import { clippingBaseFor } from "../core/clipping";
 import { RedEyeControls } from "./RedEyeControls";
 import { WhiteBalanceControls } from "./WhiteBalanceControls";
 import { GradientMapControls } from "./GradientMapControls";
 import { LayerCompsPanel } from "./LayerCompsPanel";
-import {ParagraphStylesPanel} from './ParagraphStylesPanel';
-import { AlphaChannelsPanel } from './AlphaChannelsPanel';
+import { ParagraphStylesPanel } from "./ParagraphStylesPanel";
+import { AlphaChannelsPanel } from "./AlphaChannelsPanel";
 import { ChromaticAdjustmentControls } from "./ChromaticAdjustmentControls";
 import { SmartFilterMaskPanel } from "./SmartFilterMaskPanel";
 import { SmartFiltersPanel } from "./SmartFiltersPanel";
-import {FrequencyRadiusControls} from './FrequencyRadiusControls';
-import {frequencyRadiusOwner} from '../core/frequency-separation';
+import { FrequencyRadiusControls } from "./FrequencyRadiusControls";
+import { frequencyRadiusOwner } from "../core/frequency-separation";
 import { GuidesPanel } from "./GuidesPanel";
 import { AffineTransform } from "../core/affine";
 import { layerBounds, layerTransform, parentId } from "../core/spatial";
@@ -38,11 +38,23 @@ import {
   AdjustmentLayer,
 } from "../dom";
 import type { Layer } from "../dom";
-import {GROUP_BLEND_MODES, type LayerBlendMode, type DocumentData, type LayerData} from "../core/model";
+import {
+  GROUP_BLEND_MODES,
+  type LayerBlendMode,
+  type DocumentData,
+  type LayerData,
+} from "../core/model";
 import { BLEND_MODES, allLayers, findParent, toneOf } from "../core/model";
 import { defaultStyle } from "../core/drawing";
 import type { EditorCommand } from "../core/commands";
-import { Button, IconButton, NumberField, Select, Slider, TextInput } from "./controls";
+import {
+  Button,
+  IconButton,
+  NumberField,
+  Select,
+  Slider,
+  TextInput,
+} from "./controls";
 import { InspectorSection } from "./InspectorSection";
 import { PathProperties } from "./ToolOptions";
 import { LayerStylesPanel } from "./LayerStylesPanel";
@@ -62,11 +74,17 @@ import {
   defaultLevelsAdjustment,
   defaultToneAdjustment,
 } from "../core/adjustments";
-import { computeHistogram,computeFloatHistogram, adjustmentBackdrop } from "../core/histogram";
+import {
+  computeHistogram,
+  computeFloatHistogram,
+  adjustmentBackdrop,
+} from "../core/histogram";
 import type { HistogramData } from "../core/histogram";
 
 export interface InspectorPanelProps {
-  perspectiveEditing:boolean;canEditPerspective:boolean;onTogglePerspective():void;
+  perspectiveEditing: boolean;
+  canEditPerspective: boolean;
+  onTogglePerspective(): void;
   guidesVisible: boolean;
   onGuidesVisible(value: boolean): void;
   assets: AssetStore;
@@ -84,12 +102,14 @@ export interface InspectorPanelProps {
   onSelectedAction(action: (layer: Layer) => void): void;
   onOpenHelp(): void;
   onCombinePaths(): void;
-  onManageFonts():void;
-  onDevelopRaw(layer:SmartObjectLayer):void;
+  onManageFonts(): void;
+  onDevelopRaw(layer: SmartObjectLayer): void;
 }
 
 export function InspectorPanel({
-  perspectiveEditing,canEditPerspective,onTogglePerspective,
+  perspectiveEditing,
+  canEditPerspective,
+  onTogglePerspective,
   guidesVisible,
   onGuidesVisible,
   assets,
@@ -110,9 +130,13 @@ export function InspectorPanel({
   onManageFonts,
   onDevelopRaw,
 }: InspectorPanelProps) {
-  const float=dom.precision==='float32';
-  const frequencyOwner=selected?frequencyRadiusOwner(viewDocument,selected.id):null;
-  const frequencyGroup=frequencyOwner?dom.getLayer(frequencyOwner.id) as LayerGroup:null;
+  const float = dom.precision === "float32";
+  const frequencyOwner = selected
+    ? frequencyRadiusOwner(viewDocument, selected.id)
+    : null;
+  const frequencyGroup = frequencyOwner
+    ? (dom.getLayer(frequencyOwner.id) as LayerGroup)
+    : null;
   const tone = selected?.kind === "raster" ? toneOf(selected) : null;
   const selectedWorld = selected
     ? layerTransform(viewDocument, selected.id)
@@ -159,20 +183,60 @@ export function InspectorPanel({
     if (!backdrop) return;
     const renderer = new CanvasRenderer();
     let cancelled = false;
-    void (async()=>{
-      if(backdrop.precision==='float32'){
-        const scale=Math.min(1,256/backdrop.width,256/backdrop.height),width=Math.max(1,Math.round(backdrop.width*scale)),height=Math.max(1,Math.round(backdrop.height*scale));
-        const scene=await renderer.captureFloatScene(backdrop,assets,{isCancelled:()=>cancelled});try{const samples=await scene.read({x:0,y:0,width,height},{region:{x:0,y:0,width:backdrop.width,height:backdrop.height},width,height});if(!cancelled)setHistogram(computeFloatHistogram(samples));}finally{scene.dispose();}return;
+    void (async () => {
+      if (backdrop.precision === "float32") {
+        const scale = Math.min(1, 256 / backdrop.width, 256 / backdrop.height),
+          width = Math.max(1, Math.round(backdrop.width * scale)),
+          height = Math.max(1, Math.round(backdrop.height * scale));
+        const scene = await renderer.captureFloatScene(backdrop, assets, {
+          isCancelled: () => cancelled,
+        });
+        try {
+          const samples = await scene.read(
+            { x: 0, y: 0, width, height },
+            {
+              region: {
+                x: 0,
+                y: 0,
+                width: backdrop.width,
+                height: backdrop.height,
+              },
+              width,
+              height,
+            },
+          );
+          if (!cancelled) setHistogram(computeFloatHistogram(samples));
+        } finally {
+          scene.dispose();
+        }
+        return;
       }
-      const canvas=await renderer.render(backdrop,assets,{cache:false,readback:true,maxDimension:256,maxPixels:65536});
-      try{if(!cancelled)setHistogram(computeHistogram(canvas.getContext('2d')!.getImageData(0,0,canvas.width,canvas.height).data));}finally{canvas.width=canvas.height=0;}
+      const canvas = await renderer.render(backdrop, assets, {
+        cache: false,
+        readback: true,
+        maxDimension: 256,
+        maxPixels: 65536,
+      });
+      try {
+        if (!cancelled)
+          setHistogram(
+            computeHistogram(
+              canvas
+                .getContext("2d")!
+                .getImageData(0, 0, canvas.width, canvas.height).data,
+            ),
+          );
+      } finally {
+        canvas.width = canvas.height = 0;
+      }
     })()
       .catch(() => {
         if (!cancelled) setHistogram(null);
       })
       .finally(() => renderer.dispose());
     return () => {
-      cancelled = true;renderer.dispose();
+      cancelled = true;
+      renderer.dispose();
     };
   }, [selected?.id, selected?.kind, viewDocument, assets]);
 
@@ -226,7 +290,21 @@ export function InspectorPanel({
               </div>
             )}
           </InspectorSection>
-          {(selected.kind==='raster'||selected.kind==='smart-object')&&(selectedObject instanceof RasterLayer||selectedObject instanceof SmartObjectLayer)&&<PerspectiveControls editing={perspectiveEditing} canEdit={canEditPerspective} onToggleEditing={onTogglePerspective} layer={selectedObject} selected={selected} disabled={locked||busy} onPreview={onPreview} onAttempt={onAttempt} onSelectedAction={onSelectedAction}/>}
+          {(selected.kind === "raster" || selected.kind === "smart-object") &&
+            (selectedObject instanceof RasterLayer ||
+              selectedObject instanceof SmartObjectLayer) && (
+              <PerspectiveControls
+                editing={perspectiveEditing}
+                canEdit={canEditPerspective}
+                onToggleEditing={onTogglePerspective}
+                layer={selectedObject}
+                selected={selected}
+                disabled={locked || busy}
+                onPreview={onPreview}
+                onAttempt={onAttempt}
+                onSelectedAction={onSelectedAction}
+              />
+            )}
           <InspectorSection title="Layout">
             <div className="field-grid">
               <NumberField
@@ -338,20 +416,62 @@ export function InspectorPanel({
               }
             />
           </InspectorSection>
-          {frequencyGroup&&frequencyOwner?.frequencyRadius!=null&&<FrequencyRadiusControls key={`${dom.id}:${frequencyGroup.id}`} document={dom} group={frequencyGroup} value={frequencyOwner.frequencyRadius} busy={busy} onPreview={onPreview} onAttempt={onAttempt}/>}
+          {frequencyGroup && frequencyOwner?.frequencyRadius != null && (
+            <FrequencyRadiusControls
+              key={`${dom.id}:${frequencyGroup.id}`}
+              document={dom}
+              group={frequencyGroup}
+              value={frequencyOwner.frequencyRadius}
+              busy={busy}
+              onPreview={onPreview}
+              onAttempt={onAttempt}
+            />
+          )}
           <InspectorSection title="Appearance">
-            <label className="check-field"><input type="checkbox" checked={selected.clipped??false}
-              disabled={locked||busy||(!selected.clipped&&!clippingBaseFor(dom._read().children,selected.id))}
-              onChange={event=>{onPreview(null);const value=event.target.checked;onSelectedAction(layer=>{layer.clipped=value;});}}/>Clip to base layer</label>
-            {selected.clipped&&<p className="panel-description">{clippingBaseFor(dom._read().children,selected.id)?.name??'No base layer'} controls this layer’s visible area.</p>}
-            {selected.blendMode==='pass-through'&&<p className="panel-description">Pass-through blends with surrounding layers unless this group is a clipping base. Choose Normal to use group styles or fill opacity.</p>}
+            <label className="check-field">
+              <input
+                type="checkbox"
+                checked={selected.clipped ?? false}
+                disabled={
+                  locked ||
+                  busy ||
+                  (!selected.clipped &&
+                    !clippingBaseFor(dom._read().children, selected.id))
+                }
+                onChange={(event) => {
+                  onPreview(null);
+                  const value = event.target.checked;
+                  onSelectedAction((layer) => {
+                    layer.clipped = value;
+                  });
+                }}
+              />
+              Clip to base layer
+            </label>
+            {selected.clipped && (
+              <p className="panel-description">
+                {clippingBaseFor(dom._read().children, selected.id)?.name ??
+                  "No base layer"}{" "}
+                controls this layer’s visible area.
+              </p>
+            )}
+            {selected.blendMode === "pass-through" && (
+              <p className="panel-description">
+                Pass-through blends with surrounding layers unless this group is
+                a clipping base. Choose Normal to use group styles or fill
+                opacity.
+              </p>
+            )}
             <Select
               label="Blend mode"
               hideLabel
               className="wide-select"
               value={selected.blendMode}
               disabled={locked || busy}
-              options={(selected.kind==='group'?GROUP_BLEND_MODES:BLEND_MODES).map((mode) => ({
+              options={(selected.kind === "group"
+                ? GROUP_BLEND_MODES
+                : BLEND_MODES
+              ).map((mode) => ({
                 value: mode,
                 label:
                   mode[0].toUpperCase() + mode.slice(1).replaceAll("-", " "),
@@ -362,7 +482,14 @@ export function InspectorPanel({
                 })
               }
             />
-            {float&&selected.blendMode!=='normal'&&selected.blendMode!=='pass-through'&&<p className="panel-description">This blend uses the normal SDR color range. Choose Normal to retain extended-range colors.</p>}
+            {float &&
+              selected.blendMode !== "normal" &&
+              selected.blendMode !== "pass-through" && (
+                <p className="panel-description">
+                  This blend uses the normal SDR color range. Choose Normal to
+                  retain extended-range colors.
+                </p>
+              )}
             <Slider
               label="Opacity"
               value={selected.opacity * 100}
@@ -390,7 +517,7 @@ export function InspectorPanel({
               min={0}
               max={100}
               suffix="%"
-              disabled={locked || busy || selected.blendMode==='pass-through'}
+              disabled={locked || busy || selected.blendMode === "pass-through"}
               onPreview={(value) =>
                 onPreview({
                   type: "layer.update",
@@ -405,7 +532,17 @@ export function InspectorPanel({
               }
             />
           </InspectorSection>
-          {selectedObject instanceof SmartObjectLayer&&selectedObject.rawDevelopment&&<InspectorSection title="RAW development"><Button disabled={locked||busy} onClick={()=>onDevelopRaw(selectedObject)}>Develop RAW…</Button></InspectorSection>}
+          {selectedObject instanceof SmartObjectLayer &&
+            selectedObject.rawDevelopment && (
+              <InspectorSection title="RAW development">
+                <Button
+                  disabled={locked || busy}
+                  onClick={() => onDevelopRaw(selectedObject)}
+                >
+                  Develop RAW…
+                </Button>
+              </InspectorSection>
+            )}
           {selected.kind === "smart-object" &&
             selectedObject instanceof SmartObjectLayer && (
               <SmartFiltersPanel
@@ -413,7 +550,7 @@ export function InspectorPanel({
                 document={dom}
                 layer={selectedObject}
                 value={selected.smartFilters ?? []}
-                sharedRadius={frequencyOwner?.frequencyRadius??undefined}
+                sharedRadius={frequencyOwner?.frequencyRadius ?? undefined}
                 disabled={locked || busy || !wasmReady}
                 onPreview={onPreview}
                 onAttempt={onAttempt}
@@ -448,13 +585,32 @@ export function InspectorPanel({
             />
           )}
           {selectedObject instanceof VectorLayer && (
-            <InspectorSection title="Boolean paths"><Button disabled={busy||locked} onClick={onCombinePaths}>Combine vector paths…</Button></InspectorSection>
+            <InspectorSection title="Boolean paths">
+              <Button disabled={busy || locked} onClick={onCombinePaths}>
+                Combine vector paths…
+              </Button>
+            </InspectorSection>
           )}
           {selectedObject instanceof VectorLayer && (
             <PathProperties
               layer={selectedObject}
-              anchorCount={selected.kind === "vector" ?
-                (() => { const path = selected.paths.find(path => path.id === selectedPathId) ?? selected.paths.at(-1); return path ? path.points.length + (path.subpaths ?? []).reduce((sum, c) => sum + c.points.length, 0) : 0; })() : 0}
+              anchorCount={
+                selected.kind === "vector"
+                  ? (() => {
+                      const path =
+                        selected.paths.find(
+                          (path) => path.id === selectedPathId,
+                        ) ?? selected.paths.at(-1);
+                      return path
+                        ? path.points.length +
+                            (path.subpaths ?? []).reduce(
+                              (sum, c) => sum + c.points.length,
+                              0,
+                            )
+                        : 0;
+                    })()
+                  : 0
+              }
               path={
                 selectedObject.paths.get(selectedPathId ?? "") ??
                 selectedObject.paths.at(selectedObject.paths.length - 1)
@@ -467,7 +623,11 @@ export function InspectorPanel({
                 })
               }
               onPreview={onPreview}
-              previewGradient={preview?.type === "path.update" && preview.id === selected.id ? preview.patch.fillGradient : undefined}
+              previewGradient={
+                preview?.type === "path.update" && preview.id === selected.id
+                  ? preview.patch.fillGradient
+                  : undefined
+              }
               previewStrokeWidth={
                 preview?.type === "path.update" && preview.id === selected.id
                   ? preview.patch.strokeWidth
@@ -477,19 +637,28 @@ export function InspectorPanel({
           )}
           {selectedObject instanceof TextLayer && (
             <>
-            <ParagraphStylesPanel layer={selectedObject} disabled={locked||busy} onAction={action=>onAttempt(()=>{onPreview(null);action();})}/>
-            <TextProperties
-              onManageFonts={onManageFonts}
-              layer={selectedObject}
-              disabled={locked || busy}
-              onAction={(action) =>
-                onAttempt(() => {
-                  onPreview(null);
-                  action();
-                })
-              }
-              onPreview={onPreview}
-            />
+              <ParagraphStylesPanel
+                layer={selectedObject}
+                disabled={locked || busy}
+                onAction={(action) =>
+                  onAttempt(() => {
+                    onPreview(null);
+                    action();
+                  })
+                }
+              />
+              <TextProperties
+                onManageFonts={onManageFonts}
+                layer={selectedObject}
+                disabled={locked || busy}
+                onAction={(action) =>
+                  onAttempt(() => {
+                    onPreview(null);
+                    action();
+                  })
+                }
+                onPreview={onPreview}
+              />
             </>
           )}
           {selected.kind === "paint" && (
@@ -505,8 +674,8 @@ export function InspectorPanel({
             onCancel={() => onPreview(null)}
             value={selected.styles ?? defaultStyle()}
             float={float}
-            shadowUnavailable={float && selected.kind === 'adjustment'}
-            disabled={locked || busy || selected.blendMode==='pass-through'}
+            shadowUnavailable={float && selected.kind === "adjustment"}
+            disabled={locked || busy || selected.blendMode === "pass-through"}
             onPreview={(styles) =>
               onPreview({
                 type: "layer.update",
@@ -535,22 +704,27 @@ export function InspectorPanel({
                           const kind = layer.adjustmentKind;
                           layer.update({
                             adjustment:
-                              kind === "tonal" ? {kind:"tonal",strokes:[]} : kind === "red-eye" ? defaultRedEyeAdjustment() : kind === "curves"
-                                ? defaultCurvesAdjustment()
-                                : kind === "levels"
-                                  ? defaultLevelsAdjustment()
-                                  : kind === "hsl"
-                                    ? defaultHslAdjustment()
-                                    : kind === "color-balance"
-                                      ? defaultColorBalanceAdjustment()
-                                      : kind === "vibrance"
-                                        ? defaultVibranceAdjustment()
-                                        : kind === "gradient-map"
-                                          ? defaultGradientMapAdjustment()
-                                          : kind === "white-balance"
-                                            ? defaultWhiteBalanceAdjustment()
-                                            : kind === "lut" ? defaultLutAdjustment()
-                                    : defaultToneAdjustment(),
+                              kind === "tonal"
+                                ? { kind: "tonal", strokes: [] }
+                                : kind === "red-eye"
+                                  ? defaultRedEyeAdjustment()
+                                  : kind === "curves"
+                                    ? defaultCurvesAdjustment()
+                                    : kind === "levels"
+                                      ? defaultLevelsAdjustment()
+                                      : kind === "hsl"
+                                        ? defaultHslAdjustment()
+                                        : kind === "color-balance"
+                                          ? defaultColorBalanceAdjustment()
+                                          : kind === "vibrance"
+                                            ? defaultVibranceAdjustment()
+                                            : kind === "gradient-map"
+                                              ? defaultGradientMapAdjustment()
+                                              : kind === "white-balance"
+                                                ? defaultWhiteBalanceAdjustment()
+                                                : kind === "lut"
+                                                  ? defaultLutAdjustment()
+                                                  : defaultToneAdjustment(),
                           });
                         }
                       })
@@ -577,24 +751,35 @@ export function InspectorPanel({
                     { value: "color-balance", label: "Color Balance" },
                     { value: "vibrance", label: "Vibrance" },
                     { value: "gradient-map", label: "Gradient Map" },
-                    { value: "red-eye", label: "Red Eye",disabled:float },
+                    { value: "red-eye", label: "Red Eye", disabled: float },
                     { value: "white-balance", label: "White Balance" },
                     { value: "lut", label: "Color Lookup (LUT)" },
                     { value: "curves", label: "Curves" },
                     { value: "levels", label: "Levels" },
-                    { value: "tone", label: float?'Linear tone (Exposure / Contrast / Saturation)':"Tone (Exposure / Contrast)" },
+                    {
+                      value: "tone",
+                      label: float
+                        ? "Linear tone (Exposure / Contrast / Saturation)"
+                        : "Tone (Exposure / Contrast)",
+                    },
                   ]}
                   onChange={(kind) => {
                     onSelectedAction((layer) => {
                       if (layer instanceof AdjustmentLayer) {
                         if (kind === "hsl")
                           layer.adjustment = defaultHslAdjustment();
-                        else if (kind === "color-balance") layer.adjustment = defaultColorBalanceAdjustment();
-                        else if (kind === "red-eye") layer.adjustment = defaultRedEyeAdjustment();
-                        else if (kind === "white-balance") layer.adjustment = defaultWhiteBalanceAdjustment();
-                        else if (kind === "lut") layer.adjustment = defaultLutAdjustment();
-                        else if (kind === "gradient-map") layer.adjustment = defaultGradientMapAdjustment();
-                        else if (kind === "vibrance") layer.adjustment = defaultVibranceAdjustment();
+                        else if (kind === "color-balance")
+                          layer.adjustment = defaultColorBalanceAdjustment();
+                        else if (kind === "red-eye")
+                          layer.adjustment = defaultRedEyeAdjustment();
+                        else if (kind === "white-balance")
+                          layer.adjustment = defaultWhiteBalanceAdjustment();
+                        else if (kind === "lut")
+                          layer.adjustment = defaultLutAdjustment();
+                        else if (kind === "gradient-map")
+                          layer.adjustment = defaultGradientMapAdjustment();
+                        else if (kind === "vibrance")
+                          layer.adjustment = defaultVibranceAdjustment();
                         else if (kind === "curves")
                           layer.setCurves(defaultCurvesAdjustment());
                         else if (kind === "levels")
@@ -611,9 +796,31 @@ export function InspectorPanel({
                     {selected.adjustment.strokes.length} editable tonal strokes
                   </p>
                 )}
-                {float&&selected.adjustment.kind==='tonal'&&<p className="section-description">Linear exposure strokes preserve signed and HDR colors. Protect tones limits new highlights; turn it off to brighten HDR colors.</p>}
-                {float&&(selected.adjustment.kind==='hsl'||selected.adjustment.kind==='color-balance'||selected.adjustment.kind==='vibrance')&&<p className="section-description">sRGB color controls retain float precision. Active settings need RGB from 0 to 1; neutral settings preserve extended colors.</p>}
-                {float&&(selected.adjustment.kind==='curves'||selected.adjustment.kind==='levels')&&<p className="section-description">Linear RGB: 255 means 1. Curves extend their endpoint tangents; active Levels clip to their black/white range.</p>}
+                {float && selected.adjustment.kind === "tonal" && (
+                  <p className="section-description">
+                    Linear exposure strokes preserve signed and HDR colors.
+                    Protect tones limits new highlights; turn it off to brighten
+                    HDR colors.
+                  </p>
+                )}
+                {float &&
+                  (selected.adjustment.kind === "hsl" ||
+                    selected.adjustment.kind === "color-balance" ||
+                    selected.adjustment.kind === "vibrance") && (
+                    <p className="section-description">
+                      sRGB color controls retain float precision. Active
+                      settings need RGB from 0 to 1; neutral settings preserve
+                      extended colors.
+                    </p>
+                  )}
+                {float &&
+                  (selected.adjustment.kind === "curves" ||
+                    selected.adjustment.kind === "levels") && (
+                    <p className="section-description">
+                      Linear RGB: 255 means 1. Curves extend their endpoint
+                      tangents; active Levels clip to their black/white range.
+                    </p>
+                  )}
                 {selected.adjustment.kind === "curves" && (
                   <CurvesEditor
                     linear={float}
@@ -661,30 +868,130 @@ export function InspectorPanel({
                   />
                 )}
 
-                {float&&selected.adjustment.kind==='lut'&&<p className="section-description">Signed sRGB lookup retains extended float colors. Table domains bound input; zero amount preserves original colors. The SDR preview and integer exports can clip.</p>}
-                {selected.adjustment.kind === "lut" && <LutControls key={selected.id}
-                  adjustment={selected.adjustment} disabled={locked || busy}
-                  onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
-                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
-                {selected.adjustment.kind === "red-eye" && <RedEyeControls key={selected.id}
-                  adjustment={selected.adjustment} disabled={locked || busy}
-                  onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
-                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
-                {float&&selected.adjustment.kind==='white-balance'&&<p className="section-description">Adjusts linear RGB without clipping. The SDR preview and integer exports can clip extended colors.</p>}
-                {selected.adjustment.kind === "white-balance" && <WhiteBalanceControls
-                  adjustment={selected.adjustment} disabled={locked || busy}
-                  onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
-                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
-                {float&&selected.adjustment.kind==='gradient-map'&&<p className="section-description">Maps continuous sRGB luma to your palette. Extended inputs map to palette endpoints; source colors stay unchanged.</p>}
-                {selected.adjustment.kind === "gradient-map" && <GradientMapControls
-                  key={selected.id} adjustment={selected.adjustment} disabled={locked || busy}
-                  onPreview={adjustment => onPreview({type: "layer.update", id: selected.id, patch: {adjustment}})}
-                  onCancel={() => onPreview(null)}
-                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if (layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
-                {(selected.adjustment.kind === "color-balance" || selected.adjustment.kind === "vibrance") && <ChromaticAdjustmentControls
-                  adjustment={selected.adjustment} disabled={locked||busy}
-                  onPreview={adjustment=>onPreview({type:"layer.update",id:selected.id,patch:{adjustment}})}
-                  onCommit={adjustment=>{onPreview(null);onSelectedAction(layer=>{if(layer instanceof AdjustmentLayer)layer.adjustment=adjustment;});}} />}
+                {float && selected.adjustment.kind === "lut" && (
+                  <p className="section-description">
+                    Signed sRGB lookup retains extended float colors. Table
+                    domains bound input; zero amount preserves original colors.
+                    The SDR preview and integer exports can clip.
+                  </p>
+                )}
+                {selected.adjustment.kind === "lut" && (
+                  <LutControls
+                    key={selected.id}
+                    adjustment={selected.adjustment}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer)
+                          layer.adjustment = adjustment;
+                      });
+                    }}
+                  />
+                )}
+                {selected.adjustment.kind === "red-eye" && (
+                  <RedEyeControls
+                    key={selected.id}
+                    adjustment={selected.adjustment}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer)
+                          layer.adjustment = adjustment;
+                      });
+                    }}
+                  />
+                )}
+                {float && selected.adjustment.kind === "white-balance" && (
+                  <p className="section-description">
+                    Adjusts linear RGB without clipping. The SDR preview and
+                    integer exports can clip extended colors.
+                  </p>
+                )}
+                {selected.adjustment.kind === "white-balance" && (
+                  <WhiteBalanceControls
+                    adjustment={selected.adjustment}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer)
+                          layer.adjustment = adjustment;
+                      });
+                    }}
+                  />
+                )}
+                {float && selected.adjustment.kind === "gradient-map" && (
+                  <p className="section-description">
+                    Maps continuous sRGB luma to your palette. Extended inputs
+                    map to palette endpoints; source colors stay unchanged.
+                  </p>
+                )}
+                {selected.adjustment.kind === "gradient-map" && (
+                  <GradientMapControls
+                    key={selected.id}
+                    adjustment={selected.adjustment}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCancel={() => onPreview(null)}
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer)
+                          layer.adjustment = adjustment;
+                      });
+                    }}
+                  />
+                )}
+                {(selected.adjustment.kind === "color-balance" ||
+                  selected.adjustment.kind === "vibrance") && (
+                  <ChromaticAdjustmentControls
+                    adjustment={selected.adjustment}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer)
+                          layer.adjustment = adjustment;
+                      });
+                    }}
+                  />
+                )}
                 {selected.adjustment.kind === "hsl" &&
                   (["hue", "saturation", "lightness"] as const).map((key) => (
                     <Slider
@@ -733,7 +1040,12 @@ export function InspectorPanel({
 
                 {selected.adjustment.kind === "tone" && (
                   <div className="adjustment-tone-controls">
-                    {float&&<p className="section-description">Linear RGB tone. Contrast pivots at 0.5; extended colors can exceed the SDR preview.</p>}
+                    {float && (
+                      <p className="section-description">
+                        Linear RGB tone. Contrast pivots at 0.5; extended colors
+                        can exceed the SDR preview.
+                      </p>
+                    )}
                     <HistogramView histogram={histogram} compact height={80} />
                     {(["exposure", "contrast", "saturation"] as const).map(
                       (key) => {
@@ -806,7 +1118,9 @@ export function InspectorPanel({
               }
             >
               <p className="section-description">
-                {float?'Linear RGB tone. Contrast pivots at 0.5; extended colors can exceed the SDR preview.':'Explore a different tone.'}
+                {float
+                  ? "Linear RGB tone. Contrast pivots at 0.5; extended colors can exceed the SDR preview."
+                  : "Explore a different tone."}
                 <br />
                 Your original image stays untouched.
               </p>
@@ -860,7 +1174,12 @@ export function InspectorPanel({
         disabled={busy}
         onAttempt={onAttempt}
       />
-      <AlphaChannelsPanel key={`channels:${dom.id}`} document={dom} disabled={busy} onAttempt={onAttempt}/>
+      <AlphaChannelsPanel
+        key={`channels:${dom.id}`}
+        document={dom}
+        disabled={busy}
+        onAttempt={onAttempt}
+      />
       <GuidesPanel
         document={dom}
         visible={guidesVisible}

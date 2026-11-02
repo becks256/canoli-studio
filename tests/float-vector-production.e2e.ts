@@ -1,22 +1,232 @@
-import {test,expect} from '@playwright/test';
-import {readFile,writeFile} from 'node:fs/promises';
-import {spawnSync} from 'node:child_process';
-import {historyProject,historyScript} from './helpers/history-inspector';
+import { test, expect } from "@playwright/test";
+import { readFile, writeFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { historyProject, historyScript } from "./helpers/history-inspector";
 
-test('production vector gradients use actual Inspector edits, exact native TIFF delivery, Undo and reopen without globals',async({page},info)=>{
- await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);await page.getByTestId('import-input').setInputFiles('tests/fixtures/tiff-float/rgba-raw-le.tif');const tiff=page.getByRole('dialog',{name:'Import TIFF',exact:true});await tiff.getByLabel('TIFF editing precision',{exact:true}).selectOption('float32');await tiff.getByRole('button',{name:'Import TIFF page',exact:true}).click();await expect(tiff).toHaveCount(0);
- const code=(await readFile('docs/FLOAT_VECTORS.md','utf8')).match(/```js\n([\s\S]*?)\n```/)![1];await historyScript(page,'document.layers.at(0).visible=false;'+code,'Native vectors ready');
- const before=await historyProject(page,info,'before.luma');const slider=page.getByRole('slider',{name:'Gradient stop 2 opacity',exact:true});await slider.scrollIntoViewIfNeeded();const sliderBox=(await slider.boundingBox())!;await page.mouse.move(sliderBox.x+sliderBox.width*.3,sliderBox.y+sliderBox.height/2);await page.mouse.down();await expect.poll(async()=>Number(await slider.getAttribute('aria-valuenow'))).toBeLessThan(50);await page.keyboard.press('Escape');await page.mouse.up();expect((await historyProject(page,info,'gradient-cancelled.luma')).value.document).toEqual(before.value.document);await page.getByLabel('Gradient stop 2 color',{exact:true}).fill('#00ff00');await page.getByLabel('Gradient stop 2 color',{exact:true}).press('Enter');const edited=await historyProject(page,info,'edited.luma');expect(edited.value.document).not.toEqual(before.value.document);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await historyProject(page,info,'undo.luma')).value.document).toEqual(before.value.document);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'redo.luma')).value.document).toEqual(edited.value.document);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();
- const output=async(name:string)=>{await page.getByRole('button',{name:'Export…',exact:true}).click();const dialog=page.locator('.export-dialog');await dialog.getByLabel('Format',{exact:true}).selectOption('tiff');await dialog.getByLabel('TIFF precision',{exact:true}).selectOption('float32');await dialog.getByLabel('Use output RGB profile for high-precision TIFF',{exact:true}).uncheck();const pending=page.waitForEvent('download');await dialog.getByRole('button',{name:'Export .tif',exact:true}).click();await(await pending).saveAs(info.outputPath(name+'.tif'));await expect(dialog).toHaveCount(0);};
- await output('vectors');await page.getByTestId('project-input').setInputFiles(before.path);expect((await historyProject(page,info,'reopened.luma')).value.document).toEqual(before.value.document);await output('reopened');const source=before.value.entries[0];expect(Buffer.from(await source.blob.arrayBuffer())).toEqual(await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif'));
- const record={width:131,height:79,opacity:.64123,fillOpacity:.75,stopAlpha:[.375,.75],profile:'linear-srgb',debugGlobals:false,sourceExact:true,inspectorUndoRedo:true};await writeFile(info.outputPath('float-vector-production.json'),JSON.stringify(record,null,2));const check=spawnSync('python3',['scripts/check-float-vector.py',info.outputDir],{encoding:'utf8',timeout:120000});expect(check.status,check.stderr||check.stdout).toBe(0);await writeFile(info.outputPath('independent-native-vectors.json'),check.stdout);expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+test("production vector gradients use actual Inspector edits, exact native TIFF delivery, Undo and reopen without globals", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  expect(await page.evaluate(() => "luma" in window)).toBe(false);
+  await page
+    .getByTestId("import-input")
+    .setInputFiles("tests/fixtures/tiff-float/rgba-raw-le.tif");
+  const tiff = page.getByRole("dialog", { name: "Import TIFF", exact: true });
+  await tiff
+    .getByLabel("TIFF editing precision", { exact: true })
+    .selectOption("float32");
+  await tiff
+    .getByRole("button", { name: "Import TIFF page", exact: true })
+    .click();
+  await expect(tiff).toHaveCount(0);
+  const code = (await readFile("docs/FLOAT_VECTORS.md", "utf8")).match(
+    /```js\n([\s\S]*?)\n```/,
+  )![1];
+  await historyScript(
+    page,
+    "document.layers.at(0).visible=false;" + code,
+    "Native vectors ready",
+  );
+  const before = await historyProject(page, info, "before.luma");
+  const slider = page.getByRole("slider", {
+    name: "Gradient stop 2 opacity",
+    exact: true,
+  });
+  await slider.scrollIntoViewIfNeeded();
+  const sliderBox = (await slider.boundingBox())!;
+  await page.mouse.move(
+    sliderBox.x + sliderBox.width * 0.3,
+    sliderBox.y + sliderBox.height / 2,
+  );
+  await page.mouse.down();
+  await expect
+    .poll(async () => Number(await slider.getAttribute("aria-valuenow")))
+    .toBeLessThan(50);
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  expect(
+    (await historyProject(page, info, "gradient-cancelled.luma")).value
+      .document,
+  ).toEqual(before.value.document);
+  await page
+    .getByLabel("Gradient stop 2 color", { exact: true })
+    .fill("#00ff00");
+  await page
+    .getByLabel("Gradient stop 2 color", { exact: true })
+    .press("Enter");
+  const edited = await historyProject(page, info, "edited.luma");
+  expect(edited.value.document).not.toEqual(before.value.document);
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  expect(
+    (await historyProject(page, info, "undo.luma")).value.document,
+  ).toEqual(before.value.document);
+  await page
+    .getByRole("button", { name: "Redo (Mod+Shift+Z)", exact: true })
+    .click();
+  expect(
+    (await historyProject(page, info, "redo.luma")).value.document,
+  ).toEqual(edited.value.document);
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  const output = async (name: string) => {
+    await page.getByRole("button", { name: "Export…", exact: true }).click();
+    const dialog = page.locator(".export-dialog");
+    await dialog.getByLabel("Format", { exact: true }).selectOption("tiff");
+    await dialog
+      .getByLabel("TIFF precision", { exact: true })
+      .selectOption("float32");
+    await dialog
+      .getByLabel("Use output RGB profile for high-precision TIFF", {
+        exact: true,
+      })
+      .uncheck();
+    const pending = page.waitForEvent("download");
+    await dialog
+      .getByRole("button", { name: "Export .tif", exact: true })
+      .click();
+    await (await pending).saveAs(info.outputPath(name + ".tif"));
+    await expect(dialog).toHaveCount(0);
+  };
+  await output("vectors");
+  await page.getByTestId("project-input").setInputFiles(before.path);
+  expect(
+    (await historyProject(page, info, "reopened.luma")).value.document,
+  ).toEqual(before.value.document);
+  await output("reopened");
+  const source = before.value.entries[0];
+  expect(Buffer.from(await source.blob.arrayBuffer())).toEqual(
+    await readFile("tests/fixtures/tiff-float/rgba-raw-le.tif"),
+  );
+  const record = {
+    width: 131,
+    height: 79,
+    opacity: 0.64123,
+    fillOpacity: 0.75,
+    stopAlpha: [0.375, 0.75],
+    profile: "linear-srgb",
+    debugGlobals: false,
+    sourceExact: true,
+    inspectorUndoRedo: true,
+  };
+  await writeFile(
+    info.outputPath("float-vector-production.json"),
+    JSON.stringify(record, null, 2),
+  );
+  const check = spawnSync(
+    "python3",
+    ["scripts/check-float-vector.py", info.outputDir],
+    { encoding: "utf8", timeout: 120000 },
+  );
+  expect(check.status, check.stderr || check.stdout).toBe(0);
+  await writeFile(
+    info.outputPath("independent-native-vectors.json"),
+    check.stdout,
+  );
+  expect(await page.evaluate(() => "luma" in window)).toBe(false);
 });
 
-test('production float Pen keeps private cancel, editable closed paths, shape controls and one-gesture Undo',async({page},info)=>{
- await page.goto('/');await historyScript(page,'document.resize(300,220);document.convertToFloat();','Float Pen ready');await page.getByRole('button',{name:'Vector pen (P)',exact:true}).click();await page.keyboard.press('Control+1');await page.getByRole('checkbox',{name:'Fill new paths',exact:true}).check();const width=page.getByRole('spinbutton',{name:'Pen width value',exact:true});await width.fill('0');await width.press('Enter');const before=await historyProject(page,info,'pen-before.luma'),box=(await page.locator('.canvas-wrap').boundingBox())!,point=(x:number,y:number)=>({x:box.x+x,y:box.y+y});
- await page.mouse.move(point(20,20).x,point(20,20).y);await page.mouse.down();await page.mouse.move(point(30,24).x,point(30,24).y);await page.keyboard.press('Escape');await page.mouse.up();expect((await historyProject(page,info,'pen-cancelled.luma')).value.document).toEqual(before.value.document);
- for(const [x,y] of [[20,20],[140,20],[140,130],[20,20]])await page.mouse.click(point(x,y).x,point(x,y).y);const after=await historyProject(page,info,'pen-closed.luma'),layer=after.value.document.children.find(layer=>layer.kind==='vector');if(layer?.kind!=='vector')throw new Error('No editable vector');expect(layer.paths[0].closed).toBe(true);expect(layer.paths[0].points).toHaveLength(3);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();const undo=await historyProject(page,info,'pen-close-undo.luma'),open=undo.value.document.children.find(layer=>layer.kind==='vector');if(open?.kind!=='vector')throw new Error('No open path');expect(open.paths[0].closed).toBe(false);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'pen-redo.luma')).value.document).toEqual(after.value.document);
- await page.getByRole('button',{name:'+ Ellipse',exact:true}).click();const shape=await historyProject(page,info,'pen-shape.luma'),vector=shape.value.document.children.find(layer=>layer.kind==='vector');if(vector?.kind!=='vector')throw new Error('No shape');expect(vector.paths.length).toBe(2);expect(await page.evaluate(()=>'luma'in window)).toBe(false);await writeFile(info.outputPath('float-pen-production.json'),JSON.stringify({cancelExact:true,closedPoints:layer.paths[0].points.length,oneUndoPerGesture:true,shapeEditable:true,debugGlobals:false},null,2));
+test("production float Pen keeps private cancel, editable closed paths, shape controls and one-gesture Undo", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  await historyScript(
+    page,
+    "document.resize(300,220);document.convertToFloat();",
+    "Float Pen ready",
+  );
+  await page
+    .getByRole("button", { name: "Vector pen (P)", exact: true })
+    .click();
+  await page.keyboard.press("Control+1");
+  await page
+    .getByRole("checkbox", { name: "Fill new paths", exact: true })
+    .check();
+  const width = page.getByRole("spinbutton", {
+    name: "Pen width value",
+    exact: true,
+  });
+  await width.fill("0");
+  await width.press("Enter");
+  const before = await historyProject(page, info, "pen-before.luma"),
+    box = (await page.locator(".canvas-wrap").boundingBox())!,
+    point = (x: number, y: number) => ({ x: box.x + x, y: box.y + y });
+  await page.mouse.move(point(20, 20).x, point(20, 20).y);
+  await page.mouse.down();
+  await page.mouse.move(point(30, 24).x, point(30, 24).y);
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  expect(
+    (await historyProject(page, info, "pen-cancelled.luma")).value.document,
+  ).toEqual(before.value.document);
+  for (const [x, y] of [
+    [20, 20],
+    [140, 20],
+    [140, 130],
+    [20, 20],
+  ])
+    await page.mouse.click(point(x, y).x, point(x, y).y);
+  const after = await historyProject(page, info, "pen-closed.luma"),
+    layer = after.value.document.children.find(
+      (layer) => layer.kind === "vector",
+    );
+  if (layer?.kind !== "vector") throw new Error("No editable vector");
+  expect(layer.paths[0].closed).toBe(true);
+  expect(layer.paths[0].points).toHaveLength(3);
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  const undo = await historyProject(page, info, "pen-close-undo.luma"),
+    open = undo.value.document.children.find(
+      (layer) => layer.kind === "vector",
+    );
+  if (open?.kind !== "vector") throw new Error("No open path");
+  expect(open.paths[0].closed).toBe(false);
+  await page
+    .getByRole("button", { name: "Redo (Mod+Shift+Z)", exact: true })
+    .click();
+  expect(
+    (await historyProject(page, info, "pen-redo.luma")).value.document,
+  ).toEqual(after.value.document);
+  await page.getByRole("button", { name: "+ Ellipse", exact: true }).click();
+  const shape = await historyProject(page, info, "pen-shape.luma"),
+    vector = shape.value.document.children.find(
+      (layer) => layer.kind === "vector",
+    );
+  if (vector?.kind !== "vector") throw new Error("No shape");
+  expect(vector.paths.length).toBe(2);
+  expect(await page.evaluate(() => "luma" in window)).toBe(false);
+  await writeFile(
+    info.outputPath("float-pen-production.json"),
+    JSON.stringify(
+      {
+        cancelExact: true,
+        closedPoints: layer.paths[0].points.length,
+        oneUndoPerGesture: true,
+        shapeEditable: true,
+        debugGlobals: false,
+      },
+      null,
+      2,
+    ),
+  );
 });
 
-test.describe('float vector guide',()=>{test.use({javaScriptEnabled:false,viewport:{width:390,height:844}});test('documents native vector paint with readable no-JavaScript output',async({page})=>{await page.goto('/developer/float-vectors.html');await expect(page.getByRole('heading',{name:'Editable linear float vectors',exact:true})).toBeVisible();await expect(page.locator('main')).toContainText('Canvas renders neutral white');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);});});
+test.describe("float vector guide", () => {
+  test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  test("documents native vector paint with readable no-JavaScript output", async ({
+    page,
+  }) => {
+    await page.goto("/developer/float-vectors.html");
+    await expect(
+      page.getByRole("heading", {
+        name: "Editable linear float vectors",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(page.locator("main")).toContainText(
+      "Canvas renders neutral white",
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  });
+});

@@ -25,9 +25,10 @@ Plain JSON execution requires the referenced bytes in the receiving source store
 The following trusted example receives a caller-selected package Blob as `recipePackage`. It performs no chooser, network request or edit:
 
 <!-- example: font-package-plan-trusted -->
+
 ```js
 const plan = await editor.recipes.compilePackagePlan(recipePackage);
-if (!plan.valid) throw new Error(plan.errors.join('; '));
+if (!plan.valid) throw new Error(plan.errors.join("; "));
 return {
   valid: plan.valid,
   steps: plan.steps.length,

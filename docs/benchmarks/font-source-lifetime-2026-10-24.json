@@ -1526,9 +1526,7 @@
       "wasmCount": 5,
       "unchangedSinceFreeze": false,
       "runtimeUnchangedSinceFreeze": true,
-      "changedReleaseResources": [
-        "dist/developer/font-files.html"
-      ]
+      "changedReleaseResources": ["dist/developer/font-files.html"]
     },
     "visualReview": [
       "1440x1000 relink success with original friendly name and replacement source metadata",

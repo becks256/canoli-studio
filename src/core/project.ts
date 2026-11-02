@@ -1,16 +1,45 @@
-import{assertFloatSources,isFloatDocument}from'./float-document';
-import {validateNativePaintAssets} from './prepared-paint-assets';
-import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource,type RawSourceMetadata} from "./interchange/raw/source";
+import { assertFloatSources, isFloatDocument } from "./float-document";
+import { validateNativePaintAssets } from "./prepared-paint-assets";
+import {
+  rawSourceMetadataSchema,
+  rawSourceMetadata,
+  ownRawSource,
+  verifyRawSource,
+  type RawImageSource,
+  type RawSourceMetadata,
+} from "./interchange/raw/source";
 import { freezeOwnedData } from "./immutable";
 import { AssetStore } from "./assets";
 import type { SerializedAsset, ImageAsset } from "./assets";
-import { allLayers, referencedAssets, validateDocument, validateDocumentCooperatively } from "./model";
+import {
+  allLayers,
+  referencedAssets,
+  validateDocument,
+  validateDocumentCooperatively,
+} from "./model";
 import type { DocumentData } from "./model";
-import { parseRetainedHistory, retainedDocuments, type RetainedHistory } from "./history";
-import {avifDecodeOptionsSchema,type AvifDecodeSettings} from './interchange/avif/types';
-import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from './interchange/tiff/types';
-import {captureProjectFonts,encodeProjectFonts,decodeProjectFonts,retainedFontFiles,type ProjectFonts,type ProjectFontSource} from './font-project';
-import type {FontResourceInput} from '../fonts/resources';
+import {
+  parseRetainedHistory,
+  retainedDocuments,
+  type RetainedHistory,
+} from "./history";
+import {
+  avifDecodeOptionsSchema,
+  type AvifDecodeSettings,
+} from "./interchange/avif/types";
+import {
+  tiffDecodeOptionsSchema,
+  type TiffDecodeSettings,
+} from "./interchange/tiff/types";
+import {
+  captureProjectFonts,
+  encodeProjectFonts,
+  decodeProjectFonts,
+  retainedFontFiles,
+  type ProjectFonts,
+  type ProjectFontSource,
+} from "./font-project";
+import type { FontResourceInput } from "../fonts/resources";
 
 interface ProjectFile {
   format: "luma";
@@ -33,7 +62,7 @@ interface BinaryAsset {
   sha256?: string;
   tiff?: TiffDecodeSettings;
   avif?: AvifDecodeSettings;
-  raw?: RawSourceMetadata & {originalIndex:number};
+  raw?: RawSourceMetadata & { originalIndex: number };
 }
 interface BinaryManifest {
   format: "luma";
@@ -41,8 +70,13 @@ interface BinaryManifest {
   document: DocumentData;
   assets: BinaryAsset[];
   history?: RetainedHistory;
-  rawOriginals?: {type:string;size:number;offset:number;sha256:string}[];
-  fonts?:ProjectFonts;
+  rawOriginals?: {
+    type: string;
+    size: number;
+    offset: number;
+    sha256: string;
+  }[];
+  fonts?: ProjectFonts;
 }
 const hex = (bytes: ArrayBuffer) =>
   Array.from(new Uint8Array(bytes), (byte) =>
@@ -74,10 +108,13 @@ function verifyLinkedSnapshots(
     }
 }
 export interface ProjectAssetSource {
-  fonts?:ProjectFontSource;
+  fonts?: ProjectFontSource;
   get(
     id: string,
-  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff" | "avif" | "raw">;
+  ): Pick<
+    ImageAsset,
+    "id" | "name" | "width" | "height" | "blob" | "tiff" | "avif" | "raw"
+  >;
 }
 export async function serializeProject(
   document: DocumentData,
@@ -90,27 +127,68 @@ export async function serializeProject(
     retainedHistory === undefined
       ? undefined
       : parseRetainedHistory(retainedHistory, document);
-  const fontSources=captureProjectFonts(retainedDocuments(document,history),assets.fonts);
+  const fontSources = captureProjectFonts(
+    retainedDocuments(document, history),
+    assets.fonts,
+  );
   const assetIds = new Set(referencedAssets(document));
   for (const state of retainedDocuments(document, history)) {
-    for (const assetId of referencedAssets(state))
-      assetIds.add(assetId);
+    for (const assetId of referencedAssets(state)) assetIds.add(assetId);
   }
   const entries: BinaryAsset[] = [];
-  const rawOriginals:NonNullable<BinaryManifest["rawOriginals"]>=[], originalBlobs:Blob[]=[], originalKeys=new Map<string,number>();
+  const rawOriginals: NonNullable<BinaryManifest["rawOriginals"]> = [],
+    originalBlobs: Blob[] = [],
+    originalKeys = new Map<string, number>();
   const blobs: Blob[] = [];
   let offset = 0;
   // Pin every source before RAW verification yields or a live store can be closed.
-  const originals=[...assetIds].map(assetId=>{const asset=assets.get(assetId);return{id:asset.id,name:asset.name,width:asset.width,height:asset.height,blob:asset.blob,
-    ...(asset.tiff?{tiff:tiffDecodeOptionsSchema.parse(asset.tiff)}:{}),...(asset.avif?{avif:avifDecodeOptionsSchema.parse(asset.avif)}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{})};});
+  const originals = [...assetIds].map((assetId) => {
+    const asset = assets.get(assetId);
+    return {
+      id: asset.id,
+      name: asset.name,
+      width: asset.width,
+      height: asset.height,
+      blob: asset.blob,
+      ...(asset.tiff
+        ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) }
+        : {}),
+      ...(asset.avif
+        ? { avif: avifDecodeOptionsSchema.parse(asset.avif) }
+        : {}),
+      ...(asset.raw ? { raw: ownRawSource(asset.raw) } : {}),
+    };
+  });
   for (const asset of originals) {
-    if(asset.blob.type==='image/avif'&&!asset.avif||asset.avif&&asset.blob.type!=='image/avif')throw new Error('AVIF project sources require matching saved precision and color settings.');
-    let raw:BinaryAsset['raw'];
-    if(asset.raw){
-      const source=await verifyRawSource(asset.raw,asset.blob,asset.width,asset.height),key=JSON.stringify([source.original.sha256,source.original.type]);
-      let originalIndex=originalKeys.get(key);
-      if(originalIndex===undefined){originalIndex=rawOriginals.length;originalKeys.set(key,originalIndex);rawOriginals.push({type:source.original.type,size:source.original.byteLength,offset:0,sha256:source.original.sha256});originalBlobs.push(source.originalBlob);}
-      raw={...rawSourceMetadata(source),originalIndex};
+    if (
+      (asset.blob.type === "image/avif" && !asset.avif) ||
+      (asset.avif && asset.blob.type !== "image/avif")
+    )
+      throw new Error(
+        "AVIF project sources require matching saved precision and color settings.",
+      );
+    let raw: BinaryAsset["raw"];
+    if (asset.raw) {
+      const source = await verifyRawSource(
+          asset.raw,
+          asset.blob,
+          asset.width,
+          asset.height,
+        ),
+        key = JSON.stringify([source.original.sha256, source.original.type]);
+      let originalIndex = originalKeys.get(key);
+      if (originalIndex === undefined) {
+        originalIndex = rawOriginals.length;
+        originalKeys.set(key, originalIndex);
+        rawOriginals.push({
+          type: source.original.type,
+          size: source.original.byteLength,
+          offset: 0,
+          sha256: source.original.sha256,
+        });
+        originalBlobs.push(source.originalBlob);
+      }
+      raw = { ...rawSourceMetadata(source), originalIndex };
     }
     entries.push({
       id: asset.id,
@@ -120,9 +198,13 @@ export async function serializeProject(
       type: asset.blob.type,
       size: asset.blob.size,
       offset,
-      ...(asset.tiff?{tiff:tiffDecodeOptionsSchema.parse(asset.tiff)}:{}),
-      ...(asset.avif?{avif:avifDecodeOptionsSchema.parse(asset.avif)}:{}),
-      ...(raw?{raw}:{}),
+      ...(asset.tiff
+        ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) }
+        : {}),
+      ...(asset.avif
+        ? { avif: avifDecodeOptionsSchema.parse(asset.avif) }
+        : {}),
+      ...(raw ? { raw } : {}),
     });
     blobs.push(asset.blob);
     offset += asset.blob.size;
@@ -131,17 +213,19 @@ export async function serializeProject(
   }
   for (let i = 0; i < entries.length; i++)
     entries[i].sha256 = await hashBlob(blobs[i]);
-  verifyLinkedSnapshots(
-    retainedDocuments(document, history),
-    entries,
-  );
-  for(const original of rawOriginals){original.offset=offset;offset+=original.size;if(!Number.isSafeInteger(offset))throw new Error("Project size exceeds safely representable offsets.");}
-  const encodedFonts=await encodeProjectFonts(fontSources,offset);
+  verifyLinkedSnapshots(retainedDocuments(document, history), entries);
+  for (const original of rawOriginals) {
+    original.offset = offset;
+    offset += original.size;
+    if (!Number.isSafeInteger(offset))
+      throw new Error("Project size exceeds safely representable offsets.");
+  }
+  const encodedFonts = await encodeProjectFonts(fontSources, offset);
   const manifest: BinaryManifest = {
     format: "luma",
-    version: encodedFonts.manifest?5:rawOriginals.length?4:3,
-    ...(encodedFonts.manifest?{fonts:encodedFonts.manifest}:{}),
-    ...(rawOriginals.length?{rawOriginals}:{}),
+    version: encodedFonts.manifest ? 5 : rawOriginals.length ? 4 : 3,
+    ...(encodedFonts.manifest ? { fonts: encodedFonts.manifest } : {}),
+    ...(rawOriginals.length ? { rawOriginals } : {}),
     document,
     assets: entries,
     ...(history ? { history } : {}),
@@ -149,32 +233,42 @@ export async function serializeProject(
   const json = new TextEncoder().encode(JSON.stringify(manifest));
   const header = new Uint8Array(48);
   header.set(MAGIC);
-  header[4] = 48+manifest.version;
+  header[4] = 48 + manifest.version;
   header.set(new Uint8Array(await crypto.subtle.digest("SHA-256", json)), 16);
   new DataView(header.buffer).setBigUint64(8, BigInt(json.byteLength), true);
   // Blob parts avoid full-source base64 strings and document-sized byte arrays.
-  return new Blob([header, json, ...blobs,...originalBlobs,...encodedFonts.blobs], { type: "application/x-luma" });
+  return new Blob(
+    [header, json, ...blobs, ...originalBlobs, ...encodedFonts.blobs],
+    { type: "application/x-luma" },
+  );
 }
 
 /** Internal editing preparation is opt-in; ordinary readers retain mutable owned data. */
-export async function readProject(file: Blob, options: { prepareImmutable?: boolean } = {}): Promise<{
+export async function readProject(
+  file: Blob,
+  options: { prepareImmutable?: boolean } = {},
+): Promise<{
   document: DocumentData;
   history?: RetainedHistory;
-  fonts:FontResourceInput[];
+  fonts: FontResourceInput[];
   entries: {
     id: string;
     name: string;
     width: number;
     height: number;
     blob: Blob;
-    tiff?:TiffDecodeSettings;
-    avif?:AvifDecodeSettings;
-    raw?:RawImageSource;
+    tiff?: TiffDecodeSettings;
+    avif?: AvifDecodeSettings;
+    raw?: RawImageSource;
   }[];
 }> {
   const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
-  const version5 = header[4] === 53 && MAGIC.every((value,index)=>index===4||header[index]===value);
-  const version4 = header[4] === 52 && MAGIC.every((value,index)=>index===4||header[index]===value);
+  const version5 =
+    header[4] === 53 &&
+    MAGIC.every((value, index) => index === 4 || header[index] === value);
+  const version4 =
+    header[4] === 52 &&
+    MAGIC.every((value, index) => index === 4 || header[index] === value);
   const version3 =
     (header[4] === 51 || version4 || version5) &&
     MAGIC.every((value, index) => index === 4 || header[index] === value);
@@ -194,7 +288,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       await freezeOwnedData(legacy.document);
       await validateDocumentCooperatively(legacy.document);
     }
-    return { document: legacy.document, entries,fonts:[] };
+    return { document: legacy.document, entries, fonts: [] };
   }
   if (header.byteLength !== 16)
     throw new Error("Truncated Canoli Studio project header.");
@@ -236,14 +330,35 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     manifest.history === undefined
       ? undefined
       : parseRetainedHistory(manifest.history, manifest.document);
-  if(!version5&&manifest.fonts!==undefined)throw new Error('Font source records require a version-5 project container.');
-  if(version5&&manifest.fonts===undefined)throw new Error('Missing version-5 font records.');
-  if(!version5&&!version4&&(manifest.rawOriginals!==undefined||manifest.assets.some(entry=>entry?.raw!==undefined)))throw new Error('RAW source records require a version-4 project container.');
-  if(version5&&manifest.rawOriginals!==undefined&&(!Array.isArray(manifest.rawOriginals)||!manifest.rawOriginals.length))throw new Error('Invalid RAW original records.');
-  if(version4&&(!Array.isArray(manifest.rawOriginals)||!manifest.rawOriginals.length))throw new Error('Missing RAW original records.');
+  if (!version5 && manifest.fonts !== undefined)
+    throw new Error(
+      "Font source records require a version-5 project container.",
+    );
+  if (version5 && manifest.fonts === undefined)
+    throw new Error("Missing version-5 font records.");
+  if (
+    !version5 &&
+    !version4 &&
+    (manifest.rawOriginals !== undefined ||
+      manifest.assets.some((entry) => entry?.raw !== undefined))
+  )
+    throw new Error(
+      "RAW source records require a version-4 project container.",
+    );
+  if (
+    version5 &&
+    manifest.rawOriginals !== undefined &&
+    (!Array.isArray(manifest.rawOriginals) || !manifest.rawOriginals.length)
+  )
+    throw new Error("Invalid RAW original records.");
+  if (
+    version4 &&
+    (!Array.isArray(manifest.rawOriginals) || !manifest.rawOriginals.length)
+  )
+    throw new Error("Missing RAW original records.");
   let offset = 0;
-  const rawReferences=new Set<number>();
-  const rawBlobs=new Map<number,Blob>();
+  const rawReferences = new Set<number>();
+  const rawBlobs = new Map<number, Blob>();
   const ids = new Set<string>();
   const entries = manifest.assets.map((entry) => {
     if (
@@ -257,7 +372,13 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       entry.width < 1 ||
       !Number.isSafeInteger(entry.height) ||
       entry.height < 1 ||
-      !["image/png", "image/jpeg", "image/webp", "image/tiff", "image/avif"].includes(entry.type) ||
+      ![
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/tiff",
+        "image/avif",
+      ].includes(entry.type) ||
       !Number.isSafeInteger(entry.size) ||
       entry.size <= 0 ||
       entry.offset !== offset ||
@@ -271,27 +392,65 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     )
       throw new Error("Missing or invalid project asset checksum.");
     ids.add(entry.id);
-    if(entry.tiff!==undefined&&entry.type!=='image/tiff')throw new Error('TIFF settings on a non-TIFF project asset.');
-    if(entry.avif!==undefined&&entry.type!=='image/avif')throw new Error('AVIF settings on a non-AVIF project asset.');
-    if(entry.type==='image/avif'&&!entry.avif)throw new Error('AVIF project sources require saved precision and color settings.');
-    const avif=entry.type==='image/avif'?avifDecodeOptionsSchema.parse(entry.avif):undefined;
-    const tiff=entry.type==='image/tiff'?tiffDecodeOptionsSchema.parse(entry.tiff??{}):undefined;
+    if (entry.tiff !== undefined && entry.type !== "image/tiff")
+      throw new Error("TIFF settings on a non-TIFF project asset.");
+    if (entry.avif !== undefined && entry.type !== "image/avif")
+      throw new Error("AVIF settings on a non-AVIF project asset.");
+    if (entry.type === "image/avif" && !entry.avif)
+      throw new Error(
+        "AVIF project sources require saved precision and color settings.",
+      );
+    const avif =
+      entry.type === "image/avif"
+        ? avifDecodeOptionsSchema.parse(entry.avif)
+        : undefined;
+    const tiff =
+      entry.type === "image/tiff"
+        ? tiffDecodeOptionsSchema.parse(entry.tiff ?? {})
+        : undefined;
     const blob = file.slice(
       headerSize + length + offset,
       headerSize + length + offset + entry.size,
       entry.type,
     );
     offset += entry.size;
-    let raw:RawImageSource|undefined;
-    if(entry.raw!==undefined){
-      const {originalIndex,...metadata}=entry.raw;
-      if(!Number.isSafeInteger(originalIndex)||originalIndex<0||originalIndex>=(manifest.rawOriginals?.length??0))throw new Error('Invalid RAW original reference.');
-      const original=manifest.rawOriginals![originalIndex],parsed=rawSourceMetadataSchema.parse(metadata);
-      if(!original||original.sha256!==parsed.original.sha256||original.size!==parsed.original.byteLength||original.type!==parsed.original.type)throw new Error('RAW original descriptor differs from the retained source.');
-      if(!Number.isSafeInteger(original.offset)||original.offset<0||!Number.isSafeInteger(original.offset+original.size)||original.offset+original.size>file.size-headerSize-length)throw new Error('Invalid RAW original extent.');
-      let originalBlob=rawBlobs.get(originalIndex);
-      if(!originalBlob){originalBlob=file.slice(headerSize+length+original.offset,headerSize+length+original.offset+original.size,original.type);rawBlobs.set(originalIndex,originalBlob);}
-      raw=ownRawSource({...parsed,originalBlob});
+    let raw: RawImageSource | undefined;
+    if (entry.raw !== undefined) {
+      const { originalIndex, ...metadata } = entry.raw;
+      if (
+        !Number.isSafeInteger(originalIndex) ||
+        originalIndex < 0 ||
+        originalIndex >= (manifest.rawOriginals?.length ?? 0)
+      )
+        throw new Error("Invalid RAW original reference.");
+      const original = manifest.rawOriginals![originalIndex],
+        parsed = rawSourceMetadataSchema.parse(metadata);
+      if (
+        !original ||
+        original.sha256 !== parsed.original.sha256 ||
+        original.size !== parsed.original.byteLength ||
+        original.type !== parsed.original.type
+      )
+        throw new Error(
+          "RAW original descriptor differs from the retained source.",
+        );
+      if (
+        !Number.isSafeInteger(original.offset) ||
+        original.offset < 0 ||
+        !Number.isSafeInteger(original.offset + original.size) ||
+        original.offset + original.size > file.size - headerSize - length
+      )
+        throw new Error("Invalid RAW original extent.");
+      let originalBlob = rawBlobs.get(originalIndex);
+      if (!originalBlob) {
+        originalBlob = file.slice(
+          headerSize + length + original.offset,
+          headerSize + length + original.offset + original.size,
+          original.type,
+        );
+        rawBlobs.set(originalIndex, originalBlob);
+      }
+      raw = ownRawSource({ ...parsed, originalBlob });
       rawReferences.add(originalIndex);
     }
     return {
@@ -300,17 +459,34 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       width: entry.width,
       height: entry.height,
       blob,
-      ...(tiff?{tiff}:{}),
-      ...(avif?{avif}:{}),
-      ...(raw?{raw}:{}),
+      ...(tiff ? { tiff } : {}),
+      ...(avif ? { avif } : {}),
+      ...(raw ? { raw } : {}),
     };
   });
-  for(const [index,original] of (manifest.rawOriginals??[]).entries()){
-    if(!rawReferences.has(index)||typeof original.type!=='string'||!Number.isSafeInteger(original.size)||original.size<=0||original.offset!==offset||!Number.isSafeInteger(offset+original.size)||offset+original.size>file.size-headerSize-length||typeof original.sha256!=='string'||!/^[a-f0-9]{64}$/.test(original.sha256))throw new Error('Invalid, unused or truncated RAW original.');
-    offset+=original.size;
+  for (const [index, original] of (manifest.rawOriginals ?? []).entries()) {
+    if (
+      !rawReferences.has(index) ||
+      typeof original.type !== "string" ||
+      !Number.isSafeInteger(original.size) ||
+      original.size <= 0 ||
+      original.offset !== offset ||
+      !Number.isSafeInteger(offset + original.size) ||
+      offset + original.size > file.size - headerSize - length ||
+      typeof original.sha256 !== "string" ||
+      !/^[a-f0-9]{64}$/.test(original.sha256)
+    )
+      throw new Error("Invalid, unused or truncated RAW original.");
+    offset += original.size;
   }
-  const decodedFonts=await decodeProjectFonts(manifest.fonts,retainedDocuments(manifest.document,history),file,headerSize+length,offset);
-  offset=decodedFonts.endOffset;
+  const decodedFonts = await decodeProjectFonts(
+    manifest.fonts,
+    retainedDocuments(manifest.document, history),
+    file,
+    headerSize + length,
+    offset,
+  );
+  offset = decodedFonts.endOffset;
   if (offset !== file.size - headerSize - length)
     throw new Error("Unexpected data after project assets.");
   for (const assetId of referencedAssets(manifest.document))
@@ -325,11 +501,13 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       if ((await hashBlob(entries[i].blob)) !== manifest.assets[i].sha256)
         throw new Error(`Project asset checksum mismatch: ${entries[i].name}`);
   }
-  for(const entry of entries)if(entry.raw)await verifyRawSource(entry.raw,entry.blob,entry.width,entry.height);
+  for (const entry of entries)
+    if (entry.raw)
+      await verifyRawSource(entry.raw, entry.blob, entry.width, entry.height);
   return {
     document: manifest.document,
     entries,
-    fonts:decodedFonts.fonts,
+    fonts: decodedFonts.fonts,
     ...(history ? { history } : {}),
   };
 }
@@ -347,7 +525,8 @@ export function parseProject(text: string): ProjectFile {
     );
   }
   validateDocument(project.document);
-  if(retainedFontFiles([project.document]).length)throw new Error('Embedded fonts require a version-5 project container.');
+  if (retainedFontFiles([project.document]).length)
+    throw new Error("Embedded fonts require a version-5 project container.");
   const ids = new Set<string>();
   for (const asset of project.assets) {
     if (
@@ -379,7 +558,12 @@ export function parseProject(text: string): ProjectFile {
 
 export async function loadProject(
   input: string | Blob,
-  options: { prepareImmutable?: boolean;fontSources?:NonNullable<ConstructorParameters<typeof AssetStore>[0]>['fontSources'] } = {},
+  options: {
+    prepareImmutable?: boolean;
+    fontSources?: NonNullable<
+      ConstructorParameters<typeof AssetStore>[0]
+    >["fontSources"];
+  } = {},
 ): Promise<{
   document: DocumentData;
   assets: AssetStore;
@@ -389,29 +573,45 @@ export async function loadProject(
     typeof input === "string" ? new Blob([input]) : input,
     options,
   );
-  const assets = new AssetStore({fontSources:options.fontSources});
+  const assets = new AssetStore({ fontSources: options.fontSources });
   const rasterAssets = new Set(
-    retainedDocuments(project.document, project.history).flatMap(document => allLayers(document.children))
+    retainedDocuments(project.document, project.history)
+      .flatMap((document) => allLayers(document.children))
       .filter((layer) => layer.kind === "raster")
       .map((layer) => layer.assetId),
   );
   try {
-    for(const source of project.fonts)await assets.fonts.restore(source);
+    for (const source of project.fonts) await assets.fonts.restore(source);
     for (const entry of project.entries) {
       const asset = await assets.add(
         entry.blob,
         entry.name,
         entry.id,
         rasterAssets.has(entry.id),
-        {tiff:entry.tiff,avif:entry.avif,raw:entry.raw},
+        { tiff: entry.tiff, avif: entry.avif, raw: entry.raw },
       );
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error("Embedded image dimensions do not match the project.");
     }
     const documents = retainedDocuments(project.document, project.history);
-    for(const document of documents)if(isFloatDocument(document)||assets.hasFloatAssets)assertFloatSources(document,assets);
-    const current=assets.captureLifetime();
-    for(const document of documents)if(isFloatDocument(document))await validateNativePaintAssets(document,{check:current,get(id){const source=assets.get(id);return{blob:source.blob,width:source.width,height:source.height,identity:source};}});
+    for (const document of documents)
+      if (isFloatDocument(document) || assets.hasFloatAssets)
+        assertFloatSources(document, assets);
+    const current = assets.captureLifetime();
+    for (const document of documents)
+      if (isFloatDocument(document))
+        await validateNativePaintAssets(document, {
+          check: current,
+          get(id) {
+            const source = assets.get(id);
+            return {
+              blob: source.blob,
+              width: source.width,
+              height: source.height,
+              identity: source,
+            };
+          },
+        });
     const linkedIds = new Set(
       documents.flatMap((document) =>
         (document.components ?? []).flatMap((definition) =>

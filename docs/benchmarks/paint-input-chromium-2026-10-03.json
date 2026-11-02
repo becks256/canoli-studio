@@ -2,14 +2,8 @@
   "date": "2026-10-03",
   "environment": {
     "browser": "local headless Chromium",
-    "viewportCssPixels": [
-      1440,
-      1000
-    ],
-    "documentPixels": [
-      1600,
-      1200
-    ],
+    "viewportCssPixels": [1440, 1000],
+    "documentPixels": [1600, 1200],
     "backend": "canvas2d",
     "build": "Vite development"
   },

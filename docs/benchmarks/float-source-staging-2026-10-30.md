@@ -38,10 +38,10 @@ profiles and artifacts use the same RAM-backed temporary filesystem for both
 builds; real IndexedDB timings reflect that storage environment.
 
 | Pair | Baseline click to complete frame | Candidate click to complete frame |
-| --- | ---: | ---: |
-| 1 | 93.008 s | 74.565 s |
-| 2 | 92.944 s | 73.323 s |
-| 3 | 92.940 s | 73.742 s |
+| ---- | -------------------------------: | --------------------------------: |
+| 1    |                         93.008 s |                          74.565 s |
+| 2    |                         92.944 s |                          73.323 s |
+| 3    |                         92.940 s |                          73.742 s |
 
 Median is **92.944 s → 73.742 s**. All six complete fitted
 canvas hashes and original-byte identities match, and each passes ordinary

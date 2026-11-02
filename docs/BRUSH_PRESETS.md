@@ -19,7 +19,7 @@ Storage errors offer Retry loading and Download current brush. Export saved libr
 Export selected, Export saved library and Download current brush produce `.canoli-brushes.json` files with MIME type `application/json` for source-free values. Texture-bearing collections use `.canoli-brushes` with MIME `application/x-canoli-brush-pack`; their v4/v5 payload and original blobs are described below. Legacy JSON example:
 
 ```json
-{"format":"canoli-brush-presets","version":1,"presets":[]}
+{ "format": "canoli-brush-presets", "version": 1, "presets": [] }
 ```
 
 The example above shows the envelope only; a valid pack contains at least one complete preset. Each preset has a supported `version` (1–5, subject to field-age rules below), a unique string `id`, a nonempty trimmed `name` of at most 120 characters, a supported `tool`, complete `settings`, and optional six-digit hex `color`. Unknown keys/versions/tools, duplicate pack IDs, nonfinite/out-of-range parameters and malformed pressure knots reject the entire pack before storage. Import always creates fresh IDs and revision-1 copies; even a pack exported from the current library cannot overwrite saved values. Packs are data only and never execute code or install plugins. Cancelling file reading or an active import transaction stops publication; an already completed save remains saved.
@@ -31,9 +31,17 @@ Bounds mirror supported controls: size 0.1–2048 px, hardness/opacity 0–1, fl
 `BrushPreset` is a pure immutable value exported from `src/brushes/presets.ts`, separate from the isolated document constructor namespace:
 
 ```ts
-const preset = BrushPreset.capture("Firm ink", "brush", editor.tools.getSnapshot().settings, false);
+const preset = BrushPreset.capture(
+  "Firm ink",
+  "brush",
+  editor.tools.getSnapshot().settings,
+  false,
+);
 const saved = await editor.brushPresets.save(preset); // new ID: expectedRevision defaults to 0
-await editor.brushPresets.save(saved.preset.with({name:"Renamed ink"}), saved.revision);
+await editor.brushPresets.save(
+  saved.preset.with({ name: "Renamed ink" }),
+  saved.revision,
+);
 ```
 
 - `new BrushPreset(data: unknown, source?)` validates and owns versioned metadata and its optional source record. `capture(name, tool, settings, includeColor=false, source?)` snapshots supported ToolSettings; enabled texture requires a matching source record. `id`, `name`, `tool`, optional `color`, cloned `settings`, nullable `texture`, and nullable immutable `source` are readable. Structural construction does not claim cryptographic/native verification: asynchronous save/import/export/apply performs that verification before publication. `with({name?,tool?,settings?,color?})` retains identity; `duplicate(name?)` generates a fresh ID. `toJSON()` and `toToolSettings()` return owned copies. No returned object can mutate the retained value.
@@ -62,7 +70,6 @@ Optional `settings.symmetry` retains a strict `{copies:[{a,b,c,d,e,f},...]}` Bru
 
 Existing v1/v2 values and built-ins remain readable; applying any preset without symmetry resets it to Off. A tip-only value still uses v2, an ordinary legacy value still uses v1, and old readers reject v3 rather than discarding copies. Saved centers/lines use absolute document pixels. Applying to another canvas preserves those positions; use Symmetry → Center on canvas to reposition explicitly. Actual strokes store complete conjugated copy transforms independently of library records, so deleting a preset cannot damage project or undo data. The IndexedDB record/store version remains 1; existing transaction/revision/conflict/backup rules apply. The metadata copy budget is unrelated to source-image resolution. Export computes the greatest version incrementally, without a variadic call over an arbitrarily large collection.
 
-
 ## Original-image textures (preset/pack version 4)
 
 An optional top-level preset `texture` is `{sourceId, channel: "alpha" | "luminance", invert: boolean}` and requires preset version 4. The separate source record is `{id, name, type, width, height, sha256, blob, tiff?, avif?}`. Types are PNG/JPEG/WebP/TIFF/AVIF; dimensions are positive safe integers; SHA-256 is lowercase hexadecimal. TIFF requires its canonical `{page, allowPrecisionLoss}` choices; other image types cannot carry TIFF options. AVIF requires canonical `{allowPrecisionLoss, assumeSrgb}` choices, which reject on other types. AVIF texture review shares explicit precision/fallback consent and applies supported encoded crop/orientation to derived presentation pixels while preserving original bytes. Original compressed bytes remain separate from decoded editing pixels and the 128-square cursor preview. No image megapixel/file-size cap is introduced. Browser decode limits, quota, source-sized checksum buffers, retained decoded sources and compressed/output memory remain device/workload dependent.
@@ -83,10 +90,13 @@ Source-aware library methods, preserving the old source-free methods:
 Example for trusted browser application code (not the isolated Scripts editor):
 
 ```ts
-import {captureBrushPreset, exportBrushPack} from "../src/brushes/portable";
+import { captureBrushPreset, exportBrushPack } from "../src/brushes/portable";
 const preset = await captureBrushPreset(
-  "Original grain", "brush", editor.tools.getSnapshot().settings,
-  editor.brushTextureSource, true,
+  "Original grain",
+  "brush",
+  editor.tools.getSnapshot().settings,
+  editor.brushTextureSource,
+  true,
 );
 const saved = await editor.brushPresets.save(preset);
 const file = await exportBrushPack([saved.preset]);
@@ -97,7 +107,6 @@ await editor.applyBrushPreset(saved.preset);
 ## Wet preferences (version 5)
 
 `smudge` and `mixer` are supported preset tools. Version 5 wet presets require both `settings.smudge` and `settings.mixer`, each a strict `{load, wetness, pickup}` object with finite values in 0–1. Capturing either wet tool stores both independently owned preferences. Wet fields/tools in versions 1–4 reject. Applying a legacy preset resets Smudge to `{load:0, wetness:0, pickup:0.5}` and Mixer to `{load:1, wetness:0.25, pickup:0.5}`; document/mask targets remain untouched. Ordinary captures continue using the lowest sufficient prior version. Changing a legacy value to a wet tool through `with` adds those defaults and upgrades its version. Source-free JSON packs support v5; source-bearing binary payloads accept v4/v5 and export the highest required data version, retaining original source validation and bytes. Container and physical IndexedDB versions remain unchanged. No preset executes code or changes document undo. Actual UI/runtime verification for this integration is pending.
-
 
 ## RAW-bearing textures (version 6)
 

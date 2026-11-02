@@ -16,14 +16,22 @@ export function freeze<T>(value: T): T {
 export function shareUnchanged<T>(previous: T, next: T): T {
   if (Object.is(previous, next)) return previous;
   if (isImmutable(next)) return next;
-  if (!isImmutable(previous) || !next || typeof next !== "object" || Array.isArray(previous) !== Array.isArray(next)) return next;
-  const before = previous as Record<string, unknown>, after = next as Record<string, unknown>;
+  if (
+    !isImmutable(previous) ||
+    !next ||
+    typeof next !== "object" ||
+    Array.isArray(previous) !== Array.isArray(next)
+  )
+    return next;
+  const before = previous as Record<string, unknown>,
+    after = next as Record<string, unknown>;
   const keys = Object.keys(after);
   let same = Object.keys(before).length === keys.length;
   for (const key of keys) {
     const value = shareUnchanged(before[key], after[key]);
     if (value !== after[key]) after[key] = value;
-    if (!Object.hasOwn(before, key) || !Object.is(value, before[key])) same = false;
+    if (!Object.hasOwn(before, key) || !Object.is(value, before[key]))
+      same = false;
   }
   return same ? previous : next;
 }
@@ -36,16 +44,29 @@ export async function freezeOwnedData<T>(value: T): Promise<T> {
   const stack: { value: object; children: Iterator<unknown> }[] = [];
   const enter = (item: unknown) => {
     if (!item || typeof item !== "object" || isImmutable(item)) return;
-    if (pending.has(item)) throw new TypeError("Owned model data must not contain cycles.");
+    if (pending.has(item))
+      throw new TypeError("Owned model data must not contain cycles.");
     const prototype = Object.getPrototypeOf(item);
-    if (!Array.isArray(item) && prototype !== Object.prototype && prototype !== null)
-      throw new TypeError("Owned model data must contain only plain objects and arrays.");
+    if (
+      !Array.isArray(item) &&
+      prototype !== Object.prototype &&
+      prototype !== null
+    )
+      throw new TypeError(
+        "Owned model data must contain only plain objects and arrays.",
+      );
     Object.freeze(item);
     pending.add(item);
-    stack.push({ value: item, children: (Array.isArray(item) ? item : Object.values(item))[Symbol.iterator]() });
+    stack.push({
+      value: item,
+      children: (Array.isArray(item) ? item : Object.values(item))[
+        Symbol.iterator
+      ](),
+    });
   };
   enter(value);
-  let deadline = performance.now() + 2, work = 0;
+  let deadline = performance.now() + 2,
+    work = 0;
   while (stack.length) {
     const frame = stack[stack.length - 1];
     const child = frame.children.next();

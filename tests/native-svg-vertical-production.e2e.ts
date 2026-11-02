@@ -1,14 +1,223 @@
-import {test,expect} from '@playwright/test';
-import {readFile,readdir,writeFile} from 'node:fs/promises';
-import {createHash} from 'node:crypto';
-import {compileGlyphSelectors} from '../src/fonts/glyph-sfnt';
+import { test, expect } from "@playwright/test";
+import { readFile, readdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { compileGlyphSelectors } from "../src/fonts/glyph-sfnt";
 
-test('production vertical glyph coverage preserves native orientation, baselines and exact partitions',async({page},info)=>{
- const source=new Uint8Array(await readFile('tests/fixtures/vertical-font/Vertical.ttf')),derived=compileGlyphSelectors(source),files=(await readdir('dist/assets')).filter(f=>/^svg-glyph-paint-.*\.js$/.test(f));expect(files).toHaveLength(1);const module=files[0],bytes=await readFile('dist/assets/'+module);await page.goto('/');const result=await page.evaluate(async({source,derived,selectors,module})=>{
-  const emitted=await import(/* @vite-ignore */('/assets/'+module))as Record<string,unknown>,paint=(typeof emitted.renderFloatSvgGlyphCoverage==='function'?emitted:Object.values(emitted).find(value=>value&&typeof value==='object'&&'renderFloatSvgGlyphCoverage'in value))as typeof import('../src/engine/svg-glyph-paint');if(!paint)throw new Error('Emitted glyph coverage namespace is missing');const {renderFloatSvgGlyphCoverage}=paint;
-  const data=async(bytes:number[])=>new Promise<string>((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=()=>reject(r.error);r.readAsDataURL(new Blob([new Uint8Array(bytes)],{type:'font/ttf'}));}),originalData=await data(source),glyphData=await data(derived),face=new FontFace('ProductionVerticalGlyph',new Uint8Array(derived).buffer);await face.load();document.fonts.add(face);const abort=new AbortController(),font={axes:[],descriptors:[{style:'normal'as const,weight:'400',stretch:'100%'}],sourceFamily:'Original',family:face.family,glyphCount:8,settings:'normal',monochrome:true,signal:abort.signal,async shapeRun(){throw new Error('Prepared baseline paint cannot shape');},character(id:number){return String.fromCodePoint(selectors[id]);},check(){abort.signal.throwIfAborted();if(!document.fonts.has(face))throw new Error('Prepared baseline font retired');},release(){abort.abort();document.fonts.delete(face);},async svgFont(){return{definitions:`<defs><style>@font-face{font-family:ProductionVerticalGlyph;src:url("${glyphData}");font-weight:400;font-style:normal;font-stretch:100%;}</style></defs>`,features:'normal'};}},rows=[];
-  try{for(const mode of ['identity','affine','reflection']as const)for(const orientation of ['mixed','upright','sideways']as const)for(const curved of [false,true]){const m=mode==='affine'?{a:1.25,b:.125,c:-.25,d:.9,e:15,f:14}:mode==='reflection'?{a:-1,b:0,c:0,d:1,e:600,f:0}:{a:1,b:0,c:0,d:1,e:0,f:0},path={data:'M24 150C100 30 340 30 420 150',startOffset:210,baselineOffset:-7},baseline=orientation==='sideways'?'alphabetic':'central',glyph={font,glyphId:2,surface:'svg'as const,writing:{mode:'vertical-rl',orientation:orientation==='mixed'?'sideways':orientation},baseline,origin:curved?{x:12,y:24}:{x:220,y:80},...(curved?{path}:{}),transform:m,style:{fontSize:40,fontWeight:'400',fontStyle:'normal'as const},color:[4,-.25,1.5,1]as const},area={x:0,y:0,width:640,height:320},full=await renderFloatSvgGlyphCoverage(glyph as unknown as import('../src/engine/float-glyph').FloatGlyph,area,()=>font.check()),parts=new Float32Array(full.length),markup=`<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320"><defs><style>@font-face{font-family:OriginalVerticalReference;src:url("${originalData}");}</style><path id="reference-baseline" d="M24 150C100 30 340 30 420 150"/></defs><g transform="matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})"><text x="${curved?0:220}" y="${curved?0:80}" ${curved?'dx="-7" transform="translate(12 24)"':''} fill="#fff" style="font-family:OriginalVerticalReference;font-size:40px;font-weight:400;font-style:normal;font-kerning:none;letter-spacing:0px;word-spacing:0px;white-space:pre;writing-mode:vertical-rl;text-orientation:${orientation};dominant-baseline:${baseline}">${curved?'<textPath href="#reference-baseline" startOffset="210" method="align" spacing="exact">A</textPath>':'A'}</text></g></svg>`,url=URL.createObjectURL(new Blob([markup],{type:'image/svg+xml'})),image=new Image();let error=0;
-   try{await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(new Error('Production baseline reference failed'));image.src=url;});await image.decode();const canvas=document.createElement('canvas');canvas.width=640;canvas.height=320;const c=canvas.getContext('2d')!;c.drawImage(image,0,0);const pixels=c.getImageData(0,0,640,320).data;for(let i=0;i<full.length;i++)error=Math.max(error,Math.abs(full[i]-Math.fround(pixels[i*4+3]/255)));}finally{image.src='';URL.revokeObjectURL(url);}
-   for(let x=0;x<640;x+=137){const width=Math.min(137,640-x),part=await renderFloatSvgGlyphCoverage(glyph as unknown as import('../src/engine/float-glyph').FloatGlyph,{...area,x,width},()=>font.check());for(let y=0;y<320;y++)parts.set(part.subarray(y*width,(y+1)*width),y*640+x);}rows.push({mode,orientation,curved,error,ink:full.some(a=>a>0),partitions:new Uint32Array(full.buffer).every((v,i)=>v===new Uint32Array(parts.buffer)[i])});}return{rows,developmentGlobal:'luma'in window,probes:document.querySelectorAll('[data-canoli-svg-glyph-probe]').length};}finally{font.release();}
- },{source:[...source],derived:[...derived.bytes],selectors:[...derived.selectors],module});expect(result).toMatchObject({developmentGlobal:false,probes:0});expect(result.rows).toHaveLength(18);for(const row of result.rows)expect(row).toMatchObject({error:0,ink:true,partitions:true});await writeFile(info.outputPath('production-svg-vertical.json'),JSON.stringify({module,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),scope:'Actual emitted native SVG vertical coverage with prepared fixture adapter. Complete source ownership, vertical itemization and matching are verified separately in the native source matrix.',result},null,2));
+test("production vertical glyph coverage preserves native orientation, baselines and exact partitions", async ({
+  page,
+}, info) => {
+  const source = new Uint8Array(
+      await readFile("tests/fixtures/vertical-font/Vertical.ttf"),
+    ),
+    derived = compileGlyphSelectors(source),
+    files = (await readdir("dist/assets")).filter((f) =>
+      /^svg-glyph-paint-.*\.js$/.test(f),
+    );
+  expect(files).toHaveLength(1);
+  const module = files[0],
+    bytes = await readFile("dist/assets/" + module);
+  await page.goto("/");
+  const result = await page.evaluate(
+    async ({ source, derived, selectors, module }) => {
+      const emitted = (await import(
+          /* @vite-ignore */ "/assets/" + module
+        )) as Record<string, unknown>,
+        paint = (
+          typeof emitted.renderFloatSvgGlyphCoverage === "function"
+            ? emitted
+            : Object.values(emitted).find(
+                (value) =>
+                  value &&
+                  typeof value === "object" &&
+                  "renderFloatSvgGlyphCoverage" in value,
+              )
+        ) as typeof import("../src/engine/svg-glyph-paint");
+      if (!paint)
+        throw new Error("Emitted glyph coverage namespace is missing");
+      const { renderFloatSvgGlyphCoverage } = paint;
+      const data = async (bytes: number[]) =>
+          new Promise<string>((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(String(r.result));
+            r.onerror = () => reject(r.error);
+            r.readAsDataURL(
+              new Blob([new Uint8Array(bytes)], { type: "font/ttf" }),
+            );
+          }),
+        originalData = await data(source),
+        glyphData = await data(derived),
+        face = new FontFace(
+          "ProductionVerticalGlyph",
+          new Uint8Array(derived).buffer,
+        );
+      await face.load();
+      document.fonts.add(face);
+      const abort = new AbortController(),
+        font = {
+          axes: [],
+          descriptors: [
+            { style: "normal" as const, weight: "400", stretch: "100%" },
+          ],
+          sourceFamily: "Original",
+          family: face.family,
+          glyphCount: 8,
+          settings: "normal",
+          monochrome: true,
+          signal: abort.signal,
+          async shapeRun() {
+            throw new Error("Prepared baseline paint cannot shape");
+          },
+          character(id: number) {
+            return String.fromCodePoint(selectors[id]);
+          },
+          check() {
+            abort.signal.throwIfAborted();
+            if (!document.fonts.has(face))
+              throw new Error("Prepared baseline font retired");
+          },
+          release() {
+            abort.abort();
+            document.fonts.delete(face);
+          },
+          async svgFont() {
+            return {
+              definitions: `<defs><style>@font-face{font-family:ProductionVerticalGlyph;src:url("${glyphData}");font-weight:400;font-style:normal;font-stretch:100%;}</style></defs>`,
+              features: "normal",
+            };
+          },
+        },
+        rows = [];
+      try {
+        for (const mode of ["identity", "affine", "reflection"] as const)
+          for (const orientation of ["mixed", "upright", "sideways"] as const)
+            for (const curved of [false, true]) {
+              const m =
+                  mode === "affine"
+                    ? { a: 1.25, b: 0.125, c: -0.25, d: 0.9, e: 15, f: 14 }
+                    : mode === "reflection"
+                      ? { a: -1, b: 0, c: 0, d: 1, e: 600, f: 0 }
+                      : { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
+                path = {
+                  data: "M24 150C100 30 340 30 420 150",
+                  startOffset: 210,
+                  baselineOffset: -7,
+                },
+                baseline =
+                  orientation === "sideways" ? "alphabetic" : "central",
+                glyph = {
+                  font,
+                  glyphId: 2,
+                  surface: "svg" as const,
+                  writing: {
+                    mode: "vertical-rl",
+                    orientation:
+                      orientation === "mixed" ? "sideways" : orientation,
+                  },
+                  baseline,
+                  origin: curved ? { x: 12, y: 24 } : { x: 220, y: 80 },
+                  ...(curved ? { path } : {}),
+                  transform: m,
+                  style: {
+                    fontSize: 40,
+                    fontWeight: "400",
+                    fontStyle: "normal" as const,
+                  },
+                  color: [4, -0.25, 1.5, 1] as const,
+                },
+                area = { x: 0, y: 0, width: 640, height: 320 },
+                full = await renderFloatSvgGlyphCoverage(
+                  glyph as unknown as import("../src/engine/float-glyph").FloatGlyph,
+                  area,
+                  () => font.check(),
+                ),
+                parts = new Float32Array(full.length),
+                markup = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320"><defs><style>@font-face{font-family:OriginalVerticalReference;src:url("${originalData}");}</style><path id="reference-baseline" d="M24 150C100 30 340 30 420 150"/></defs><g transform="matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})"><text x="${curved ? 0 : 220}" y="${curved ? 0 : 80}" ${curved ? 'dx="-7" transform="translate(12 24)"' : ""} fill="#fff" style="font-family:OriginalVerticalReference;font-size:40px;font-weight:400;font-style:normal;font-kerning:none;letter-spacing:0px;word-spacing:0px;white-space:pre;writing-mode:vertical-rl;text-orientation:${orientation};dominant-baseline:${baseline}">${curved ? '<textPath href="#reference-baseline" startOffset="210" method="align" spacing="exact">A</textPath>' : "A"}</text></g></svg>`,
+                url = URL.createObjectURL(
+                  new Blob([markup], { type: "image/svg+xml" }),
+                ),
+                image = new Image();
+              let error = 0;
+              try {
+                await new Promise<void>((resolve, reject) => {
+                  image.onload = () => resolve();
+                  image.onerror = () =>
+                    reject(new Error("Production baseline reference failed"));
+                  image.src = url;
+                });
+                await image.decode();
+                const canvas = document.createElement("canvas");
+                canvas.width = 640;
+                canvas.height = 320;
+                const c = canvas.getContext("2d")!;
+                c.drawImage(image, 0, 0);
+                const pixels = c.getImageData(0, 0, 640, 320).data;
+                for (let i = 0; i < full.length; i++)
+                  error = Math.max(
+                    error,
+                    Math.abs(full[i] - Math.fround(pixels[i * 4 + 3] / 255)),
+                  );
+              } finally {
+                image.src = "";
+                URL.revokeObjectURL(url);
+              }
+              for (let x = 0; x < 640; x += 137) {
+                const width = Math.min(137, 640 - x),
+                  part = await renderFloatSvgGlyphCoverage(
+                    glyph as unknown as import("../src/engine/float-glyph").FloatGlyph,
+                    { ...area, x, width },
+                    () => font.check(),
+                  );
+                for (let y = 0; y < 320; y++)
+                  parts.set(
+                    part.subarray(y * width, (y + 1) * width),
+                    y * 640 + x,
+                  );
+              }
+              rows.push({
+                mode,
+                orientation,
+                curved,
+                error,
+                ink: full.some((a) => a > 0),
+                partitions: new Uint32Array(full.buffer).every(
+                  (v, i) => v === new Uint32Array(parts.buffer)[i],
+                ),
+              });
+            }
+        return {
+          rows,
+          developmentGlobal: "luma" in window,
+          probes: document.querySelectorAll("[data-canoli-svg-glyph-probe]")
+            .length,
+        };
+      } finally {
+        font.release();
+      }
+    },
+    {
+      source: [...source],
+      derived: [...derived.bytes],
+      selectors: [...derived.selectors],
+      module,
+    },
+  );
+  expect(result).toMatchObject({ developmentGlobal: false, probes: 0 });
+  expect(result.rows).toHaveLength(18);
+  for (const row of result.rows)
+    expect(row).toMatchObject({ error: 0, ink: true, partitions: true });
+  await writeFile(
+    info.outputPath("production-svg-vertical.json"),
+    JSON.stringify(
+      {
+        module,
+        bytes: bytes.length,
+        sha256: createHash("sha256").update(bytes).digest("hex"),
+        scope:
+          "Actual emitted native SVG vertical coverage with prepared fixture adapter. Complete source ownership, vertical itemization and matching are verified separately in the native source matrix.",
+        result,
+      },
+      null,
+      2,
+    ),
+  );
 });

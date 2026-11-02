@@ -5,13 +5,5 @@
   "glyphs": 18,
   "originalMappings": 12,
   "referenceSelectorBase": 1048576,
-  "featuresDisabled": [
-    "fina",
-    "init",
-    "kern",
-    "liga",
-    "mark",
-    "medi",
-    "rlig"
-  ]
+  "featuresDisabled": ["fina", "init", "kern", "liga", "mark", "medi", "rlig"]
 }

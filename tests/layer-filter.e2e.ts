@@ -1,8 +1,10 @@
 import { test, expect } from "@playwright/test";
-import {layerControlsWorkflow} from './helpers/layer-controls';
+import { layerControlsWorkflow } from "./helpers/layer-controls";
 
-test('layer glyphs and controls stay current through typing, history and group changes', async ({page},info) => {
-  await layerControlsWorkflow(page,info);
+test("layer glyphs and controls stay current through typing, history and group changes", async ({
+  page,
+}, info) => {
+  await layerControlsWorkflow(page, info);
 });
 
 test("filters nested layers without changing selection, history, or collapsed state", async ({

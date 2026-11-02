@@ -15,16 +15,26 @@ Schema 46 adds an authored cubic baseline and a measured frame origin to native 
 `control` is `{signal?: AbortSignal}` in trusted host code. Prepare outside synchronous `Document.transaction`. Native preparation captures the text owner/revision/font sources and rejects cancellation, changed work, locks, missing native capability or invalid geometry without partial edits. Isolated scripts use panel cancellation, the existing read/write grants, five-second deadline and 32-native-preparation/256-command limits. The broker returns finite bounds/origin only; final host commands revalidate/recompute accepted changes. No font source bytes, renderer, file chooser, import service or network grant is exposed.
 
 <!-- example: text-on-path -->
+
 ```js
-const title = document.layers.add(new TextLayer({
-  name: "Curved title", text: "Canoli Studio", fontFamily: "serif",
-  fontSize: 32, color: "#2468ac"
-}));
-await title.setTextPath(new TextPath({points: [
-  {x: 24, y: 160, in: {x: 24, y: 160}, out: {x: 100, y: 24}},
-  {x: 420, y: 160, in: {x: 340, y: 24}, out: {x: 420, y: 160}}
-]}));
-await title.formatRange(0, 6, {color: "#a43e29"});
+const title = document.layers.add(
+  new TextLayer({
+    name: "Curved title",
+    text: "Canoli Studio",
+    fontFamily: "serif",
+    fontSize: 32,
+    color: "#2468ac",
+  }),
+);
+await title.setTextPath(
+  new TextPath({
+    points: [
+      { x: 24, y: 160, in: { x: 24, y: 160 }, out: { x: 100, y: 24 } },
+      { x: 420, y: 160, in: { x: 340, y: 24 }, out: { x: 420, y: 160 } },
+    ],
+  }),
+);
+await title.formatRange(0, 6, { color: "#a43e29" });
 document.selectedLayer = title;
 print("Curved title ready");
 ```

@@ -27,13 +27,13 @@ export interface DeliveryVariantSpec {
   targetWidth: number;
   targetHeight: number;
   format: "png" | "jpeg" | "webp" | "avif" | "tiff" | "pdf";
-  color?:import('../../core/color/output-record').ColorOutputSource;
-  tiffVariant?:import('../../core/tiff').TiffVariant;
-  tiffPrecision?:import('../../core/tiff').TiffPrecision;
-  pdfDpi?:number;
-  quality?:number;
-  avifLossless?:boolean;
-  avifSpeed?:number;
+  color?: import("../../core/color/output-record").ColorOutputSource;
+  tiffVariant?: import("../../core/tiff").TiffVariant;
+  tiffPrecision?: import("../../core/tiff").TiffPrecision;
+  pdfDpi?: number;
+  quality?: number;
+  avifLossless?: boolean;
+  avifSpeed?: number;
   fit: "cover" | "contain" | "fill";
   nameTemplate?: string; // e.g. "{name}_{variant}_{width}x{height}"
 }
@@ -43,8 +43,8 @@ export interface DeliveryDeliverable {
   itemId: string;
   variantId: string;
   variantName: string;
-  settingsSha256?:string;
-  color?:import('../../core/color/output-record').ColorOutputReceipt;
+  settingsSha256?: string;
+  color?: import("../../core/color/output-record").ColorOutputReceipt;
   format: "png" | "jpeg" | "webp" | "avif" | "tiff" | "pdf";
   width: number;
   height: number;
@@ -63,10 +63,10 @@ export interface BatchSourceInput extends BatchSourceImage {
 }
 
 export interface BatchPreparation {
-  version:1;
-  sha256:string;
-  byteLength:number;
-  inputsSha256:string;
+  version: 1;
+  sha256: string;
+  byteLength: number;
+  inputsSha256: string;
 }
 
 export interface BatchSourceImage {
@@ -80,7 +80,7 @@ export interface BatchSourceImage {
   assetId?: string;
   dataUrl?: string;
   blob?: Blob;
-  raw?:import('./raw').BatchRawSource;
+  raw?: import("./raw").BatchRawSource;
 }
 
 export interface BatchItem {
@@ -96,7 +96,7 @@ export interface BatchItem {
   estimatedCostCents: number;
   actualCostCents: number;
   checkpoint?: DocumentData;
-  preparation?:BatchPreparation;
+  preparation?: BatchPreparation;
   deliverables: DeliveryDeliverable[];
   startedAt?: string;
   completedAt?: string;
@@ -140,8 +140,8 @@ export interface DeliveryManifestDeliverable {
   itemId: string;
   itemName: string;
   sourceHash: string;
-  settingsSha256?:string;
-  color?:import('../../core/color/output-record').ColorOutputReceipt;
+  settingsSha256?: string;
+  color?: import("../../core/color/output-record").ColorOutputReceipt;
   variantName: string;
   filePath: string;
   format: string;
@@ -155,7 +155,7 @@ export interface DeliveryManifestDeliverable {
 }
 
 export interface DeliveryManifest {
-  schemaVersion: 2|3;
+  schemaVersion: 2 | 3;
   manifestId: string;
   batchId: string;
   batchName: string;

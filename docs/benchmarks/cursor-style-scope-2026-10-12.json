@@ -16,11 +16,7 @@
             "prepareMs": 9
           }
         ],
-        "longTasks": [
-          111,
-          52,
-          51
-        ],
+        "longTasks": [111, 52, 51],
         "longTaskDetails": [
           {
             "start": 2075.199999988079,
@@ -179,10 +175,7 @@
             "prepareMs": 6.800000011920929
           }
         ],
-        "longTasks": [
-          121,
-          86
-        ],
+        "longTasks": [121, 86],
         "longTaskDetails": [
           {
             "start": 1306.2999999821186,
@@ -339,11 +332,7 @@
             "prepareMs": 7.800000011920929
           }
         ],
-        "longTasks": [
-          120,
-          88,
-          53
-        ],
+        "longTasks": [120, 88, 53],
         "longTaskDetails": [
           {
             "start": 1323.0999999940395,
@@ -508,9 +497,7 @@
             "prepareMs": 8.400000005960464
           }
         ],
-        "longTasks": [
-          51
-        ],
+        "longTasks": [51],
         "longTaskDetails": [
           {
             "start": 3744.7999999821186,
@@ -665,9 +652,7 @@
             "prepareMs": 6.700000017881393
           }
         ],
-        "longTasks": [
-          85
-        ],
+        "longTasks": [85],
         "longTaskDetails": [
           {
             "start": 1381.699999988079,
@@ -1124,11 +1109,7 @@
             "prepareMs": 7.700000017881393
           }
         ],
-        "longTasks": [
-          54,
-          50,
-          56
-        ],
+        "longTasks": [54, 50, 56],
         "longTaskDetails": [
           {
             "start": 2106.7000000178814,
@@ -1291,9 +1272,7 @@
             "prepareMs": 6.0999999940395355
           }
         ],
-        "longTasks": [
-          81
-        ],
+        "longTasks": [81],
         "longTaskDetails": [
           {
             "start": 1347.0999999940395,

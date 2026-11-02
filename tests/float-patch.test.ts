@@ -1,41 +1,295 @@
-import {it,expect} from 'vitest';
-import {readFile} from 'node:fs/promises';
-import {Document,AdjustmentLayer,PatchAdjustment,AffineTransform,LayerGroup,LayerMask} from '../src/dom';
-import {validateDocument,SCHEMA_VERSION} from '../src/core/model';
-import {assertFloatSources} from '../src/core/float-document';
-import {captureFloatPatchAssets,validateFloatPatchAssets} from '../src/core/float-patch-assets';
-import {encodeFloatPatchAsset} from '../src/core/float-patch-codec';
-import {captureFloatPatch,applyFloatPatch} from '../src/engine/float-patch';
-import {hasPreparedPaint,commandHasPreparedPaint,validatePreparedPaintAssets} from '../src/core/prepared-paint-assets';
-import {blendFloatAdjustment} from '../src/engine/float-adjustment-blend';
-import {readFloatWetTileWindow} from '../src/core/float-wet-tile';
-import type {WetImageSource} from '../src/core/wet-assets';
-const words=(p:Float32Array)=>[...new Uint32Array(p.buffer,p.byteOffset,p.length)],world=new AffineTransform();
-async function fixture(){const pixels=new Float32Array([4,-2,8,.375,-16,32,4,.125]),coverage=new Float32Array([.64123,.375]),blob=await encodeFloatPatchAsset(pixels,coverage,2,1),sources=new Map<string,WetImageSource>([['native',{blob,width:2,height:1,identity:{}}]]),provider={async *alpha():AsyncGenerator<Uint8Array>{throw new Error('Native patches must not read byte alpha');},get(id:string){const source=sources.get(id);if(!source)throw new Error('Missing native source');return source;}};return{pixels,coverage,blob,sources,provider};}
-const patch=()=>new PatchAdjustment({precision:'float32',assetId:'native',width:2,height:1});
-it('schema 59 native patch values share atomic OO commands, nested locks, source roles, version ages and exact history',()=>{
- const detached=new LayerGroup();const detachedPatch=detached.layers.add(new AdjustmentLayer({adjustment:patch()}));detachedPatch.opacity=.64123;expect(detachedPatch.opacity).toBe(.64123);const value=patch();expect(value.precision).toBe('float32');expect(new PatchAdjustment({assetId:'byte',width:2,height:1}).toJSON()).not.toHaveProperty('precision');const d=new Document({precision:'float32'}),group=d.layers.add(new LayerGroup()),before=d.toJSON(),layer=group.layers.add(new AdjustmentLayer({adjustment:value})),after=d.toJSON();expect(after.schemaVersion).toBe(SCHEMA_VERSION);d.undo();expect(d.toJSON()).toEqual(before);d.redo();expect(d.toJSON()).toEqual(after);expect(Document.fromJSON(after).toJSON()).toEqual(after);
- const old=structuredClone(after);old.schemaVersion=58;expect(()=>validateDocument(old)).toThrow('59');const byte=new Document();expect(()=>byte.layers.add(new AdjustmentLayer({adjustment:patch()}))).toThrow('float32');expect(()=>d.layers.add(new AdjustmentLayer({adjustment:new PatchAdjustment({assetId:'byte',width:2,height:1})}))).toThrow('explicit native');group.locked=true;expect(()=>layer.setPatch(patch())).toThrow(/unlock|lock/i);group.locked=false;
- const assets={get:()=>({tiff:{editingPrecision:'float32'},tiffColor:{}} as never)};expect(()=>assertFloatSources(d.toJSON(),assets)).not.toThrow();layer.mask=LayerMask.fromBitmap('native');expect(()=>assertFloatSources(d.toJSON(),assets)).toThrow('native byte');
+import { it, expect } from "vitest";
+import { readFile } from "node:fs/promises";
+import {
+  Document,
+  AdjustmentLayer,
+  PatchAdjustment,
+  AffineTransform,
+  LayerGroup,
+  LayerMask,
+} from "../src/dom";
+import { validateDocument, SCHEMA_VERSION } from "../src/core/model";
+import { assertFloatSources } from "../src/core/float-document";
+import {
+  captureFloatPatchAssets,
+  validateFloatPatchAssets,
+} from "../src/core/float-patch-assets";
+import { encodeFloatPatchAsset } from "../src/core/float-patch-codec";
+import { captureFloatPatch, applyFloatPatch } from "../src/engine/float-patch";
+import {
+  hasPreparedPaint,
+  commandHasPreparedPaint,
+  validatePreparedPaintAssets,
+} from "../src/core/prepared-paint-assets";
+import { blendFloatAdjustment } from "../src/engine/float-adjustment-blend";
+import { readFloatWetTileWindow } from "../src/core/float-wet-tile";
+import type { WetImageSource } from "../src/core/wet-assets";
+const words = (p: Float32Array) => [
+    ...new Uint32Array(p.buffer, p.byteOffset, p.length),
+  ],
+  world = new AffineTransform();
+async function fixture() {
+  const pixels = new Float32Array([4, -2, 8, 0.375, -16, 32, 4, 0.125]),
+    coverage = new Float32Array([0.64123, 0.375]),
+    blob = await encodeFloatPatchAsset(pixels, coverage, 2, 1),
+    sources = new Map<string, WetImageSource>([
+      ["native", { blob, width: 2, height: 1, identity: {} }],
+    ]),
+    provider = {
+      async *alpha(): AsyncGenerator<Uint8Array> {
+        throw new Error("Native patches must not read byte alpha");
+      },
+      get(id: string) {
+        const source = sources.get(id);
+        if (!source) throw new Error("Missing native source");
+        return source;
+      },
+    };
+  return { pixels, coverage, blob, sources, provider };
+}
+const patch = () =>
+  new PatchAdjustment({
+    precision: "float32",
+    assetId: "native",
+    width: 2,
+    height: 1,
+  });
+it("schema 59 native patch values share atomic OO commands, nested locks, source roles, version ages and exact history", () => {
+  const detached = new LayerGroup();
+  const detachedPatch = detached.layers.add(
+    new AdjustmentLayer({ adjustment: patch() }),
+  );
+  detachedPatch.opacity = 0.64123;
+  expect(detachedPatch.opacity).toBe(0.64123);
+  const value = patch();
+  expect(value.precision).toBe("float32");
+  expect(
+    new PatchAdjustment({ assetId: "byte", width: 2, height: 1 }).toJSON(),
+  ).not.toHaveProperty("precision");
+  const d = new Document({ precision: "float32" }),
+    group = d.layers.add(new LayerGroup()),
+    before = d.toJSON(),
+    layer = group.layers.add(new AdjustmentLayer({ adjustment: value })),
+    after = d.toJSON();
+  expect(after.schemaVersion).toBe(SCHEMA_VERSION);
+  d.undo();
+  expect(d.toJSON()).toEqual(before);
+  d.redo();
+  expect(d.toJSON()).toEqual(after);
+  expect(Document.fromJSON(after).toJSON()).toEqual(after);
+  const old = structuredClone(after);
+  old.schemaVersion = 58;
+  expect(() => validateDocument(old)).toThrow("59");
+  const byte = new Document();
+  expect(() =>
+    byte.layers.add(new AdjustmentLayer({ adjustment: patch() })),
+  ).toThrow("float32");
+  expect(() =>
+    d.layers.add(
+      new AdjustmentLayer({
+        adjustment: new PatchAdjustment({
+          assetId: "byte",
+          width: 2,
+          height: 1,
+        }),
+      }),
+    ),
+  ).toThrow("explicit native");
+  group.locked = true;
+  expect(() => layer.setPatch(patch())).toThrow(/unlock|lock/i);
+  group.locked = false;
+  const assets = {
+    get: () =>
+      ({ tiff: { editingPrecision: "float32" }, tiffColor: {} }) as never,
+  };
+  expect(() => assertFloatSources(d.toJSON(), assets)).not.toThrow();
+  layer.mask = LayerMask.fromBitmap("native");
+  expect(() => assertFloatSources(d.toJSON(), assets)).toThrow("native byte");
 });
-it('complete native patch source capture owns logical metadata and detects every original identity change before publication',async()=>{
- const f=await fixture(),value=patch().toJSON(),pending=captureFloatPatchAssets([value],f.provider);value.assetId='foreign';value.width=99;const captured=await pending;expect(captured.tiles[0]).toEqual({region:{x:0,y:0,width:2,height:1},original:f.blob});captured.dispose();expect(()=>captured.tiles).toThrow('disposed');
- for(const key of ['blob','width','height','identity','pixels'] as const){const source=f.sources.get('native')!,saved={...source},next=captureFloatPatchAssets([patch().toJSON()],f.provider);if(key==='blob')source.blob=f.blob.slice(0,f.blob.size,'image/tiff');else if(key==='width'||key==='height')source[key]++;else source[key]={};await expect(next).rejects.toThrow(/changed|dimensions/);Object.assign(source,saved);}
- const data=patch().toJSON(),fieldPending=captureFloatPatch(data,f.provider);data.width=80;const field=await fieldPending,expected=await field.read({x:0,y:0,width:2,height:1},world);expect(words(expected)).toEqual(words(new Float32Array([4,-2,8,f.coverage[0],-16,32,4,f.coverage[1]])));field.dispose();expect(expected[0]).toBe(4);await expect(field.read({x:0,y:0,width:1,height:1},world)).rejects.toThrow('disposed');
+it("complete native patch source capture owns logical metadata and detects every original identity change before publication", async () => {
+  const f = await fixture(),
+    value = patch().toJSON(),
+    pending = captureFloatPatchAssets([value], f.provider);
+  value.assetId = "foreign";
+  value.width = 99;
+  const captured = await pending;
+  expect(captured.tiles[0]).toEqual({
+    region: { x: 0, y: 0, width: 2, height: 1 },
+    original: f.blob,
+  });
+  captured.dispose();
+  expect(() => captured.tiles).toThrow("disposed");
+  for (const key of [
+    "blob",
+    "width",
+    "height",
+    "identity",
+    "pixels",
+  ] as const) {
+    const source = f.sources.get("native")!,
+      saved = { ...source },
+      next = captureFloatPatchAssets([patch().toJSON()], f.provider);
+    if (key === "blob")
+      source.blob = f.blob.slice(0, f.blob.size, "image/tiff");
+    else if (key === "width" || key === "height") source[key]++;
+    else source[key] = {};
+    await expect(next).rejects.toThrow(/changed|dimensions/);
+    Object.assign(source, saved);
+  }
+  const data = patch().toJSON(),
+    fieldPending = captureFloatPatch(data, f.provider);
+  data.width = 80;
+  const field = await fieldPending,
+    expected = await field.read({ x: 0, y: 0, width: 2, height: 1 }, world);
+  expect(words(expected)).toEqual(
+    words(
+      new Float32Array([4, -2, 8, f.coverage[0], -16, 32, 4, f.coverage[1]]),
+    ),
+  );
+  field.dispose();
+  expect(expected[0]).toBe(4);
+  await expect(
+    field.read({ x: 0, y: 0, width: 1, height: 1 }, world),
+  ).rejects.toThrow("disposed");
 });
-it('hidden native corrections validate full canonical originals, including a nonfinite tail outside the first rendering tile',async()=>{
- const f=await fixture(),d=new Document({precision:'float32'}),layer=d.layers.add(new AdjustmentLayer({visible:false,opacity:0,adjustment:patch()}));expect(hasPreparedPaint(d.toJSON())).toBe(true);expect(commandHasPreparedPaint({type:'layer.add',layer:layer.toJSON()})).toBe(true);expect(commandHasPreparedPaint({type:'layer.update',id:layer.id,patch:{adjustment:patch().toJSON()}})).toBe(true);await validatePreparedPaintAssets(d.toJSON(),f.provider);
- const invalid=new Blob([new Uint8Array(await readFile('tests/fixtures/float-retouch/invalid-tail.tif'))],{type:'image/tiff'});f.sources.set('native',{blob:invalid,width:517,height:3,identity:{}});await expect(validateFloatPatchAssets(d.toJSON(),f.provider)).rejects.toThrow('finite');f.sources.set('native',{blob:f.blob,width:2,height:1,identity:{}});await validateFloatPatchAssets(d.toJSON(),f.provider);
- const abort=new AbortController(),pending=captureFloatPatchAssets([patch().toJSON()],f.provider,{signal:abort.signal});abort.abort(new Error('Cancelled native correction'));await expect(pending).rejects.toThrow('Cancelled native correction');
+it("hidden native corrections validate full canonical originals, including a nonfinite tail outside the first rendering tile", async () => {
+  const f = await fixture(),
+    d = new Document({ precision: "float32" }),
+    layer = d.layers.add(
+      new AdjustmentLayer({ visible: false, opacity: 0, adjustment: patch() }),
+    );
+  expect(hasPreparedPaint(d.toJSON())).toBe(true);
+  expect(
+    commandHasPreparedPaint({ type: "layer.add", layer: layer.toJSON() }),
+  ).toBe(true);
+  expect(
+    commandHasPreparedPaint({
+      type: "layer.update",
+      id: layer.id,
+      patch: { adjustment: patch().toJSON() },
+    }),
+  ).toBe(true);
+  await validatePreparedPaintAssets(d.toJSON(), f.provider);
+  const invalid = new Blob(
+    [
+      new Uint8Array(
+        await readFile("tests/fixtures/float-retouch/invalid-tail.tif"),
+      ),
+    ],
+    { type: "image/tiff" },
+  );
+  f.sources.set("native", {
+    blob: invalid,
+    width: 517,
+    height: 3,
+    identity: {},
+  });
+  await expect(
+    validateFloatPatchAssets(d.toJSON(), f.provider),
+  ).rejects.toThrow("finite");
+  f.sources.set("native", { blob: f.blob, width: 2, height: 1, identity: {} });
+  await validateFloatPatchAssets(d.toJSON(), f.provider);
+  const abort = new AbortController(),
+    pending = captureFloatPatchAssets([patch().toJSON()], f.provider, {
+      signal: abort.signal,
+    });
+  abort.abort(new Error("Cancelled native correction"));
+  await expect(pending).rejects.toThrow("Cancelled native correction");
 });
-it('native correction capture closes safely under reentrant cancellation and retains exact affine read partitions',async()=>{
- const f=await fixture();let field:Awaited<ReturnType<typeof captureFloatPatch>>|undefined,retire=false;field=await captureFloatPatch(patch().toJSON(),f.provider,{check(){if(retire)field!.dispose();}});const pose=new AffineTransform(-1.5,.13,.2,.75,6.25,2.5),area={x:0,y:0,width:10,height:6},all=await field.read(area,pose),parts=new Float32Array(all.length);for(let y=0;y<area.height;y++)for(let x=0;x<area.width;x++)parts.set(await field.read({x,y,width:1,height:1},pose),(y*area.width+x)*4);expect(words(parts)).toEqual(words(all));retire=true;await expect(field.read(area,pose)).rejects.toThrow('disposed');
+it("native correction capture closes safely under reentrant cancellation and retains exact affine read partitions", async () => {
+  const f = await fixture();
+  let field: Awaited<ReturnType<typeof captureFloatPatch>> | undefined,
+    retire = false;
+  field = await captureFloatPatch(patch().toJSON(), f.provider, {
+    check() {
+      if (retire) field!.dispose();
+    },
+  });
+  const pose = new AffineTransform(-1.5, 0.13, 0.2, 0.75, 6.25, 2.5),
+    area = { x: 0, y: 0, width: 10, height: 6 },
+    all = await field.read(area, pose),
+    parts = new Float32Array(all.length);
+  for (let y = 0; y < area.height; y++)
+    for (let x = 0; x < area.width; x++)
+      parts.set(
+        await field.read({ x, y, width: 1, height: 1 }, pose),
+        (y * area.width + x) * 4,
+      );
+  expect(words(parts)).toEqual(words(all));
+  retire = true;
+  await expect(field.read(area, pose)).rejects.toThrow("disposed");
 });
-it('linear patch replacement applies coverage once and retains every alpha and uncovered/transparent hidden word',async()=>{
- const before=new Float32Array([16,-8,4,.375,-0,-4,123,-0,0,0,0,.0001,3e38,-3e38,8,.5]),source=new Float32Array([4,-2,8,.64123,4,8,16,1,-3e38,3e38,2e30,1,-3e38,3e38,16,.5]),saved=before.slice(),amount=source[3],expected=new Float32Array([16+amount*(4-16),-8+amount*(-2+8),4+amount*(8-4),.375,-0,-4,123,-0,-3e38,3e38,2e30,before[11],0,0,12,.5]),result=await applyFloatPatch(before,source,()=>{});expect(words(result)).toEqual(words(expected));expect(words(before)).toEqual(words(saved));
- const final=await blendFloatAdjustment(before,result,'normal',.64123,undefined,{floatComposite:async()=>{throw new Error('Normal replacement must not source-over alpha');}},()=>{});for(let i=3;i<before.length;i+=4)expect(words(final)[i]).toBe(words(before)[i]);expect(words(final).slice(4,8)).toEqual(words(before).slice(4,8));
- await expect(applyFloatPatch(before,new Float32Array(4),()=>{})).rejects.toThrow('geometry');const bad=source.slice();bad[0]=NaN;await expect(applyFloatPatch(before,bad,()=>{})).rejects.toThrow();
+it("linear patch replacement applies coverage once and retains every alpha and uncovered/transparent hidden word", async () => {
+  const before = new Float32Array([
+      16, -8, 4, 0.375, -0, -4, 123, -0, 0, 0, 0, 0.0001, 3e38, -3e38, 8, 0.5,
+    ]),
+    source = new Float32Array([
+      4, -2, 8, 0.64123, 4, 8, 16, 1, -3e38, 3e38, 2e30, 1, -3e38, 3e38, 16,
+      0.5,
+    ]),
+    saved = before.slice(),
+    amount = source[3],
+    expected = new Float32Array([
+      16 + amount * (4 - 16),
+      -8 + amount * (-2 + 8),
+      4 + amount * (8 - 4),
+      0.375,
+      -0,
+      -4,
+      123,
+      -0,
+      -3e38,
+      3e38,
+      2e30,
+      before[11],
+      0,
+      0,
+      12,
+      0.5,
+    ]),
+    result = await applyFloatPatch(before, source, () => {});
+  expect(words(result)).toEqual(words(expected));
+  expect(words(before)).toEqual(words(saved));
+  const final = await blendFloatAdjustment(
+    before,
+    result,
+    "normal",
+    0.64123,
+    undefined,
+    {
+      floatComposite: async () => {
+        throw new Error("Normal replacement must not source-over alpha");
+      },
+    },
+    () => {},
+  );
+  for (let i = 3; i < before.length; i += 4)
+    expect(words(final)[i]).toBe(words(before)[i]);
+  expect(words(final).slice(4, 8)).toEqual(words(before).slice(4, 8));
+  await expect(
+    applyFloatPatch(before, new Float32Array(4), () => {}),
+  ).rejects.toThrow("geometry");
+  const bad = source.slice();
+  bad[0] = NaN;
+  await expect(applyFloatPatch(before, bad, () => {})).rejects.toThrow();
 });
-it('native corrected RGB and continuous coverage encode over several tiles without a renderer-window-sized patch cap',async()=>{
- const width=513,height=512,pixels=new Float32Array(width*height*4),coverage=new Float32Array(width*height);for(let p=0;p<coverage.length;p++){pixels.set([4,-2,8,.125],p*4);coverage[p]=p%2?.64123:1e-6;}const blob=await encodeFloatPatchAsset(pixels,coverage,width,height),region={x:509,y:510,width:4,height:2},actual=await readFloatWetTileWindow(blob,width,height,region);for(let y=0;y<2;y++)for(let x=0;x<4;x++){const p=(region.y+y)*width+region.x+x;expect([...actual.subarray((y*4+x)*4,(y*4+x+1)*4)]).toEqual([4,-2,8,coverage[p]]);}
+it("native corrected RGB and continuous coverage encode over several tiles without a renderer-window-sized patch cap", async () => {
+  const width = 513,
+    height = 512,
+    pixels = new Float32Array(width * height * 4),
+    coverage = new Float32Array(width * height);
+  for (let p = 0; p < coverage.length; p++) {
+    pixels.set([4, -2, 8, 0.125], p * 4);
+    coverage[p] = p % 2 ? 0.64123 : 1e-6;
+  }
+  const blob = await encodeFloatPatchAsset(pixels, coverage, width, height),
+    region = { x: 509, y: 510, width: 4, height: 2 },
+    actual = await readFloatWetTileWindow(blob, width, height, region);
+  for (let y = 0; y < 2; y++)
+    for (let x = 0; x < 4; x++) {
+      const p = (region.y + y) * width + region.x + x;
+      expect([
+        ...actual.subarray((y * 4 + x) * 4, (y * 4 + x + 1) * 4),
+      ]).toEqual([4, -2, 8, coverage[p]]);
+    }
 });

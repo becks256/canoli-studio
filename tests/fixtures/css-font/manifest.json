@@ -1,26 +1,10 @@
 {
   "license": "CC0-1.0; original geometric test artwork",
   "axes": {
-    "wght": [
-      400,
-      400,
-      800
-    ],
-    "wdth": [
-      75,
-      100,
-      125
-    ],
-    "ital": [
-      0,
-      0,
-      1
-    ],
-    "slnt": [
-      -14,
-      0,
-      0
-    ]
+    "wght": [400, 400, 800],
+    "wdth": [75, 100, 125],
+    "ital": [0, 0, 1],
+    "slnt": [-14, 0, 0]
   },
   "references": {
     "weight": {

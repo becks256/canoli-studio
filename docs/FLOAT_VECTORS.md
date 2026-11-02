@@ -63,22 +63,36 @@ The following works in an existing float document, through Scripts or the
 ordinary trusted OO API:
 
 ```js
-const vectors = document.layers.add(new VectorLayer({
-  name: "Linear vectors", opacity: 0.64123, fillOpacity: 0.75
-}));
-vectors.paths.add(VectorPath.rectangle({
-  x: 0, y: 0, width: document.width, height: document.height
-}, 0, {
-  stroke: null,
-  fillGradient: {
-    kind: "linear", start: {x: 0, y: 0},
-    end: {x: document.width, y: 0},
-    stops: [
-      {position: 0, color: "#ff0000", opacity: 0.375},
-      {position: 1, color: "#0000ff", opacity: 0.75}
-    ]
-  }
-}));
+const vectors = document.layers.add(
+  new VectorLayer({
+    name: "Linear vectors",
+    opacity: 0.64123,
+    fillOpacity: 0.75,
+  }),
+);
+vectors.paths.add(
+  VectorPath.rectangle(
+    {
+      x: 0,
+      y: 0,
+      width: document.width,
+      height: document.height,
+    },
+    0,
+    {
+      stroke: null,
+      fillGradient: {
+        kind: "linear",
+        start: { x: 0, y: 0 },
+        end: { x: document.width, y: 0 },
+        stops: [
+          { position: 0, color: "#ff0000", opacity: 0.375 },
+          { position: 1, color: "#0000ff", opacity: 0.75 },
+        ],
+      },
+    },
+  ),
+);
 document.selectedLayer = vectors;
 ```
 

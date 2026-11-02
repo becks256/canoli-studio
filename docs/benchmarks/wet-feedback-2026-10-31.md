@@ -42,14 +42,14 @@ pixels sampled on animation frames; pixel readback is included. Complete frame
 hashing happens after each endpoint's timing. Both releases use the same test.
 CPU sampling is enabled in this pair and may perturb timing.
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 99.0 → 67.6 ms | 119.5 → 86.8 ms |
-| Affine mask | 91.9 → 72.6 ms | 128.8 → 96.0 ms |
-| Affine filter mask | 99.9 → 87.5 ms | 174.2 → 116.8 ms |
-| Projected raster | 111.1 → 102.7 ms | 172.5 → 135.9 ms |
-| Projected mask | 134.4 → 118.7 ms | 164.1 → 147.8 ms |
-| Projected filter mask | 143.9 → 124.5 ms | 197.2 → 197.1 ms |
+| Target                | Median before → after | P95 before → after |
+| --------------------- | --------------------: | -----------------: |
+| Affine raster         |        99.0 → 67.6 ms |    119.5 → 86.8 ms |
+| Affine mask           |        91.9 → 72.6 ms |    128.8 → 96.0 ms |
+| Affine filter mask    |        99.9 → 87.5 ms |   174.2 → 116.8 ms |
+| Projected raster      |      111.1 → 102.7 ms |   172.5 → 135.9 ms |
+| Projected mask        |      134.4 → 118.7 ms |   164.1 → 147.8 ms |
+| Projected filter mask |      143.9 → 124.5 ms |   197.2 → 197.1 ms |
 
 All **72 complete foreground-frame hashes** and **six final PNGs** are identical
 between releases. Original PNG bytes, twelve accepted samples per operation,
@@ -114,14 +114,14 @@ reference/generators, CPU/stage traces, complete reports, raw samples and small
 artifacts. Full failed/pilot logs remain alongside final acceptance; no accepted
 browser run retries or skips a case.
 
-| Unprofiled target | Median before → after | P95 before → after | Long tasks before / after |
-| --- | ---: | ---: | ---: |
-| Affine layer | 102.9 → 94.9 ms | 136.5 → 111.3 ms | 0 / 0 |
-| Affine mask | 120.9 → 87.1 ms | 183.3 → 129.5 ms | 0 / 0 |
-| Affine filter-mask | 125.0 → 121.5 ms | 194.5 → 161.0 ms | 0 / 0 |
-| Projected layer | 162.5 → 131.3 ms | 229.4 → 180.9 ms | 0 / 0 |
-| Projected mask | 162.3 → 143.4 ms | 203.8 → 198.9 ms | 0 / 0 |
-| Projected filter-mask | 197.3 → 163.3 ms | 278.6 → 263.5 ms | 0 / 0 |
+| Unprofiled target     | Median before → after | P95 before → after | Long tasks before / after |
+| --------------------- | --------------------: | -----------------: | ------------------------: |
+| Affine layer          |       102.9 → 94.9 ms |   136.5 → 111.3 ms |                     0 / 0 |
+| Affine mask           |       120.9 → 87.1 ms |   183.3 → 129.5 ms |                     0 / 0 |
+| Affine filter-mask    |      125.0 → 121.5 ms |   194.5 → 161.0 ms |                     0 / 0 |
+| Projected layer       |      162.5 → 131.3 ms |   229.4 → 180.9 ms |                     0 / 0 |
+| Projected mask        |      162.3 → 143.4 ms |   203.8 → 198.9 ms |                     0 / 0 |
+| Projected filter-mask |      197.3 → 163.3 ms |   278.6 → 263.5 ms |                     0 / 0 |
 
 [Compact evidence archive](wet-feedback-2026-10-31.json.gz):
 

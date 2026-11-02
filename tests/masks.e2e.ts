@@ -1,4 +1,4 @@
-import {expectPenControl} from './pen-control-position';
+import { expectPenControl } from "./pen-control-position";
 import { test, expect } from "@playwright/test";
 
 test("mask inspector supports keyboard toggles, density, undo and script/project round trips", async ({
@@ -821,91 +821,99 @@ test("painted-mask prefixes and active stamps are reused without changing previe
       increments: number[] = [],
       replayCounts: number[] = [];
     try {
-      for (const feather of [0, 9.5]) for (const clipped of [false, true]) for (const mode of ["hide", "reveal"] as const) {
-        renderer.clearCache();
-        const doc = new Document({ width: 600, height: 90 });
-        const group = doc.layers.add(new LayerGroup());
-        group.layers.add(
-          new TextLayer({
-            text: "Cached source",
-            fontSize: 60,
-            color: "#ff8855",
-          }),
-        );
-        const clip = new MarqueeSelection({
-          shape: "rectangle",
-          x: 10,
-          y: 5,
-          width: 580,
-          height: 70,
-        });
-        const finished = new BrushStroke({
-          points: [
-            { x: 100, y: 40 },
-            { x: 500, y: 40 },
-          ],
-          size: 30,
-          opacity: 0.3,
-        });
-        const live = new BrushStroke({
-          points: [
-            { x: 40, y: 30 },
-            { x: 550, y: 35 },
-          ],
-          size: 38,
-          opacity: 0.6,
-          hardness: 0.35,
-          ...(clipped ? { clip } : {}),
-        });
-        let base = new LayerMask({ base: mode === "hide" ? 1 : 0, feather })
-          .paint(finished, mode)
-          .paint(live, mode)
-          .toJSON();
-        if (base.kind !== "paint") throw Error("paint mask expected");
-        const draw = async (cache = true) => {
-          const c = await renderer.render(
-            doc.getSnapshot().document,
-            editor.assetStore,
-            { cache },
-          );
-          const pixels = c.getContext("2d")!.getImageData(0, 0, 600, 90).data;
-          c.width = c.height = 1;
-          return pixels;
-        };
-        group.update({ mask: base });
-        await draw();
-        const before = renderer.maskDiagnostics,
-          drawsBefore = textDraws;
-        base = structuredClone(base);
-        const appended=base.strokes.at(-1)!.stroke;if(appended.kind==='wet')throw new Error('Expected ordinary active coverage.');
-        appended.points.push({x:570,y:45,pressure:.7});
-        group.update({ mask: base });
-        const actual = await draw();
-        const after = renderer.maskDiagnostics;
-        increments.push(after.appendedPoints - before.appendedPoints);
-        replayCounts.push(after.prefixReplays - before.prefixReplays);
-        if (textDraws !== drawsBefore)
-          throw Error("Mask edit rerasterized unchanged source text");
-        const expected = await draw(false);
-        let max = 0;
-        for (let i = 0; i < actual.length; i++)
-          max = Math.max(max, Math.abs(actual[i] - expected[i]));
-        differences.push(max);
-        // Editing an earlier point must reset active coverage, rather than append over stale pixels.
-        base = structuredClone(base);
-        const changedStroke=base.strokes.at(-1)!.stroke;if(changedStroke.kind==='wet')throw new Error('Expected ordinary changed coverage.');
-        changedStroke.points[0].y=65;
-        group.update({ mask: base });
-        const changed = await draw(),
-          reference = await draw(false);
-        let changedMax = 0;
-        for (let i = 0; i < changed.length; i++)
-          changedMax = Math.max(
-            changedMax,
-            Math.abs(changed[i] - reference[i]),
-          );
-        differences.push(changedMax);
-      }
+      for (const feather of [0, 9.5])
+        for (const clipped of [false, true])
+          for (const mode of ["hide", "reveal"] as const) {
+            renderer.clearCache();
+            const doc = new Document({ width: 600, height: 90 });
+            const group = doc.layers.add(new LayerGroup());
+            group.layers.add(
+              new TextLayer({
+                text: "Cached source",
+                fontSize: 60,
+                color: "#ff8855",
+              }),
+            );
+            const clip = new MarqueeSelection({
+              shape: "rectangle",
+              x: 10,
+              y: 5,
+              width: 580,
+              height: 70,
+            });
+            const finished = new BrushStroke({
+              points: [
+                { x: 100, y: 40 },
+                { x: 500, y: 40 },
+              ],
+              size: 30,
+              opacity: 0.3,
+            });
+            const live = new BrushStroke({
+              points: [
+                { x: 40, y: 30 },
+                { x: 550, y: 35 },
+              ],
+              size: 38,
+              opacity: 0.6,
+              hardness: 0.35,
+              ...(clipped ? { clip } : {}),
+            });
+            let base = new LayerMask({ base: mode === "hide" ? 1 : 0, feather })
+              .paint(finished, mode)
+              .paint(live, mode)
+              .toJSON();
+            if (base.kind !== "paint") throw Error("paint mask expected");
+            const draw = async (cache = true) => {
+              const c = await renderer.render(
+                doc.getSnapshot().document,
+                editor.assetStore,
+                { cache },
+              );
+              const pixels = c
+                .getContext("2d")!
+                .getImageData(0, 0, 600, 90).data;
+              c.width = c.height = 1;
+              return pixels;
+            };
+            group.update({ mask: base });
+            await draw();
+            const before = renderer.maskDiagnostics,
+              drawsBefore = textDraws;
+            base = structuredClone(base);
+            const appended = base.strokes.at(-1)!.stroke;
+            if (appended.kind === "wet")
+              throw new Error("Expected ordinary active coverage.");
+            appended.points.push({ x: 570, y: 45, pressure: 0.7 });
+            group.update({ mask: base });
+            const actual = await draw();
+            const after = renderer.maskDiagnostics;
+            increments.push(after.appendedPoints - before.appendedPoints);
+            replayCounts.push(after.prefixReplays - before.prefixReplays);
+            if (textDraws !== drawsBefore)
+              throw Error("Mask edit rerasterized unchanged source text");
+            const expected = await draw(false);
+            let max = 0;
+            for (let i = 0; i < actual.length; i++)
+              max = Math.max(max, Math.abs(actual[i] - expected[i]));
+            differences.push(max);
+            // Editing an earlier point must reset active coverage, rather than append over stale pixels.
+            base = structuredClone(base);
+            const changedStroke = base.strokes.at(-1)!.stroke;
+            if (changedStroke.kind === "wet")
+              throw new Error("Expected ordinary changed coverage.");
+            changedStroke.points[0].y = 65;
+            group.update({ mask: base });
+            const changed = await draw(),
+              reference = await draw(false);
+            let changedMax = 0;
+            for (let i = 0; i < changed.length; i++)
+              changedMax = Math.max(
+                changedMax,
+                Math.abs(changed[i] - reference[i]),
+              );
+            differences.push(changedMax);
+          }
       const retained = renderer.maskDiagnostics.activeBytes;
       renderer.clearCache();
       return {
@@ -1246,8 +1254,14 @@ test("Pen mask target edits anchors and handles with keyboard, cancellation and 
   await expect(insert).toBeDisabled();
   await page.mouse.click(box.x + 60, box.y + 60);
   const controls = page.getByTestId("pen-controls");
-  await expect(controls.locator("rect").first()).toHaveAttribute("fill", "#d5e79b");
-  await expect(controls.locator("rect").nth(1)).toHaveAttribute("fill", "#202523");
+  await expect(controls.locator("rect").first()).toHaveAttribute(
+    "fill",
+    "#d5e79b",
+  );
+  await expect(controls.locator("rect").nth(1)).toHaveAttribute(
+    "fill",
+    "#202523",
+  );
   await insert.click();
   expect((await read()).count).toBe(5);
   expect((await read()).strokes).toBe(1);

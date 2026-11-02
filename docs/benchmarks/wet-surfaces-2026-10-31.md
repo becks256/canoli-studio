@@ -60,14 +60,14 @@ event timestamp to new matching foreground-canvas pixels on animation frames;
 readback is included and complete frame hashing happens after each timing.
 Endpoints are more than three brush diameters apart and have pre-event witnesses.
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 84.4 → 70.4 ms | 123.0 → 90.2 ms |
-| Affine mask | 94.6 → 70.7 ms | 131.2 → 90.2 ms |
-| Affine filter mask | 139.2 → 72.3 ms | 249.9 → 104.3 ms |
-| Projected raster | 157.3 → 94.3 ms | 250.4 → 114.8 ms |
-| Projected mask | 158.8 → 119.0 ms | 200.2 → 147.3 ms |
-| Projected filter mask | 166.1 → 119.2 ms | 279.5 → 200.4 ms |
+| Target                | Median before → after | P95 before → after |
+| --------------------- | --------------------: | -----------------: |
+| Affine raster         |        84.4 → 70.4 ms |    123.0 → 90.2 ms |
+| Affine mask           |        94.6 → 70.7 ms |    131.2 → 90.2 ms |
+| Affine filter mask    |       139.2 → 72.3 ms |   249.9 → 104.3 ms |
+| Projected raster      |       157.3 → 94.3 ms |   250.4 → 114.8 ms |
+| Projected mask        |      158.8 → 119.0 ms |   200.2 → 147.3 ms |
+| Projected filter mask |      166.1 → 119.2 ms |   279.5 → 200.4 ms |
 
 All **72 complete foreground hashes and six final PNGs** match the reference.
 Every operation retains twelve accepted samples, original source bytes, one Undo
@@ -96,13 +96,13 @@ limit general performance claims. Keep compact findings/receipts in Git; new raw
 ZIPs stay local.
 
 | Counterbalanced target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine layer | 73.3 → 60.8 ms | 86.3 → 78.7 ms |
-| Affine mask | 72.9 → 60.5 ms | 93.5 → 77.8 ms |
-| Affine filter-mask | 86.0 → 72.0 ms | 102.6 → 105.4 ms |
-| Projected layer | 101.5 → 86.9 ms | 132.3 → 130.8 ms |
-| Projected mask | 121.2 → 103.5 ms | 147.2 → 142.1 ms |
-| Projected filter-mask | 119.8 → 120.3 ms | 197.9 → 202.0 ms |
+| ---------------------- | --------------------: | -----------------: |
+| Affine layer           |        73.3 → 60.8 ms |     86.3 → 78.7 ms |
+| Affine mask            |        72.9 → 60.5 ms |     93.5 → 77.8 ms |
+| Affine filter-mask     |        86.0 → 72.0 ms |   102.6 → 105.4 ms |
+| Projected layer        |       101.5 → 86.9 ms |   132.3 → 130.8 ms |
+| Projected mask         |      121.2 → 103.5 ms |   147.2 → 142.1 ms |
+| Projected filter-mask  |      119.8 → 120.3 ms |   197.9 → 202.0 ms |
 
 The counterbalanced pair improves five of six medians. Projected filter-mask
 median is essentially unchanged (119.8→120.3 ms); affine filter-mask p95 rises

@@ -3610,10 +3610,7 @@
     "percentile": "nearest-rank, no filtering or pooling",
     "presentation": "Input through prepared matching-state frame to canvas copy, not physical display",
     "sourceIdentity": "Measured benchmark and final matrices have identical runtime/test inputs. Normal-build resource differences include the expected debug bundle/HTML and updated generated architecture/requirements/system-design guides.",
-    "viewport": [
-      1440,
-      1000
-    ],
+    "viewport": [1440, 1000],
     "workers": 1
   },
   "negativeControl": {
@@ -3849,9 +3846,7 @@
     "baselineControlsAfterCandidate": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "commitMs": {
             "median": 1.7499999403953552,
             "n": 12,
@@ -3859,9 +3854,7 @@
           },
           "iterations": 12,
           "layers": 16,
-          "longTasks": [
-            50
-          ],
+          "longTasks": [50],
           "presentMs": {
             "median": 75.60000002384186,
             "n": 12,
@@ -3869,9 +3862,7 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "commitMs": {
             "median": 4.349999964237213,
             "n": 12,
@@ -3880,27 +3871,8 @@
           "iterations": 12,
           "layers": 64,
           "longTasks": [
-            184,
-            106,
-            103,
-            99,
-            96,
-            97,
-            100,
-            52,
-            100,
-            55,
-            108,
-            56,
-            104,
-            50,
-            95,
-            52,
-            109,
-            51,
-            98,
-            53,
-            92
+            184, 106, 103, 99, 96, 97, 100, 52, 100, 55, 108, 56, 104, 50, 95,
+            52, 109, 51, 98, 53, 92
           ],
           "presentMs": {
             "median": 145.14999997615814,
@@ -4021,9 +3993,7 @@
     "baselineFirst": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "commitMs": {
             "median": 1.600000023841858,
             "n": 12,
@@ -4031,9 +4001,7 @@
           },
           "iterations": 12,
           "layers": 16,
-          "longTasks": [
-            50
-          ],
+          "longTasks": [50],
           "presentMs": {
             "median": 77.80000001192093,
             "n": 12,
@@ -4041,9 +4009,7 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "commitMs": {
             "median": 4.349999964237213,
             "n": 12,
@@ -4052,31 +4018,8 @@
           "iterations": 12,
           "layers": 64,
           "longTasks": [
-            174,
-            103,
-            106,
-            51,
-            103,
-            52,
-            98,
-            61,
-            118,
-            51,
-            104,
-            53,
-            95,
-            52,
-            102,
-            56,
-            107,
-            56,
-            99,
-            51,
-            98,
-            51,
-            100,
-            53,
-            102
+            174, 103, 106, 51, 103, 52, 98, 61, 118, 51, 104, 53, 95, 52, 102,
+            56, 107, 56, 99, 51, 98, 51, 100, 53, 102
           ],
           "presentMs": {
             "median": 150.54999995231628,
@@ -4097,9 +4040,7 @@
     "candidate": {
       "measurements": [
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "commitMs": {
             "median": 1.800000011920929,
             "n": 12,
@@ -4107,9 +4048,7 @@
           },
           "iterations": 12,
           "layers": 16,
-          "longTasks": [
-            52
-          ],
+          "longTasks": [52],
           "presentMs": {
             "median": 57.30000001192093,
             "n": 12,
@@ -4117,9 +4056,7 @@
           }
         },
         {
-          "backends": [
-            "canvas2d"
-          ],
+          "backends": ["canvas2d"],
           "commitMs": {
             "median": 3.899999976158142,
             "n": 12,
@@ -4127,11 +4064,7 @@
           },
           "iterations": 12,
           "layers": 64,
-          "longTasks": [
-            177,
-            54,
-            74
-          ],
+          "longTasks": [177, 54, 74],
           "presentMs": {
             "median": 58.40000003576279,
             "n": 12,
@@ -4252,10 +4185,7 @@
   "scope": "F14 cold plain-text viewport working geometry; the full original implementation-roadmap goal remains active",
   "verification": {
     "allMatrixInputsEqual": true,
-    "builds": [
-      "benchmark",
-      "normal production"
-    ],
+    "builds": ["benchmark", "normal production"],
     "independentPixels": {
       "allExpectedEqual": true,
       "decoder": "Pillow 10.3.0",
@@ -4326,10 +4256,7 @@
         "allPixelsMatch": true,
         "path": "/tmp/canoli-text-typography-results/font-features.e2e.ts-a-gen-44e74-text-across-tile-boundaries/font-features-50mp-png.png",
         "rgbaSha256": "9394d1f0935152238d25e348b077bb0d1fc8d468fdf83635576f70480b9a1da6",
-        "size": [
-          10000,
-          5000
-        ]
+        "size": [10000, 5000]
       }
     },
     "nativeComposition": {

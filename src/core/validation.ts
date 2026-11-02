@@ -1,14 +1,21 @@
-import {writingModeSchema,textOrientationSchema} from './text-writing';
-import {perspectiveSchema} from './perspective';
-import {textPathSchema} from './text-path';
-import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
-import {characterRangeSchema} from './text-ranges';
-import {fontFamilyRequestSchema} from './font-management';
-import {fontFileSchema} from './font-files';
-import {layerAlignmentSchema,alignmentTargetSchema} from './layer-layout';
+import { writingModeSchema, textOrientationSchema } from "./text-writing";
+import { perspectiveSchema } from "./perspective";
+import { textPathSchema } from "./text-path";
+import {
+  fontVariantCapsSchema,
+  fontStretchSchema,
+  fontVariationSettingsSchema,
+} from "./font-features";
+import { characterRangeSchema } from "./text-ranges";
+import { fontFamilyRequestSchema } from "./font-management";
+import { fontFileSchema } from "./font-files";
+import { layerAlignmentSchema, alignmentTargetSchema } from "./layer-layout";
 import { layerCompSchema } from "./layer-comps";
-import {paragraphStyleSchema,paragraphOverrideKeysSchema} from './paragraph-styles';
-import { alphaChannelSchema } from './alpha-channels';
+import {
+  paragraphStyleSchema,
+  paragraphOverrideKeysSchema,
+} from "./paragraph-styles";
+import { alphaChannelSchema } from "./alpha-channels";
 import { polygonSelectionSchema } from "./lasso";
 import { smartFiltersSchema } from "./smart/filters";
 import { componentDefinitionSchema } from "./smart/manager";
@@ -28,7 +35,7 @@ import {
   pathSchema,
 } from "./drawing";
 import { z } from "zod";
-import { vectorBooleanOperandsSchema } from './vector-boolean';
+import { vectorBooleanOperandsSchema } from "./vector-boolean";
 import type { EditorCommand } from "./commands";
 import { validateDocument, createDocument } from "./model";
 import type { LayerData } from "./model";
@@ -63,7 +70,7 @@ const toneValues = z
 const patch = z
   .object({
     transform: affineSchema.optional(),
-    perspective:perspectiveSchema.nullable().optional(),
+    perspective: perspectiveSchema.nullable().optional(),
     mask: layerMaskSchema.nullable().optional(),
     metadata: authoredMetadataSchema.nullable().optional(),
     name: identifier.optional(),
@@ -76,13 +83,20 @@ const patch = z
     opacity: z.number().min(0).max(1).optional(),
     fillOpacity: z.number().min(0).max(1).optional(),
     clipped: z.boolean().optional(),
-    frequencyRadius: z.number().finite().min(0).max(4096/3).nullable().optional(),
+    frequencyRadius: z
+      .number()
+      .finite()
+      .min(0)
+      .max(4096 / 3)
+      .nullable()
+      .optional(),
     styles: styleSchema.optional(),
     blendMode: z.enum(GROUP_BLEND_MODES).optional(),
     text: z.string().max(10000).optional(),
-    writingMode:writingModeSchema.optional(),textOrientation:textOrientationSchema.optional(),
-    textPath:textPathSchema.nullable().optional(),
-    characterRanges:z.array(characterRangeSchema).max(10000).optional(),
+    writingMode: writingModeSchema.optional(),
+    textOrientation: textOrientationSchema.optional(),
+    textPath: textPathSchema.nullable().optional(),
+    characterRanges: z.array(characterRangeSchema).max(10000).optional(),
     fontSize: z.number().min(1).max(Number.MAX_SAFE_INTEGER).optional(),
     fontFamily: identifier.optional(),
     color: identifier.optional(),
@@ -90,11 +104,11 @@ const patch = z
     lineHeight: z.number().min(0.5).max(10).optional(),
     letterSpacing: z.number().min(-50).max(500).optional(),
     wordSpacing: z.number().min(-50).max(500).optional(),
-    fontKerning: z.enum(['auto', 'normal', 'none']).optional(),
-    fontVariantCaps:fontVariantCapsSchema.optional(),
-    fontStretch:fontStretchSchema.optional(),
-    fontVariationSettings:fontVariationSettingsSchema.optional(),
-    paragraphJustify: z.enum(["none","inter-word"]).optional(),
+    fontKerning: z.enum(["auto", "normal", "none"]).optional(),
+    fontVariantCaps: fontVariantCapsSchema.optional(),
+    fontStretch: fontStretchSchema.optional(),
+    fontVariationSettings: fontVariationSettingsSchema.optional(),
+    paragraphJustify: z.enum(["none", "inter-word"]).optional(),
     wrapWidth: dimension.nullable().optional(),
     paragraphSpacing: z.number().min(0).max(10000).optional(),
     firstLineIndent: z.number().min(-10000).max(10000).optional(),
@@ -109,8 +123,19 @@ const layer = z.unknown().transform((value, context) => {
   try {
     // Detached command data has no document precision yet. Accept a tree valid
     // in either editing mode; execution still validates its real destination.
-    try { validateDocument({ ...createDocument(), children: [value] }, false); }
-    catch { validateDocument({ ...createDocument(), precision:'float32', colorSpace:'linear-srgb', children:[value] }, false); }
+    try {
+      validateDocument({ ...createDocument(), children: [value] }, false);
+    } catch {
+      validateDocument(
+        {
+          ...createDocument(),
+          precision: "float32",
+          colorSpace: "linear-srgb",
+          children: [value],
+        },
+        false,
+      );
+    }
     return value as LayerData;
   } catch {
     context.addIssue({ code: "custom", message: "Invalid layer tree." });
@@ -120,7 +145,14 @@ const layer = z.unknown().transform((value, context) => {
 
 const commandVariants = () =>
   z.discriminatedUnion("type", [
-    z.object({type:z.literal('layer.align'),ids:z.array(identifier).min(1),alignment:layerAlignmentSchema,target:alignmentTargetSchema.optional()}).strict(),
+    z
+      .object({
+        type: z.literal("layer.align"),
+        ids: z.array(identifier).min(1),
+        alignment: layerAlignmentSchema,
+        target: alignmentTargetSchema.optional(),
+      })
+      .strict(),
     z
       .object({
         type: z.literal("layer.flip"),
@@ -139,17 +171,70 @@ const commandVariants = () =>
     z
       .object({ type: z.literal("layerComp.set"), comp: layerCompSchema })
       .strict(),
-    z.object({type:z.literal('document.font.replace'),from:fontFamilyRequestSchema,to:fontFamilyRequestSchema}).strict(),
-    z.object({type:z.literal('font.file.add'),file:fontFileSchema}).strict(),
-    z.object({type:z.literal('font.file.rename'),id:identifier,name:fontFileSchema.shape.name}).strict(),
-    z.object({type:z.literal('font.file.remove'),id:identifier,replaceWith:fontFamilyRequestSchema.optional()}).strict(),
-    z.object({type:z.literal('paragraphStyle.set'),style:paragraphStyleSchema}).strict(),
-    z.object({type:z.literal('paragraphStyle.remove'),id:identifier}).strict(),
-    z.object({type:z.literal('text.paragraphStyle'),id:identifier,styleId:identifier.nullable(),keepOverrides:z.boolean().optional()}).strict(),
-    z.object({type:z.literal('text.paragraphOverrides.clear'),id:identifier,keys:paragraphOverrideKeysSchema.optional()}).strict(),
-    z.object({type:z.literal('alphaChannel.set'),channel:alphaChannelSchema}).strict(),
-    z.object({type:z.literal('alphaChannel.remove'),id:identifier}).strict(),
-    z.object({type:z.literal('alphaChannel.reorder'),id:identifier,direction:z.enum(['up','down'])}).strict(),
+    z
+      .object({
+        type: z.literal("document.font.replace"),
+        from: fontFamilyRequestSchema,
+        to: fontFamilyRequestSchema,
+      })
+      .strict(),
+    z
+      .object({ type: z.literal("font.file.add"), file: fontFileSchema })
+      .strict(),
+    z
+      .object({
+        type: z.literal("font.file.rename"),
+        id: identifier,
+        name: fontFileSchema.shape.name,
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("font.file.remove"),
+        id: identifier,
+        replaceWith: fontFamilyRequestSchema.optional(),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("paragraphStyle.set"),
+        style: paragraphStyleSchema,
+      })
+      .strict(),
+    z
+      .object({ type: z.literal("paragraphStyle.remove"), id: identifier })
+      .strict(),
+    z
+      .object({
+        type: z.literal("text.paragraphStyle"),
+        id: identifier,
+        styleId: identifier.nullable(),
+        keepOverrides: z.boolean().optional(),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("text.paragraphOverrides.clear"),
+        id: identifier,
+        keys: paragraphOverrideKeysSchema.optional(),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("alphaChannel.set"),
+        channel: alphaChannelSchema,
+      })
+      .strict(),
+    z
+      .object({ type: z.literal("alphaChannel.remove"), id: identifier })
+      .strict(),
+    z
+      .object({
+        type: z.literal("alphaChannel.reorder"),
+        id: identifier,
+        direction: z.enum(["up", "down"]),
+      })
+      .strict(),
     z.object({ type: z.literal("layerComp.remove"), id: identifier }).strict(),
     z.object({ type: z.literal("layerComp.apply"), id: identifier }).strict(),
     z
@@ -250,7 +335,13 @@ const commandVariants = () =>
     z
       .object({ type: z.literal("path.add"), id: identifier, path: pathSchema })
       .strict(),
-    z.object({type:z.literal('paths.replace'),operands:vectorBooleanOperandsSchema,result:pathSchema.nullable()}).strict(),
+    z
+      .object({
+        type: z.literal("paths.replace"),
+        operands: vectorBooleanOperandsSchema,
+        result: pathSchema.nullable(),
+      })
+      .strict(),
     z
       .object({
         type: z.literal("path.update"),
@@ -269,7 +360,16 @@ const commandVariants = () =>
     z
       .object({ type: z.literal("document.guides"), guides: guidesSchema })
       .strict(),
-    z.object({type:z.literal('document.precision.float'),sources:z.array(z.object({layerId:identifier,assetId:identifier}).strict()).optional()}).strict(),
+    z
+      .object({
+        type: z.literal("document.precision.float"),
+        sources: z
+          .array(
+            z.object({ layerId: identifier, assetId: identifier }).strict(),
+          )
+          .optional(),
+      })
+      .strict(),
     z.object({ type: z.literal("document.rename"), name: identifier }).strict(),
     z
       .object({ type: z.literal("document.crop"), bounds: cropBoundsSchema })
@@ -363,9 +463,9 @@ const commandVariants = () =>
 const commandSchema: z.ZodType<EditorCommand> = z.lazy(commandVariants);
 
 /** Metadata for trusted adapters. parseCommands remains the admission boundary. */
-export const commandMetadataSchema=commandSchema;
-export const commandMetadataVariants=()=>commandVariants().options;
-export const layerPatchMetadataSchema=patch;
+export const commandMetadataSchema = commandSchema;
+export const commandMetadataVariants = () => commandVariants().options;
+export const layerPatchMetadataSchema = patch;
 
 /** Shared trust boundary for REST and sandbox results. Bound nesting before schema recursion. */
 export function parseCommands(input: unknown): EditorCommand[] {

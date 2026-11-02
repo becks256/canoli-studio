@@ -299,12 +299,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -336,12 +331,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -434,12 +424,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [

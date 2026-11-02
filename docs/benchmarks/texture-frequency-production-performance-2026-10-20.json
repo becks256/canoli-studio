@@ -200,10 +200,7 @@
           "reference": 13.400000035762787,
           "candidate": 14
         },
-        "candidateP95Range": [
-          14,
-          15
-        ],
+        "candidateP95Range": [14, 15],
         "candidateMaximumInput": 17.30000001192093,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -219,10 +216,7 @@
           "reference": 23.400000035762787,
           "candidate": 21.19999998807907
         },
-        "candidateP95Range": [
-          20.80000001192093,
-          21.5
-        ],
+        "candidateP95Range": [20.80000001192093, 21.5],
         "candidateMaximumInput": 23.600000023841858,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -238,10 +232,7 @@
           "reference": 20.30000001192093,
           "candidate": 14.300000011920929
         },
-        "candidateP95Range": [
-          14.300000011920929,
-          16.399999976158142
-        ],
+        "candidateP95Range": [14.300000011920929, 16.399999976158142],
         "candidateMaximumInput": 21.600000023841858,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -257,10 +248,7 @@
           "reference": 34.90000003576279,
           "candidate": 34.5
         },
-        "candidateP95Range": [
-          31.80000001192093,
-          36.89999997615814
-        ],
+        "candidateP95Range": [31.80000001192093, 36.89999997615814],
         "candidateMaximumInput": 74.20000004768372,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -276,10 +264,7 @@
           "reference": 95.70000004768372,
           "candidate": 31.599999964237213
         },
-        "candidateP95Range": [
-          28.69999998807907,
-          32
-        ],
+        "candidateP95Range": [28.69999998807907, 32],
         "candidateMaximumInput": 38.19999998807907,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -295,10 +280,7 @@
           "reference": 13.899999976158142,
           "candidate": 14
         },
-        "candidateP95Range": [
-          13.800000011920929,
-          14.200000047683716
-        ],
+        "candidateP95Range": [13.800000011920929, 14.200000047683716],
         "candidateMaximumInput": 15.199999988079071,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -314,10 +296,7 @@
           "reference": 22.80000001192093,
           "candidate": 28.30000001192093
         },
-        "candidateP95Range": [
-          24.100000023841858,
-          28.69999998807907
-        ],
+        "candidateP95Range": [24.100000023841858, 28.69999998807907],
         "candidateMaximumInput": 32.60000002384186,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -333,10 +312,7 @@
           "reference": 55.10000002384186,
           "candidate": 32.40000003576279
         },
-        "candidateP95Range": [
-          30.900000035762787,
-          36.10000002384186
-        ],
+        "candidateP95Range": [30.900000035762787, 36.10000002384186],
         "candidateMaximumInput": 39.89999997615814,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -352,10 +328,7 @@
           "reference": 17.899999976158142,
           "candidate": 14.600000023841858
         },
-        "candidateP95Range": [
-          14,
-          15.699999988079071
-        ],
+        "candidateP95Range": [14, 15.699999988079071],
         "candidateMaximumInput": 20.299999952316284,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -371,10 +344,7 @@
           "reference": 37.700000047683716,
           "candidate": 36.80000001192093
         },
-        "candidateP95Range": [
-          31.30000001192093,
-          40.19999998807907
-        ],
+        "candidateP95Range": [31.30000001192093, 40.19999998807907],
         "candidateMaximumInput": 61.09999996423721,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -390,10 +360,7 @@
           "reference": 89,
           "candidate": 31.900000035762787
         },
-        "candidateP95Range": [
-          28.30000001192093,
-          32.59999996423721
-        ],
+        "candidateP95Range": [28.30000001192093, 32.59999996423721],
         "candidateMaximumInput": 36.799999952316284,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {
@@ -409,10 +376,7 @@
           "reference": 7.899999976158142,
           "candidate": 14.700000047683716
         },
-        "candidateP95Range": [
-          12.399999976158142,
-          14.800000011920929
-        ],
+        "candidateP95Range": [12.399999976158142, 14.800000011920929],
         "candidateMaximumInput": 15.100000023841858,
         "candidateOverlappingTasks": 0,
         "legacyPixelDelta": {

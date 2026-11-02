@@ -1,18 +1,33 @@
-import {bitmapProjectionRequiresPrecision,projectBitmapPixels} from './bitmap-projection';
-import {AffineTransform} from '../core/affine';
-import {yieldTask} from './task-yield';
-import type { AssetStore, ImageAsset } from '../core/assets';
-import { brushTextureSourceSchema, textureSample, textureAffineSample, type BrushTextureSource, type TextureSample, type TextureAffineSample } from '../core/brush-texture';
-import { CanvasCache } from './cache';
-import { createCanvas, release } from './canvas';
-import type { PixelProcessor } from './processor';
+import {
+  bitmapProjectionRequiresPrecision,
+  projectBitmapPixels,
+} from "./bitmap-projection";
+import { AffineTransform } from "../core/affine";
+import { yieldTask } from "./task-yield";
+import type { AssetStore, ImageAsset } from "../core/assets";
+import {
+  brushTextureSourceSchema,
+  textureSample,
+  textureAffineSample,
+  type BrushTextureSource,
+  type TextureSample,
+  type TextureAffineSample,
+} from "../core/brush-texture";
+import { CanvasCache } from "./cache";
+import { createCanvas, release } from "./canvas";
+import type { PixelProcessor } from "./processor";
 
 export interface TexturePreparationControl {
   signal?: AbortSignal;
   isCancelled?(): boolean;
 }
-export interface TextureReadbackRegion { x:number; y:number; width:number; height:number; }
-type TextureConverter=PixelProcessor['brushTexture'];
+export interface TextureReadbackRegion {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+type TextureConverter = PixelProcessor["brushTexture"];
 
 /** Bounded, private mask tiles. Original bitmaps and source Blobs remain asset-owned. */
 export class BrushTextureSampler {
@@ -22,21 +37,37 @@ export class BrushTextureSampler {
   private generation = 0;
   private cacheGeneration = 0;
   private disposed = false;
-  private opaque:HTMLCanvasElement|null=null;
-  private readonly maximums=new WeakMap<HTMLCanvasElement,number>();
+  private opaque: HTMLCanvasElement | null = null;
+  private readonly maximums = new WeakMap<HTMLCanvasElement, number>();
 
-  constructor(private readonly processor: Pick<PixelProcessor, 'brushTexture'>, budget = 32 * 1024 * 1024) {
+  constructor(
+    private readonly processor: Pick<PixelProcessor, "brushTexture">,
+    budget = 32 * 1024 * 1024,
+  ) {
     if (!Number.isSafeInteger(budget) || budget < 0)
-      throw new Error('Texture cache budget must be a nonnegative safe integer.');
+      throw new Error(
+        "Texture cache budget must be a nonnegative safe integer.",
+      );
     this.cache = new CanvasCache(budget, true);
   }
 
-  get byteLength() { return this.cache.byteLength; }
+  get byteLength() {
+    return this.cache.byteLength;
+  }
   /** Alpha ceiling of the prepared snapshot, before caller compositing. */
-  preparedMaximum(canvas:HTMLCanvasElement){return this.maximums.get(canvas);}
-  private rememberMaximum(canvas:HTMLCanvasElement,pixels:Uint8ClampedArray){
-    let maximum=0;for(let i=3;i<pixels.length;i+=4){maximum=Math.max(maximum,pixels[i]);if(maximum===255)break;}
-    this.maximums.set(canvas,maximum);
+  preparedMaximum(canvas: HTMLCanvasElement) {
+    return this.maximums.get(canvas);
+  }
+  private rememberMaximum(
+    canvas: HTMLCanvasElement,
+    pixels: Uint8ClampedArray,
+  ) {
+    let maximum = 0;
+    for (let i = 3; i < pixels.length; i += 4) {
+      maximum = Math.max(maximum, pixels[i]);
+      if (maximum === 255) break;
+    }
+    this.maximums.set(canvas, maximum);
   }
 
   /** Returns a caller-owned surface. Release it after drawing, including error paths. */
@@ -47,53 +78,140 @@ export class BrushTextureSampler {
     control: TexturePreparationControl = {},
   ): Promise<HTMLCanvasElement> {
     const settings = brushTextureSourceSchema.parse(source);
-    const asset = assets.get(settings.assetId), bitmap = asset.bitmap;
-    const sample = textureSample(asset, input), { sourceRect: rect } = sample;
-    const signature = JSON.stringify([settings.channel, settings.invert, sample.width, sample.height,
-      rect.x, rect.y, rect.width, rect.height, sample.smoothing]);
-    return this.prepareTile(assets, asset, settings, sample, signature, context => {
-      context.drawImage(bitmap, rect.x, rect.y, rect.width, rect.height, 0, 0, sample.width, sample.height);
-    }, control);
+    const asset = assets.get(settings.assetId),
+      bitmap = asset.bitmap;
+    const sample = textureSample(asset, input),
+      { sourceRect: rect } = sample;
+    const signature = JSON.stringify([
+      settings.channel,
+      settings.invert,
+      sample.width,
+      sample.height,
+      rect.x,
+      rect.y,
+      rect.width,
+      rect.height,
+      sample.smoothing,
+    ]);
+    return this.prepareTile(
+      assets,
+      asset,
+      settings,
+      sample,
+      signature,
+      (context) => {
+        context.drawImage(
+          bitmap,
+          rect.x,
+          rect.y,
+          rect.width,
+          rect.height,
+          0,
+          0,
+          sample.width,
+          sample.height,
+        );
+      },
+      control,
+    );
   }
 
   /** No source-sized intermediate: project the original bitmap directly onto a bounded tile. */
   async prepareAffine(
-    assets:AssetStore,
-    source:BrushTextureSource,
-    input:TextureAffineSample,
-    control:TexturePreparationControl={},
-  ):Promise<HTMLCanvasElement> {
-    return this.prepareAffineUsing(assets,source,input,control,this.processor.brushTexture.bind(this.processor));
+    assets: AssetStore,
+    source: BrushTextureSource,
+    input: TextureAffineSample,
+    control: TexturePreparationControl = {},
+  ): Promise<HTMLCanvasElement> {
+    return this.prepareAffineUsing(
+      assets,
+      source,
+      input,
+      control,
+      this.processor.brushTexture.bind(this.processor),
+    );
   }
 
   /** Pack independent samples into one bounded pixel conversion, preserving
    * their original native projection and byte conversion order. */
   async prepareAffineBatch(
-    assets:AssetStore,
-    source:BrushTextureSource,
-    inputs:readonly TextureAffineSample[],
-    control:TexturePreparationControl={},
-    readbackRegions?:readonly TextureReadbackRegion[],
-  ):Promise<HTMLCanvasElement[]> {
-    if(inputs.length>64)throw new Error('Split texture conversion batches into at most 64 samples.');
-    const settings=brushTextureSourceSchema.parse(source),asset=assets.get(settings.assetId),bitmap=asset.bitmap,lifetime=assets.captureLifetime();
-    const samples=Array.from(inputs,input=>textureAffineSample(asset,input));
-    if(readbackRegions&&readbackRegions.length!==samples.length)throw new Error('Each texture sample requires one readback region.');
-    const regions=readbackRegions?Array.from(readbackRegions,(region,index)=>{
-      if(!region)throw new Error('Texture readback regions must be integer rectangles inside their projection.');
-      const {x,y,width,height}=region,sample=samples[index];
-      if(![x,y,width,height].every(Number.isSafeInteger)||x<0||y<0||width<=0||height<=0||x+width>sample.width||y+height>sample.height)
-        throw new Error('Texture readback regions must be integer rectangles inside their projection.');
-      return{x,y,width,height};
-    }):undefined;
+    assets: AssetStore,
+    source: BrushTextureSource,
+    inputs: readonly TextureAffineSample[],
+    control: TexturePreparationControl = {},
+    readbackRegions?: readonly TextureReadbackRegion[],
+  ): Promise<HTMLCanvasElement[]> {
+    if (inputs.length > 64)
+      throw new Error(
+        "Split texture conversion batches into at most 64 samples.",
+      );
+    const settings = brushTextureSourceSchema.parse(source),
+      asset = assets.get(settings.assetId),
+      bitmap = asset.bitmap,
+      lifetime = assets.captureLifetime();
+    const samples = Array.from(inputs, (input) =>
+      textureAffineSample(asset, input),
+    );
+    if (readbackRegions && readbackRegions.length !== samples.length)
+      throw new Error("Each texture sample requires one readback region.");
+    const regions = readbackRegions
+      ? Array.from(readbackRegions, (region, index) => {
+          if (!region)
+            throw new Error(
+              "Texture readback regions must be integer rectangles inside their projection.",
+            );
+          const { x, y, width, height } = region,
+            sample = samples[index];
+          if (
+            ![x, y, width, height].every(Number.isSafeInteger) ||
+            x < 0 ||
+            y < 0 ||
+            width <= 0 ||
+            height <= 0 ||
+            x + width > sample.width ||
+            y + height > sample.height
+          )
+            throw new Error(
+              "Texture readback regions must be integer rectangles inside their projection.",
+            );
+          return { x, y, width, height };
+        })
+      : undefined;
     lifetime();
-    if(!assets.has(settings.assetId)||assets.get(settings.assetId)!==asset||asset.bitmap!==bitmap||bitmap.width!==asset.width||bitmap.height!==asset.height)
-      throw new Error('The texture source changed during batch preparation.');
-    if(samples.reduce((sum,input)=>sum+input.width*input.height,0)>1_000_000)
-      throw new Error('Split texture conversion batches into at most 1,000,000 working pixels.');
-    const conversions:{args:Parameters<TextureConverter>;resolve:(pixels:Uint8ClampedArray)=>void;reject:(error:unknown)=>void}[]=[];
-    const arrivals=samples.map(()=>{let resolve!:()=>void;const promise=new Promise<void>(done=>{resolve=done;});return{promise,resolve};});
-    const converter=(index:number):TextureConverter=>(...args)=>new Promise((resolve,reject)=>{conversions.push({args,resolve,reject});arrivals[index].resolve();});
+    if (
+      !assets.has(settings.assetId) ||
+      assets.get(settings.assetId) !== asset ||
+      asset.bitmap !== bitmap ||
+      bitmap.width !== asset.width ||
+      bitmap.height !== asset.height
+    )
+      throw new Error("The texture source changed during batch preparation.");
+    if (
+      samples.reduce((sum, input) => sum + input.width * input.height, 0) >
+      1_000_000
+    )
+      throw new Error(
+        "Split texture conversion batches into at most 1,000,000 working pixels.",
+      );
+    const conversions: {
+      args: Parameters<TextureConverter>;
+      resolve: (pixels: Uint8ClampedArray) => void;
+      reject: (error: unknown) => void;
+    }[] = [];
+    const arrivals = samples.map(() => {
+      let resolve!: () => void;
+      const promise = new Promise<void>((done) => {
+        resolve = done;
+      });
+      return { promise, resolve };
+    });
+    const converter =
+      (index: number): TextureConverter =>
+      (...args) =>
+        new Promise((resolve, reject) => {
+          conversions.push({ args, resolve, reject });
+          arrivals[index].resolve();
+        });
     // Ordinary captures reach conversion synchronously. Precision fallbacks
     // yield while gathering bounded native pixels; wait for every capture/cache
     // result/error before flushing and attach rejection handlers immediately.
@@ -104,147 +222,360 @@ export class BrushTextureSampler {
     // Only one numerical reader owns native tile scratch at a time. Sharing
     // this deadline also prevents many short capture promises from starving UI
     // tasks before the batch reaches its worker conversion.
-    let captureQueue:Promise<void>=Promise.resolve(),captureDeadline=performance.now()+2;
-    const batchGeneration=this.generation;
-    const serialCapture=<T>(capture:()=>Promise<T>):Promise<T>=>{
-      const task=captureQueue.then(async()=>{
+    let captureQueue: Promise<void> = Promise.resolve(),
+      captureDeadline = performance.now() + 2;
+    const batchGeneration = this.generation;
+    const serialCapture = <T>(capture: () => Promise<T>): Promise<T> => {
+      const task = captureQueue.then(async () => {
         control.signal?.throwIfAborted();
-        if(this.disposed||this.generation!==batchGeneration)throw new Error('Texture preparation was cleared or disposed.');
-        if(performance.now()>=captureDeadline){await yieldTask();captureDeadline=performance.now()+2;}
+        if (this.disposed || this.generation !== batchGeneration)
+          throw new Error("Texture preparation was cleared or disposed.");
+        if (performance.now() >= captureDeadline) {
+          await yieldTask();
+          captureDeadline = performance.now() + 2;
+        }
         return capture();
       });
-      captureQueue=task.then(()=>{},()=>{});return task;
+      captureQueue = task.then(
+        () => {},
+        () => {},
+      );
+      return task;
     };
-    const projections=new Map<string,HTMLCanvasElement>();
-    const projection=(width:number,height:number)=>{
-      const key=`${width}:${height}`;let canvas=projections.get(key);
-      if(!canvas){canvas=createCanvas(width,height,true);projections.set(key,canvas);}
-      const context=canvas.getContext('2d')!;context.resetTransform();context.globalCompositeOperation='source-over';context.globalAlpha=1;context.clearRect(0,0,width,height);
+    const projections = new Map<string, HTMLCanvasElement>();
+    const projection = (width: number, height: number) => {
+      const key = `${width}:${height}`;
+      let canvas = projections.get(key);
+      if (!canvas) {
+        canvas = createCanvas(width, height, true);
+        projections.set(key, canvas);
+      }
+      const context = canvas.getContext("2d")!;
+      context.resetTransform();
+      context.globalCompositeOperation = "source-over";
+      context.globalAlpha = 1;
+      context.clearRect(0, 0, width, height);
       return context;
     };
-    const pending=Promise.allSettled(samples.map((input,index)=>{
-      const task=this.prepareAffineUsing(assets,settings,input,control,converter(index),regions?.[index],projection,serialCapture);
-      // A cache hit or pre-conversion failure also finishes this arrival. Every
-      // numerical capture owns its bytes before the batch releases scratch.
-      task.then(arrivals[index].resolve,arrivals[index].resolve);return task;
-    }));
-    try{await Promise.all(arrivals.map(arrival=>arrival.promise));}
-    finally{for(const canvas of projections.values())release(canvas);}
-    if(conversions.length){
-      try{
-        control.signal?.throwIfAborted();
-        if(this.disposed||this.generation!==batchGeneration)throw new Error('Texture preparation was cleared or disposed.');
-        lifetime();if(!assets.has(settings.assetId)||assets.get(settings.assetId)!==asset||asset.bitmap!==bitmap||bitmap.width!==asset.width||bitmap.height!==asset.height)throw new Error('The texture source changed during batch preparation.');
-        if(control.isCancelled?.())throw new Error('Texture preparation was cancelled.');
-        const length=conversions.reduce((sum,value)=>sum+value.args[0].length,0),pixels=new Uint8ClampedArray(length);
-        const support=conversions.some(value=>value.args[2])?new Uint8ClampedArray(length):undefined;
-        let offset=0;
-        for(const value of conversions){pixels.set(value.args[0],offset);if(support&&value.args[2])support.set(value.args[2],offset);offset+=value.args[0].length;}
-        const result=await this.processor.brushTexture(pixels,conversions[0].args[1],support);
-        if(!(result instanceof Uint8ClampedArray)||result.length!==length)throw new Error('The texture worker returned invalid batched coverage pixels.');
-        offset=0;for(const value of conversions){const end=offset+value.args[0].length;value.resolve(result.slice(offset,end));offset=end;}
-      }catch(error){for(const value of conversions)value.reject(error);}
+    const pending = Promise.allSettled(
+      samples.map((input, index) => {
+        const task = this.prepareAffineUsing(
+          assets,
+          settings,
+          input,
+          control,
+          converter(index),
+          regions?.[index],
+          projection,
+          serialCapture,
+        );
+        // A cache hit or pre-conversion failure also finishes this arrival. Every
+        // numerical capture owns its bytes before the batch releases scratch.
+        task.then(arrivals[index].resolve, arrivals[index].resolve);
+        return task;
+      }),
+    );
+    try {
+      await Promise.all(arrivals.map((arrival) => arrival.promise));
+    } finally {
+      for (const canvas of projections.values()) release(canvas);
     }
-    const results=await pending,failed=results.find(value=>value.status==='rejected');
-    if(failed){for(const value of results)if(value.status==='fulfilled')release(value.value);throw failed.reason;}
-    return results.map(value=>(value as PromiseFulfilledResult<HTMLCanvasElement>).value);
+    if (conversions.length) {
+      try {
+        control.signal?.throwIfAborted();
+        if (this.disposed || this.generation !== batchGeneration)
+          throw new Error("Texture preparation was cleared or disposed.");
+        lifetime();
+        if (
+          !assets.has(settings.assetId) ||
+          assets.get(settings.assetId) !== asset ||
+          asset.bitmap !== bitmap ||
+          bitmap.width !== asset.width ||
+          bitmap.height !== asset.height
+        )
+          throw new Error(
+            "The texture source changed during batch preparation.",
+          );
+        if (control.isCancelled?.())
+          throw new Error("Texture preparation was cancelled.");
+        const length = conversions.reduce(
+            (sum, value) => sum + value.args[0].length,
+            0,
+          ),
+          pixels = new Uint8ClampedArray(length);
+        const support = conversions.some((value) => value.args[2])
+          ? new Uint8ClampedArray(length)
+          : undefined;
+        let offset = 0;
+        for (const value of conversions) {
+          pixels.set(value.args[0], offset);
+          if (support && value.args[2]) support.set(value.args[2], offset);
+          offset += value.args[0].length;
+        }
+        const result = await this.processor.brushTexture(
+          pixels,
+          conversions[0].args[1],
+          support,
+        );
+        if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+          throw new Error(
+            "The texture worker returned invalid batched coverage pixels.",
+          );
+        offset = 0;
+        for (const value of conversions) {
+          const end = offset + value.args[0].length;
+          value.resolve(result.slice(offset, end));
+          offset = end;
+        }
+      } catch (error) {
+        for (const value of conversions) value.reject(error);
+      }
+    }
+    const results = await pending,
+      failed = results.find((value) => value.status === "rejected");
+    if (failed) {
+      for (const value of results)
+        if (value.status === "fulfilled") release(value.value);
+      throw failed.reason;
+    }
+    return results.map(
+      (value) => (value as PromiseFulfilledResult<HTMLCanvasElement>).value,
+    );
   }
 
   private async prepareAffineUsing(
-    assets:AssetStore,
-    source:BrushTextureSource,
-    input:TextureAffineSample,
-    control:TexturePreparationControl,
-    convert:TextureConverter,
-    region?:TextureReadbackRegion,
-    projection?:(width:number,height:number)=>CanvasRenderingContext2D,
-    serialCapture:<T>(capture:()=>Promise<T>)=>Promise<T>=capture=>capture(),
-  ):Promise<HTMLCanvasElement> {
-    const settings=brushTextureSourceSchema.parse(source),asset=assets.get(settings.assetId);
-    const sample=textureAffineSample(asset,input),m=sample.sourceToOutput;
-    const signature=JSON.stringify(['affine',settings.channel,settings.invert,sample.width,sample.height,
-      m.a,m.b,m.c,m.d,m.e,m.f,sample.smoothing,region]);
-    const matrix=AffineTransform.fromJSON(m),precise=bitmapProjectionRequiresPrecision(matrix,asset.width,asset.height);
-    const readRegion=region??{x:0,y:0,width:sample.width,height:sample.height};
-    const bitmap=asset.bitmap,generation=this.generation,lifetime=precise?assets.captureLifetime():undefined;
-    const precisionControl:TexturePreparationControl=precise?{signal:control.signal,isCancelled:()=>{
-      if(this.disposed||this.generation!==generation)throw new Error('Texture preparation was cleared or disposed.');
-      lifetime!();if(!assets.has(settings.assetId)||assets.get(settings.assetId)!==asset||asset.bitmap!==bitmap)throw new Error('The texture source changed during preparation.');
-      return control.isCancelled?.()??false;
-    }}:control;
-    const draw=(context:CanvasRenderingContext2D)=>{
-      context.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
-      context.drawImage(asset.bitmap,0,0);
+    assets: AssetStore,
+    source: BrushTextureSource,
+    input: TextureAffineSample,
+    control: TexturePreparationControl,
+    convert: TextureConverter,
+    region?: TextureReadbackRegion,
+    projection?: (width: number, height: number) => CanvasRenderingContext2D,
+    serialCapture: <T>(capture: () => Promise<T>) => Promise<T> = (capture) =>
+      capture(),
+  ): Promise<HTMLCanvasElement> {
+    const settings = brushTextureSourceSchema.parse(source),
+      asset = assets.get(settings.assetId);
+    const sample = textureAffineSample(asset, input),
+      m = sample.sourceToOutput;
+    const signature = JSON.stringify([
+      "affine",
+      settings.channel,
+      settings.invert,
+      sample.width,
+      sample.height,
+      m.a,
+      m.b,
+      m.c,
+      m.d,
+      m.e,
+      m.f,
+      sample.smoothing,
+      region,
+    ]);
+    const matrix = AffineTransform.fromJSON(m),
+      precise = bitmapProjectionRequiresPrecision(
+        matrix,
+        asset.width,
+        asset.height,
+      );
+    const readRegion = region ?? {
+      x: 0,
+      y: 0,
+      width: sample.width,
+      height: sample.height,
+    };
+    const bitmap = asset.bitmap,
+      generation = this.generation,
+      lifetime = precise ? assets.captureLifetime() : undefined;
+    const precisionControl: TexturePreparationControl = precise
+      ? {
+          signal: control.signal,
+          isCancelled: () => {
+            if (this.disposed || this.generation !== generation)
+              throw new Error("Texture preparation was cleared or disposed.");
+            lifetime!();
+            if (
+              !assets.has(settings.assetId) ||
+              assets.get(settings.assetId) !== asset ||
+              asset.bitmap !== bitmap
+            )
+              throw new Error("The texture source changed during preparation.");
+            return control.isCancelled?.() ?? false;
+          },
+        }
+      : control;
+    const draw = (context: CanvasRenderingContext2D) => {
+      context.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+      context.drawImage(asset.bitmap, 0, 0);
       context.resetTransform();
     };
-    return this.prepareTile(assets,asset,settings,region?{...sample,width:region.width,height:region.height}:sample,signature,draw,control,settings.channel==='alpha'&&settings.invert?()=>{
-      if(precise)return serialCapture(()=>projectBitmapPixels(bitmap,matrix,readRegion,sample.smoothing,precisionControl,true)).then(image=>image.data);
-      const support=region?undefined:createCanvas(sample.width,sample.height,true);
-      try{
-        if(!this.opaque){this.opaque=createCanvas(1,1);this.opaque.getContext('2d')!.fillRect(0,0,1,1);}
-        const c=region?projection!(sample.width,sample.height):support!.getContext('2d')!;c.imageSmoothingEnabled=sample.smoothing;c.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);
-        c.drawImage(this.opaque,0,0,asset.width,asset.height);
-        return c.getImageData(region?.x??0,region?.y??0,region?.width??sample.width,region?.height??sample.height).data;
-      }finally{if(support)release(support);}
-    }:undefined,convert,precise?()=>serialCapture(()=>projectBitmapPixels(bitmap,matrix,readRegion,sample.smoothing,precisionControl)):region?()=>{
-      const context=projection!(sample.width,sample.height);context.imageSmoothingEnabled=sample.smoothing;draw(context);
-      return context.getImageData(region.x,region.y,region.width,region.height);
-    }:undefined);
+    return this.prepareTile(
+      assets,
+      asset,
+      settings,
+      region
+        ? { ...sample, width: region.width, height: region.height }
+        : sample,
+      signature,
+      draw,
+      control,
+      settings.channel === "alpha" && settings.invert
+        ? () => {
+            if (precise)
+              return serialCapture(() =>
+                projectBitmapPixels(
+                  bitmap,
+                  matrix,
+                  readRegion,
+                  sample.smoothing,
+                  precisionControl,
+                  true,
+                ),
+              ).then((image) => image.data);
+            const support = region
+              ? undefined
+              : createCanvas(sample.width, sample.height, true);
+            try {
+              if (!this.opaque) {
+                this.opaque = createCanvas(1, 1);
+                this.opaque.getContext("2d")!.fillRect(0, 0, 1, 1);
+              }
+              const c = region
+                ? projection!(sample.width, sample.height)
+                : support!.getContext("2d")!;
+              c.imageSmoothingEnabled = sample.smoothing;
+              c.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+              c.drawImage(this.opaque, 0, 0, asset.width, asset.height);
+              return c.getImageData(
+                region?.x ?? 0,
+                region?.y ?? 0,
+                region?.width ?? sample.width,
+                region?.height ?? sample.height,
+              ).data;
+            } finally {
+              if (support) release(support);
+            }
+          }
+        : undefined,
+      convert,
+      precise
+        ? () =>
+            serialCapture(() =>
+              projectBitmapPixels(
+                bitmap,
+                matrix,
+                readRegion,
+                sample.smoothing,
+                precisionControl,
+              ),
+            )
+        : region
+          ? () => {
+              const context = projection!(sample.width, sample.height);
+              context.imageSmoothingEnabled = sample.smoothing;
+              draw(context);
+              return context.getImageData(
+                region.x,
+                region.y,
+                region.width,
+                region.height,
+              );
+            }
+          : undefined,
+    );
   }
 
   private async prepareTile(
-    assets:AssetStore,
-    asset:ImageAsset,
-    settings:ReturnType<typeof brushTextureSourceSchema.parse>,
-    sample:{width:number;height:number;smoothing:boolean},
-    signature:string,
-    draw:(context:CanvasRenderingContext2D)=>void,
-    control:TexturePreparationControl,
-    support?:()=>Uint8ClampedArray|Promise<Uint8ClampedArray>,
-    convert:TextureConverter=this.processor.brushTexture.bind(this.processor),
-    capture?:()=>ImageData|Promise<ImageData>,
-  ):Promise<HTMLCanvasElement> {
-    const bitmap=asset.bitmap;
-    const lifetime = assets.captureLifetime(), generation = this.generation, cacheGeneration = this.cacheGeneration;
+    assets: AssetStore,
+    asset: ImageAsset,
+    settings: ReturnType<typeof brushTextureSourceSchema.parse>,
+    sample: { width: number; height: number; smoothing: boolean },
+    signature: string,
+    draw: (context: CanvasRenderingContext2D) => void,
+    control: TexturePreparationControl,
+    support?: () => Uint8ClampedArray | Promise<Uint8ClampedArray>,
+    convert: TextureConverter = this.processor.brushTexture.bind(
+      this.processor,
+    ),
+    capture?: () => ImageData | Promise<ImageData>,
+  ): Promise<HTMLCanvasElement> {
+    const bitmap = asset.bitmap;
+    const lifetime = assets.captureLifetime(),
+      generation = this.generation,
+      cacheGeneration = this.cacheGeneration;
     const check = () => {
       control.signal?.throwIfAborted();
-      if (control.isCancelled?.()) throw new Error('Texture preparation was cancelled.');
+      if (control.isCancelled?.())
+        throw new Error("Texture preparation was cancelled.");
       if (this.disposed || this.generation !== generation)
-        throw new Error('Texture preparation was cleared or disposed.');
+        throw new Error("Texture preparation was cleared or disposed.");
       lifetime();
-      if (!assets.has(settings.assetId) || assets.get(settings.assetId) !== asset || asset.bitmap !== bitmap ||
-          bitmap.width !== asset.width || bitmap.height !== asset.height || !bitmap.width || !bitmap.height)
-        throw new Error('The texture source changed during preparation.');
+      if (
+        !assets.has(settings.assetId) ||
+        assets.get(settings.assetId) !== asset ||
+        asset.bitmap !== bitmap ||
+        bitmap.width !== asset.width ||
+        bitmap.height !== asset.height ||
+        !bitmap.width ||
+        !bitmap.height
+      )
+        throw new Error("The texture source changed during preparation.");
     };
     check();
     let identity = this.identities.get(bitmap);
-    if (identity === undefined) this.identities.set(bitmap, identity = ++this.sequence);
+    if (identity === undefined)
+      this.identities.set(bitmap, (identity = ++this.sequence));
     const key = `brush-texture:${identity}`;
     const output = createCanvas(sample.width, sample.height, true);
     try {
       if (this.cache.read(key, signature, output)) {
         check();
-        this.rememberMaximum(output,output.getContext('2d')!.getImageData(0,0,sample.width,sample.height).data);
+        this.rememberMaximum(
+          output,
+          output
+            .getContext("2d")!
+            .getImageData(0, 0, sample.width, sample.height).data,
+        );
         check();
         return output;
       }
-      const context = output.getContext('2d')!;
+      const context = output.getContext("2d")!;
       context.imageSmoothingEnabled = sample.smoothing;
-      if(!capture)draw(context);
-      const captureResult = capture?capture():context.getImageData(0, 0, sample.width, sample.height);
-      const captured=captureResult instanceof Promise?await captureResult:captureResult;check();
-      const supportResult=support?.(),supportPixels=supportResult instanceof Promise?await supportResult:supportResult;check();
-      const pixels = await convert(captured.data, { channel: settings.channel, invert: settings.invert },supportPixels);
+      if (!capture) draw(context);
+      const captureResult = capture
+        ? capture()
+        : context.getImageData(0, 0, sample.width, sample.height);
+      const captured =
+        captureResult instanceof Promise ? await captureResult : captureResult;
       check();
-      if (!(pixels instanceof Uint8ClampedArray) || pixels.length !== captured.data.length)
-        throw new Error('The texture worker returned invalid coverage pixels.');
+      const supportResult = support?.(),
+        supportPixels =
+          supportResult instanceof Promise
+            ? await supportResult
+            : supportResult;
+      check();
+      const pixels = await convert(
+        captured.data,
+        { channel: settings.channel, invert: settings.invert },
+        supportPixels,
+      );
+      check();
+      if (
+        !(pixels instanceof Uint8ClampedArray) ||
+        pixels.length !== captured.data.length
+      )
+        throw new Error("The texture worker returned invalid coverage pixels.");
       captured.data.set(pixels);
-      this.rememberMaximum(output,captured.data);
+      this.rememberMaximum(output, captured.data);
       context.putImageData(captured, 0, 0);
       // A cache allocation failure must not discard an already prepared tile.
       if (cacheGeneration === this.cacheGeneration) {
-        try { this.cache.write(key, signature, output, 64); }
-        catch { this.cache.clear(); }
+        try {
+          this.cache.write(key, signature, output, 64);
+        } catch {
+          this.cache.clear();
+        }
       }
       check();
       return output;
@@ -259,7 +590,8 @@ export class BrushTextureSampler {
     this.cacheGeneration++;
     this.cache.clear();
     this.identities = new WeakMap();
-    if(this.opaque)release(this.opaque);this.opaque=null;
+    if (this.opaque) release(this.opaque);
+    this.opaque = null;
   }
 
   clear() {

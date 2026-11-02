@@ -19,30 +19,86 @@ function chunk(type: string, bytes: Uint8Array): Uint8Array<ArrayBuffer> {
 
 /** Native scanline sink; retains compressed output and one bounded caller strip. */
 export class PngRowEncoder {
-  private parts:BlobPart[]=[];
-  private compression=new CompressionStream('deflate');
-  private writer=this.compression.writable.getWriter();
-  private reader=this.compression.readable.getReader();
-  private collecting:Promise<void>;
-  private rows=0;
-  constructor(readonly width:number,readonly height:number,iccDeflated?:Uint8Array,profileName='TIFF source'){
-    if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<1||height<1||width>0x7fffffff||height>0x7fffffff)throw new Error('Invalid PNG geometry.');
-    if(iccDeflated&&!/^[\x20-\x7e]{1,79}$/.test(profileName))throw new Error('Invalid PNG profile name.');
-    const header=new Uint8Array(13),view=new DataView(header.buffer);view.setUint32(0,width);view.setUint32(4,height);header[8]=8;header[9]=6;
-    let color=chunk('sRGB',new Uint8Array([0]));
-    if(iccDeflated){const name=new TextEncoder().encode(profileName+'\0\0'),bytes=new Uint8Array(name.length+iccDeflated.length);bytes.set(name);bytes.set(iccDeflated,name.length);color=chunk('iCCP',bytes);}
-    this.parts=[new Uint8Array([137,80,78,71,13,10,26,10]),chunk('IHDR',header),color];
-    this.collecting=(async()=>{while(true){const {value,done}=await this.reader.read();if(done)break;this.parts.push(chunk('IDAT',value));}})();void this.collecting.catch(()=>{});
+  private parts: BlobPart[] = [];
+  private compression = new CompressionStream("deflate");
+  private writer = this.compression.writable.getWriter();
+  private reader = this.compression.readable.getReader();
+  private collecting: Promise<void>;
+  private rows = 0;
+  constructor(
+    readonly width: number,
+    readonly height: number,
+    iccDeflated?: Uint8Array,
+    profileName = "TIFF source",
+  ) {
+    if (
+      !Number.isSafeInteger(width) ||
+      !Number.isSafeInteger(height) ||
+      width < 1 ||
+      height < 1 ||
+      width > 0x7fffffff ||
+      height > 0x7fffffff
+    )
+      throw new Error("Invalid PNG geometry.");
+    if (iccDeflated && !/^[\x20-\x7e]{1,79}$/.test(profileName))
+      throw new Error("Invalid PNG profile name.");
+    const header = new Uint8Array(13),
+      view = new DataView(header.buffer);
+    view.setUint32(0, width);
+    view.setUint32(4, height);
+    header[8] = 8;
+    header[9] = 6;
+    let color = chunk("sRGB", new Uint8Array([0]));
+    if (iccDeflated) {
+      const name = new TextEncoder().encode(profileName + "\0\0"),
+        bytes = new Uint8Array(name.length + iccDeflated.length);
+      bytes.set(name);
+      bytes.set(iccDeflated, name.length);
+      color = chunk("iCCP", bytes);
+    }
+    this.parts = [
+      new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
+      chunk("IHDR", header),
+      color,
+    ];
+    this.collecting = (async () => {
+      while (true) {
+        const { value, done } = await this.reader.read();
+        if (done) break;
+        this.parts.push(chunk("IDAT", value));
+      }
+    })();
+    void this.collecting.catch(() => {});
   }
-  async append(rgba:Uint8Array,rows:number):Promise<void>{
-    if(!Number.isInteger(rows)||rows<1||this.rows+rows>this.height||rgba.length!==this.width*rows*4)throw new Error('PNG scanlines do not match source geometry.');
-    const bytes=this.width*4,filtered=new Uint8Array((bytes+1)*rows);
-    for(let y=0;y<rows;y++)filtered.set(rgba.subarray(y*bytes,(y+1)*bytes),y*(bytes+1)+1);
-    await this.writer.write(filtered);this.rows+=rows;
+  async append(rgba: Uint8Array, rows: number): Promise<void> {
+    if (
+      !Number.isInteger(rows) ||
+      rows < 1 ||
+      this.rows + rows > this.height ||
+      rgba.length !== this.width * rows * 4
+    )
+      throw new Error("PNG scanlines do not match source geometry.");
+    const bytes = this.width * 4,
+      filtered = new Uint8Array((bytes + 1) * rows);
+    for (let y = 0; y < rows; y++)
+      filtered.set(
+        rgba.subarray(y * bytes, (y + 1) * bytes),
+        y * (bytes + 1) + 1,
+      );
+    await this.writer.write(filtered);
+    this.rows += rows;
   }
-  async finish():Promise<Blob>{
-    if(this.rows!==this.height)throw new Error('Incomplete PNG scanlines.');
-    await this.writer.close();await this.collecting;this.parts.push(chunk('IEND',new Uint8Array()));return new Blob(this.parts,{type:'image/png'});
+  async finish(): Promise<Blob> {
+    if (this.rows !== this.height) throw new Error("Incomplete PNG scanlines.");
+    await this.writer.close();
+    await this.collecting;
+    this.parts.push(chunk("IEND", new Uint8Array()));
+    return new Blob(this.parts, { type: "image/png" });
   }
-  async abort(reason:unknown){await Promise.allSettled([this.writer.abort(reason),this.reader.cancel(reason)]);}
+  async abort(reason: unknown) {
+    await Promise.allSettled([
+      this.writer.abort(reason),
+      this.reader.cancel(reason),
+    ]);
+  }
 }

@@ -18,7 +18,10 @@ export function retouchViewDocument(
     throw new Error("Retouch sampling requires a selected layer.");
   // Current-layer sampling owns this branch's source, independently of sibling
   // clipping. Current-and-below retains the real preceding bases instead.
-  const isolate=(node:LayerData):LayerData=>options.mode==='current-layer'&&node.clipped?{...node,clipped:undefined}:node;
+  const isolate = (node: LayerData): LayerData =>
+    options.mode === "current-layer" && node.clipped
+      ? { ...node, clipped: undefined }
+      : node;
   const prune = (nodes: LayerData[]): LayerData[] | undefined => {
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
@@ -27,7 +30,17 @@ export function retouchViewDocument(
       if (node.id === options.layerId) return [...preceding, isolate(node)];
       if (node.kind === "group") {
         const children = prune(node.children);
-        if (children) return [...preceding, { ...node, ...(options.mode==='current-layer'&&node.clipped?{clipped:undefined}:{}), children }];
+        if (children)
+          return [
+            ...preceding,
+            {
+              ...node,
+              ...(options.mode === "current-layer" && node.clipped
+                ? { clipped: undefined }
+                : {}),
+              children,
+            },
+          ];
       }
     }
     return undefined;
@@ -38,7 +51,10 @@ export function retouchViewDocument(
 }
 
 /** Detach only the requested branch, rather than first cloning unrelated artwork. */
-export function retouchSampleDocument(document: DocumentData, options: RetouchSamplingOptions): DocumentData {
+export function retouchSampleDocument(
+  document: DocumentData,
+  options: RetouchSamplingOptions,
+): DocumentData {
   return structuredClone(retouchViewDocument(document, options));
 }
 
@@ -63,8 +79,10 @@ export async function sampleRetouchRegion(
   signal?.throwIfAborted();
   // A single readback already owns a fresh native-resolution RGBA buffer.
   // Allocate assembly storage only when several tiles must be combined.
-  const pixels = width <= 1024 && height <= 1024
-    ? null : new Uint8ClampedArray(width * height * 4);
+  const pixels =
+    width <= 1024 && height <= 1024
+      ? null
+      : new Uint8ClampedArray(width * height * 4);
   let deadline = performance.now() + 4;
   for (let ty = 0; ty < height; ty += 1024)
     for (let tx = 0; tx < width; tx += 1024) {
@@ -89,17 +107,21 @@ export async function sampleRetouchRegion(
         const tile = context.getImageData(0, 0, w, h).data;
         if (!pixels) return tile;
         if (w === width) pixels.set(tile, ty * width * 4);
-        else for (let row = 0; row < h; row++)
-          pixels.set(
-            tile.subarray(row * w * 4, (row + 1) * w * 4),
-            ((ty + row) * width + tx) * 4,
-          );
+        else
+          for (let row = 0; row < h; row++)
+            pixels.set(
+              tile.subarray(row * w * 4, (row + 1) * w * 4),
+              ((ty + row) * width + tx) * 4,
+            );
       } finally {
         release(canvas);
       }
       // Keep the exact native tile grid, but do not join every tile into one
       // long microtask chain that prevents pending input from being handled.
-      if ((tx + w < width || ty + h < height) && performance.now() >= deadline) {
+      if (
+        (tx + w < width || ty + h < height) &&
+        performance.now() >= deadline
+      ) {
         await yieldTask();
         deadline = performance.now() + 4;
       }

@@ -143,9 +143,7 @@
         "severity": "warning",
         "layerId": "2e53fe5d-7e9a-4f43-b9ca-00bdc5c05f49",
         "layerName": "color-line.png",
-        "path": [
-          "2e53fe5d-7e9a-4f43-b9ca-00bdc5c05f49"
-        ],
+        "path": ["2e53fe5d-7e9a-4f43-b9ca-00bdc5c05f49"],
         "message": "Worst-direction sampling is 150.0 PPI; the inspection policy requires 200 PPI at 300 output DPI.",
         "assetId": "d745c38f-6ca7-4b28-9d75-b5c987cc6fc4",
         "effectivePpi": 150
@@ -155,9 +153,7 @@
         "severity": "warning",
         "layerId": "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d",
         "layerName": "Headline",
-        "path": [
-          "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d"
-        ],
+        "path": ["0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d"],
         "message": "Authored bounds extend beyond the canvas. Review intentional bleed and clipping; masks, effects and occlusion are not evaluated.",
         "bounds": {
           "x": -20,
@@ -171,9 +167,7 @@
         "severity": "warning",
         "layerId": "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d",
         "layerName": "Headline",
-        "path": [
-          "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d"
-        ],
+        "path": ["0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d"],
         "message": "The browser could not resolve this font family; fallback may be used.",
         "family": "Canoli Preflight Missing Font 517892"
       }

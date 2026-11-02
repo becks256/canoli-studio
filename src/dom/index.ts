@@ -1,86 +1,254 @@
-import {captureMaskMappedPlacement} from '../core/mask-plane-brush';
-import{isFloatDocument,assertFloatSources}from'../core/float-document';
-import {PerspectiveTransform} from './perspective';
-import {activePerspective,perspectiveMatrix,perspectiveRect} from '../core/perspective';
-import {captureFieldBounds} from '../core/projective-field';
-export {PerspectiveTransform} from './perspective';
-import {textWritingSchema} from '../core/text-writing';
-export type {WritingMode,TextOrientation,TextWritingInput} from '../core/text-writing';
-import {characterBoundsSchema,characterBoundsForLayout} from '../core/character-layout';
-import {TextPath} from './text-path';
-export {TextPath} from './text-path';
-export type {TextPathInput,TextPathData} from '../core/text-path';
-import type {CharacterBounds} from '../core/character-layout';
-import type {FontFeatures,FontVariantCaps,FontStretch} from '../core/font-features';
-import {formatCharacterRange,editCharacterRanges,type CharacterRangeData} from '../core/text-ranges';
-import type {CharacterFormatPatch} from '../core/character-format';
-import {characterInputForLayer,measureCharacterTextAsync,withPreparedCharacterBounds} from '../core/character-layout';
-export type {CharacterRangeData} from '../core/text-ranges';
-export type {CharacterFormat,CharacterFormatPatch} from '../core/character-format';
-export interface TypographyControl {signal?:AbortSignal}
+import { captureMaskMappedPlacement } from "../core/mask-plane-brush";
+import { isFloatDocument, assertFloatSources } from "../core/float-document";
+import { PerspectiveTransform } from "./perspective";
+import {
+  activePerspective,
+  perspectiveMatrix,
+  perspectiveRect,
+} from "../core/perspective";
+import { captureFieldBounds } from "../core/projective-field";
+export { PerspectiveTransform } from "./perspective";
+import { textWritingSchema } from "../core/text-writing";
+export type {
+  WritingMode,
+  TextOrientation,
+  TextWritingInput,
+} from "../core/text-writing";
+import {
+  characterBoundsSchema,
+  characterBoundsForLayout,
+} from "../core/character-layout";
+import { TextPath } from "./text-path";
+export { TextPath } from "./text-path";
+export type { TextPathInput, TextPathData } from "../core/text-path";
+import type { CharacterBounds } from "../core/character-layout";
+import type {
+  FontFeatures,
+  FontVariantCaps,
+  FontStretch,
+} from "../core/font-features";
+import {
+  formatCharacterRange,
+  editCharacterRanges,
+  type CharacterRangeData,
+} from "../core/text-ranges";
+import type { CharacterFormatPatch } from "../core/character-format";
+import {
+  characterInputForLayer,
+  measureCharacterTextAsync,
+  withPreparedCharacterBounds,
+} from "../core/character-layout";
+export type { CharacterRangeData } from "../core/text-ranges";
+export type {
+  CharacterFormat,
+  CharacterFormatPatch,
+} from "../core/character-format";
+export interface TypographyControl {
+  signal?: AbortSignal;
+}
 import { createFrequencySeparation } from "./frequency-separation";
-import {RawDevelopment,type RawDevelopmentControl} from './raw';
-import type {RawDevelopSettings,RawImportReport} from '../core/interchange/raw/types';
-export {RawDevelopment,LensCorrection,LensProfile} from './raw';
-export type {RawDevelopmentControl,RawDevelopmentOptions,LensProfileCorrectionOptions} from './raw';
-export type {LensProfileOptions,LensProfileData,LensProfileSelectionOptions,LensProfileSelectionData} from '../core/interchange/lens/schema';
-export type {RawImportReport,RawShootingMetadata} from '../core/interchange/raw/types';
-export type {LensCorrectionOptions,LensCorrectionData} from '../core/interchange/raw/lens';
+import { RawDevelopment, type RawDevelopmentControl } from "./raw";
+import type {
+  RawDevelopSettings,
+  RawImportReport,
+} from "../core/interchange/raw/types";
+export { RawDevelopment, LensCorrection, LensProfile } from "./raw";
+export type {
+  RawDevelopmentControl,
+  RawDevelopmentOptions,
+  LensProfileCorrectionOptions,
+} from "./raw";
+export type {
+  LensProfileOptions,
+  LensProfileData,
+  LensProfileSelectionOptions,
+  LensProfileSelectionData,
+} from "../core/interchange/lens/schema";
+export type {
+  RawImportReport,
+  RawShootingMetadata,
+} from "../core/interchange/raw/types";
+export type {
+  LensCorrectionOptions,
+  LensCorrectionData,
+} from "../core/interchange/raw/lens";
 import { frequencyRadiusOwner } from "../core/frequency-separation";
 import type { FrequencySeparationOptions } from "../core/frequency-separation";
 export type { FrequencySeparationOptions } from "../core/frequency-separation";
-import { captureVectorBoolean, vectorBooleanOperationSchema, vectorBooleanResultSchema, type VectorBooleanOperation, type VectorBooleanSelection, type VectorBooleanResult, type VectorBooleanControl } from '../core/vector-boolean';
-export type { VectorBooleanOperation, VectorBooleanProgress, VectorBooleanControl } from '../core/vector-boolean';
-import {vectorFillData,type VectorFillOptions,type VectorGradientData} from '../core/vector-gradient';
-export type {VectorGradientData,VectorGradientStop,VectorFillOptions} from '../core/vector-gradient';
-import {vectorStrokeData,vectorStrokeValues,type VectorStrokeOptions} from '../core/vector-stroke';
-export type {VectorStrokeOptions} from '../core/vector-stroke';
-import { parseCubeLut, lutOptionsSchema, type LutInterpolation } from "../core/lut";
-import {inspectDesign,preflightOptionsSchema,preflightReportSchema,type PreflightOptions,type PreflightSettings,type PreflightReport,type PreflightControl} from '../core/preflight';
-export type {PreflightOptions,PreflightReport,PreflightFinding,PreflightControl,PreflightAlignmentRule,PreflightAlignmentInput,PreflightAlignmentSummary} from '../core/preflight';
-import { selectSubjectOptionsSchema, type SelectSubjectSettings, type SelectSubjectControl } from '../core/subject-selection';
-import {refineEdgeOptionsSchema,mattingPlanSchema,type MattingRequest,type PreparedMatting,type RefineEdgeControl} from '../core/matting';
-import {parentId,intrinsicLocalBounds} from '../core/spatial';
-import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings, type ColorRangeControl } from "../core/color-range";
-import { quickSelectionOptionsSchema, type QuickSelectionOptions, type QuickSelectionSettings, type QuickSelectionControl } from '../core/quick-selection';
-export type { QuickSelectionOptions, QuickSelectionControl } from '../core/quick-selection';
-export type { ColorRangeOptions, ColorRangeSettings, ColorRangeControl } from "../core/color-range";
-export { defaultLutAdjustment, parseCubeLut, serializeCubeLut } from "../core/lut";
-export type { LutAdjustmentData, CubeLutData, LutInterpolation } from "../core/lut";
+import {
+  captureVectorBoolean,
+  vectorBooleanOperationSchema,
+  vectorBooleanResultSchema,
+  type VectorBooleanOperation,
+  type VectorBooleanSelection,
+  type VectorBooleanResult,
+  type VectorBooleanControl,
+} from "../core/vector-boolean";
+export type {
+  VectorBooleanOperation,
+  VectorBooleanProgress,
+  VectorBooleanControl,
+} from "../core/vector-boolean";
+import {
+  vectorFillData,
+  type VectorFillOptions,
+  type VectorGradientData,
+} from "../core/vector-gradient";
+export type {
+  VectorGradientData,
+  VectorGradientStop,
+  VectorFillOptions,
+} from "../core/vector-gradient";
+import {
+  vectorStrokeData,
+  vectorStrokeValues,
+  type VectorStrokeOptions,
+} from "../core/vector-stroke";
+export type { VectorStrokeOptions } from "../core/vector-stroke";
+import {
+  parseCubeLut,
+  lutOptionsSchema,
+  type LutInterpolation,
+} from "../core/lut";
+import {
+  inspectDesign,
+  preflightOptionsSchema,
+  preflightReportSchema,
+  type PreflightOptions,
+  type PreflightSettings,
+  type PreflightReport,
+  type PreflightControl,
+} from "../core/preflight";
+export type {
+  PreflightOptions,
+  PreflightReport,
+  PreflightFinding,
+  PreflightControl,
+  PreflightAlignmentRule,
+  PreflightAlignmentInput,
+  PreflightAlignmentSummary,
+} from "../core/preflight";
+import {
+  selectSubjectOptionsSchema,
+  type SelectSubjectSettings,
+  type SelectSubjectControl,
+} from "../core/subject-selection";
+import {
+  refineEdgeOptionsSchema,
+  mattingPlanSchema,
+  type MattingRequest,
+  type PreparedMatting,
+  type RefineEdgeControl,
+} from "../core/matting";
+import { parentId, intrinsicLocalBounds } from "../core/spatial";
+import {
+  colorRangeOptionsSchema,
+  type ColorRangeOptions,
+  type ColorRangeSettings,
+  type ColorRangeControl,
+} from "../core/color-range";
+import {
+  quickSelectionOptionsSchema,
+  type QuickSelectionOptions,
+  type QuickSelectionSettings,
+  type QuickSelectionControl,
+} from "../core/quick-selection";
+export type {
+  QuickSelectionOptions,
+  QuickSelectionControl,
+} from "../core/quick-selection";
+export type {
+  ColorRangeOptions,
+  ColorRangeSettings,
+  ColorRangeControl,
+} from "../core/color-range";
+export {
+  defaultLutAdjustment,
+  parseCubeLut,
+  serializeCubeLut,
+} from "../core/lut";
+export type {
+  LutAdjustmentData,
+  CubeLutData,
+  LutInterpolation,
+} from "../core/lut";
 export { defaultWhiteBalanceAdjustment } from "../core/white-balance";
 export type { WhiteBalanceAdjustmentData } from "../core/white-balance";
 export { defaultGradientMapAdjustment } from "../core/gradient-map";
-export type { GradientMapAdjustmentData, GradientStop } from "../core/gradient-map";
+export type {
+  GradientMapAdjustmentData,
+  GradientStop,
+} from "../core/gradient-map";
 import { freeze, isImmutable } from "../core/immutable";
 import { yieldTask } from "../core/task-yield";
-import { selectionModificationSchema, type SelectionModificationOptions, type SelectionModificationControl } from "../core/selection-modification";
+import {
+  selectionModificationSchema,
+  type SelectionModificationOptions,
+  type SelectionModificationControl,
+} from "../core/selection-modification";
 import { selectionSchema } from "../core/drawing";
-export type { SelectionModificationOptions, SelectionModificationControl } from "../core/selection-modification";
+export type {
+  SelectionModificationOptions,
+  SelectionModificationControl,
+} from "../core/selection-modification";
 import { EraserStroke, PaintFill } from "./values";
 import { LayerCompCollection } from "./layer-comps";
-import {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
-import {DocumentFonts} from './fonts';
-export {FontFile,FontFileCollection} from './font-file';
-export type {FontFileRemoveOptions} from './font-file';
-import {fontFileSchema,documentFontFiles,fontFilesForArtwork,type FontFileData} from '../core/font-files';
-import {sameFontResource} from '../fonts/resources';
-import type {FontSourceStore} from '../fonts/store';
-import type {SmartComponentDefinition} from '../core/smart/types';
-import {captureRetainedHistory,retainedDocuments} from '../core/history';
-export {DocumentFonts} from './fonts';
-export type {FontEmbedOptions,FontRelinkOptions,FontEmbedControl} from './fonts';
-export type {DocumentFontUsage} from '../core/font-management';
-import {z} from 'zod';
-import {paragraphFormat,type ParagraphFormat} from '../core/paragraph-styles';
-export {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
-export type {ParagraphFormat} from '../core/paragraph-styles';
-import { AlphaChannelCollection } from './alpha-channels';
-import { channelLoadSchema, channelLoadOptionsSchema, type ChannelLoadSettings, type ChannelLoadOptions, type ChannelLoadControl } from '../core/alpha-channels';
-export { AlphaChannel, AlphaChannelCollection } from './alpha-channels';
-import type {HistoryTarget, HistoryRegion, HistoryComparisonChanges} from '../core/history';
-import {historyOriginSchema,type HistoryOrigin,type HistoryOperation} from '../core/history-provenance';
-export type {HistoryTarget, HistoryRegion, HistoryComparisonChanges} from '../core/history';
-export type { ChannelLoadOptions, ChannelLoadControl } from '../core/alpha-channels';
+import { ParagraphStyle, ParagraphStyleCollection } from "./paragraph-styles";
+import { DocumentFonts } from "./fonts";
+export { FontFile, FontFileCollection } from "./font-file";
+export type { FontFileRemoveOptions } from "./font-file";
+import {
+  fontFileSchema,
+  documentFontFiles,
+  fontFilesForArtwork,
+  type FontFileData,
+} from "../core/font-files";
+import { sameFontResource } from "../fonts/resources";
+import type { FontSourceStore } from "../fonts/store";
+import type { SmartComponentDefinition } from "../core/smart/types";
+import { captureRetainedHistory, retainedDocuments } from "../core/history";
+export { DocumentFonts } from "./fonts";
+export type {
+  FontEmbedOptions,
+  FontRelinkOptions,
+  FontEmbedControl,
+} from "./fonts";
+export type { DocumentFontUsage } from "../core/font-management";
+import { z } from "zod";
+import {
+  paragraphFormat,
+  type ParagraphFormat,
+} from "../core/paragraph-styles";
+export { ParagraphStyle, ParagraphStyleCollection } from "./paragraph-styles";
+export type { ParagraphFormat } from "../core/paragraph-styles";
+import { AlphaChannelCollection } from "./alpha-channels";
+import {
+  channelLoadSchema,
+  channelLoadOptionsSchema,
+  type ChannelLoadSettings,
+  type ChannelLoadOptions,
+  type ChannelLoadControl,
+} from "../core/alpha-channels";
+export { AlphaChannel, AlphaChannelCollection } from "./alpha-channels";
+import type {
+  HistoryTarget,
+  HistoryRegion,
+  HistoryComparisonChanges,
+} from "../core/history";
+import {
+  historyOriginSchema,
+  type HistoryOrigin,
+  type HistoryOperation,
+} from "../core/history-provenance";
+export type {
+  HistoryTarget,
+  HistoryRegion,
+  HistoryComparisonChanges,
+} from "../core/history";
+export type {
+  ChannelLoadOptions,
+  ChannelLoadControl,
+} from "../core/alpha-channels";
 export { LayerComp, LayerCompCollection } from "./layer-comps";
 import { SmartFilter } from "./smart-filters";
 export {
@@ -121,7 +289,12 @@ export type { PatchRegionOptions } from "../core/retouch/patch-region";
 export { PatchAdjustment, TonalStroke } from "./retouch";
 import { GuideCollection } from "./guides";
 export { Guide, GuideCollection } from "./guides";
-import { maskTransform,maskPlacedPerspective,translateMaskData,withoutMaskPlacedOffset } from "../core/masks";
+import {
+  maskTransform,
+  maskPlacedPerspective,
+  translateMaskData,
+  withoutMaskPlacedOffset,
+} from "../core/masks";
 import { LayerSelection } from "./layer-selection";
 export { LayerSelection } from "./layer-selection";
 export { AffineTransform } from "../core/affine";
@@ -129,12 +302,12 @@ import type { CropBounds } from "../core/crop";
 export type { CropBounds } from "../core/crop";
 import { splitPathSegment } from "../core/bezier";
 import { layerTransform } from "../core/spatial";
-import { LayerMask,maskPaintPlacementValue } from "./masks";
-import {maskOwnerPose,relinkMaskPlane} from '../core/mask-plane';
+import { LayerMask, maskPaintPlacementValue } from "./masks";
+import { maskOwnerPose, relinkMaskPlane } from "../core/mask-plane";
 export { LayerMask } from "./masks";
-export {MaskPlane} from './mask-plane';
-export type {MaskPlaneOptions,MaskPlanePose} from './mask-plane';
-export type { MaskPaintPlacement,RasterErasureMaskSource } from "./masks";
+export { MaskPlane } from "./mask-plane";
+export type { MaskPlaneOptions, MaskPlanePose } from "./mask-plane";
+export type { MaskPaintPlacement, RasterErasureMaskSource } from "./masks";
 import { LayerMetadata } from "./metadata";
 export { LayerMetadata } from "./metadata";
 import {
@@ -153,12 +326,26 @@ import {
   type TonalSculptOptions as TonalSculptDataOptions,
 } from "../core/retouch/tonal-sculpt";
 import type { DodgeBurnMode, DodgeBurnRange } from "../core/retouch/types";
-import type {PressureCurveData} from '../core/pressure-curve';
-import type {BrushSymmetryData} from '../core/brush-symmetry';
-import type {BrushTextureData} from '../core/brush-texture';
-import type {BrushTipData,PenTiltData} from '../core/brush-tip';
-export type TonalSculptOptions=Omit<TonalSculptDataOptions,'pressureCurve'|'tip'|'symmetry'|'texture'>&{pressureCurve?:PressureCurve|PressureCurveData|null;tip?:BrushTip|BrushTipData|null;symmetry?:BrushSymmetry|BrushSymmetryData|null;texture?:BrushTexture|BrushTextureData|null};
-import { defaultStyle, pathSchema, styleSchema, vectorContourSchema, pathContours } from "../core/drawing";
+import type { PressureCurveData } from "../core/pressure-curve";
+import type { BrushSymmetryData } from "../core/brush-symmetry";
+import type { BrushTextureData } from "../core/brush-texture";
+import type { BrushTipData, PenTiltData } from "../core/brush-tip";
+export type TonalSculptOptions = Omit<
+  TonalSculptDataOptions,
+  "pressureCurve" | "tip" | "symmetry" | "texture"
+> & {
+  pressureCurve?: PressureCurve | PressureCurveData | null;
+  tip?: BrushTip | BrushTipData | null;
+  symmetry?: BrushSymmetry | BrushSymmetryData | null;
+  texture?: BrushTexture | BrushTextureData | null;
+};
+import {
+  defaultStyle,
+  pathSchema,
+  styleSchema,
+  vectorContourSchema,
+  pathContours,
+} from "../core/drawing";
 import type { VectorContourData } from "../core/drawing";
 import type {
   BlendIfData,
@@ -186,12 +373,23 @@ export {
   CloneStroke,
   PaintFill,
 } from "./values";
-export type { BrushOptions,BrushTipOptions,WetPaintStrokeOptions } from "./values";
-export type { WetPaintStrokeData, WetPaintTileData,WetPaintPlacementData } from '../core/wet-operation';
-export type {PressureCurveData,PressureKnot} from '../core/pressure-curve';
-export type {BrushSymmetryData} from '../core/brush-symmetry';
-export type {BrushTextureData,BrushTextureSource} from '../core/brush-texture';
-export type {BrushTipData,PenTiltData} from '../core/brush-tip';
+export type {
+  BrushOptions,
+  BrushTipOptions,
+  WetPaintStrokeOptions,
+} from "./values";
+export type {
+  WetPaintStrokeData,
+  WetPaintTileData,
+  WetPaintPlacementData,
+} from "../core/wet-operation";
+export type { PressureCurveData, PressureKnot } from "../core/pressure-curve";
+export type { BrushSymmetryData } from "../core/brush-symmetry";
+export type {
+  BrushTextureData,
+  BrushTextureSource,
+} from "../core/brush-texture";
+export type { BrushTipData, PenTiltData } from "../core/brush-tip";
 import {
   KAPPA,
   createRectanglePath,
@@ -214,7 +412,10 @@ export {
   parseSvgPath,
 };
 import type { AssetStore } from "../core/assets";
-import type {SelectSubjectOptions,RefineEdgeOptions} from "../intelligence/matting/types";
+import type {
+  SelectSubjectOptions,
+  RefineEdgeOptions,
+} from "../intelligence/matting/types";
 import { AffineTransform } from "../core/affine";
 export * from "../intelligence/matting";
 export type { ShapeOptions };
@@ -240,7 +441,12 @@ export {
   defaultToneAdjustment,
 };
 export type { AdjustmentData, CurvePoint, LevelChannelData };
-export type { ColorBalanceAdjustmentData, VibranceAdjustmentData, BalanceChannels, ChromaticAdjustmentData } from "../core/adjustments";
+export type {
+  ColorBalanceAdjustmentData,
+  VibranceAdjustmentData,
+  BalanceChannels,
+  ChromaticAdjustmentData,
+} from "../core/adjustments";
 import { execute } from "../core/commands";
 import type { EditorCommand, LayerPatch } from "../core/commands";
 import {
@@ -273,7 +479,7 @@ import type {
 import { EditorStore } from "../core/store";
 
 export interface DocumentOptions {
-  precision?:'uint8'|'float32';
+  precision?: "uint8" | "float32";
   name?: string;
   width?: number;
   height?: number;
@@ -291,17 +497,17 @@ export interface LayerOptions {
   blendMode?: BlendMode;
 }
 export interface RasterLayerOptions extends LayerOptions {
-  perspective?:PerspectiveTransform|null;
+  perspective?: PerspectiveTransform | null;
   assetId: string;
   width: number;
   height: number;
 }
-export interface TextLayerOptions extends LayerOptions,FontFeatures {
-  writingMode?:import('../core/text-writing').WritingMode;
-  textOrientation?:import('../core/text-writing').TextOrientation;
-  textPath?:TextPath|null;
-  characterRanges?:readonly CharacterRangeData[];
-  paragraphJustify?: 'none' | 'inter-word';
+export interface TextLayerOptions extends LayerOptions, FontFeatures {
+  writingMode?: import("../core/text-writing").WritingMode;
+  textOrientation?: import("../core/text-writing").TextOrientation;
+  textPath?: TextPath | null;
+  characterRanges?: readonly CharacterRangeData[];
+  paragraphJustify?: "none" | "inter-word";
   wrapWidth?: number | null;
   paragraphSpacing?: number;
   firstLineIndent?: number;
@@ -313,7 +519,7 @@ export interface TextLayerOptions extends LayerOptions,FontFeatures {
   lineHeight?: number;
   letterSpacing?: number;
   wordSpacing?: number;
-  fontKerning?: 'auto' | 'normal' | 'none';
+  fontKerning?: "auto" | "normal" | "none";
   fontWeight?: string;
   fontStyle?: "normal" | "italic";
   direction?: "ltr" | "rtl";
@@ -331,7 +537,11 @@ export interface ToneOptions {
  */
 export class Document {
   /** Register or replace an embedded master; source edits remain detached until this call. */
-  createFrequencySeparation(source: RasterLayer, snapshot: RasterLayer, options: FrequencySeparationOptions = {}): LayerGroup {
+  createFrequencySeparation(
+    source: RasterLayer,
+    snapshot: RasterLayer,
+    options: FrequencySeparationOptions = {},
+  ): LayerGroup {
     return createFrequencySeparation(this, source, snapshot, options);
   }
 
@@ -341,10 +551,21 @@ export class Document {
   ): string {
     if (!(source instanceof Document))
       throw new Error("A component source must be a Document.");
-    if(isFloatDocument(source._read()))throw new Error('Smart-object embedding requires its float document integration.');
+    if (isFloatDocument(source._read()))
+      throw new Error(
+        "Smart-object embedding requires its float document integration.",
+      );
     const { components: _nestedDefinitions, ...data } = source.toJSON();
-    const files=fontFilesForArtwork(source._read(),data);
-    if(files.length){data.fontFiles=files;if(this.assetStore){if(!source.assetStore)throw new Error('The component is missing its font source store.');for(const file of files)source.assetStore.fonts.shareTo(this.assetStore.fonts,file.id);}}
+    const files = fontFilesForArtwork(source._read(), data);
+    if (files.length) {
+      data.fontFiles = files;
+      if (this.assetStore) {
+        if (!source.assetStore)
+          throw new Error("The component is missing its font source store.");
+        for (const file of files)
+          source.assetStore.fonts.shareTo(this.assetStore.fonts, file.id);
+      }
+    }
     const componentId = options.id ?? id();
     this._dispatch({
       type: "component.set",
@@ -375,12 +596,13 @@ export class Document {
               ),
             ],
           };
-    const components=structuredClone(this._read().components??[]),fonts=fontFilesForArtwork(this._read(),{...data,components});
+    const components = structuredClone(this._read().components ?? []),
+      fonts = fontFilesForArtwork(this._read(), { ...data, components });
     const document = Document.fromJSON({
       ...data,
       schemaVersion: SCHEMA_VERSION,
       components,
-      ...(fonts.length?{fontFiles:fonts}:{}),
+      ...(fonts.length ? { fontFiles: fonts } : {}),
     });
     document.assetStore = this.assetStore;
     return document;
@@ -435,13 +657,27 @@ export class Document {
   /** @internal Asynchronous host operation; no renderer or credentials enter isolated scripts. */
   _rasterizeSmartObject?: (layerId: string) => Promise<RasterLayer>;
   /** @internal Native file development requires a configured application host. */
-  _prepareRawDevelopment?:(layerId:string,settings:RawDevelopSettings,control:RawDevelopmentControl)=>Promise<Readonly<RawImportReport>>;
+  _prepareRawDevelopment?: (
+    layerId: string,
+    settings: RawDevelopSettings,
+    control: RawDevelopmentControl,
+  ) => Promise<Readonly<RawImportReport>>;
   /** @internal Metadata-only bridge for isolated callers; never transfers source bytes. */
-  _readRawDevelopment?:(layerId:string)=>Promise<RawDevelopSettings|null>;
-  async _developRaw(layerId:string,settings:RawDevelopSettings,control:RawDevelopmentControl):Promise<Readonly<RawImportReport>>{
-    if(this.batch)throw new Error('RAW development cannot run inside a synchronous transaction.');
-    if(!this._prepareRawDevelopment)throw new Error('RAW development requires a configured application host.');
-    return this._prepareRawDevelopment(layerId,settings,control);
+  _readRawDevelopment?: (layerId: string) => Promise<RawDevelopSettings | null>;
+  async _developRaw(
+    layerId: string,
+    settings: RawDevelopSettings,
+    control: RawDevelopmentControl,
+  ): Promise<Readonly<RawImportReport>> {
+    if (this.batch)
+      throw new Error(
+        "RAW development cannot run inside a synchronous transaction.",
+      );
+    if (!this._prepareRawDevelopment)
+      throw new Error(
+        "RAW development requires a configured application host.",
+      );
+    return this._prepareRawDevelopment(layerId, settings, control);
   }
   async _rasterize(layerId: string): Promise<RasterLayer> {
     if (this.batch)
@@ -456,11 +692,12 @@ export class Document {
   private handles = new Map<string, Layer>();
   private staged: DocumentData | null = null;
   private batch: EditorCommand[] | null = null;
-  private fontTransactionActivations:{store:FontSourceStore;id:string}[]|null=null;
-  private checkedFontDeclarations=new WeakMap<object,object>();
-  private stopFontHistory?:()=>void;
-  private unbindFontSources?:()=>void;
-  private hasFontHistory=false;
+  private fontTransactionActivations:
+    { store: FontSourceStore; id: string }[] | null = null;
+  private checkedFontDeclarations = new WeakMap<object, object>();
+  private stopFontHistory?: () => void;
+  private unbindFontSources?: () => void;
+  private hasFontHistory = false;
   private commandListeners = new Set<
     (command: EditorCommand, before: DocumentData, after: DocumentData) => void
   >();
@@ -468,84 +705,209 @@ export class Document {
   private branchListeners = new Set<() => void>();
   private navigatingHistory = false;
   private acceptingCommand = false;
-  private defaultHistoryOrigin:HistoryOrigin = {surface:'host'};
-  private scopedHistoryOrigin:HistoryOrigin|null = null;
+  private defaultHistoryOrigin: HistoryOrigin = { surface: "host" };
+  private scopedHistoryOrigin: HistoryOrigin | null = null;
   private _assetStore: AssetStore | null = null;
   /** @internal Native geometry broker; final host commands remeasure independently. */
-  _prepareTextLayout?:(layerId:string,patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'writingMode'|'textOrientation'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl)=>Promise<CharacterBounds>;
+  _prepareTextLayout?: (
+    layerId: string,
+    patch: Partial<
+      Pick<
+        TextLayerData,
+        | "text"
+        | "characterRanges"
+        | "textPath"
+        | "writingMode"
+        | "textOrientation"
+        | "wrapWidth"
+        | "paragraphSpacing"
+        | "firstLineIndent"
+        | "paragraphJustify"
+      >
+    >,
+    control: TypographyControl,
+  ) => Promise<CharacterBounds>;
   /** @internal Async typography must not outlive a synchronous transaction. */
-  _assertTypographyPreparation(){if(this.batch)throw new Error('Prepare typography outside synchronous transactions.');}
+  _assertTypographyPreparation() {
+    if (this.batch)
+      throw new Error("Prepare typography outside synchronous transactions.");
+  }
   /** @internal Read-only host inspection; no result can mutate document/history. */
-  _preflight?: (options:PreflightSettings,control:PreflightControl)=>Promise<PreflightReport>;
-  async preflight(options:PreflightOptions={},control:PreflightControl={}):Promise<PreflightReport>{
-    if(this.batch)throw new Error('Run design checks outside synchronous transactions.');
-    const settings=preflightOptionsSchema.parse(options),snapshot=this.getSnapshot();control.signal?.throwIfAborted();
-    const report=preflightReportSchema.parse(await(this._preflight?this._preflight(settings,control):inspectDesign(snapshot.document,snapshot.revision,settings,{signal:control.signal,assets:this._assetStore?new Map(this._assetStore.values().map(asset=>[asset.id,{width:asset.width,height:asset.height}])):undefined})));
+  _preflight?: (
+    options: PreflightSettings,
+    control: PreflightControl,
+  ) => Promise<PreflightReport>;
+  async preflight(
+    options: PreflightOptions = {},
+    control: PreflightControl = {},
+  ): Promise<PreflightReport> {
+    if (this.batch)
+      throw new Error("Run design checks outside synchronous transactions.");
+    const settings = preflightOptionsSchema.parse(options),
+      snapshot = this.getSnapshot();
     control.signal?.throwIfAborted();
-    if(this.getSnapshot().revision!==snapshot.revision)throw new Error('The document changed during design checks.');
-    if(report.documentId!==this.id||report.revision!==snapshot.revision||JSON.stringify(report.options)!==JSON.stringify(settings))throw new Error('Design-check results do not match the inspected document and policy.');
+    const report = preflightReportSchema.parse(
+      await (this._preflight
+        ? this._preflight(settings, control)
+        : inspectDesign(snapshot.document, snapshot.revision, settings, {
+            signal: control.signal,
+            assets: this._assetStore
+              ? new Map(
+                  this._assetStore
+                    .values()
+                    .map((asset) => [
+                      asset.id,
+                      { width: asset.width, height: asset.height },
+                    ]),
+                )
+              : undefined,
+          })),
+    );
+    control.signal?.throwIfAborted();
+    if (this.getSnapshot().revision !== snapshot.revision)
+      throw new Error("The document changed during design checks.");
+    if (
+      report.documentId !== this.id ||
+      report.revision !== snapshot.revision ||
+      JSON.stringify(report.options) !== JSON.stringify(settings)
+    )
+      throw new Error(
+        "Design-check results do not match the inspected document and policy.",
+      );
     return report;
   }
   /** @internal Host preparation only; returned data is committed through normal DOM commands. */
   _preparePatch?: (request: PatchRegionRequest) => Promise<AdjustmentLayerData>;
   /** @internal Hosts prepare coverage off the UI thread; this class validates the commit. */
-  _prepareSelectionModification?: (options: SelectionModificationOptions, control: SelectionModificationControl) => Promise<SelectionData>;
+  _prepareSelectionModification?: (
+    options: SelectionModificationOptions,
+    control: SelectionModificationControl,
+  ) => Promise<SelectionData>;
   /** @internal Private worker preparation; final geometry uses shared path replacement. */
-  _prepareVectorBoolean?: (selection:VectorBooleanSelection,control:VectorBooleanControl)=>Promise<VectorBooleanResult>;
-  async combinePaths(operation:VectorBooleanOperation,paths:VectorPath[],control:VectorBooleanControl={}):Promise<VectorPath|null>{
-    if(this.batch)throw new Error('Boolean operations cannot run inside a synchronous transaction.');
+  _prepareVectorBoolean?: (
+    selection: VectorBooleanSelection,
+    control: VectorBooleanControl,
+  ) => Promise<VectorBooleanResult>;
+  async combinePaths(
+    operation: VectorBooleanOperation,
+    paths: VectorPath[],
+    control: VectorBooleanControl = {},
+  ): Promise<VectorPath | null> {
+    if (this.batch)
+      throw new Error(
+        "Boolean operations cannot run inside a synchronous transaction.",
+      );
     vectorBooleanOperationSchema.parse(operation);
-    if(!this._prepareVectorBoolean)throw new Error('Boolean operations require a configured application host.');
+    if (!this._prepareVectorBoolean)
+      throw new Error(
+        "Boolean operations require a configured application host.",
+      );
     control.signal?.throwIfAborted();
-    const operands=paths.map(path=>{
-      const layer=path._owner;if(!layer||layer.document!==this||!layer.isAttached)throw new Error('Boolean operands must belong to this document.');
-      return {layerId:layer.id,pathId:path.id};
+    const operands = paths.map((path) => {
+      const layer = path._owner;
+      if (!layer || layer.document !== this || !layer.isAttached)
+        throw new Error("Boolean operands must belong to this document.");
+      return { layerId: layer.id, pathId: path.id };
     });
-    const snapshot=this.getSnapshot(),captured=captureVectorBoolean(snapshot.document,{operation,operands});
+    const snapshot = this.getSnapshot(),
+      captured = captureVectorBoolean(snapshot.document, {
+        operation,
+        operands,
+      });
     control.signal?.throwIfAborted();
-    const prepared=vectorBooleanResultSchema.parse(await this._prepareVectorBoolean(captured.selection,control));
-    if(control.signal)await yieldTask();control.signal?.throwIfAborted();
-    if(this.getSnapshot().revision!==snapshot.revision)throw new Error('The document changed during the Boolean operation.');
-    const [points,...extras]=prepared.contours;
-    const result=points?pathSchema.parse({...captured.first.path,points,closed:true,fillRule:prepared.fillRule,subpaths:extras.map(points=>({id:id(),points,closed:true}))}):null;
-    this._dispatch({type:'transaction',label:`${operation[0].toUpperCase()+operation.slice(1)} vector paths`,commands:[{type:'paths.replace',operands,result}]});
-    const layer=this.getLayer(operands[0].layerId);
-    if(layer&&(this.selectedLayer?.id!==layer.id||this.selectedLayers.length!==1))this.selectedLayer=layer;
-    return result&&layer instanceof VectorLayer?layer.paths.get(result.id):null;
+    const prepared = vectorBooleanResultSchema.parse(
+      await this._prepareVectorBoolean(captured.selection, control),
+    );
+    if (control.signal) await yieldTask();
+    control.signal?.throwIfAborted();
+    if (this.getSnapshot().revision !== snapshot.revision)
+      throw new Error("The document changed during the Boolean operation.");
+    const [points, ...extras] = prepared.contours;
+    const result = points
+      ? pathSchema.parse({
+          ...captured.first.path,
+          points,
+          closed: true,
+          fillRule: prepared.fillRule,
+          subpaths: extras.map((points) => ({
+            id: id(),
+            points,
+            closed: true,
+          })),
+        })
+      : null;
+    this._dispatch({
+      type: "transaction",
+      label: `${operation[0].toUpperCase() + operation.slice(1)} vector paths`,
+      commands: [{ type: "paths.replace", operands, result }],
+    });
+    const layer = this.getLayer(operands[0].layerId);
+    if (
+      layer &&
+      (this.selectedLayer?.id !== layer.id || this.selectedLayers.length !== 1)
+    )
+      this.selectedLayer = layer;
+    return result && layer instanceof VectorLayer
+      ? layer.paths.get(result.id)
+      : null;
   }
   /** @internal Native color sampling belongs to the application host. */
-  _prepareColorRange?: (options:ColorRangeSettings,control:ColorRangeControl)=>Promise<SelectionData>;
+  _prepareColorRange?: (
+    options: ColorRangeSettings,
+    control: ColorRangeControl,
+  ) => Promise<SelectionData>;
   /** @internal Private native sampling and region growing belong to the host. */
-  _prepareQuickSelection?: (options:QuickSelectionSettings,control:QuickSelectionControl)=>Promise<SelectionData>;
+  _prepareQuickSelection?: (
+    options: QuickSelectionSettings,
+    control: QuickSelectionControl,
+  ) => Promise<SelectionData>;
   /** @internal Original-pixel subject sampling belongs to the configured host. */
-  _prepareSubject?: (options:SelectSubjectSettings,control:SelectSubjectControl)=>Promise<SelectionData>;
+  _prepareSubject?: (
+    options: SelectSubjectSettings,
+    control: SelectSubjectControl,
+  ) => Promise<SelectionData>;
   /** @internal Hosts stage native matte assets; mutations remain shared commands. */
-  _prepareMatting?: (request:MattingRequest,control:RefineEdgeControl)=>Promise<PreparedMatting>;
+  _prepareMatting?: (
+    request: MattingRequest,
+    control: RefineEdgeControl,
+  ) => Promise<PreparedMatting>;
   /** @internal */
   _prepareHeal?: (request: HealSpotRequest) => Promise<AdjustmentLayerData>;
   readonly layerComps: LayerCompCollection;
-  readonly paragraphStyles:ParagraphStyleCollection;
-  readonly fonts:DocumentFonts;
+  readonly paragraphStyles: ParagraphStyleCollection;
+  readonly fonts: DocumentFonts;
   readonly alphaChannels: AlphaChannelCollection;
   /** @internal Hosts rasterize saved coverage without exposing source pixels. */
-  _prepareChannelLoad?: (settings:ChannelLoadSettings,control:ChannelLoadControl)=>Promise<SelectionData>;
+  _prepareChannelLoad?: (
+    settings: ChannelLoadSettings,
+    control: ChannelLoadControl,
+  ) => Promise<SelectionData>;
   readonly guides: GuideCollection;
   readonly layers: LayerCollection;
   readonly layerSelection: LayerSelection;
 
   constructor(options: DocumentOptions = {}) {
-    if(options.precision!==undefined&&options.precision!=='uint8'&&options.precision!=='float32')throw new Error('Use uint8 or float32 document precision.');
-    const data=createDocument(options.name, options.width, options.height);if(options.precision==='float32'){data.precision='float32';data.colorSpace='linear-srgb';}
+    if (
+      options.precision !== undefined &&
+      options.precision !== "uint8" &&
+      options.precision !== "float32"
+    )
+      throw new Error("Use uint8 or float32 document precision.");
+    const data = createDocument(options.name, options.width, options.height);
+    if (options.precision === "float32") {
+      data.precision = "float32";
+      data.colorSpace = "linear-srgb";
+    }
     this.store = new EditorStore(data);
     this.layerComps = new LayerCompCollection(this);
-    this.paragraphStyles=new ParagraphStyleCollection(this);
-    this.fonts=new DocumentFonts(this);
+    this.paragraphStyles = new ParagraphStyleCollection(this);
+    this.fonts = new DocumentFonts(this);
     this.alphaChannels = new AlphaChannelCollection(this);
     this.guides = new GuideCollection(this);
     this.layers = new LayerCollection(this);
     this.layerSelection = new LayerSelection(this);
     this.watchFontHistory();
-    if(options.assets)this.assetStore=options.assets;
+    if (options.assets) this.assetStore = options.assets;
   }
 
   static fromJSON(data: unknown): Document {
@@ -557,7 +919,7 @@ export class Document {
   }
   /** @internal Restoration validates retained history before exposing the session. */
   static _fromWorkspace(data: unknown, history?: unknown): Document {
-    const store = new EditorStore(data, history, {migrateSchema: true});
+    const store = new EditorStore(data, history, { migrateSchema: true });
     const document = new Document();
     document.store = store;
     document.watchFontHistory();
@@ -565,16 +927,37 @@ export class Document {
   }
 
   /** @internal AlphaChannel.load owns the public instance API. */
-  async _loadAlphaChannel(id:string,options:ChannelLoadOptions={},control:ChannelLoadControl={}):Promise<void>{
-    const settings=channelLoadSchema.parse({...channelLoadOptionsSchema.parse(options),id});
-    if(this.batch)throw new Error('Load an alpha channel outside synchronous transactions.');
-    if(!this.alphaChannels.getById(id))throw new Error('Alpha channel not found.');
-    if(!this._prepareChannelLoad)throw new Error('Loading alpha channels requires a configured application host.');
-    const revision=this.getSnapshot().revision;control.signal?.throwIfAborted();
-    const selection=selectionSchema.parse(await this._prepareChannelLoad(settings,control));
-    if(control.signal)await yieldTask();control.signal?.throwIfAborted();
-    if(this.getSnapshot().revision!==revision)throw new Error('The document changed while loading its alpha channel.');
-    this.transaction('Load alpha channel',()=>{this.selection=new MarqueeSelection(selection);});
+  async _loadAlphaChannel(
+    id: string,
+    options: ChannelLoadOptions = {},
+    control: ChannelLoadControl = {},
+  ): Promise<void> {
+    const settings = channelLoadSchema.parse({
+      ...channelLoadOptionsSchema.parse(options),
+      id,
+    });
+    if (this.batch)
+      throw new Error(
+        "Load an alpha channel outside synchronous transactions.",
+      );
+    if (!this.alphaChannels.getById(id))
+      throw new Error("Alpha channel not found.");
+    if (!this._prepareChannelLoad)
+      throw new Error(
+        "Loading alpha channels requires a configured application host.",
+      );
+    const revision = this.getSnapshot().revision;
+    control.signal?.throwIfAborted();
+    const selection = selectionSchema.parse(
+      await this._prepareChannelLoad(settings, control),
+    );
+    if (control.signal) await yieldTask();
+    control.signal?.throwIfAborted();
+    if (this.getSnapshot().revision !== revision)
+      throw new Error("The document changed while loading its alpha channel.");
+    this.transaction("Load alpha channel", () => {
+      this.selection = new MarqueeSelection(selection);
+    });
   }
   get id() {
     return this._read().id;
@@ -588,9 +971,15 @@ export class Document {
   get width() {
     return this._read().width;
   }
-  get precision():'uint8'|'float32'{return this._read().precision??'uint8';}
-  get workingSpace(){return this._read().colorSpace;}
-  convertToFloat(){this._dispatch({type:'document.precision.float'});}
+  get precision(): "uint8" | "float32" {
+    return this._read().precision ?? "uint8";
+  }
+  get workingSpace() {
+    return this._read().colorSpace;
+  }
+  convertToFloat() {
+    this._dispatch({ type: "document.precision.float" });
+  }
   set width(value: number) {
     this.resize(value, this.height);
   }
@@ -613,46 +1002,123 @@ export class Document {
     return this._assetStore;
   }
   /** @internal Async font preparation must precede synchronous model edits. */
-  _assertFontImportReady():void{
-    if(this.batch||this.navigatingHistory||this.acceptingCommand)throw new Error('Prepare a font outside synchronous transactions and history navigation.');
+  _assertFontImportReady(): void {
+    if (this.batch || this.navigatingHistory || this.acceptingCommand)
+      throw new Error(
+        "Prepare a font outside synchronous transactions and history navigation.",
+      );
   }
   set assetStore(store: AssetStore | null) {
-    if(store&&(isFloatDocument(this._read())||store.hasFloatAssets))assertFloatSources(this._read(),store);
-    if(store){const files=this.fontDeclarations();this.activateFontSources(store.fonts,files);}
-    if(store===this._assetStore){store?.fonts.collect();return;}
-    const unbind=this.unbindFontSources;this.unbindFontSources=undefined;this._assetStore=store;
-    if(store)this.unbindFontSources=store.fonts.bind(this);
+    if (store && (isFloatDocument(this._read()) || store.hasFloatAssets))
+      assertFloatSources(this._read(), store);
+    if (store) {
+      const files = this.fontDeclarations();
+      this.activateFontSources(store.fonts, files);
+    }
+    if (store === this._assetStore) {
+      store?.fonts.collect();
+      return;
+    }
+    const unbind = this.unbindFontSources;
+    this.unbindFontSources = undefined;
+    this._assetStore = store;
+    if (store) this.unbindFontSources = store.fonts.bind(this);
     unbind?.();
   }
-  private watchFontHistory():void{
+  private watchFontHistory(): void {
     this.stopFontHistory?.();
-    this.stopFontHistory=this.store.subscribe(()=>this._assetStore?.fonts.collect());
+    this.stopFontHistory = this.store.subscribe(() =>
+      this._assetStore?.fonts.collect(),
+    );
   }
   /** @internal Complete model closure for shared source-store collection. */
-  _fontSourceIds():ReadonlySet<string>{return new Set(this.fontDeclarations().map(file=>file.id));}
-  private fontDeclarations():FontFileData[]{
-    const state=this.getSnapshot(),documents=retainedDocuments(state.document,captureRetainedHistory(state));
-    if(this.staged)documents.push(this.staged);
-    const files=documents.flatMap(documentFontFiles);if(files.length)this.hasFontHistory=true;return files;
+  _fontSourceIds(): ReadonlySet<string> {
+    return new Set(this.fontDeclarations().map((file) => file.id));
   }
-  private activateFontSources(store:FontSourceStore,files:readonly FontFileData[]){
-    const values=new Map<string,FontFileData>();
-    for(const file of files){const previous=values.get(file.id);if(previous){if(previous.resource!==file.resource&&!sameFontResource(previous.resource,file.resource))throw new Error('Conflicting retained font source declarations.');continue;}const resource=store.get(file.id);if(this.checkedFontDeclarations.get(file.resource)!==resource){if(!sameFontResource(resource.descriptor,file.resource))throw new Error('Document font declarations differ from their owned source.');if(isImmutable(file.resource))this.checkedFontDeclarations.set(file.resource,resource);}values.set(file.id,file);}
-    const activated:{store:FontSourceStore;id:string}[]=[];
-    try{for(const id of values.keys()){const active=store.isActive(id);store.activate(id);if(!active)activated.push({store,id});}return activated;}
-    catch(error){for(const entry of activated)entry.store.deactivate(entry.id);throw error;}
+  private fontDeclarations(): FontFileData[] {
+    const state = this.getSnapshot(),
+      documents = retainedDocuments(
+        state.document,
+        captureRetainedHistory(state),
+      );
+    if (this.staged) documents.push(this.staged);
+    const files = documents.flatMap(documentFontFiles);
+    if (files.length) this.hasFontHistory = true;
+    return files;
   }
-  private prepareFontCommands(command:EditorCommand){
-    if(!this._assetStore)return[];
-    const incoming:FontFileData[]=[],definition=(value:SmartComponentDefinition)=>{if(value.source.kind==='document')incoming.push(...documentFontFiles(value.source.document));},visit=(value:EditorCommand)=>{if(value.type==='transaction')for(const child of value.commands)visit(child);else if(value.type==='font.file.add')incoming.push(fontFileSchema.parse(value.file));else if(value.type==='component.set')definition(value.definition);else if(value.type==='component.replaceAll')for(const entry of value.definitions)definition(entry);};visit(command);
-    if(!incoming.length&&!this._assetStore.fonts.size&&!documentFontFiles(this._read()).length)return[];
-    const files=[...this.fontDeclarations(),...incoming];
-    return this.activateFontSources(this._assetStore.fonts,files);
+  private activateFontSources(
+    store: FontSourceStore,
+    files: readonly FontFileData[],
+  ) {
+    const values = new Map<string, FontFileData>();
+    for (const file of files) {
+      const previous = values.get(file.id);
+      if (previous) {
+        if (
+          previous.resource !== file.resource &&
+          !sameFontResource(previous.resource, file.resource)
+        )
+          throw new Error("Conflicting retained font source declarations.");
+        continue;
+      }
+      const resource = store.get(file.id);
+      if (this.checkedFontDeclarations.get(file.resource) !== resource) {
+        if (!sameFontResource(resource.descriptor, file.resource))
+          throw new Error(
+            "Document font declarations differ from their owned source.",
+          );
+        if (isImmutable(file.resource))
+          this.checkedFontDeclarations.set(file.resource, resource);
+      }
+      values.set(file.id, file);
+    }
+    const activated: { store: FontSourceStore; id: string }[] = [];
+    try {
+      for (const id of values.keys()) {
+        const active = store.isActive(id);
+        store.activate(id);
+        if (!active) activated.push({ store, id });
+      }
+      return activated;
+    } catch (error) {
+      for (const entry of activated) entry.store.deactivate(entry.id);
+      throw error;
+    }
   }
-  private releaseUnacceptedFonts(entries:readonly {store:FontSourceStore;id:string}[]){
-    if(!entries.length)return;
-    const required=new Set(this.fontDeclarations().map(value=>value.id));
-    for(const entry of entries)if(entry.store!==this._assetStore?.fonts||!required.has(entry.id))entry.store.deactivate(entry.id);
+  private prepareFontCommands(command: EditorCommand) {
+    if (!this._assetStore) return [];
+    const incoming: FontFileData[] = [],
+      definition = (value: SmartComponentDefinition) => {
+        if (value.source.kind === "document")
+          incoming.push(...documentFontFiles(value.source.document));
+      },
+      visit = (value: EditorCommand) => {
+        if (value.type === "transaction")
+          for (const child of value.commands) visit(child);
+        else if (value.type === "font.file.add")
+          incoming.push(fontFileSchema.parse(value.file));
+        else if (value.type === "component.set") definition(value.definition);
+        else if (value.type === "component.replaceAll")
+          for (const entry of value.definitions) definition(entry);
+      };
+    visit(command);
+    if (
+      !incoming.length &&
+      !this._assetStore.fonts.size &&
+      !documentFontFiles(this._read()).length
+    )
+      return [];
+    const files = [...this.fontDeclarations(), ...incoming];
+    return this.activateFontSources(this._assetStore.fonts, files);
+  }
+  private releaseUnacceptedFonts(
+    entries: readonly { store: FontSourceStore; id: string }[],
+  ) {
+    if (!entries.length) return;
+    const required = new Set(this.fontDeclarations().map((value) => value.id));
+    for (const entry of entries)
+      if (entry.store !== this._assetStore?.fonts || !required.has(entry.id))
+        entry.store.deactivate(entry.id);
   }
   get selectedLayer() {
     return this.getLayer(this.store.getSnapshot().selectedId);
@@ -708,50 +1174,115 @@ export class Document {
       selection: value?.toJSON() ?? null,
     });
   }
-  selectPolygon(points: Point[], operation: "replace" | SelectionOperation = "replace"): void {
+  selectPolygon(
+    points: Point[],
+    operation: "replace" | SelectionOperation = "replace",
+  ): void {
     this._dispatch({ type: "selection.polygon", points, operation });
   }
-  async modifySelection(options: SelectionModificationOptions, control: SelectionModificationControl = {}): Promise<void> {
+  async modifySelection(
+    options: SelectionModificationOptions,
+    control: SelectionModificationControl = {},
+  ): Promise<void> {
     const settings = selectionModificationSchema.parse(options);
-    if (this.batch) throw new Error("Selection modification cannot run inside a synchronous transaction.");
-    if (!this._read().selection) throw new Error("Create a pixel selection first.");
-    if (!this._prepareSelectionModification) throw new Error("Selection modification requires a configured application host.");
+    if (this.batch)
+      throw new Error(
+        "Selection modification cannot run inside a synchronous transaction.",
+      );
+    if (!this._read().selection)
+      throw new Error("Create a pixel selection first.");
+    if (!this._prepareSelectionModification)
+      throw new Error(
+        "Selection modification requires a configured application host.",
+      );
     const revision = this.getSnapshot().revision;
     control.signal?.throwIfAborted();
-    const selection = selectionSchema.parse(await this._prepareSelectionModification(settings, control));
+    const selection = selectionSchema.parse(
+      await this._prepareSelectionModification(settings, control),
+    );
     if (control.signal) await yieldTask();
     control.signal?.throwIfAborted();
-    if (this.getSnapshot().revision !== revision) throw new Error("The document changed while modifying its selection. Try again.");
-    this.transaction(`${settings.operation[0].toUpperCase()+settings.operation.slice(1)} selection`, () => {
-      this.selection = new MarqueeSelection(selection);
+    if (this.getSnapshot().revision !== revision)
+      throw new Error(
+        "The document changed while modifying its selection. Try again.",
+      );
+    this.transaction(
+      `${settings.operation[0].toUpperCase() + settings.operation.slice(1)} selection`,
+      () => {
+        this.selection = new MarqueeSelection(selection);
+      },
+    );
+  }
+  async selectQuickSelection(
+    options: QuickSelectionOptions,
+    control: QuickSelectionControl = {},
+  ): Promise<void> {
+    const settings = quickSelectionOptionsSchema.parse(options);
+    if (this.batch)
+      throw new Error(
+        "Quick Selection cannot run inside a synchronous transaction.",
+      );
+    if (!this._prepareQuickSelection)
+      throw new Error(
+        "Quick Selection requires a configured application host.",
+      );
+    const revision = this.getSnapshot().revision;
+    control.signal?.throwIfAborted();
+    const prepared = selectionSchema.parse(
+      await this._prepareQuickSelection(settings, control),
+    );
+    if (control.signal) await yieldTask();
+    control.signal?.throwIfAborted();
+    if (this.getSnapshot().revision !== revision)
+      throw new Error("The document changed during Quick Selection.");
+    const next = new MarqueeSelection(prepared);
+    this.transaction("Quick selection", () => {
+      this.selection =
+        settings.operation === "replace" ||
+        (!prepared.regions.length && settings.operation === "intersect")
+          ? next
+          : !prepared.regions.length
+            ? (this.selection ?? new MarqueeSelection())
+            : (this.selection ?? new MarqueeSelection()).combine(
+                next,
+                settings.operation,
+              );
     });
   }
-  async selectQuickSelection(options:QuickSelectionOptions,control:QuickSelectionControl={}):Promise<void>{
-    const settings=quickSelectionOptionsSchema.parse(options);
-    if(this.batch)throw new Error('Quick Selection cannot run inside a synchronous transaction.');
-    if(!this._prepareQuickSelection)throw new Error('Quick Selection requires a configured application host.');
-    const revision=this.getSnapshot().revision;control.signal?.throwIfAborted();
-    const prepared=selectionSchema.parse(await this._prepareQuickSelection(settings,control));
-    if(control.signal)await yieldTask();control.signal?.throwIfAborted();
-    if(this.getSnapshot().revision!==revision)throw new Error('The document changed during Quick Selection.');
-    const next=new MarqueeSelection(prepared);
-    this.transaction('Quick selection',()=>{
-      this.selection=settings.operation==='replace'||(!prepared.regions.length&&settings.operation==='intersect')?next:
-        !prepared.regions.length?(this.selection??new MarqueeSelection()):(this.selection??new MarqueeSelection()).combine(next,settings.operation);
-    });
-  }
-  async selectColorRange(options:ColorRangeOptions,control:ColorRangeControl={}):Promise<void> {
-    const settings=colorRangeOptionsSchema.parse(options);
-    if(this.batch)throw new Error('Color Range cannot run inside a synchronous transaction.');
-    if(!this._prepareColorRange)throw new Error('Color Range requires a configured application host.');
-    const revision=this.getSnapshot().revision;control.signal?.throwIfAborted();
-    const prepared=selectionSchema.parse(await this._prepareColorRange(settings,control));
-    if(control.signal)await yieldTask();control.signal?.throwIfAborted();
-    if(this.getSnapshot().revision!==revision)throw new Error('The document changed while selecting a color range. Try again.');
-    const next=new MarqueeSelection(prepared);
-    this.transaction('Select color range',()=>{
-      this.selection=settings.operation==='replace'||(!prepared.regions.length&&settings.operation==='intersect')?next:
-        !prepared.regions.length?(this.selection??new MarqueeSelection()):(this.selection??new MarqueeSelection()).combine(next,settings.operation);
+  async selectColorRange(
+    options: ColorRangeOptions,
+    control: ColorRangeControl = {},
+  ): Promise<void> {
+    const settings = colorRangeOptionsSchema.parse(options);
+    if (this.batch)
+      throw new Error(
+        "Color Range cannot run inside a synchronous transaction.",
+      );
+    if (!this._prepareColorRange)
+      throw new Error("Color Range requires a configured application host.");
+    const revision = this.getSnapshot().revision;
+    control.signal?.throwIfAborted();
+    const prepared = selectionSchema.parse(
+      await this._prepareColorRange(settings, control),
+    );
+    if (control.signal) await yieldTask();
+    control.signal?.throwIfAborted();
+    if (this.getSnapshot().revision !== revision)
+      throw new Error(
+        "The document changed while selecting a color range. Try again.",
+      );
+    const next = new MarqueeSelection(prepared);
+    this.transaction("Select color range", () => {
+      this.selection =
+        settings.operation === "replace" ||
+        (!prepared.regions.length && settings.operation === "intersect")
+          ? next
+          : !prepared.regions.length
+            ? (this.selection ?? new MarqueeSelection())
+            : (this.selection ?? new MarqueeSelection()).combine(
+                next,
+                settings.operation,
+              );
     });
   }
   async patchRegion(
@@ -814,24 +1345,54 @@ export class Document {
     return this.layers.add(new AdjustmentLayer(layer));
   }
   applyTonalSculpt(
-    path: (Point & { pressure?: number;tilt?:PenTiltData })[],
+    path: (Point & { pressure?: number; tilt?: PenTiltData })[],
     mode: DodgeBurnMode,
     range: DodgeBurnRange,
     exposure: number,
     options: TonalSculptOptions = {},
   ): AdjustmentLayer {
-    const curve=options.pressureCurve;
-    const normalized={...options,
-      ...(options.symmetry===undefined?{}:{symmetry:options.symmetry instanceof BrushSymmetry?options.symmetry.toJSON():options.symmetry??undefined}),
-      ...(options.texture===undefined?{}:{texture:options.texture instanceof BrushTexture?options.texture.toJSON():options.texture??undefined}),
-      ...(curve===undefined?{}:{pressureCurve:curve instanceof PressureCurve?curve.toJSON():curve??undefined}),
-      ...(options.tip===undefined?{}:{tip:options.tip instanceof BrushTip?options.tip.toJSON():options.tip??undefined})};
+    const curve = options.pressureCurve;
+    const normalized = {
+      ...options,
+      ...(options.symmetry === undefined
+        ? {}
+        : {
+            symmetry:
+              options.symmetry instanceof BrushSymmetry
+                ? options.symmetry.toJSON()
+                : (options.symmetry ?? undefined),
+          }),
+      ...(options.texture === undefined
+        ? {}
+        : {
+            texture:
+              options.texture instanceof BrushTexture
+                ? options.texture.toJSON()
+                : (options.texture ?? undefined),
+          }),
+      ...(curve === undefined
+        ? {}
+        : {
+            pressureCurve:
+              curve instanceof PressureCurve
+                ? curve.toJSON()
+                : (curve ?? undefined),
+          }),
+      ...(options.tip === undefined
+        ? {}
+        : {
+            tip:
+              options.tip instanceof BrushTip
+                ? options.tip.toJSON()
+                : (options.tip ?? undefined),
+          }),
+    };
     const parsed = tonalSculptSchema.parse({
       path,
       mode,
       range,
       exposure,
-      options:normalized,
+      options: normalized,
     });
     const {
       name,
@@ -870,57 +1431,127 @@ export class Document {
   deselect() {
     this.selection = null;
   }
-  async selectSubject(options:SelectSubjectOptions={},control:SelectSubjectControl={}):Promise<SelectionData>{
-    const settings=selectSubjectOptionsSchema.parse(options);
+  async selectSubject(
+    options: SelectSubjectOptions = {},
+    control: SelectSubjectControl = {},
+  ): Promise<SelectionData> {
+    const settings = selectSubjectOptionsSchema.parse(options);
     settings.targetLayerId ??= this.selectedLayer?.id;
-    if(!settings.targetLayerId)throw new Error('Select a raster layer for Select Subject.');
-    if(this.batch)throw new Error('Select Subject cannot run inside a synchronous transaction.');
-    if(!this._prepareSubject)throw new Error('Select Subject requires a configured application host.');
-    const revision=this.getSnapshot().revision;control.signal?.throwIfAborted();
-    const selection=selectionSchema.parse(await this._prepareSubject(settings,control));
-    if(control.signal)await yieldTask();control.signal?.throwIfAborted();
-    if(this.getSnapshot().revision!==revision)throw new Error('The document changed during Select Subject.');
-    if(!selection.regions.length)throw new Error('No foreground found. Try Quick Selection or adjust the threshold.');
-    this.transaction('Select subject',()=>{this.selection=new MarqueeSelection(selection);});
+    if (!settings.targetLayerId)
+      throw new Error("Select a raster layer for Select Subject.");
+    if (this.batch)
+      throw new Error(
+        "Select Subject cannot run inside a synchronous transaction.",
+      );
+    if (!this._prepareSubject)
+      throw new Error("Select Subject requires a configured application host.");
+    const revision = this.getSnapshot().revision;
+    control.signal?.throwIfAborted();
+    const selection = selectionSchema.parse(
+      await this._prepareSubject(settings, control),
+    );
+    if (control.signal) await yieldTask();
+    control.signal?.throwIfAborted();
+    if (this.getSnapshot().revision !== revision)
+      throw new Error("The document changed during Select Subject.");
+    if (!selection.regions.length)
+      throw new Error(
+        "No foreground found. Try Quick Selection or adjust the threshold.",
+      );
+    this.transaction("Select subject", () => {
+      this.selection = new MarqueeSelection(selection);
+    });
     return structuredClone(selection);
   }
   async removeBackground(
     targetLayer?: RasterLayer,
     options?: RefineEdgeOptions,
-    control?:RefineEdgeControl,
+    control?: RefineEdgeControl,
   ): Promise<RasterLayer> {
     const layer = targetLayer ?? this.selectedLayer;
     if (!(layer instanceof RasterLayer)) {
       throw new Error("Select a raster layer to remove its background.");
     }
-    if(layer.document!==this)throw new Error('The raster belongs to another document.');
-    return (await this._refineRaster(layer.id,options,control)).layer;
+    if (layer.document !== this)
+      throw new Error("The raster belongs to another document.");
+    return (await this._refineRaster(layer.id, options, control)).layer;
   }
   /** @internal Shared OO entry point for native matte preparation and one asset/history commit. */
-  async _refineRaster(layerId:string,options:RefineEdgeOptions={},control:RefineEdgeControl={}):Promise<{layer:RasterLayer;mask:LayerMask}>{
-    const settings=refineEdgeOptionsSchema.parse(options),source=findLayer(this._read(),layerId);
-    if(this.batch)throw new Error('Refine Edge cannot run inside a synchronous transaction.');
-    if(source?.kind!=='raster'||isLocked(this._read(),layerId))throw new Error('Refine Edge requires an attached unlocked raster layer.');
-    if(!this._prepareMatting)throw new Error('Refine Edge requires a configured application host.');
-    const revision=this.getSnapshot().revision;control.signal?.throwIfAborted();
-    const prepared=await this._prepareMatting({layerId,options:settings},control);
-    try{
-      const plan=mattingPlanSchema.parse(prepared.plan),layer=plan.layer as RasterLayerData|undefined;
-      if(control.signal)await yieldTask();control.signal?.throwIfAborted();
-      if(this.getSnapshot().revision!==revision)throw new Error('The document changed during matting.');
-      if(plan.sourceId!==layerId||plan.mask.kind!=='bitmap'||!!layer!==(settings.outputTo==='new-layer'))throw new Error('Invalid prepared matting target or output.');
-      const commands:EditorCommand[]=layer?[
-        {type:'layer.add',layer,parentId:parentId(this._read(),layerId)??undefined},
-        {type:'layer.place',id:layer.id,targetId:layerId,placement:'after',preservePosition:false},
-        {type:'layer.update',id:layerId,patch:{visible:false}},
-      ]:[{type:'mask.setFromMatting',id:layerId,mask:plan.mask}];
-      if(layer&&(layer.kind!=='raster'||layer.id===layerId||JSON.stringify(layer.mask)!==JSON.stringify(plan.mask)))throw new Error('Invalid corrected foreground output.');
-      const command:EditorCommand={type:'transaction',label:layer?'Refine edge to new layer':'Refine edge mask',commands};
-      execute(this._read(),command); // Validate before any host transfers staged assets.
-      const apply=()=>this._dispatch(command);if(prepared.commit)prepared.commit(apply);else apply();
-      const target=this.getLayer(layer?.id??layerId) as RasterLayer;if(layer)this.selectedLayer=target;
-      return{layer:target,mask:target.mask!};
-    }finally{prepared.dispose?.();}
+  async _refineRaster(
+    layerId: string,
+    options: RefineEdgeOptions = {},
+    control: RefineEdgeControl = {},
+  ): Promise<{ layer: RasterLayer; mask: LayerMask }> {
+    const settings = refineEdgeOptionsSchema.parse(options),
+      source = findLayer(this._read(), layerId);
+    if (this.batch)
+      throw new Error(
+        "Refine Edge cannot run inside a synchronous transaction.",
+      );
+    if (source?.kind !== "raster" || isLocked(this._read(), layerId))
+      throw new Error(
+        "Refine Edge requires an attached unlocked raster layer.",
+      );
+    if (!this._prepareMatting)
+      throw new Error("Refine Edge requires a configured application host.");
+    const revision = this.getSnapshot().revision;
+    control.signal?.throwIfAborted();
+    const prepared = await this._prepareMatting(
+      { layerId, options: settings },
+      control,
+    );
+    try {
+      const plan = mattingPlanSchema.parse(prepared.plan),
+        layer = plan.layer as RasterLayerData | undefined;
+      if (control.signal) await yieldTask();
+      control.signal?.throwIfAborted();
+      if (this.getSnapshot().revision !== revision)
+        throw new Error("The document changed during matting.");
+      if (
+        plan.sourceId !== layerId ||
+        plan.mask.kind !== "bitmap" ||
+        !!layer !== (settings.outputTo === "new-layer")
+      )
+        throw new Error("Invalid prepared matting target or output.");
+      const commands: EditorCommand[] = layer
+        ? [
+            {
+              type: "layer.add",
+              layer,
+              parentId: parentId(this._read(), layerId) ?? undefined,
+            },
+            {
+              type: "layer.place",
+              id: layer.id,
+              targetId: layerId,
+              placement: "after",
+              preservePosition: false,
+            },
+            { type: "layer.update", id: layerId, patch: { visible: false } },
+          ]
+        : [{ type: "mask.setFromMatting", id: layerId, mask: plan.mask }];
+      if (
+        layer &&
+        (layer.kind !== "raster" ||
+          layer.id === layerId ||
+          JSON.stringify(layer.mask) !== JSON.stringify(plan.mask))
+      )
+        throw new Error("Invalid corrected foreground output.");
+      const command: EditorCommand = {
+        type: "transaction",
+        label: layer ? "Refine edge to new layer" : "Refine edge mask",
+        commands,
+      };
+      execute(this._read(), command); // Validate before any host transfers staged assets.
+      const apply = () => this._dispatch(command);
+      if (prepared.commit) prepared.commit(apply);
+      else apply();
+      const target = this.getLayer(layer?.id ?? layerId) as RasterLayer;
+      if (layer) this.selectedLayer = target;
+      return { layer: target, mask: target.mask! };
+    } finally {
+      prepared.dispose?.();
+    }
   }
   get canUndo() {
     return this.store.getSnapshot().past.length > 0;
@@ -951,29 +1582,49 @@ export class Document {
     };
   }
   /** @internal Trusted ingress only; isolated requests never supply this context. */
-  _setDefaultHistoryOrigin(origin:HistoryOrigin):void {this.defaultHistoryOrigin=freeze(historyOriginSchema.parse(origin));}
+  _setDefaultHistoryOrigin(origin: HistoryOrigin): void {
+    this.defaultHistoryOrigin = freeze(historyOriginSchema.parse(origin));
+  }
   /** @internal Capture before async preparation; apply it only around a synchronous commit. */
-  _getHistoryOrigin():HistoryOrigin {return this.scopedHistoryOrigin??this.defaultHistoryOrigin;}
+  _getHistoryOrigin(): HistoryOrigin {
+    return this.scopedHistoryOrigin ?? this.defaultHistoryOrigin;
+  }
   /** @internal Never hold an origin scope across an await. */
-  _withHistoryOrigin<T>(origin:Partial<HistoryOrigin>,run:()=>T):T {
-    const previous=this.scopedHistoryOrigin;
-    this.scopedHistoryOrigin=freeze(historyOriginSchema.parse({...this._getHistoryOrigin(),...origin}));
-    try {const result=run();if(result instanceof Promise)throw new Error('History origin scopes require synchronous commits.');return result;}finally{this.scopedHistoryOrigin=previous;}
+  _withHistoryOrigin<T>(origin: Partial<HistoryOrigin>, run: () => T): T {
+    const previous = this.scopedHistoryOrigin;
+    this.scopedHistoryOrigin = freeze(
+      historyOriginSchema.parse({ ...this._getHistoryOrigin(), ...origin }),
+    );
+    try {
+      const result = run();
+      if (result instanceof Promise)
+        throw new Error("History origin scopes require synchronous commits.");
+      return result;
+    } finally {
+      this.scopedHistoryOrigin = previous;
+    }
   }
   /** @internal Observation is runtime-owned and is never trusted from a project file. */
-  _isHistoryOperationObserved(operation:HistoryOperation):boolean {return this.store.isHistoryOperationObserved(operation);}
+  _isHistoryOperationObserved(operation: HistoryOperation): boolean {
+    return this.store.isHistoryOperationObserved(operation);
+  }
   getSnapshot = () => this.store.getSnapshot();
   /** Trusted host observer; switching routes invalidates an active semantic recording. */
   onHistoryBranchSwitch(listener: () => void): () => void {
     this.branchListeners.add(listener);
-    return () => {this.branchListeners.delete(listener);};
+    return () => {
+      this.branchListeners.delete(listener);
+    };
   }
   createHistoryBranch(name: string): string {
     return this.mutateHistoryBranch(() => this.store.createHistoryBranch(name));
   }
   checkoutHistoryBranch(id: string): void {
     const state = this.store.getSnapshot();
-    if (state.activeBranchId === id) {this.navigateHistory(state.past.length + state.future.length); return;}
+    if (state.activeBranchId === id) {
+      this.navigateHistory(state.past.length + state.future.length);
+      return;
+    }
     this.mutateHistoryBranch(() => this.store.checkoutHistoryBranch(id), true);
   }
   renameHistoryBranch(id: string, name: string): void {
@@ -982,34 +1633,88 @@ export class Document {
   deleteHistoryBranch(id: string): void {
     this.mutateHistoryBranch(() => this.store.deleteHistoryBranch(id));
   }
-  createHistoryComparison(name: string, before: HistoryTarget, after: HistoryTarget, region?: HistoryRegion): string {
-    return this.mutateHistoryBranch(() => this.store.createHistoryComparison(name, before, after, region), false, 'comparison');
+  createHistoryComparison(
+    name: string,
+    before: HistoryTarget,
+    after: HistoryTarget,
+    region?: HistoryRegion,
+  ): string {
+    return this.mutateHistoryBranch(
+      () => this.store.createHistoryComparison(name, before, after, region),
+      false,
+      "comparison",
+    );
   }
   updateHistoryComparison(id: string, changes: HistoryComparisonChanges): void {
-    this.mutateHistoryBranch(() => this.store.updateHistoryComparison(id, changes), false, 'comparison');
+    this.mutateHistoryBranch(
+      () => this.store.updateHistoryComparison(id, changes),
+      false,
+      "comparison",
+    );
   }
   deleteHistoryComparison(id: string): void {
-    this.mutateHistoryBranch(() => this.store.deleteHistoryComparison(id), false, 'comparison');
+    this.mutateHistoryBranch(
+      () => this.store.deleteHistoryComparison(id),
+      false,
+      "comparison",
+    );
   }
-  createHistoryBranchFromComparison(id: string, side: 'before' | 'after', name: string): string {
-    return this.mutateHistoryBranch(() => this.store.createHistoryBranchFromComparison(id, side, name), true);
+  createHistoryBranchFromComparison(
+    id: string,
+    side: "before" | "after",
+    name: string,
+  ): string {
+    return this.mutateHistoryBranch(
+      () => this.store.createHistoryBranchFromComparison(id, side, name),
+      true,
+    );
   }
-  private mutateHistoryBranch<T>(run: () => T, switchBranch = false, noun: 'branch' | 'comparison' = 'branch'): T {
-    if (this.batch) throw new Error('Finish the transaction first.');
-    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
-    if(this._assetStore&&(this._assetStore.fonts.size||this.hasFontHistory))this.activateFontSources(this._assetStore.fonts,this.fontDeclarations());
+  private mutateHistoryBranch<T>(
+    run: () => T,
+    switchBranch = false,
+    noun: "branch" | "comparison" = "branch",
+  ): T {
+    if (this.batch) throw new Error("Finish the transaction first.");
+    if (this.navigatingHistory || this.acceptingCommand)
+      throw new Error(
+        "Finish history navigation before editing or navigating again.",
+      );
+    if (
+      this._assetStore &&
+      (this._assetStore.fonts.size || this.hasFontHistory)
+    )
+      this.activateFontSources(this._assetStore.fonts, this.fontDeclarations());
     this.navigatingHistory = true;
     try {
       const before = this.store.getSnapshot().revision;
-      let result!: T, failure: unknown, failed = false;
-      try {result = run();} catch (cause) {failure = cause; failed = true;}
+      let result!: T,
+        failure: unknown,
+        failed = false;
+      try {
+        result = run();
+      } catch (cause) {
+        failure = cause;
+        failed = true;
+      }
       if (this.store.getSnapshot().revision !== before) {
-        if (switchBranch) for (const listener of this.branchListeners)
-          try {listener();} catch (cause) {if (!failed) failure = cause; failed = true;}
-        if (failed) throw new Error(`History ${noun} changed, but an observer failed. Inspect the document before retrying.`, {cause: failure});
+        if (switchBranch)
+          for (const listener of this.branchListeners)
+            try {
+              listener();
+            } catch (cause) {
+              if (!failed) failure = cause;
+              failed = true;
+            }
+        if (failed)
+          throw new Error(
+            `History ${noun} changed, but an observer failed. Inspect the document before retrying.`,
+            { cause: failure },
+          );
       } else if (failed) throw failure;
       return result;
-    } finally {this.navigatingHistory = false;}
+    } finally {
+      this.navigatingHistory = false;
+    }
   }
   toJSON(): DocumentData {
     return structuredClone(this._read());
@@ -1028,22 +1733,48 @@ export class Document {
   /** Zero is the oldest retained state; past.length is the current position. */
   navigateHistory(position: number): void {
     if (this.batch) throw new Error("Finish the transaction first.");
-    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
-    if(this._assetStore&&(this._assetStore.fonts.size||this.hasFontHistory))this.activateFontSources(this._assetStore.fonts,this.fontDeclarations());
+    if (this.navigatingHistory || this.acceptingCommand)
+      throw new Error(
+        "Finish history navigation before editing or navigating again.",
+      );
+    if (
+      this._assetStore &&
+      (this._assetStore.fonts.size || this.hasFontHistory)
+    )
+      this.activateFontSources(this._assetStore.fonts, this.fontDeclarations());
     this.navigatingHistory = true;
     try {
-      const before = this.store.getSnapshot(), count = Math.abs(position - before.past.length);
-      let failure: unknown, failed = false;
-      try {this.store.navigateHistory(position);} catch (cause) {failure = cause; failed = true;}
+      const before = this.store.getSnapshot(),
+        count = Math.abs(position - before.past.length);
+      let failure: unknown,
+        failed = false;
+      try {
+        this.store.navigateHistory(position);
+      } catch (cause) {
+        failure = cause;
+        failed = true;
+      }
       // A store observer can throw after publication. Recipe observers must still
       // receive every accepted transition, without seeing intermediate model states.
       if (this.store.getSnapshot().revision !== before.revision) {
-        const direction = position < before.past.length ? 'undo' : 'redo';
-        for (let index = 0; index < count; index++) for (const listener of this.historyListeners)
-          try {listener(direction);} catch (cause) {if (!failed) failure = cause; failed = true;}
-        if (failed) throw new Error('History moved, but an observer failed. Inspect the document before retrying.', {cause: failure});
+        const direction = position < before.past.length ? "undo" : "redo";
+        for (let index = 0; index < count; index++)
+          for (const listener of this.historyListeners)
+            try {
+              listener(direction);
+            } catch (cause) {
+              if (!failed) failure = cause;
+              failed = true;
+            }
+        if (failed)
+          throw new Error(
+            "History moved, but an observer failed. Inspect the document before retrying.",
+            { cause: failure },
+          );
       } else if (failed) throw failure;
-    } finally {this.navigatingHistory = false;}
+    } finally {
+      this.navigatingHistory = false;
+    }
   }
 
   getLayer(layerId: string | null): Layer | null {
@@ -1061,11 +1792,15 @@ export class Document {
 
   /** Synchronous, atomic changes; one history entry. Failed batches roll back. */
   transaction(label: string, callback: () => void): void {
-    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
+    if (this.navigatingHistory || this.acceptingCommand)
+      throw new Error(
+        "Finish history navigation before editing or navigating again.",
+      );
     if (this.batch) throw new Error("Nested transactions are not supported.");
-    if (typeof label !== 'string') throw new Error('A transaction label must be a string.');
+    if (typeof label !== "string")
+      throw new Error("A transaction label must be a string.");
     this.batch = [];
-    this.fontTransactionActivations=[];
+    this.fontTransactionActivations = [];
     this.staged = this.store.getSnapshot().document;
     try {
       const result: unknown = callback();
@@ -1079,7 +1814,9 @@ export class Document {
     } finally {
       this.batch = null;
       this.staged = null;
-      const activations=this.fontTransactionActivations;this.fontTransactionActivations=null;if(activations)this.releaseUnacceptedFonts(activations);
+      const activations = this.fontTransactionActivations;
+      this.fontTransactionActivations = null;
+      if (activations) this.releaseUnacceptedFonts(activations);
       this._assetStore?.fonts.collect();
     }
   }
@@ -1090,41 +1827,107 @@ export class Document {
   }
   /** @internal Automation adapters must validate external requests before dispatch. */
   _dispatch(command: EditorCommand) {
-    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
-    const activations=this.prepareFontCommands(command);this.fontTransactionActivations?.push(...activations);
-    try{
-    const changesPrecision=(value:EditorCommand):boolean=>value.type==='document.precision.float'||value.type==='transaction'&&value.commands.some(changesPrecision);
-    const replacesPrecisionSources=(value:EditorCommand):boolean=>value.type==='document.precision.float'&&!!value.sources?.length||value.type==='transaction'&&value.commands.some(replacesPrecisionSources);
-    if(this._assetStore&&replacesPrecisionSources(command)){
-      const assets=this._assetStore;
-      const verify=(value:EditorCommand,before:DocumentData):void=>{
-        if(value.type==='transaction'){for(const nested of value.commands){if(replacesPrecisionSources(nested))verify(nested,before);before=execute(before,nested);}return;}
-        if(value.type!=='document.precision.float')return;
-        for(const replacement of value.sources??[]){
-          const layer=findLayer(before,replacement.layerId);if(!layer||layer.kind!=='raster')throw new Error('Precision replacement requires an existing raster source.');
-          const original=assets.get(layer.assetId),prepared=assets.get(replacement.assetId);
-          if(original.blob!==prepared.blob||original.width!==prepared.width||original.height!==prepared.height||!original.tiff||prepared.tiff?.editingPrecision!=='float32'||original.tiff.page!==prepared.tiff.page||original.tiff.floatColorSpace!==prepared.tiff.floatColorSpace)throw new Error('Precision replacements must retain the same original TIFF bytes, page, source color and geometry.');
+    if (this.navigatingHistory || this.acceptingCommand)
+      throw new Error(
+        "Finish history navigation before editing or navigating again.",
+      );
+    const activations = this.prepareFontCommands(command);
+    this.fontTransactionActivations?.push(...activations);
+    try {
+      const changesPrecision = (value: EditorCommand): boolean =>
+        value.type === "document.precision.float" ||
+        (value.type === "transaction" && value.commands.some(changesPrecision));
+      const replacesPrecisionSources = (value: EditorCommand): boolean =>
+        (value.type === "document.precision.float" &&
+          !!value.sources?.length) ||
+        (value.type === "transaction" &&
+          value.commands.some(replacesPrecisionSources));
+      if (this._assetStore && replacesPrecisionSources(command)) {
+        const assets = this._assetStore;
+        const verify = (value: EditorCommand, before: DocumentData): void => {
+          if (value.type === "transaction") {
+            for (const nested of value.commands) {
+              if (replacesPrecisionSources(nested)) verify(nested, before);
+              before = execute(before, nested);
+            }
+            return;
+          }
+          if (value.type !== "document.precision.float") return;
+          for (const replacement of value.sources ?? []) {
+            const layer = findLayer(before, replacement.layerId);
+            if (!layer || layer.kind !== "raster")
+              throw new Error(
+                "Precision replacement requires an existing raster source.",
+              );
+            const original = assets.get(layer.assetId),
+              prepared = assets.get(replacement.assetId);
+            if (
+              original.blob !== prepared.blob ||
+              original.width !== prepared.width ||
+              original.height !== prepared.height ||
+              !original.tiff ||
+              prepared.tiff?.editingPrecision !== "float32" ||
+              original.tiff.page !== prepared.tiff.page ||
+              original.tiff.floatColorSpace !== prepared.tiff.floatColorSpace
+            )
+              throw new Error(
+                "Precision replacements must retain the same original TIFF bytes, page, source color and geometry.",
+              );
+          }
+        };
+        verify(command, this._read());
+      }
+      if (
+        this._assetStore &&
+        (isFloatDocument(this._read()) ||
+          this._assetStore.hasFloatAssets ||
+          changesPrecision(command))
+      )
+        assertFloatSources(execute(this._read(), command), this._assetStore);
+      if (this.batch) {
+        this.staged = freeze(execute(this._read(), command));
+        this.batch.push(command);
+      } else {
+        this.acceptingCommand = true;
+        try {
+          const state = this.store.getSnapshot(),
+            observing = this.commandListeners.size > 0;
+          let failure: unknown,
+            failed = false;
+          try {
+            this.store.dispatch(command, this._getHistoryOrigin());
+          } catch (cause) {
+            failure = cause;
+            failed = true;
+          }
+          if (this.store.getSnapshot().revision !== state.revision) {
+            if (observing) {
+              const after = this.store.getSnapshot().document;
+              for (const listener of [...this.commandListeners])
+                try {
+                  listener(
+                    structuredClone(command),
+                    structuredClone(state.document),
+                    structuredClone(after),
+                  );
+                } catch (cause) {
+                  if (!failed) failure = cause;
+                  failed = true;
+                }
+            }
+            if (failed)
+              throw new Error(
+                "Command accepted, but an observer failed. Inspect the document before retrying.",
+                { cause: failure },
+              );
+          } else if (failed) throw failure;
+        } finally {
+          this.acceptingCommand = false;
         }
-      };
-      verify(command,this._read());
+      }
+    } finally {
+      this.releaseUnacceptedFonts(activations);
     }
-    if(this._assetStore&&(isFloatDocument(this._read())||this._assetStore.hasFloatAssets||changesPrecision(command)))assertFloatSources(execute(this._read(),command),this._assetStore);
-    if (this.batch) {
-      this.staged = freeze(execute(this._read(), command));
-      this.batch.push(command);
-    } else {
-      this.acceptingCommand=true;
-      try {
-        const state=this.store.getSnapshot(),observing=this.commandListeners.size>0;
-        let failure:unknown,failed=false;
-        try {this.store.dispatch(command,this._getHistoryOrigin());}catch(cause){failure=cause;failed=true;}
-        if(this.store.getSnapshot().revision!==state.revision){
-          if(observing){const after=this.store.getSnapshot().document;for(const listener of [...this.commandListeners])try{listener(structuredClone(command),structuredClone(state.document),structuredClone(after));}catch(cause){if(!failed)failure=cause;failed=true;}}
-          if(failed)throw new Error('Command accepted, but an observer failed. Inspect the document before retrying.',{cause:failure});
-        }else if(failed)throw failure;
-      }finally{this.acceptingCommand=false;}
-    }
-    }finally{this.releaseUnacceptedFonts(activations);}
   }
 
   /** @internal */
@@ -1158,10 +1961,10 @@ export abstract class Layer {
   }
   /** Group controlling frequency filters in this document plane, including this group itself. */
   get frequencyGroup(): LayerGroup | null {
-    const document=this.document;
-    if(!document || !this.isAttached)return null;
-    const owner=frequencyRadiusOwner(document._read(),this.id);
-    return owner ? document.getLayer(owner.id) as LayerGroup : null;
+    const document = this.document;
+    if (!document || !this.isAttached) return null;
+    const owner = frequencyRadiusOwner(document._read(), this.id);
+    return owner ? (document.getLayer(owner.id) as LayerGroup) : null;
   }
   get isAttached() {
     return !!this.document && !!findLayer(this.document._read(), this.id);
@@ -1207,11 +2010,17 @@ export abstract class Layer {
   get opacity() {
     return this._read().opacity;
   }
-  get perspective():PerspectiveTransform|null {const value=this._read().perspective;return value?new PerspectiveTransform(value):null;}
-  set perspective(value:PerspectiveTransform|null){
-    if(value!==null&&!(value instanceof PerspectiveTransform))throw new Error('Use a PerspectiveTransform constructor or null.');
-    const data=this._read();if(data.kind!=='raster'&&data.kind!=='smart-object')throw new Error('Perspective requires a raster or smart-object layer.');
-    this.update({perspective:value?.toJSON()??null});
+  get perspective(): PerspectiveTransform | null {
+    const value = this._read().perspective;
+    return value ? new PerspectiveTransform(value) : null;
+  }
+  set perspective(value: PerspectiveTransform | null) {
+    if (value !== null && !(value instanceof PerspectiveTransform))
+      throw new Error("Use a PerspectiveTransform constructor or null.");
+    const data = this._read();
+    if (data.kind !== "raster" && data.kind !== "smart-object")
+      throw new Error("Perspective requires a raster or smart-object layer.");
+    this.update({ perspective: value?.toJSON() ?? null });
   }
   set opacity(value: number) {
     this.update({ opacity: value });
@@ -1222,8 +2031,12 @@ export abstract class Layer {
   set fillOpacity(value: number) {
     this.update({ fillOpacity: value });
   }
-  get clipped(): boolean { return this._read().clipped ?? false; }
-  set clipped(value: boolean) { this.update({clipped:value}); }
+  get clipped(): boolean {
+    return this._read().clipped ?? false;
+  }
+  set clipped(value: boolean) {
+    this.update({ clipped: value });
+  }
   get mask(): LayerMask | null {
     const value = this._read().mask;
     return value ? LayerMask._fromJSON(value) : null;
@@ -1232,33 +2045,107 @@ export abstract class Layer {
     this.update({ mask: value?.toJSON() ?? null });
   }
   /** Refine an existing mask using local or captured placed-image coordinates. */
-  paintMask(stroke:BrushStroke|import('./values').PencilStroke,mode:'hide'|'reveal'='hide',options:{space?:'local'|'placed';filterMask?:boolean}={}):void {
-    if(!(stroke instanceof BrushStroke))throw new Error('Use a BrushStroke or PencilStroke value.');
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>!['space','filterMask'].includes(key))||options.space!==undefined&&!['local','placed'].includes(options.space)||options.filterMask!==undefined&&typeof options.filterMask!=='boolean')throw new Error('Invalid mask painting options.');
-    if(options.filterMask&&!(this instanceof SmartObjectLayer))throw new Error('Filter masks require a smart object.');
-    const mask=options.filterMask&&this instanceof SmartObjectLayer?this.filterMask:this.mask;
-    if(!mask)throw new Error('Add a mask before painting.');
-    const layer=this._read();let placement:import('./masks').MaskPaintPlacement|undefined;
-    if(options.space==='placed'&&mask.plane){
-      const document=this.requireDocument(),world=layerTransform(document._read(),this.id)!;
-      const master=options.filterMask&&this instanceof SmartObjectLayer?document.getComponent(this.componentId):undefined;
-      const owner=maskOwnerPose(layer,world,master),image=layer.kind==='raster'||layer.kind==='smart-object',width=mask.linked&&image?layer.width:document.width,height=mask.linked&&image?layer.height:document.height;
-      placement=maskPaintPlacementValue(captureMaskMappedPlacement(mask.toJSON(),owner,mask.linked?world:new AffineTransform(),width,height,!!options.filterMask));
-    }else if(options.space==='placed'&&activePerspective(layer.perspective)&&mask.linked){
-      if(layer.kind!=='raster'&&layer.kind!=='smart-object')throw new Error('Placed mask painting requires an image.');
-      let parent=new AffineTransform();
-      if(options.filterMask&&this instanceof SmartObjectLayer){const master=this.requireDocument().getComponent(this.componentId);parent=AffineTransform.scale(this.width/master.width,this.height/master.height);}
-      placement={width:layer.width,height:layer.height,perspective:new PerspectiveTransform(options.filterMask?layer.perspective:maskPlacedPerspective(layer.perspective,layer.width,layer.height,mask.toJSON())),basis:maskTransform(mask.toJSON(),parent,!!options.filterMask)};
+  paintMask(
+    stroke: BrushStroke | import("./values").PencilStroke,
+    mode: "hide" | "reveal" = "hide",
+    options: { space?: "local" | "placed"; filterMask?: boolean } = {},
+  ): void {
+    if (!(stroke instanceof BrushStroke))
+      throw new Error("Use a BrushStroke or PencilStroke value.");
+    if (
+      !options ||
+      typeof options !== "object" ||
+      Array.isArray(options) ||
+      Object.keys(options).some(
+        (key) => !["space", "filterMask"].includes(key),
+      ) ||
+      (options.space !== undefined &&
+        !["local", "placed"].includes(options.space)) ||
+      (options.filterMask !== undefined &&
+        typeof options.filterMask !== "boolean")
+    )
+      throw new Error("Invalid mask painting options.");
+    if (options.filterMask && !(this instanceof SmartObjectLayer))
+      throw new Error("Filter masks require a smart object.");
+    const mask =
+      options.filterMask && this instanceof SmartObjectLayer
+        ? this.filterMask
+        : this.mask;
+    if (!mask) throw new Error("Add a mask before painting.");
+    const layer = this._read();
+    let placement: import("./masks").MaskPaintPlacement | undefined;
+    if (options.space === "placed" && mask.plane) {
+      const document = this.requireDocument(),
+        world = layerTransform(document._read(), this.id)!;
+      const master =
+        options.filterMask && this instanceof SmartObjectLayer
+          ? document.getComponent(this.componentId)
+          : undefined;
+      const owner = maskOwnerPose(layer, world, master),
+        image = layer.kind === "raster" || layer.kind === "smart-object",
+        width = mask.linked && image ? layer.width : document.width,
+        height = mask.linked && image ? layer.height : document.height;
+      placement = maskPaintPlacementValue(
+        captureMaskMappedPlacement(
+          mask.toJSON(),
+          owner,
+          mask.linked ? world : new AffineTransform(),
+          width,
+          height,
+          !!options.filterMask,
+        ),
+      );
+    } else if (
+      options.space === "placed" &&
+      activePerspective(layer.perspective) &&
+      mask.linked
+    ) {
+      if (layer.kind !== "raster" && layer.kind !== "smart-object")
+        throw new Error("Placed mask painting requires an image.");
+      let parent = new AffineTransform();
+      if (options.filterMask && this instanceof SmartObjectLayer) {
+        const master = this.requireDocument().getComponent(this.componentId);
+        parent = AffineTransform.scale(
+          this.width / master.width,
+          this.height / master.height,
+        );
+      }
+      placement = {
+        width: layer.width,
+        height: layer.height,
+        perspective: new PerspectiveTransform(
+          options.filterMask
+            ? layer.perspective
+            : maskPlacedPerspective(
+                layer.perspective,
+                layer.width,
+                layer.height,
+                mask.toJSON(),
+              ),
+        ),
+        basis: maskTransform(mask.toJSON(), parent, !!options.filterMask),
+      };
     }
-    const next=mask.paint(stroke,mode,placement?{placement}:{});
-    if(options.filterMask&&this instanceof SmartObjectLayer)this.filterMask=next;else this.mask=next;
+    const next = mask.paint(stroke, mode, placement ? { placement } : {});
+    if (options.filterMask && this instanceof SmartObjectLayer)
+      this.filterMask = next;
+    else this.mask = next;
   }
   /** Move the ordinary mask in containing-document pixels without changing its geometry. */
-  translateMask(dx:number,dy:number):void {
-    const document=this.requireDocument(),mask=this.mask;
-    if(!mask)throw new Error('This layer has no mask to move.');
-    const data=this._read(),source=mask.toJSON(),next=translateMaskData(source,layerTransform(document._read(),this.id)!,dx,dy,activePerspective(data.perspective));
-    if(next!==source)this.mask=LayerMask._fromJSON(next);
+  translateMask(dx: number, dy: number): void {
+    const document = this.requireDocument(),
+      mask = this.mask;
+    if (!mask) throw new Error("This layer has no mask to move.");
+    const data = this._read(),
+      source = mask.toJSON(),
+      next = translateMaskData(
+        source,
+        layerTransform(document._read(), this.id)!,
+        dx,
+        dy,
+        activePerspective(data.perspective),
+      );
+    if (next !== source) this.mask = LayerMask._fromJSON(next);
   }
   /** Toggle coordinate planes while preserving the mask's current world position. */
   setMaskLinked(linked: boolean) {
@@ -1269,18 +2156,40 @@ export abstract class Layer {
     if (!mask) throw new Error("This layer has no mask to link.");
     if (mask.linked === linked) return;
     const layerWorld = layerTransform(document._read(), this.id)!;
-    const data=this._read();
-    if(mask.plane||activePerspective(data.perspective)){
-      let reference:import('../core/mask-plane').MaskPlaneData['reference']|undefined;
-      if(data.kind==='raster')reference={kind:'asset',assetId:data.assetId};
-      else if(data.kind==='smart-object'){const source=new ComponentRegistry(document._read().components).get(data.componentId).source;reference=source.kind==='asset'?{kind:'asset',assetId:source.assetId}:{kind:'pixels',width:Math.ceil(source.document.width),height:Math.ceil(source.document.height)};}
-      this.mask=LayerMask._fromJSON(relinkMaskPlane(mask.toJSON(),maskOwnerPose(data,layerWorld),linked,reference));return;
+    const data = this._read();
+    if (mask.plane || activePerspective(data.perspective)) {
+      let reference:
+        import("../core/mask-plane").MaskPlaneData["reference"] | undefined;
+      if (data.kind === "raster")
+        reference = { kind: "asset", assetId: data.assetId };
+      else if (data.kind === "smart-object") {
+        const source = new ComponentRegistry(document._read().components).get(
+          data.componentId,
+        ).source;
+        reference =
+          source.kind === "asset"
+            ? { kind: "asset", assetId: source.assetId }
+            : {
+                kind: "pixels",
+                width: Math.ceil(source.document.width),
+                height: Math.ceil(source.document.height),
+              };
+      }
+      this.mask = LayerMask._fromJSON(
+        relinkMaskPlane(
+          mask.toJSON(),
+          maskOwnerPose(data, layerWorld),
+          linked,
+          reference,
+        ),
+      );
+      return;
     }
     const world = maskTransform(mask.toJSON(), layerWorld);
     const local = linked ? layerWorld.inverse().multiply(world) : world;
     this.mask = mask.with({
       linked,
-      ...(mask.placedX||mask.placedY?{placedX:0,placedY:0}:{}),
+      ...(mask.placedX || mask.placedY ? { placedX: 0, placedY: 0 } : {}),
       x: local.e,
       y: local.f,
       basis: new AffineTransform(local.a, local.b, local.c, local.d, 0, 0),
@@ -1289,10 +2198,13 @@ export abstract class Layer {
   /** Capture a document-space selection as a mask that moves with this layer. */
   maskFromSelection(selection: MarqueeSelection) {
     const document = this.requireDocument();
-    const world=layerTransform(document._read(),this.id)!;
-    if(activePerspective(this._read().perspective)){
-      const raw=new LayerMask({selection,linked:false});
-      this.mask=LayerMask._fromJSON(relinkMaskPlane(raw.toJSON(),maskOwnerPose(this._read(),world),true));return;
+    const world = layerTransform(document._read(), this.id)!;
+    if (activePerspective(this._read().perspective)) {
+      const raw = new LayerMask({ selection, linked: false });
+      this.mask = LayerMask._fromJSON(
+        relinkMaskPlane(raw.toJSON(), maskOwnerPose(this._read(), world), true),
+      );
+      return;
     }
     const inverse = world.inverse();
     this.mask = new LayerMask({
@@ -1306,33 +2218,65 @@ export abstract class Layer {
       throw new Error("Mask source must belong to the same document.");
     const target = layerTransform(document._read(), this.id)!;
     const origin = layerTransform(document._read(), source.id)!;
-    const projected=activePerspective(this._read().perspective);
-    const mapping = projected?new AffineTransform():target.inverse().multiply(origin);
+    const projected = activePerspective(this._read().perspective);
+    const mapping = projected
+      ? new AffineTransform()
+      : target.inverse().multiply(origin);
     const sources = [...source.paths];
-    const explicitRules = sources.some(path => path.subpaths.length || path._pathRecord().fillRule !== undefined);
-    const rules = new Set(sources.map(path => explicitRules ? path.fillRule : "evenodd"));
-    if (rules.size > 1) throw new Error("Mask source paths must use the same fill rule.");
-    const paths = [...source.paths].flatMap(path => pathContours(path.toJSON()).map(
-      (contour) =>
-        new VectorPath({
-          closed: contour.closed,
-          points: contour.points.map((p) => ({
-            ...mapping.point(p),
-            in: mapping.point(p.in),
-            out: mapping.point(p.out),
-          })),
-        }),
-    ));
+    const explicitRules = sources.some(
+      (path) =>
+        path.subpaths.length || path._pathRecord().fillRule !== undefined,
+    );
+    const rules = new Set(
+      sources.map((path) => (explicitRules ? path.fillRule : "evenodd")),
+    );
+    if (rules.size > 1)
+      throw new Error("Mask source paths must use the same fill rule.");
+    const paths = [...source.paths].flatMap((path) =>
+      pathContours(path.toJSON()).map(
+        (contour) =>
+          new VectorPath({
+            closed: contour.closed,
+            points: contour.points.map((p) => ({
+              ...mapping.point(p),
+              in: mapping.point(p.in),
+              out: mapping.point(p.out),
+            })),
+          }),
+      ),
+    );
     if (!paths.length)
       throw new Error("The vector layer has no paths to copy.");
-    const mask=new LayerMask({ paths, fillRule: [...rules][0] ?? "nonzero",...(projected?{linked:false,x:origin.e,y:origin.f,basis:new AffineTransform(origin.a,origin.b,origin.c,origin.d)}:{}) });
-    this.mask=projected?LayerMask._fromJSON(relinkMaskPlane(mask.toJSON(),maskOwnerPose(this._read(),target),true)):mask;
+    const mask = new LayerMask({
+      paths,
+      fillRule: [...rules][0] ?? "nonzero",
+      ...(projected
+        ? {
+            linked: false,
+            x: origin.e,
+            y: origin.f,
+            basis: new AffineTransform(origin.a, origin.b, origin.c, origin.d),
+          }
+        : {}),
+    });
+    this.mask = projected
+      ? LayerMask._fromJSON(
+          relinkMaskPlane(
+            mask.toJSON(),
+            maskOwnerPose(this._read(), target),
+            true,
+          ),
+        )
+      : mask;
   }
   /** Create a bitmap mask referencing an asset in the document's AssetStore. */
   maskFromBitmap(assetId: string) {
     this.mask = LayerMask.fromBitmap(assetId);
   }
-  async refineEdge(_options: RefineEdgeOptions = {}, _control:RefineEdgeControl={}): Promise<LayerMask> {
+  async refineEdge(
+    _options: RefineEdgeOptions = {},
+    _control: RefineEdgeControl = {},
+  ): Promise<LayerMask> {
     throw new Error("Refine edge is only supported on raster layers.");
   }
   get metadata(): LayerMetadata {
@@ -1380,8 +2324,10 @@ export abstract class Layer {
       );
       // Detached groups share the child's record. Preserve that identity while
       // clearing fields removed by reflow (for example a vertical frame cache).
-      for(const key of Object.keys(this.data))if(!Object.hasOwn(updated.children[0],key))delete(this.data as unknown as Record<string,unknown>)[key];
-      Object.assign(this.data,updated.children[0]);
+      for (const key of Object.keys(this.data))
+        if (!Object.hasOwn(updated.children[0], key))
+          delete (this.data as unknown as Record<string, unknown>)[key];
+      Object.assign(this.data, updated.children[0]);
     }
   }
   remove() {
@@ -1520,31 +2466,55 @@ function allIds(nodes: LayerData[]): string[] {
 
 export class SmartObjectLayer extends Layer {
   /** Accepted settings for this shared master; null for ordinary smart objects. */
-  get rawDevelopment():RawDevelopment|null{
-    const document=this.requireDocument(),source=new ComponentRegistry(document._read().components).get(this.componentId).source;
-    if(document._readRawDevelopment&&!document.assetStore)throw new Error('Use await layer.getRawDevelopment() in isolated scripts.');
-    const store=document.assetStore,raw=source.kind==='asset'&&store?.has(source.assetId)?store.get(source.assetId).raw:undefined;
-    return raw?new RawDevelopment(raw.settings.development):null;
+  get rawDevelopment(): RawDevelopment | null {
+    const document = this.requireDocument(),
+      source = new ComponentRegistry(document._read().components).get(
+        this.componentId,
+      ).source;
+    if (document._readRawDevelopment && !document.assetStore)
+      throw new Error(
+        "Use await layer.getRawDevelopment() in isolated scripts.",
+      );
+    const store = document.assetStore,
+      raw =
+        source.kind === "asset" && store?.has(source.assetId)
+          ? store.get(source.assetId).raw
+          : undefined;
+    return raw ? new RawDevelopment(raw.settings.development) : null;
   }
-  async getRawDevelopment():Promise<RawDevelopment|null>{
-    const document=this.requireDocument();if(!document._readRawDevelopment)return this.rawDevelopment;
-    const revision=document.getSnapshot().revision,settings=await document._readRawDevelopment(this.id);
-    if(document.getSnapshot().revision!==revision)throw new Error('The document changed while reading RAW development settings.');
-    return settings?new RawDevelopment(settings):null;
+  async getRawDevelopment(): Promise<RawDevelopment | null> {
+    const document = this.requireDocument();
+    if (!document._readRawDevelopment) return this.rawDevelopment;
+    const revision = document.getSnapshot().revision,
+      settings = await document._readRawDevelopment(this.id);
+    if (document.getSnapshot().revision !== revision)
+      throw new Error(
+        "The document changed while reading RAW development settings.",
+      );
+    return settings ? new RawDevelopment(settings) : null;
   }
-  async developRaw(value:RawDevelopment,control:RawDevelopmentControl={}):Promise<Readonly<RawImportReport>>{
-    if(!(value instanceof RawDevelopment))throw new Error('Use a RawDevelopment constructor.');
-    return this.requireDocument()._developRaw(this.id,value.toJSON(),control);
+  async developRaw(
+    value: RawDevelopment,
+    control: RawDevelopmentControl = {},
+  ): Promise<Readonly<RawImportReport>> {
+    if (!(value instanceof RawDevelopment))
+      throw new Error("Use a RawDevelopment constructor.");
+    return this.requireDocument()._developRaw(this.id, value.toJSON(), control);
   }
   constructor(
     options: LayerOptions & {
       componentId: string;
       width: number;
       height: number;
-      perspective?:PerspectiveTransform|null;
+      perspective?: PerspectiveTransform | null;
     },
   ) {
-    if(options.perspective!==undefined&&options.perspective!==null&&!(options.perspective instanceof PerspectiveTransform))throw new Error('Use a PerspectiveTransform constructor.');
+    if (
+      options.perspective !== undefined &&
+      options.perspective !== null &&
+      !(options.perspective instanceof PerspectiveTransform)
+    )
+      throw new Error("Use a PerspectiveTransform constructor.");
     super({
       ...createRaster(
         options.name ?? "Smart object",
@@ -1554,7 +2524,9 @@ export class SmartObjectLayer extends Layer {
       ),
       ...options,
       kind: "smart-object",
-      ...(options.perspective===undefined?{}:{perspective:options.perspective?.toJSON()??null}),
+      ...(options.perspective === undefined
+        ? {}
+        : { perspective: options.perspective?.toJSON() ?? null }),
     } as SmartObjectInstanceData);
     delete (this.data as unknown as Record<string, unknown>).assetId;
     delete (this.data as unknown as Record<string, unknown>).effects;
@@ -1607,9 +2579,19 @@ export class SmartObjectLayer extends Layer {
       this.componentId,
     ).source;
     const master = source.kind === "asset" ? source : source.document;
-    const data=this._read(),modelWorld=layerTransform(document._read(),this.id)!;
-    if(mask.plane||activePerspective(data.perspective)){
-      this.filterMask=LayerMask._fromJSON(relinkMaskPlane(mask.toJSON(),maskOwnerPose(data,modelWorld,master),linked,{kind:'pixels',width:master.width,height:master.height},true));return;
+    const data = this._read(),
+      modelWorld = layerTransform(document._read(), this.id)!;
+    if (mask.plane || activePerspective(data.perspective)) {
+      this.filterMask = LayerMask._fromJSON(
+        relinkMaskPlane(
+          mask.toJSON(),
+          maskOwnerPose(data, modelWorld, master),
+          linked,
+          { kind: "pixels", width: master.width, height: master.height },
+          true,
+        ),
+      );
+      return;
     }
     const nativeWorld = layerTransform(document._read(), this.id)!.multiply(
       AffineTransform.scale(
@@ -1621,7 +2603,7 @@ export class SmartObjectLayer extends Layer {
     const local = linked ? nativeWorld.inverse().multiply(world) : world;
     this.filterMask = mask.with({
       linked,
-      ...(mask.placedX||mask.placedY?{placedX:0,placedY:0}:{}),
+      ...(mask.placedX || mask.placedY ? { placedX: 0, placedY: 0 } : {}),
       x: local.e,
       y: local.f,
       basis: new AffineTransform(local.a, local.b, local.c, local.d, 0, 0),
@@ -1725,39 +2707,112 @@ export class SmartObjectLayer extends Layer {
 export class RasterLayer extends Layer {
   /** Apply a prepared native replacement in the same order as erase/clear. */
   applyWetPaint(stroke: WetPaintStroke): void {
-    if (!(stroke instanceof WetPaintStroke)) throw new Error('Use a WetPaintStroke value.');
+    if (!(stroke instanceof WetPaintStroke))
+      throw new Error("Use a WetPaintStroke value.");
     this.appendErasure(stroke);
   }
   /** Non-destructive alpha erasure in layer-local coordinates. */
-  erase(stroke: EraserStroke, options: {space?:'local'|'placed'} = {}): void {
-    if (!(stroke instanceof EraserStroke)) throw new Error("Use an EraserStroke value.");
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='space')||options.space!==undefined&&!['local','placed'].includes(options.space))throw new Error('Eraser space must be local or placed.');
-    const layer=this._read() as RasterLayerData;
-    if(options.space==='placed'&&activePerspective(layer.perspective)){
-      this.update({erasures:[...(layer.erasures??[]),{width:this.width,height:this.height,stroke:stroke.toJSON(),placement:{perspective:layer.perspective,bounds:intrinsicLocalBounds(layer)!}}]});
+  erase(
+    stroke: EraserStroke,
+    options: { space?: "local" | "placed" } = {},
+  ): void {
+    if (!(stroke instanceof EraserStroke))
+      throw new Error("Use an EraserStroke value.");
+    if (
+      !options ||
+      typeof options !== "object" ||
+      Array.isArray(options) ||
+      Object.keys(options).some((key) => key !== "space") ||
+      (options.space !== undefined &&
+        !["local", "placed"].includes(options.space))
+    )
+      throw new Error("Eraser space must be local or placed.");
+    const layer = this._read() as RasterLayerData;
+    if (options.space === "placed" && activePerspective(layer.perspective)) {
+      this.update({
+        erasures: [
+          ...(layer.erasures ?? []),
+          {
+            width: this.width,
+            height: this.height,
+            stroke: stroke.toJSON(),
+            placement: {
+              perspective: layer.perspective,
+              bounds: intrinsicLocalBounds(layer)!,
+            },
+          },
+        ],
+      });
       return;
     }
     this.appendErasure(stroke);
   }
   /** Clear a local-coordinate selection, or the complete image when omitted. */
-  clear(selection: MarqueeSelection | null = null, options: {space?:'local'|'placed'} = {}): void {
-    if (selection !== null && !(selection instanceof MarqueeSelection)) throw new Error("Use a MarqueeSelection value.");
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='space')||options.space!==undefined&&!['local','placed'].includes(options.space))throw new Error('Clear space must be local or placed.');
-    const layer=this._read() as RasterLayerData;
-    if(options.space==='placed'&&activePerspective(layer.perspective)){
-      const support=intrinsicLocalBounds(layer)!,placed=perspectiveRect(perspectiveMatrix(layer.width,layer.height,layer.perspective),support).bounds;
+  clear(
+    selection: MarqueeSelection | null = null,
+    options: { space?: "local" | "placed" } = {},
+  ): void {
+    if (selection !== null && !(selection instanceof MarqueeSelection))
+      throw new Error("Use a MarqueeSelection value.");
+    if (
+      !options ||
+      typeof options !== "object" ||
+      Array.isArray(options) ||
+      Object.keys(options).some((key) => key !== "space") ||
+      (options.space !== undefined &&
+        !["local", "placed"].includes(options.space))
+    )
+      throw new Error("Clear space must be local or placed.");
+    const layer = this._read() as RasterLayerData;
+    if (options.space === "placed" && activePerspective(layer.perspective)) {
+      const support = intrinsicLocalBounds(layer)!,
+        placed = perspectiveRect(
+          perspectiveMatrix(layer.width, layer.height, layer.perspective),
+          support,
+        ).bounds;
       // Cover every interpolation neighbor of the placed image, including a
       // subpixel-sized quad. The actual selection still clips the clear field.
-      const x=Math.floor(placed.x)-1,y=Math.floor(placed.y)-1;
-      const bounds=captureFieldBounds({x,y,width:Math.ceil(placed.x+placed.width)+1-x,height:Math.ceil(placed.y+placed.height)+1-y});
-      const stroke=new PaintFill({bounds,erase:true,clip:selection}).toJSON();
-      this.update({erasures:[...(layer.erasures??[]),{width:this.width,height:this.height,stroke,placement:{perspective:layer.perspective,bounds:support}}]});
+      const x = Math.floor(placed.x) - 1,
+        y = Math.floor(placed.y) - 1;
+      const bounds = captureFieldBounds({
+        x,
+        y,
+        width: Math.ceil(placed.x + placed.width) + 1 - x,
+        height: Math.ceil(placed.y + placed.height) + 1 - y,
+      });
+      const stroke = new PaintFill({
+        bounds,
+        erase: true,
+        clip: selection,
+      }).toJSON();
+      this.update({
+        erasures: [
+          ...(layer.erasures ?? []),
+          {
+            width: this.width,
+            height: this.height,
+            stroke,
+            placement: { perspective: layer.perspective, bounds: support },
+          },
+        ],
+      });
       return;
     }
-    this.appendErasure(new PaintFill({ bounds: { x: 0, y: 0, width: this.width, height: this.height }, erase: true, clip: selection }));
+    this.appendErasure(
+      new PaintFill({
+        bounds: { x: 0, y: 0, width: this.width, height: this.height },
+        erase: true,
+        clip: selection,
+      }),
+    );
   }
   private appendErasure(operation: PaintOperation): void {
-    this.update({ erasures: [...((this._read() as RasterLayerData).erasures ?? []), { width: this.width, height: this.height, stroke: operation.toJSON() }] });
+    this.update({
+      erasures: [
+        ...((this._read() as RasterLayerData).erasures ?? []),
+        { width: this.width, height: this.height, stroke: operation.toJSON() },
+      ],
+    });
   }
 
   /** Convert without changing original source bytes or the layer's stack position. */
@@ -1777,12 +2832,19 @@ export class RasterLayer extends Layer {
 
   readonly adjustments: AdjustmentCollection;
   constructor(options: RasterLayerOptions) {
-    const { assetId, width, height,perspective, ...base } = options;
-    if(perspective!==undefined&&perspective!==null&&!(perspective instanceof PerspectiveTransform))throw new Error('Use a PerspectiveTransform constructor.');
+    const { assetId, width, height, perspective, ...base } = options;
+    if (
+      perspective !== undefined &&
+      perspective !== null &&
+      !(perspective instanceof PerspectiveTransform)
+    )
+      throw new Error("Use a PerspectiveTransform constructor.");
     super({
       ...createRaster(options.name ?? "Image", assetId, width, height),
       ...base,
-      ...(perspective===undefined?{}:{perspective:perspective?.toJSON()??null}),
+      ...(perspective === undefined
+        ? {}
+        : { perspective: perspective?.toJSON() ?? null }),
     });
     validateDocument({ ...createDocument(), children: [this.data] });
     this.adjustments = new AdjustmentCollection(this);
@@ -1813,8 +2875,13 @@ export class RasterLayer extends Layer {
       this.document._dispatch({ type: "effect.reset", id: this.id });
     else (this.data as RasterLayerData).effects = [];
   }
-  override async refineEdge(options:RefineEdgeOptions={},control:RefineEdgeControl={}):Promise<LayerMask>{
-    return(await this.requireDocument()._refineRaster(this.id,options,control)).mask;
+  override async refineEdge(
+    options: RefineEdgeOptions = {},
+    control: RefineEdgeControl = {},
+  ): Promise<LayerMask> {
+    return (
+      await this.requireDocument()._refineRaster(this.id, options, control)
+    ).mask;
   }
   /** @internal */
   _effectCommand(command: EditorCommand) {
@@ -1831,17 +2898,36 @@ export class RasterLayer extends Layer {
 
 /** Detached native corrections need a native validation context before they
  * have a document owner. Attachment still validates the actual document. */
-function detachedLayerDocument(children: LayerData[], adjustment?: AdjustmentData): DocumentData {
-  const native = (layers: LayerData[]): boolean => layers.some(layer =>
-    layer.kind === 'adjustment' && layer.adjustment.kind === 'patch' && layer.adjustment.precision === 'float32' ||
-    layer.kind === 'group' && native(layer.children));
-  return {...createDocument(), ...(native(children) || adjustment?.kind === 'patch' && adjustment.precision === 'float32'
-    ? {precision:'float32' as const,colorSpace:'linear-srgb' as const} : {}), children};
+function detachedLayerDocument(
+  children: LayerData[],
+  adjustment?: AdjustmentData,
+): DocumentData {
+  const native = (layers: LayerData[]): boolean =>
+    layers.some(
+      (layer) =>
+        (layer.kind === "adjustment" &&
+          layer.adjustment.kind === "patch" &&
+          layer.adjustment.precision === "float32") ||
+        (layer.kind === "group" && native(layer.children)),
+    );
+  return {
+    ...createDocument(),
+    ...(native(children) ||
+    (adjustment?.kind === "patch" && adjustment.precision === "float32")
+      ? { precision: "float32" as const, colorSpace: "linear-srgb" as const }
+      : {}),
+    children,
+  };
 }
 
 export class LayerGroup extends Layer {
   readonly layers: LayerCollection;
-  constructor(options: Omit<LayerOptions, 'blendMode'> & {blendMode?:LayerBlendMode;frequencyRadius?:number|null} = {}) {
+  constructor(
+    options: Omit<LayerOptions, "blendMode"> & {
+      blendMode?: LayerBlendMode;
+      frequencyRadius?: number | null;
+    } = {},
+  ) {
     super({ ...createGroup(options.name), ...options });
     validateDocument({ ...createDocument(), children: [this.data] });
     this.layers = new LayerCollection(this);
@@ -1850,7 +2936,7 @@ export class LayerGroup extends Layer {
     return (this._read() as GroupLayerData).frequencyRadius ?? null;
   }
   set frequencyRadius(value: number | null) {
-    this.update({frequencyRadius:value});
+    this.update({ frequencyRadius: value });
   }
 }
 
@@ -2168,9 +3254,16 @@ export class StrokeCollection implements Iterable<PaintOperation> {
 }
 export class VectorLayer extends Layer {
   readonly paths = new PathCollection(this);
-  async combinePaths(operation:VectorBooleanOperation,paths:VectorPath[]=[...this.paths],control:VectorBooleanControl={}):Promise<VectorPath|null>{
-    if(paths.some(path=>path._owner!==this))throw new Error('Use Document.combinePaths for paths from different layers.');
-    return this.requireDocument().combinePaths(operation,paths,control);
+  async combinePaths(
+    operation: VectorBooleanOperation,
+    paths: VectorPath[] = [...this.paths],
+    control: VectorBooleanControl = {},
+  ): Promise<VectorPath | null> {
+    if (paths.some((path) => path._owner !== this))
+      throw new Error(
+        "Use Document.combinePaths for paths from different layers.",
+      );
+    return this.requireDocument().combinePaths(operation, paths, control);
   }
   constructor(options: LayerOptions = {}) {
     super({ ...base("Vector"), ...options, kind: "vector", paths: [] });
@@ -2182,34 +3275,46 @@ export class VectorLayer extends Layer {
       // The detached layer shell remains mutable (including inside a detached
       // group). Copy caller-owned fields before freezing; retain only values
       // already proven recursively immutable by our own registry.
-      const owned = Object.fromEntries(Object.entries(this.data).map(([key, value]) =>
-        [key, isImmutable(value) ? value : structuredClone(value)],
-      )) as unknown as LayerData;
+      const owned = Object.fromEntries(
+        Object.entries(this.data).map(([key, value]) => [
+          key,
+          isImmutable(value) ? value : structuredClone(value),
+        ]),
+      ) as unknown as LayerData;
       const snapshot = freeze({ ...createDocument(), children: [owned] });
       const next = execute(snapshot, command).children[0];
       Object.assign(this.data, freeze(next));
     }
   }
   toSvg(docWidth = 1920, docHeight = 1080): string {
-    let layer=this._read() as VectorLayerData;
+    let layer = this._read() as VectorLayerData;
     // Standalone output excludes ancestors. Rebase an attached unlinked mask
     // from document space into the immediate parent plane without mutating it.
-    if(this.document&&layer.mask?.linked===false){
-      const parent=parentId(this.document._read(),this.id);
-      const frame=parent?layerTransform(this.document._read(),parent):undefined;
-      if(frame){
-        const m=frame.inverse().multiply(maskTransform(layer.mask,new AffineTransform()));
-        layer={...layer,mask:{...withoutMaskPlacedOffset(layer.mask),x:m.e,y:m.f,basis:{a:m.a,b:m.b,c:m.c,d:m.d,e:0,f:0}}};
+    if (this.document && layer.mask?.linked === false) {
+      const parent = parentId(this.document._read(), this.id);
+      const frame = parent
+        ? layerTransform(this.document._read(), parent)
+        : undefined;
+      if (frame) {
+        const m = frame
+          .inverse()
+          .multiply(maskTransform(layer.mask, new AffineTransform()));
+        layer = {
+          ...layer,
+          mask: {
+            ...withoutMaskPlacedOffset(layer.mask),
+            x: m.e,
+            y: m.f,
+            basis: { a: m.a, b: m.b, c: m.c, d: m.d, e: 0, f: 0 },
+          },
+        };
       }
     }
-    return exportVectorLayerSvg(
-      layer,
-      docWidth,
-      docHeight,
-    );
+    return exportVectorLayerSvg(layer, docWidth, docHeight);
   }
 }
-export interface VectorPathOptions extends VectorStrokeOptions, VectorFillOptions {
+export interface VectorPathOptions
+  extends VectorStrokeOptions, VectorFillOptions {
   points: (Point & { in?: Point; out?: Point })[];
   closed?: boolean;
   fill?: string | null;
@@ -2240,11 +3345,15 @@ export class VectorPath {
       ...vectorStrokeData(options),
       ...vectorFillData(options),
       ...(options.fillRule === undefined ? {} : { fillRule: options.fillRule }),
-      ...(options.subpaths === undefined ? {} : { subpaths: options.subpaths.map(contour => contour.toJSON()) }),
+      ...(options.subpaths === undefined
+        ? {}
+        : { subpaths: options.subpaths.map((contour) => contour.toJSON()) }),
     });
     for (const contour of options.subpaths ?? []) this.subpaths._own(contour);
   }
-  /** @internal */ _pathRecord() { return this.read(); }
+  /** @internal */ _pathRecord() {
+    return this.read();
+  }
   private read() {
     if (!this._owner) return this.data;
     const path = (this._owner._read() as VectorLayerData).paths.find(
@@ -2266,8 +3375,12 @@ export class VectorPath {
   set closed(value: boolean) {
     this.update({ closed: value });
   }
-  get fillRule() { return this.read().fillRule ?? "nonzero"; }
-  set fillRule(value: "nonzero" | "evenodd") { this.update({ fillRule: value }); }
+  get fillRule() {
+    return this.read().fillRule ?? "nonzero";
+  }
+  set fillRule(value: "nonzero" | "evenodd") {
+    this.update({ fillRule: value });
+  }
   get fill() {
     return this.read().fill;
   }
@@ -2286,18 +3399,42 @@ export class VectorPath {
   set strokeWidth(value: number) {
     this.update({ strokeWidth: value });
   }
-  get fillGradient():VectorGradientData|null{return structuredClone(this.read().fillGradient??null);}
-  set fillGradient(value:VectorGradientData|null){this.update({fillGradient:value});}
-  get strokeCap(){return vectorStrokeValues(this.read()).strokeCap;}
-  set strokeCap(value:NonNullable<VectorStrokeOptions['strokeCap']>){this.update({strokeCap:value});}
-  get strokeJoin(){return vectorStrokeValues(this.read()).strokeJoin;}
-  set strokeJoin(value:NonNullable<VectorStrokeOptions['strokeJoin']>){this.update({strokeJoin:value});}
-  get strokeMiterLimit(){return vectorStrokeValues(this.read()).strokeMiterLimit;}
-  set strokeMiterLimit(value:number){this.update({strokeMiterLimit:value});}
-  get strokeDashArray():number[]{return [...vectorStrokeValues(this.read()).strokeDashArray];}
-  set strokeDashArray(value:number[]){this.update({strokeDashArray:value});}
-  get strokeDashOffset(){return vectorStrokeValues(this.read()).strokeDashOffset;}
-  set strokeDashOffset(value:number){this.update({strokeDashOffset:value});}
+  get fillGradient(): VectorGradientData | null {
+    return structuredClone(this.read().fillGradient ?? null);
+  }
+  set fillGradient(value: VectorGradientData | null) {
+    this.update({ fillGradient: value });
+  }
+  get strokeCap() {
+    return vectorStrokeValues(this.read()).strokeCap;
+  }
+  set strokeCap(value: NonNullable<VectorStrokeOptions["strokeCap"]>) {
+    this.update({ strokeCap: value });
+  }
+  get strokeJoin() {
+    return vectorStrokeValues(this.read()).strokeJoin;
+  }
+  set strokeJoin(value: NonNullable<VectorStrokeOptions["strokeJoin"]>) {
+    this.update({ strokeJoin: value });
+  }
+  get strokeMiterLimit() {
+    return vectorStrokeValues(this.read()).strokeMiterLimit;
+  }
+  set strokeMiterLimit(value: number) {
+    this.update({ strokeMiterLimit: value });
+  }
+  get strokeDashArray(): number[] {
+    return [...vectorStrokeValues(this.read()).strokeDashArray];
+  }
+  set strokeDashArray(value: number[]) {
+    this.update({ strokeDashArray: value });
+  }
+  get strokeDashOffset() {
+    return vectorStrokeValues(this.read()).strokeDashOffset;
+  }
+  set strokeDashOffset(value: number) {
+    this.update({ strokeDashOffset: value });
+  }
   toJSON(): VectorPathData {
     return structuredClone(this.read());
   }
@@ -2404,69 +3541,129 @@ export class VectorContour {
   private data: VectorContourData;
   /** @internal */ _owner: VectorPath | null = null;
   constructor(options: { points: (Point & { in?: Point; out?: Point })[] }) {
-    this.data = vectorContourSchema.parse({ id: id(), closed: true, points: options.points.map(p => ({
-      x: p.x, y: p.y, in: p.in ?? { x: p.x, y: p.y }, out: p.out ?? { x: p.x, y: p.y },
-    })) });
+    this.data = vectorContourSchema.parse({
+      id: id(),
+      closed: true,
+      points: options.points.map((p) => ({
+        x: p.x,
+        y: p.y,
+        in: p.in ?? { x: p.x, y: p.y },
+        out: p.out ?? { x: p.x, y: p.y },
+      })),
+    });
   }
   private read(): VectorContourData {
     if (!this._owner) return this.data;
-    const data = this._owner._pathRecord().subpaths?.find(contour => contour.id === this.id);
-    if (!data) throw new Error("This contour is not in the current document revision.");
+    const data = this._owner
+      ._pathRecord()
+      .subpaths?.find((contour) => contour.id === this.id);
+    if (!data)
+      throw new Error("This contour is not in the current document revision.");
     return data;
   }
-  get id() { return this.data.id; }
-  get closed(): true { this.read(); return true; }
-  get points() { return structuredClone(this.read().points); }
-  toJSON(): VectorContourData { return structuredClone(this.read()); }
+  get id() {
+    return this.data.id;
+  }
+  get closed(): true {
+    this.read();
+    return true;
+  }
+  get points() {
+    return structuredClone(this.read().points);
+  }
+  toJSON(): VectorContourData {
+    return structuredClone(this.read());
+  }
   private update(points: PathAnchor[]) {
     const data = vectorContourSchema.parse({ ...this.read(), points });
-    if (this._owner) this._owner.update({ subpaths: this._owner._pathRecord().subpaths!.map(c => c.id === this.id ? data : c) });
+    if (this._owner)
+      this._owner.update({
+        subpaths: this._owner
+          ._pathRecord()
+          .subpaths!.map((c) => (c.id === this.id ? data : c)),
+      });
     else this.data = data;
   }
   setPoint(index: number, patch: Partial<PathAnchor>) {
     const points = this.points;
     if (!points[index]) throw new Error("Anchor not found.");
-    points[index] = { ...points[index], ...patch }; this.update(points);
+    points[index] = { ...points[index], ...patch };
+    this.update(points);
   }
   addPoint(point: Point & { in?: Point; out?: Point }) {
-    this.update([...this.points, { x: point.x, y: point.y, in: point.in ?? { x: point.x, y: point.y }, out: point.out ?? { x: point.x, y: point.y } }]);
+    this.update([
+      ...this.points,
+      {
+        x: point.x,
+        y: point.y,
+        in: point.in ?? { x: point.x, y: point.y },
+        out: point.out ?? { x: point.x, y: point.y },
+      },
+    ]);
   }
-  splitSegment(index: number, t = .5) { this.update(splitPathSegment(this.points, true, index, t)); return index + 1; }
+  splitSegment(index: number, t = 0.5) {
+    this.update(splitPathSegment(this.points, true, index, t));
+    return index + 1;
+  }
   removePoint(index: number) {
     const points = this.points;
     if (!points[index]) throw new Error("Anchor not found.");
-    points.splice(index, 1); this.update(points);
+    points.splice(index, 1);
+    this.update(points);
   }
   remove() {
     if (!this._owner) throw new Error("Add the contour to a path first.");
-    this.read(); this._owner.subpaths.remove(this.id);
+    this.read();
+    this._owner.subpaths.remove(this.id);
   }
-  /** @internal */ static _fromData(data: VectorContourData, owner: VectorPath) {
+  /** @internal */ static _fromData(
+    data: VectorContourData,
+    owner: VectorPath,
+  ) {
     const contour = new VectorContour({ points: [{ x: 0, y: 0 }] });
-    contour.data.id = data.id; contour._owner = owner; return contour;
+    contour.data.id = data.id;
+    contour._owner = owner;
+    return contour;
   }
 }
 export class SubpathCollection implements Iterable<VectorContour> {
   private handles = new Map<string, VectorContour>();
   constructor(private owner: VectorPath) {}
-  private get data() { return this.owner._pathRecord().subpaths ?? []; }
-  get length() { return this.data.length; }
+  private get data() {
+    return this.owner._pathRecord().subpaths ?? [];
+  }
+  get length() {
+    return this.data.length;
+  }
   get(id: string): VectorContour | null {
-    const data = this.data.find(c => c.id === id); if (!data) return null;
-    if (!this.handles.has(id)) this.handles.set(id, VectorContour._fromData(data, this.owner));
+    const data = this.data.find((c) => c.id === id);
+    if (!data) return null;
+    if (!this.handles.has(id))
+      this.handles.set(id, VectorContour._fromData(data, this.owner));
     return this.handles.get(id)!;
   }
-  at(index: number) { const data = this.data.at(index); return data ? this.get(data.id) : null; }
-  /** @internal */ _own(contour: VectorContour) { contour._owner = this.owner; this.handles.set(contour.id, contour); }
+  at(index: number) {
+    const data = this.data.at(index);
+    return data ? this.get(data.id) : null;
+  }
+  /** @internal */ _own(contour: VectorContour) {
+    contour._owner = this.owner;
+    this.handles.set(contour.id, contour);
+  }
   add(contour: VectorContour): VectorContour {
     if (contour._owner) throw new Error("Contour already belongs to a path.");
-    this.owner.update({ subpaths: [...this.data, contour.toJSON()] }); this._own(contour); return contour;
+    this.owner.update({ subpaths: [...this.data, contour.toJSON()] });
+    this._own(contour);
+    return contour;
   }
   remove(id: string) {
-    if (!this.data.some(c => c.id === id)) throw new Error("Contour not found.");
-    this.owner.update({ subpaths: this.data.filter(c => c.id !== id) });
+    if (!this.data.some((c) => c.id === id))
+      throw new Error("Contour not found.");
+    this.owner.update({ subpaths: this.data.filter((c) => c.id !== id) });
   }
-  *[Symbol.iterator]() { for (const data of this.data) yield this.get(data.id)!; }
+  *[Symbol.iterator]() {
+    for (const data of this.data) yield this.get(data.id)!;
+  }
 }
 export class PathCollection implements Iterable<VectorPath> {
   private handles = new Map<string, VectorPath>();
@@ -2507,20 +3704,51 @@ export class PathCollection implements Iterable<VectorPath> {
 }
 
 export class TextLayer extends Layer {
-  get paragraphFormat():ParagraphFormat{return paragraphFormat(this._read() as TextLayerData);}
-  get paragraphStyle():ParagraphStyle|null{
-    const binding=(this._read() as TextLayerData).paragraphStyle;
-    return binding?this.requireDocument().paragraphStyles.getById(binding.id)??null:null;
+  get paragraphFormat(): ParagraphFormat {
+    return paragraphFormat(this._read() as TextLayerData);
   }
-  set paragraphStyle(style:ParagraphStyle|null){this.applyParagraphStyle(style);}
-  get paragraphOverrides():Partial<ParagraphFormat>{return structuredClone((this._read() as TextLayerData).paragraphStyle?.overrides??{});}
-  applyParagraphStyle(style:ParagraphStyle|null,options:{keepOverrides?:boolean}={}){
-    const document=this.requireDocument();
-    if(style!==null&&(!(style instanceof ParagraphStyle)||style.document!==document))throw new Error('Use a paragraph style attached to this document.');
-    const settings=z.object({keepOverrides:z.boolean().optional()}).strict().parse(options);
-    document._dispatch({type:'text.paragraphStyle',id:this.id,styleId:style?.id??null,...settings});
+  get paragraphStyle(): ParagraphStyle | null {
+    const binding = (this._read() as TextLayerData).paragraphStyle;
+    return binding
+      ? (this.requireDocument().paragraphStyles.getById(binding.id) ?? null)
+      : null;
   }
-  resetParagraphOverrides(keys?:(keyof ParagraphFormat)[]){this.requireDocument()._dispatch({type:'text.paragraphOverrides.clear',id:this.id,...(keys===undefined?{}:{keys})});}
+  set paragraphStyle(style: ParagraphStyle | null) {
+    this.applyParagraphStyle(style);
+  }
+  get paragraphOverrides(): Partial<ParagraphFormat> {
+    return structuredClone(
+      (this._read() as TextLayerData).paragraphStyle?.overrides ?? {},
+    );
+  }
+  applyParagraphStyle(
+    style: ParagraphStyle | null,
+    options: { keepOverrides?: boolean } = {},
+  ) {
+    const document = this.requireDocument();
+    if (
+      style !== null &&
+      (!(style instanceof ParagraphStyle) || style.document !== document)
+    )
+      throw new Error("Use a paragraph style attached to this document.");
+    const settings = z
+      .object({ keepOverrides: z.boolean().optional() })
+      .strict()
+      .parse(options);
+    document._dispatch({
+      type: "text.paragraphStyle",
+      id: this.id,
+      styleId: style?.id ?? null,
+      ...settings,
+    });
+  }
+  resetParagraphOverrides(keys?: (keyof ParagraphFormat)[]) {
+    this.requireDocument()._dispatch({
+      type: "text.paragraphOverrides.clear",
+      id: this.id,
+      ...(keys === undefined ? {} : { keys }),
+    });
+  }
   constructor(options: TextLayerOptions = {}) {
     const {
       text = "Text",
@@ -2554,7 +3782,18 @@ export class TextLayer extends Layer {
         characterRanges,
         writingMode,
         textOrientation,
-        ...(textPath===undefined?{}:{textPath:textPath instanceof TextPath?textPath.toJSON():textPath===null?null:(()=>{throw new Error('Use a TextPath value or null.');})()}),
+        ...(textPath === undefined
+          ? {}
+          : {
+              textPath:
+                textPath instanceof TextPath
+                  ? textPath.toJSON()
+                  : textPath === null
+                    ? null
+                    : (() => {
+                        throw new Error("Use a TextPath value or null.");
+                      })(),
+            }),
         fontFamily,
         color,
         align,
@@ -2575,91 +3814,264 @@ export class TextLayer extends Layer {
       }),
       ...baseOpts,
     });
-    validateDocument({ ...createDocument(), children: [this.data] },false);
+    validateDocument({ ...createDocument(), children: [this.data] }, false);
   }
 
-  get writingMode():import('../core/text-writing').WritingMode{return (this._read()as TextLayerData).writingMode??'horizontal-tb';}
-  set writingMode(value:import('../core/text-writing').WritingMode|undefined){this.update({writingMode:value});}
-  get textOrientation():import('../core/text-writing').TextOrientation{return (this._read()as TextLayerData).textOrientation??'mixed';}
-  set textOrientation(value:import('../core/text-writing').TextOrientation|undefined){this.update({textOrientation:value});}
-  /** Native bounds for the current logical source; one ordinary undoable edit. */
-  async setWriting(writing:import('../core/text-writing').TextWritingInput,control:TypographyControl={}):Promise<void>{
-    const value=textWritingSchema.parse(writing);
-    await this.applyCharacterFormatting({writingMode:value.mode,textOrientation:value.orientation},control);
+  get writingMode(): import("../core/text-writing").WritingMode {
+    return (this._read() as TextLayerData).writingMode ?? "horizontal-tb";
   }
-  get textPath():TextPath|null{const value=(this._read()as TextLayerData).textPath;return value?new TextPath(value):null;}
-  set textPath(value:TextPath|null){this.update(this.pathPatch(value));}
-  private pathPatch(value:TextPath|null){
-    if(value!==null&&!(value instanceof TextPath))throw new Error('Use a TextPath value or null.');
-    return{textPath:value?.toJSON()??null,...(value?{wrapWidth:null,paragraphSpacing:0,firstLineIndent:0,paragraphJustify:'none'as const}:{})};
+  set writingMode(
+    value: import("../core/text-writing").WritingMode | undefined,
+  ) {
+    this.update({ writingMode: value });
+  }
+  get textOrientation(): import("../core/text-writing").TextOrientation {
+    return (this._read() as TextLayerData).textOrientation ?? "mixed";
+  }
+  set textOrientation(
+    value: import("../core/text-writing").TextOrientation | undefined,
+  ) {
+    this.update({ textOrientation: value });
+  }
+  /** Native bounds for the current logical source; one ordinary undoable edit. */
+  async setWriting(
+    writing: import("../core/text-writing").TextWritingInput,
+    control: TypographyControl = {},
+  ): Promise<void> {
+    const value = textWritingSchema.parse(writing);
+    await this.applyCharacterFormatting(
+      { writingMode: value.mode, textOrientation: value.orientation },
+      control,
+    );
+  }
+  get textPath(): TextPath | null {
+    const value = (this._read() as TextLayerData).textPath;
+    return value ? new TextPath(value) : null;
+  }
+  set textPath(value: TextPath | null) {
+    this.update(this.pathPatch(value));
+  }
+  private pathPatch(value: TextPath | null) {
+    if (value !== null && !(value instanceof TextPath))
+      throw new Error("Use a TextPath value or null.");
+    return {
+      textPath: value?.toJSON() ?? null,
+      ...(value
+        ? {
+            wrapWidth: null,
+            paragraphSpacing: 0,
+            firstLineIndent: 0,
+            paragraphJustify: "none" as const,
+          }
+        : {}),
+    };
   }
   /** Native preparation keeps the baseline and current revision owned through one Undo. */
-  async setTextPath(value:TextPath|null,control:TypographyControl={}):Promise<void>{
-    const patch=this.pathPatch(value);
-    await this.applyCharacterFormatting(patch,control);
+  async setTextPath(
+    value: TextPath | null,
+    control: TypographyControl = {},
+  ): Promise<void> {
+    const patch = this.pathPatch(value);
+    await this.applyCharacterFormatting(patch, control);
   }
   /** Recalculate bounds with fonts available to this execution environment. */
   reflow(): void {
     this.update({ text: this.text });
   }
   /** Owned source-indexed overrides. Gaps inherit the layer's paragraph format. */
-  get characterRanges():readonly CharacterRangeData[]{
-    return structuredClone((this._read() as TextLayerData).characterRanges??[]);
+  get characterRanges(): readonly CharacterRangeData[] {
+    return structuredClone(
+      (this._read() as TextLayerData).characterRanges ?? [],
+    );
   }
   /** Format a nonempty UTF-16 interval; null restores inherited formatting. */
-  async formatRange(start:number,end:number,format:CharacterFormatPatch|null,control:TypographyControl={}):Promise<void>{
-    const before=this._read() as TextLayerData;
-    const ranges=formatCharacterRange(before.text,before.characterRanges??[],start,end,format);
-    await this.applyCharacterFormatting({text:before.text,characterRanges:ranges},control);
+  async formatRange(
+    start: number,
+    end: number,
+    format: CharacterFormatPatch | null,
+    control: TypographyControl = {},
+  ): Promise<void> {
+    const before = this._read() as TextLayerData;
+    const ranges = formatCharacterRange(
+      before.text,
+      before.characterRanges ?? [],
+      start,
+      end,
+      format,
+    );
+    await this.applyCharacterFormatting(
+      { text: before.text, characterRanges: ranges },
+      control,
+    );
   }
-  async clearCharacterFormatting(start=0,end=this.text.length,control:TypographyControl={}):Promise<void>{
-    if(start===0&&end===0&&this.text===''){control.signal?.throwIfAborted();return;}
-    await this.formatRange(start,end,null,control);
+  async clearCharacterFormatting(
+    start = 0,
+    end = this.text.length,
+    control: TypographyControl = {},
+  ): Promise<void> {
+    if (start === 0 && end === 0 && this.text === "") {
+      control.signal?.throwIfAborted();
+      return;
+    }
+    await this.formatRange(start, end, null, control);
   }
   /** Exact source replacement; insertion defaults to the preceding character. */
-  replaceText(start:number,end:number,replacement:string,options:{affinity?:'before'|'after'}={}):void{
-    const settings=z.object({affinity:z.enum(['before','after']).optional()}).strict().parse(options),before=this._read() as TextLayerData;
-    const result=editCharacterRanges(before.text,before.characterRanges??[],start,end,replacement,settings.affinity);
-    this.update({text:result.text,...(before.characterRanges===undefined?{}:{characterRanges:result.ranges})});
+  replaceText(
+    start: number,
+    end: number,
+    replacement: string,
+    options: { affinity?: "before" | "after" } = {},
+  ): void {
+    const settings = z
+        .object({ affinity: z.enum(["before", "after"]).optional() })
+        .strict()
+        .parse(options),
+      before = this._read() as TextLayerData;
+    const result = editCharacterRanges(
+      before.text,
+      before.characterRanges ?? [],
+      start,
+      end,
+      replacement,
+      settings.affinity,
+    );
+    this.update({
+      text: result.text,
+      ...(before.characterRanges === undefined
+        ? {}
+        : { characterRanges: result.ranges }),
+    });
   }
   /** Refresh native rich-text bounds, including inside an isolated script. */
-  async reflowNative(control:TypographyControl={}):Promise<void>{
-    const before=this._read() as TextLayerData;
-    await this.applyCharacterFormatting({text:before.text,characterRanges:before.characterRanges??[]},control);
+  async reflowNative(control: TypographyControl = {}): Promise<void> {
+    const before = this._read() as TextLayerData;
+    await this.applyCharacterFormatting(
+      { text: before.text, characterRanges: before.characterRanges ?? [] },
+      control,
+    );
   }
-  private async applyCharacterFormatting(patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'writingMode'|'textOrientation'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl):Promise<void>{
-    control={...control};control.signal?.throwIfAborted();
-    const owner=this.document;owner?._assertTypographyPreparation();
-    const before=this._read() as TextLayerData,revision=owner?.getSnapshot().revision,assets=owner?.assetStore,detached=owner?undefined:JSON.stringify(before);
-    const unchanged=()=>{control.signal?.throwIfAborted();if(this.document!==owner||owner&&(owner.getSnapshot().revision!==revision||owner.assetStore!==assets)||!owner&&JSON.stringify(this._read())!==detached)throw new Error('Text or document changed during typography preparation.');};
-    const input=characterInputForLayer({...before,...patch});let release=()=>{},check=unchanged;
-    try{
-      let bounds:CharacterBounds;
-      if(owner?._prepareTextLayout)bounds=await owner._prepareTextLayout(this.id,patch,control);
-      else if(typeof globalThis.document!=='undefined'&&assets&&owner){
-        const {prepareCharacterTextMetrics}=await import('../engine/styled-text-layout');unchanged();
-        const prepared=await prepareCharacterTextMetrics(input,owner._read(),assets,{...control,isCancelled:()=>{unchanged();return false;}});
-        release=prepared.release;check=()=>{unchanged();prepared.check();};bounds=prepared.bounds;
-      }else{const layout=await measureCharacterTextAsync(input,{...control,check:unchanged});bounds=characterBoundsForLayout(layout);}
-      bounds=characterBoundsSchema.parse(bounds);
-      check();withPreparedCharacterBounds(input,bounds,()=>this.update(patch),check);
-    }finally{release();}
+  private async applyCharacterFormatting(
+    patch: Partial<
+      Pick<
+        TextLayerData,
+        | "text"
+        | "characterRanges"
+        | "textPath"
+        | "writingMode"
+        | "textOrientation"
+        | "wrapWidth"
+        | "paragraphSpacing"
+        | "firstLineIndent"
+        | "paragraphJustify"
+      >
+    >,
+    control: TypographyControl,
+  ): Promise<void> {
+    control = { ...control };
+    control.signal?.throwIfAborted();
+    const owner = this.document;
+    owner?._assertTypographyPreparation();
+    const before = this._read() as TextLayerData,
+      revision = owner?.getSnapshot().revision,
+      assets = owner?.assetStore,
+      detached = owner ? undefined : JSON.stringify(before);
+    const unchanged = () => {
+      control.signal?.throwIfAborted();
+      if (
+        this.document !== owner ||
+        (owner &&
+          (owner.getSnapshot().revision !== revision ||
+            owner.assetStore !== assets)) ||
+        (!owner && JSON.stringify(this._read()) !== detached)
+      )
+        throw new Error(
+          "Text or document changed during typography preparation.",
+        );
+    };
+    const input = characterInputForLayer({ ...before, ...patch });
+    let release = () => {},
+      check = unchanged;
+    try {
+      let bounds: CharacterBounds;
+      if (owner?._prepareTextLayout)
+        bounds = await owner._prepareTextLayout(this.id, patch, control);
+      else if (typeof globalThis.document !== "undefined" && assets && owner) {
+        const { prepareCharacterTextMetrics } =
+          await import("../engine/styled-text-layout");
+        unchanged();
+        const prepared = await prepareCharacterTextMetrics(
+          input,
+          owner._read(),
+          assets,
+          {
+            ...control,
+            isCancelled: () => {
+              unchanged();
+              return false;
+            },
+          },
+        );
+        release = prepared.release;
+        check = () => {
+          unchanged();
+          prepared.check();
+        };
+        bounds = prepared.bounds;
+      } else {
+        const layout = await measureCharacterTextAsync(input, {
+          ...control,
+          check: unchanged,
+        });
+        bounds = characterBoundsForLayout(layout);
+      }
+      bounds = characterBoundsSchema.parse(bounds);
+      check();
+      withPreparedCharacterBounds(
+        input,
+        bounds,
+        () => this.update(patch),
+        check,
+      );
+    } finally {
+      release();
+    }
   }
   /** Restore point text and default paragraph spacing in one undoable command. */
   resetParagraph(): void {
-    this.update({wrapWidth: null, paragraphSpacing: 0, firstLineIndent: 0, paragraphJustify: 'none'});
+    this.update({
+      wrapWidth: null,
+      paragraphSpacing: 0,
+      firstLineIndent: 0,
+      paragraphJustify: "none",
+    });
   }
-  get paragraphJustify(): 'none' | 'inter-word' | undefined { return (this._read() as TextLayerData).paragraphJustify; }
-  set paragraphJustify(value: 'none' | 'inter-word' | undefined) { this.update({paragraphJustify: value}); }
-  get wrapWidth(): number | undefined { return (this._read() as TextLayerData).wrapWidth??undefined; }
-  set wrapWidth(value: number | null | undefined) { this.update({wrapWidth: value}); }
-  get paragraphSpacing(): number | undefined { return (this._read() as TextLayerData).paragraphSpacing; }
-  set paragraphSpacing(value: number | undefined) { this.update({paragraphSpacing: value}); }
-  get firstLineIndent(): number | undefined { return (this._read() as TextLayerData).firstLineIndent; }
-  set firstLineIndent(value: number | undefined) { this.update({firstLineIndent: value}); }
+  get paragraphJustify(): "none" | "inter-word" | undefined {
+    return (this._read() as TextLayerData).paragraphJustify;
+  }
+  set paragraphJustify(value: "none" | "inter-word" | undefined) {
+    this.update({ paragraphJustify: value });
+  }
+  get wrapWidth(): number | undefined {
+    return (this._read() as TextLayerData).wrapWidth ?? undefined;
+  }
+  set wrapWidth(value: number | null | undefined) {
+    this.update({ wrapWidth: value });
+  }
+  get paragraphSpacing(): number | undefined {
+    return (this._read() as TextLayerData).paragraphSpacing;
+  }
+  set paragraphSpacing(value: number | undefined) {
+    this.update({ paragraphSpacing: value });
+  }
+  get firstLineIndent(): number | undefined {
+    return (this._read() as TextLayerData).firstLineIndent;
+  }
+  set firstLineIndent(value: number | undefined) {
+    this.update({ firstLineIndent: value });
+  }
   /** Restore native default spacing in one command, including unsupported styles. */
   resetSpacing(): void {
-    this.update({letterSpacing: 0, wordSpacing: 0, fontKerning: 'auto'});
+    this.update({ letterSpacing: 0, wordSpacing: 0, fontKerning: "auto" });
   }
   get text(): string {
     return (this._read() as TextLayerData).text;
@@ -2714,23 +4126,39 @@ export class TextLayer extends Layer {
     return (this._read() as TextLayerData).wordSpacing;
   }
   set wordSpacing(value: number | undefined) {
-    this.update({wordSpacing: value});
+    this.update({ wordSpacing: value });
   }
-  get fontKerning(): 'auto' | 'normal' | 'none' | undefined {
+  get fontKerning(): "auto" | "normal" | "none" | undefined {
     return (this._read() as TextLayerData).fontKerning;
   }
-  set fontKerning(value: 'auto' | 'normal' | 'none' | undefined) {
-    this.update({fontKerning: value});
+  set fontKerning(value: "auto" | "normal" | "none" | undefined) {
+    this.update({ fontKerning: value });
   }
   /** Restore native default glyph requests without changing authored text. */
-  resetFontFeatures():void { this.update({fontVariantCaps:'normal',fontStretch:'normal'}); }
-  get fontVariantCaps():FontVariantCaps|undefined{return(this._read() as TextLayerData).fontVariantCaps;}
-  set fontVariantCaps(value:FontVariantCaps|undefined){this.update({fontVariantCaps:value});}
-  get fontVariationSettings():string|undefined{return(this._read() as TextLayerData).fontVariationSettings;}
-  set fontVariationSettings(value:string|undefined){this.update({fontVariationSettings:value});}
-  resetVariableAxes():void{this.update({fontVariationSettings:'normal'});}
-  get fontStretch():FontStretch|undefined{return(this._read() as TextLayerData).fontStretch;}
-  set fontStretch(value:FontStretch|undefined){this.update({fontStretch:value});}
+  resetFontFeatures(): void {
+    this.update({ fontVariantCaps: "normal", fontStretch: "normal" });
+  }
+  get fontVariantCaps(): FontVariantCaps | undefined {
+    return (this._read() as TextLayerData).fontVariantCaps;
+  }
+  set fontVariantCaps(value: FontVariantCaps | undefined) {
+    this.update({ fontVariantCaps: value });
+  }
+  get fontVariationSettings(): string | undefined {
+    return (this._read() as TextLayerData).fontVariationSettings;
+  }
+  set fontVariationSettings(value: string | undefined) {
+    this.update({ fontVariationSettings: value });
+  }
+  resetVariableAxes(): void {
+    this.update({ fontVariationSettings: "normal" });
+  }
+  get fontStretch(): FontStretch | undefined {
+    return (this._read() as TextLayerData).fontStretch;
+  }
+  set fontStretch(value: FontStretch | undefined) {
+    this.update({ fontStretch: value });
+  }
   get fontWeight(): string | undefined {
     return (this._read() as TextLayerData).fontWeight;
   }
@@ -2771,7 +4199,8 @@ export class AdjustmentLayer extends Layer {
     super({
       ...createAdjustmentLayer(
         options.name ?? "Adjustment",
-        adjustment instanceof PatchAdjustment || adjustment instanceof RedEyeAdjustment
+        adjustment instanceof PatchAdjustment ||
+          adjustment instanceof RedEyeAdjustment
           ? adjustment.toJSON()
           : adjustment,
       ),
@@ -2793,7 +4222,8 @@ export class AdjustmentLayer extends Layer {
   }
 
   setRedEye(value: RedEyeAdjustment): void {
-    if (!(value instanceof RedEyeAdjustment)) throw new Error("Expected a RedEyeAdjustment.");
+    if (!(value instanceof RedEyeAdjustment))
+      throw new Error("Expected a RedEyeAdjustment.");
     this.adjustment = value.toJSON();
   }
 
@@ -2804,10 +4234,17 @@ export class AdjustmentLayer extends Layer {
   }
 
   /** Parse a portable .cube table, then use the normal validated command/history boundary. */
-  setLut(source: string, options: { amount?: number; interpolation?: LutInterpolation } = {}): void {
+  setLut(
+    source: string,
+    options: { amount?: number; interpolation?: LutInterpolation } = {},
+  ): void {
     const settings = lutOptionsSchema.parse(options);
-    this.adjustment = { kind: "lut", lut: parseCubeLut(source), amount: settings.amount ?? 100,
-      interpolation: settings.interpolation ?? "tetrahedral" };
+    this.adjustment = {
+      kind: "lut",
+      lut: parseCubeLut(source),
+      amount: settings.amount ?? 100,
+      interpolation: settings.interpolation ?? "tetrahedral",
+    };
   }
 
   addTonalStroke(stroke: TonalStroke): void {

@@ -5,9 +5,7 @@
     "before": {
       "openMs": 940.2000000178814,
       "maxFrameGapMs": 936.2999999821186,
-      "longTasks": [
-        923
-      ],
+      "longTasks": [923],
       "name": "Listing revision 2",
       "layers": 1,
       "topSelfSamples": [
@@ -166,9 +164,7 @@
     "after": {
       "openMs": 701.5999999940395,
       "maxFrameGapMs": 680.9000000059605,
-      "longTasks": [
-        678
-      ],
+      "longTasks": [678],
       "name": "Listing revision 2",
       "layers": 1,
       "topSelfSamples": [
@@ -327,9 +323,7 @@
     "repeat": {
       "openMs": 626.9000000059605,
       "maxFrameGapMs": 621,
-      "longTasks": [
-        612
-      ],
+      "longTasks": [612],
       "name": "Listing revision 2",
       "layers": 1,
       "topSelfSamples": [

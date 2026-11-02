@@ -33,21 +33,43 @@ shared document commands. It does not export files or change Color preferences.
 
 ```ts
 const color = await editor.batch.captureColorOutput(
-  editor.colorSettings.output, {signal});
-const variants = [{
-  id: 'print', name: 'Printed RGB', format: 'tiff',
-  targetWidth: 10000, targetHeight: 5000, fit: 'contain',
-  tiffVariant: 'auto', color,
-}];
-const file = await editor.batch.exportDeliveryPreset({name: 'Delivery', variants}, {signal});
-const preset = await editor.batch.importDeliveryPreset(file, {signal});
-const recipeFile = await editor.recipes.attachDeliveryPreset(recipeOrPackage, file, {signal});
+  editor.colorSettings.output,
+  { signal },
+);
+const variants = [
+  {
+    id: "print",
+    name: "Printed RGB",
+    format: "tiff",
+    targetWidth: 10000,
+    targetHeight: 5000,
+    fit: "contain",
+    tiffVariant: "auto",
+    color,
+  },
+];
+const file = await editor.batch.exportDeliveryPreset(
+  { name: "Delivery", variants },
+  { signal },
+);
+const preset = await editor.batch.importDeliveryPreset(file, { signal });
+const recipeFile = await editor.recipes.attachDeliveryPreset(
+  recipeOrPackage,
+  file,
+  { signal },
+);
 // Install only on explicit request; attaching above is a file-only operation.
 const installed = await editor.recipes.packages.save(recipeFile);
-const run = await editor.batch.createBatch({
-  name: 'Production', budgetId: 'default-budget', recipePackageId: installed.id,
-  // Omit variants to use the package's defaults. An explicit list overrides them.
-}, sourceImages, {signal});
+const run = await editor.batch.createBatch(
+  {
+    name: "Production",
+    budgetId: "default-budget",
+    recipePackageId: installed.id,
+    // Omit variants to use the package's defaults. An explicit list overrides them.
+  },
+  sourceImages,
+  { signal },
+);
 await editor.batch.start(run.id);
 const result = await editor.batch.waitForRun(run.id);
 ```

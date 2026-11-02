@@ -66,12 +66,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -102,14 +97,7 @@
         },
         "width": 131,
         "height": 79,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "ordinary-native.f32le.gz",
@@ -163,12 +151,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -199,14 +182,7 @@
         },
         "width": 138,
         "height": 86,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "ordinary-padded.f32le.gz",
@@ -260,12 +236,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -296,14 +267,7 @@
         },
         "width": 65,
         "height": 39,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "ordinary-half.f32le.gz",
@@ -357,12 +321,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -393,14 +352,7 @@
         },
         "width": 262,
         "height": 158,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "ordinary-double.f32le.gz",
@@ -454,12 +406,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -490,14 +437,7 @@
         },
         "width": 150,
         "height": 110,
-        "root": [
-          0.75,
-          0.25,
-          -0.25,
-          1,
-          4.25,
-          -3.5
-        ],
+        "root": [0.75, 0.25, -0.25, 1, 4.25, -3.5],
         "exact": false
       },
       "reference": "ordinary-shear.f32le.gz",
@@ -551,12 +491,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -587,14 +522,7 @@
         },
         "width": 100,
         "height": 140,
-        "root": [
-          0,
-          1,
-          -1,
-          0,
-          90.25,
-          -2.5
-        ],
+        "root": [0, 1, -1, 0, 90.25, -2.5],
         "exact": true
       },
       "reference": "ordinary-quarter-turn.f32le.gz",
@@ -648,12 +576,7 @@
           "kind": "adjustment",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ]
+            "rect": [15, 10, 90, 55]
           },
           "adjustment": {
             "kind": "levels",
@@ -684,14 +607,7 @@
         },
         "width": 150,
         "height": 90,
-        "root": [
-          -1,
-          0,
-          0,
-          0.75,
-          135.5,
-          2.25
-        ],
+        "root": [-1, 0, 0, 0.75, 135.5, 2.25],
         "exact": true
       },
       "reference": "ordinary-reflected.f32le.gz",
@@ -705,12 +621,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -800,14 +711,7 @@
         },
         "width": 131,
         "height": 79,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "clipped-native.f32le.gz",
@@ -821,12 +725,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -916,14 +815,7 @@
         },
         "width": 138,
         "height": 86,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "clipped-padded.f32le.gz",
@@ -937,12 +829,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -1032,14 +919,7 @@
         },
         "width": 65,
         "height": 39,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "clipped-half.f32le.gz",
@@ -1053,12 +933,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -1148,14 +1023,7 @@
         },
         "width": 262,
         "height": 158,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "clipped-double.f32le.gz",
@@ -1169,12 +1037,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -1264,14 +1127,7 @@
         },
         "width": 150,
         "height": 110,
-        "root": [
-          0.75,
-          0.25,
-          -0.25,
-          1,
-          4.25,
-          -3.5
-        ],
+        "root": [0.75, 0.25, -0.25, 1, 4.25, -3.5],
         "exact": false
       },
       "reference": "clipped-shear.f32le.gz",
@@ -1285,12 +1141,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -1380,14 +1231,7 @@
         },
         "width": 100,
         "height": 140,
-        "root": [
-          0,
-          1,
-          -1,
-          0,
-          90.25,
-          -2.5
-        ],
+        "root": [0, 1, -1, 0, 90.25, -2.5],
         "exact": true
       },
       "reference": "clipped-quarter-turn.f32le.gz",
@@ -1401,12 +1245,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              5,
-              3,
-              115,
-              65
-            ]
+            "rect": [5, 3, 115, 65]
           }
         },
         {
@@ -1496,14 +1335,7 @@
         },
         "width": 150,
         "height": 90,
-        "root": [
-          -1,
-          0,
-          0,
-          0.75,
-          135.5,
-          2.25
-        ],
+        "root": [-1, 0, 0, 0.75, 135.5, 2.25],
         "exact": true
       },
       "reference": "clipped-reflected.f32le.gz",
@@ -1519,12 +1351,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -1599,14 +1426,7 @@
         },
         "width": 131,
         "height": 79,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "groups-native.f32le.gz",
@@ -1622,12 +1442,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -1702,14 +1517,7 @@
         },
         "width": 138,
         "height": 86,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "groups-padded.f32le.gz",
@@ -1725,12 +1533,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -1805,14 +1608,7 @@
         },
         "width": 65,
         "height": 39,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "groups-half.f32le.gz",
@@ -1828,12 +1624,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -1908,14 +1699,7 @@
         },
         "width": 262,
         "height": 158,
-        "root": [
-          1,
-          0,
-          0,
-          1,
-          0,
-          0
-        ],
+        "root": [1, 0, 0, 1, 0, 0],
         "exact": true
       },
       "reference": "groups-double.f32le.gz",
@@ -1931,12 +1715,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -2011,14 +1790,7 @@
         },
         "width": 150,
         "height": 110,
-        "root": [
-          0.75,
-          0.25,
-          -0.25,
-          1,
-          4.25,
-          -3.5
-        ],
+        "root": [0.75, 0.25, -0.25, 1, 4.25, -3.5],
         "exact": false
       },
       "reference": "groups-shear.f32le.gz",
@@ -2034,12 +1806,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -2114,14 +1881,7 @@
         },
         "width": 100,
         "height": 140,
-        "root": [
-          0,
-          1,
-          -1,
-          0,
-          90.25,
-          -2.5
-        ],
+        "root": [0, 1, -1, 0, 90.25, -2.5],
         "exact": true
       },
       "reference": "groups-quarter-turn.f32le.gz",
@@ -2137,12 +1897,7 @@
           "kind": "group",
           "opacity": 0.75,
           "mask": {
-            "rect": [
-              8,
-              5,
-              110,
-              65
-            ],
+            "rect": [8, 5, 110, 65],
             "density": 0.7
           },
           "children": [
@@ -2217,14 +1972,7 @@
         },
         "width": 150,
         "height": 90,
-        "root": [
-          -1,
-          0,
-          0,
-          0.75,
-          135.5,
-          2.25
-        ],
+        "root": [-1, 0, 0, 0.75, 135.5, 2.25],
         "exact": true
       },
       "reference": "groups-reflected.f32le.gz",
@@ -2338,6 +2086,6 @@
       "rawSha256": "8ad5ed96c31ad18a76c92ba8f4fa56ac65ec18de48edc5c9943d7da9769e8d65"
     }
   },
-  "colorTolerance": 9.5367431640625e-07,
-  "alphaTolerance": 2.384185791015625e-07
+  "colorTolerance": 9.5367431640625e-7,
+  "alphaTolerance": 2.384185791015625e-7
 }

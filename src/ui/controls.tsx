@@ -1,5 +1,5 @@
-import {PaletteColorInput} from "./PaletteColorControl";
-import {textEditRange,type TextEditStart} from './text-edit-range';
+import { PaletteColorInput } from "./PaletteColorControl";
+import { textEditRange, type TextEditStart } from "./text-edit-range";
 import { useShortcutLabel } from "./ShortcutHints";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -121,7 +121,13 @@ export function NumberField({
     dirty.current = false;
     const trimmed = draft.trim();
     const parsed = Number(trimmed);
-    if (trimmed && Number.isFinite(parsed) && parsed >= min && parsed <= max && (!integer || Number.isInteger(parsed))) {
+    if (
+      trimmed &&
+      Number.isFinite(parsed) &&
+      parsed >= min &&
+      parsed <= max &&
+      (!integer || Number.isInteger(parsed))
+    ) {
       if (parsed !== value) {
         onCommit?.(parsed);
         onChange?.(parsed);
@@ -383,7 +389,7 @@ export function Slider({
           min={min}
           max={max}
           integer={integer}
-          step={integer ? 1 : 'any'}
+          step={integer ? 1 : "any"}
           disabled={disabled}
           hideLabel
           onCommit={onCommit}
@@ -563,12 +569,31 @@ export function TextArea({
   className?: string;
   placeholder?: string;
   ariaLabel?: string;
-  onEdit?(previous:string,start:number,end:number,replacement:string):void;
-  onSelection?(start:number,end:number):void;
+  onEdit?(
+    previous: string,
+    start: number,
+    end: number,
+    replacement: string,
+  ): void;
+  onSelection?(start: number, end: number): void;
 }) {
   const [draft, setDraft] = useState(value);
-  const input=useRef<HTMLTextAreaElement>(null),before=useRef<TextEditStart|undefined>(undefined);
-  useEffect(()=>{const node=input.current;if(!node)return;const capture=(event:InputEvent)=>{before.current={value:node.value,start:node.selectionStart,end:node.selectionEnd,inputType:event.inputType};};node.addEventListener('beforeinput',capture);return()=>node.removeEventListener('beforeinput',capture);},[]);
+  const input = useRef<HTMLTextAreaElement>(null),
+    before = useRef<TextEditStart | undefined>(undefined);
+  useEffect(() => {
+    const node = input.current;
+    if (!node) return;
+    const capture = (event: InputEvent) => {
+      before.current = {
+        value: node.value,
+        start: node.selectionStart,
+        end: node.selectionEnd,
+        inputType: event.inputType,
+      };
+    };
+    node.addEventListener("beforeinput", capture);
+    return () => node.removeEventListener("beforeinput", capture);
+  }, []);
   const dirty = useRef(false);
   useEffect(() => {
     dirty.current = false;
@@ -598,12 +623,21 @@ export function TextArea({
           dirty.current = true;
           const val = e.target.value;
           setDraft(val);
-          if(onEdit){const edit=textEditRange(draft,val,before.current);onEdit(draft,edit.start,edit.end,edit.replacement);}before.current=undefined;
+          if (onEdit) {
+            const edit = textEditRange(draft, val, before.current);
+            onEdit(draft, edit.start, edit.end, edit.replacement);
+          }
+          before.current = undefined;
           onChange?.(val);
           onPreview?.(val);
         }}
         onBlur={commit}
-        onSelect={event=>onSelection?.(event.currentTarget.selectionStart,event.currentTarget.selectionEnd)}
+        onSelect={(event) =>
+          onSelection?.(
+            event.currentTarget.selectionStart,
+            event.currentTarget.selectionEnd,
+          )
+        }
       />
     </label>
   );
@@ -690,7 +724,12 @@ export function ColorField({
   return (
     <div className={`style-color-row ${className}`.trim()}>
       <span>{label}</span>
-      <PaletteColorInput label={ariaLabel ?? label} value={value} disabled={disabled} onChange={onChange}/>
+      <PaletteColorInput
+        label={ariaLabel ?? label}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+      />
     </div>
   );
 }

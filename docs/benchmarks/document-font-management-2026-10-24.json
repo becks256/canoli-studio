@@ -6350,109 +6350,73 @@
         "group": "reference",
         "path": "/tmp/canoli-fonts-accepted-native-typography-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-after.png",
         "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "original",
         "path": "/tmp/canoli-fonts-accepted-native-typography-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-before.png",
         "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "reference",
         "path": "/tmp/canoli-fonts-accepted-native-typography-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-reference.png",
         "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "reference",
         "path": "/tmp/canoli-fonts-accepted-native-typography-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-reopened.png",
         "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "original",
         "path": "/tmp/canoli-fonts-accepted-native-typography-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-scripted.png",
         "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "original",
         "path": "/tmp/canoli-fonts-accepted-native-typography-results/font-management.e2e.ts-doc-2923b-asters-scripts-and-projects/fonts-undone.png",
         "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "reference",
         "path": "/tmp/canoli-fonts-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-after.png",
         "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "original",
         "path": "/tmp/canoli-fonts-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-before.png",
         "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "reference",
         "path": "/tmp/canoli-fonts-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-reference.png",
         "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "reference",
         "path": "/tmp/canoli-fonts-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-reopened.png",
         "rgbaSha256": "35eef262ef3ac58c4a0d112a10a899cd9da597b2977d8ad916abe5cdd971d08b",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "original",
         "path": "/tmp/canoli-fonts-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-scripted.png",
         "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       },
       {
         "group": "original",
         "path": "/tmp/canoli-fonts-production-results/production.e2e.ts-producti-ff37c-ndo-and-project-portability/fonts-undone.png",
         "rgbaSha256": "482adfade5b2030eb8bfdc7194349e4547c407fbdd55d5cde381d89597b99872",
-        "size": [
-          400,
-          300
-        ]
+        "size": [400, 300]
       }
     ]
   },
@@ -8479,9 +8443,7 @@
         "commitMedianMs": 1.899999976158142,
         "commitP95Ms": 4.299999952316284,
         "layers": 16,
-        "longTasks": [
-          53
-        ],
+        "longTasks": [53],
         "presentMedianMs": 78.8500000834465,
         "presentP95Ms": 86.80000007152557,
         "samples": 12
@@ -8491,29 +8453,8 @@
         "commitP95Ms": 7.199999928474426,
         "layers": 64,
         "longTasks": [
-          172,
-          96,
-          96,
-          95,
-          99,
-          55,
-          102,
-          63,
-          102,
-          57,
-          115,
-          59,
-          108,
-          56,
-          103,
-          54,
-          109,
-          59,
-          109,
-          53,
-          100,
-          53,
-          104
+          172, 96, 96, 95, 99, 55, 102, 63, 102, 57, 115, 59, 108, 56, 103, 54,
+          109, 59, 109, 53, 100, 53, 104
         ],
         "presentMedianMs": 153.35000002384186,
         "presentP95Ms": 169,
@@ -8525,9 +8466,7 @@
         "commitMedianMs": 1.4500000476837158,
         "commitP95Ms": 4.600000023841858,
         "layers": 16,
-        "longTasks": [
-          51
-        ],
+        "longTasks": [51],
         "presentMedianMs": 78.80000007152557,
         "presentP95Ms": 92.60000002384186,
         "samples": 12
@@ -8537,24 +8476,8 @@
         "commitP95Ms": 7.600000023841858,
         "layers": 64,
         "longTasks": [
-          186,
-          103,
-          104,
-          117,
-          99,
-          107,
-          112,
-          105,
-          54,
-          112,
-          103,
-          50,
-          113,
-          109,
-          59,
-          114,
-          69,
-          150
+          186, 103, 104, 117, 99, 107, 112, 105, 54, 112, 103, 50, 113, 109, 59,
+          114, 69, 150
         ],
         "presentMedianMs": 156.8499999642372,
         "presentP95Ms": 214.29999995231628,
@@ -8566,9 +8489,7 @@
         "commitMedianMs": 1.5,
         "commitP95Ms": 3.700000047683716,
         "layers": 16,
-        "longTasks": [
-          50
-        ],
+        "longTasks": [50],
         "presentMedianMs": 36.15000003576279,
         "presentP95Ms": 88.10000002384186,
         "samples": 12
@@ -8578,20 +8499,7 @@
         "commitP95Ms": 7.800000071525574,
         "layers": 64,
         "longTasks": [
-          195,
-          103,
-          146,
-          92,
-          88,
-          99,
-          151,
-          93,
-          97,
-          100,
-          90,
-          120,
-          91,
-          84
+          195, 103, 146, 92, 88, 99, 151, 93, 97, 100, 90, 120, 91, 84
         ],
         "presentMedianMs": 145.0,
         "presentP95Ms": 182.39999997615814,
@@ -8604,20 +8512,7 @@
         "commitP95Ms": 10.100000023841858,
         "layers": 64,
         "longTasks": [
-          167,
-          106,
-          97,
-          89,
-          98,
-          125,
-          102,
-          101,
-          97,
-          94,
-          94,
-          100,
-          99,
-          155
+          167, 106, 97, 89, 98, 125, 102, 101, 97, 94, 94, 100, 99, 155
         ],
         "presentMedianMs": 150.80000001192093,
         "presentP95Ms": 216.40000009536743,

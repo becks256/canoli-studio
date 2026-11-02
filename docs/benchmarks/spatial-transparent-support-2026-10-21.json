@@ -3936,10 +3936,7 @@
       "samples": 27,
       "p95Ms": 56.69999998807907,
       "maximumMs": 58.09999996423721,
-      "longTasks": [
-        61,
-        119
-      ],
+      "longTasks": [61, 119],
       "limit": "Single native regression diagnostics, not paired production or full-editor latency acceptance."
     },
     {
@@ -3948,10 +3945,7 @@
       "samples": 24,
       "p95Ms": 82.40000003576279,
       "maximumMs": 82.89999997615814,
-      "longTasks": [
-        62,
-        85
-      ],
+      "longTasks": [62, 85],
       "limit": "Single native regression diagnostics, not paired production or full-editor latency acceptance."
     },
     {
@@ -3960,10 +3954,7 @@
       "samples": 24,
       "p95Ms": 73.40000003576279,
       "maximumMs": 79,
-      "longTasks": [
-        72,
-        98
-      ],
+      "longTasks": [72, 98],
       "limit": "Single native regression diagnostics, not paired production or full-editor latency acceptance."
     }
   ],

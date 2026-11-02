@@ -22,11 +22,11 @@ An exact structural identity can draw the captured source outside conservative r
 
 The frozen schema-36 and current renderer were profiled separately on the same opaque 10,000×5,000 source, sigma 2, using offscreen documents and fresh renderers after editor readiness. These are single intrusive local CPU-profile observations, not an alternating unprofiled benchmark or a physical-device/frame-rate guarantee:
 
-| Scene | Frozen baseline | Current | Current Gaussian requests / pixels |
-| --- | ---: | ---: | ---: |
-| Unchanged separation | 61,681.5 ms | 4,791.9 ms | 0 / 0 |
-| 32×24 low-band retouch | Not separately profiled | 4,822.9 ms | 2 / 24,528 |
-| Full-frame low-band retouch | 62,465.2 ms | 40,961.9 ms | 6,241 / 75,169,920 |
+| Scene                       |         Frozen baseline |     Current | Current Gaussian requests / pixels |
+| --------------------------- | ----------------------: | ----------: | ---------------------------------: |
+| Unchanged separation        |             61,681.5 ms |  4,791.9 ms |                              0 / 0 |
+| 32×24 low-band retouch      | Not separately profiled |  4,822.9 ms |                         2 / 24,528 |
+| Full-frame low-band retouch |             62,465.2 ms | 40,961.9 ms |                 6,241 / 75,169,920 |
 
 The matched full-frame baseline issues 18,723 Gaussian requests over 225,509,760 pixels. Current profiles report no long tasks, with no new injected positive control; this diagnostic is not general responsiveness acceptance. The initial identity implementation exposed 50–87 ms tasks and was corrected with cooperative yields. Baseline Vite denied font-file requests, but the measured raster-only scene contains no text and timing begins after readiness. No competing build/tests ran during profiles. Full-frame export still takes about 41 seconds in this instrumented scene.
 
@@ -52,14 +52,14 @@ The isolated final build, all **1,354 unit/API tests across 167 files**, **115 n
 
 Two separate three-pair alternating normal-production studies each retain 720 newly matched movements, 36 native task controls, 108 complete native PNGs and 108 independently decoded saved projects. Every stroke retains all 21 x/y points, only the intended operation and exact undo. Their layouts/endpoints differ and must not be pooled. The fixed 1440×1000 benchmark uses unchanged default panel widths; the shared panel-budget fix affects constrained layouts.
 
-| Fixture | Pointer p95 median, baseline → candidate (ms) | Release to History median (ms) | Release to final canvas copy median (ms) |
-| --- | ---: | ---: | ---: |
-| mixer-layer | 78.6 → 82.4 | 29.4 → 29.3 | 37.0 → 36.7 |
-| smudge-layer | 75.3 → 76.3 | 28.7 → 28.8 | 37.7 → 36.0 |
-| mixer-mask | 95.0 → 96.5 | 28.9 → 28.8 | 41.0 → 42.8 |
-| smudge-mask | 80.0 → 73.6 | 27.5 → 28.8 | 42.2 → 43.3 |
-| mixer-filter-mask | 98.8 → 92.4 | 30.0 → 30.9 | 56.2 → 57.0 |
-| smudge-filter-mask | 89.5 → 91.3 | 30.2 → 29.1 | 60.8 → 57.4 |
+| Fixture            | Pointer p95 median, baseline → candidate (ms) | Release to History median (ms) | Release to final canvas copy median (ms) |
+| ------------------ | --------------------------------------------: | -----------------------------: | ---------------------------------------: |
+| mixer-layer        |                                   78.6 → 82.4 |                    29.4 → 29.3 |                              37.0 → 36.7 |
+| smudge-layer       |                                   75.3 → 76.3 |                    28.7 → 28.8 |                              37.7 → 36.0 |
+| mixer-mask         |                                   95.0 → 96.5 |                    28.9 → 28.8 |                              41.0 → 42.8 |
+| smudge-mask        |                                   80.0 → 73.6 |                    27.5 → 28.8 |                              42.2 → 43.3 |
+| mixer-filter-mask  |                                   98.8 → 92.4 |                    30.0 → 30.9 |                              56.2 → 57.0 |
+| smudge-filter-mask |                                   89.5 → 91.3 |                    30.2 → 29.1 |                              60.8 → 57.4 |
 
 Pointer medians are mixed: two decrease 6.5–8.0%, while four increase 1.3–4.8%; release medians also vary by fixture. These data do not establish a general speedup or universal non-regression. All pointer medians remain above 33 ms. The concrete acceptance is redundant-work removal, preserved synchronous geometry and repaired canvas space, not a latency-target claim. Three observations/runs per fixture on one headless host, native-copy/DOM endpoints and uncontrolled external host activity do not establish sustained/high-rate/representative-photo/tablet/hardware-GPU/physical-display/process-memory or editor-wide 60fps acceptance.
 
@@ -71,14 +71,14 @@ The isolated candidate delivers ready wet prefixes directly to the viewport, coa
 
 Two separate three-pair, alternating, unprofiled production studies each preserve 720 newly matching pointer samples, 36 native task controls, 108 complete native PNGs and 108 independently decoded project containers. All 72 combined stroke records retain all 21 x/y points, only the intended native operation and exact undo. Source/release HTTP identity is checked around every run. Pointer and release studies use different layouts/endpoints and must remain separate.
 
-| Fixture | Pointer p95, baseline → candidate (ms) | Release to History (ms) | Release to final canvas copy (ms) |
-| --- | ---: | ---: | ---: |
-| mixer-layer | 92.7 → 78.3 | 39.8 → 43.0 | 64.6 → 60.0 |
-| smudge-layer | 94.4 → 82.1 | 35.2 → 41.6 | 42.7 → 60.2 |
-| mixer-mask | 94.1 → 81.2 | 42.1 → 42.4 | 67.3 → 65.1 |
-| smudge-mask | 93.8 → 83.1 | 34.9 → 43.9 | 51.2 → 60.8 |
-| mixer-filter-mask | 129.7 → 97.0 | 35.1 → 47.4 | 70.4 → 104.6 |
-| smudge-filter-mask | 118.9 → 103.4 | 34.9 → 39.4 | 70.3 → 80.3 |
+| Fixture            | Pointer p95, baseline → candidate (ms) | Release to History (ms) | Release to final canvas copy (ms) |
+| ------------------ | -------------------------------------: | ----------------------: | --------------------------------: |
+| mixer-layer        |                            92.7 → 78.3 |             39.8 → 43.0 |                       64.6 → 60.0 |
+| smudge-layer       |                            94.4 → 82.1 |             35.2 → 41.6 |                       42.7 → 60.2 |
+| mixer-mask         |                            94.1 → 81.2 |             42.1 → 42.4 |                       67.3 → 65.1 |
+| smudge-mask        |                            93.8 → 83.1 |             34.9 → 43.9 |                       51.2 → 60.8 |
+| mixer-filter-mask  |                           129.7 → 97.0 |             35.1 → 47.4 |                      70.4 → 104.6 |
+| smudge-filter-mask |                          118.9 → 103.4 |             34.9 → 39.4 |                       70.3 → 80.3 |
 
 All six median per-run pointer p95 values decrease 11.4–25.2%, but all remain above 33 ms. Release-to-History medians increase in all six fixtures, and final-canvas-copy medians increase in four. The combined candidate is **not applied**. Three releases per fixture/release, headless DOM/native-copy proxies and uncontrolled external host activity limit these observations; no sustained/high-rate/physical-display/tablet/hardware-GPU/process-memory or universal 60fps acceptance follows. A faster pointer proxy does not complete the broader responsiveness requirement.
 
@@ -90,14 +90,14 @@ An isolated candidate groups at most 32 consecutive same-cell/same-copy dabs int
 
 Three clean alternating unprofiled normal-production pairs preserve all 720 newly matching movements, 36 native task controls, 108 complete native PNGs and 108 independently decoded projects. Every stroke retains all 21 x/y coordinates, one intended native operation and exact model undo. PNGs match the previous sealed release.
 
-| Fixture | Baseline median per-run p95 (ms) | Isolated packet candidate (ms) |
-| --- | ---: | ---: |
-| mixer-layer | 92.0 | 95.3 |
-| smudge-layer | 89.4 | 98.3 |
-| mixer-mask | 100.2 | 100.1 |
-| smudge-mask | 86.4 | 94.3 |
-| mixer-filter-mask | 108.1 | 126.7 |
-| smudge-filter-mask | 121.8 | 107.1 |
+| Fixture            | Baseline median per-run p95 (ms) | Isolated packet candidate (ms) |
+| ------------------ | -------------------------------: | -----------------------------: |
+| mixer-layer        |                             92.0 |                           95.3 |
+| smudge-layer       |                             89.4 |                           98.3 |
+| mixer-mask         |                            100.2 |                          100.1 |
+| smudge-mask        |                             86.4 |                           94.3 |
+| mixer-filter-mask  |                            108.1 |                          126.7 |
+| smudge-filter-mask |                            121.8 |                          107.1 |
 
 Four measured medians increase by 3.6–17.2%; one decreases about 0.1% and one about 12.1%, with variable individual trials. No overlapping native long tasks were observed. This candidate is **not applied**: fewer worker round trips do not establish an end-to-end input improvement. No separate release study was run for the rejected candidate.
 
@@ -113,27 +113,27 @@ Two separate clean studies each use three alternating unprofiled normal-producti
 
 The unchanged pointer harness measures20trusted moves per case and nearest-rank per-runp95, summarized by the median of three runs:
 
-| Fixture | Before pointer p95 median (ms) | Candidate pointer p95 median (ms) |
-| --- | ---: | ---: |
-| mixer-layer | 92.0 | 88.1 |
-| smudge-layer | 88.7 | 78.7 |
-| mixer-mask | 100.2 | 98.0 |
-| smudge-mask | 83.0 | 83.5 |
-| mixer-filter-mask | 104.3 | 106.6 |
-| smudge-filter-mask | 100.8 | 96.5 |
+| Fixture            | Before pointer p95 median (ms) | Candidate pointer p95 median (ms) |
+| ------------------ | -----------------------------: | --------------------------------: |
+| mixer-layer        |                           92.0 |                              88.1 |
+| smudge-layer       |                           88.7 |                              78.7 |
+| mixer-mask         |                          100.2 |                              98.0 |
+| smudge-mask        |                           83.0 |                              83.5 |
+| mixer-filter-mask  |                          104.3 |                             106.6 |
+| smudge-filter-mask |                          100.8 |                              96.5 |
 
 Four medians decrease2.2–11.3%; Smudge mask and Mixer filter-mask increase0.6% and2.2%, with variable/overlapping trial ranges. All six remain above33 ms. No general continuous-pointer speedup is established. Both releases have zero observed overlapping native long tasks and16.8msmaximum observed animation gaps; callbacks do not prove equally frequent ink updates.
 
 The separate release study opens the actual History tab before drawing. A trusted pointerup starts timing; the new named History row marks a DOM commit proxy, and the first subsequent artwork drawImage return marks a final native-canvas-copy proxy. Whole saved projects prove the actual commit/undo. There are only three releases per fixture/release: report medians, not p95. Pointer timings collected with this layout are functional diagnostics only.
 
-| Fixture | History UI before → candidate median (ms) | Final canvas before → candidate median (ms) |
-| --- | ---: | ---: |
-| mixer-layer | 56.1 → 29.9 | 71.5 → 36.5 |
-| smudge-layer | 52.2 → 32.2 | 58.5 → 40.9 |
-| mixer-mask | 60.7 → 28.9 | 79.3 → 45.6 |
-| smudge-mask | 56.8 → 30.4 | 78.2 → 47.1 |
-| mixer-filter-mask | 59.1 → 32.7 | 87.8 → 64.4 |
-| smudge-filter-mask | 53.5 → 32.6 | 86.6 → 63.2 |
+| Fixture            | History UI before → candidate median (ms) | Final canvas before → candidate median (ms) |
+| ------------------ | ----------------------------------------: | ------------------------------------------: |
+| mixer-layer        |                               56.1 → 29.9 |                                 71.5 → 36.5 |
+| smudge-layer       |                               52.2 → 32.2 |                                 58.5 → 40.9 |
+| mixer-mask         |                               60.7 → 28.9 |                                 79.3 → 45.6 |
+| smudge-mask        |                               56.8 → 30.4 |                                 78.2 → 47.1 |
+| mixer-filter-mask  |                               59.1 → 32.7 |                                 87.8 → 64.4 |
+| smudge-filter-mask |                               53.5 → 32.6 |                                 86.6 → 63.2 |
 
 Release medians improve across six fixtures. Native task controls pass with zero observed overlapping release tasks. These are small synthetic local UI/canvas-copy observations, not physical display, representative photos, sustained/high-rate input, hardware/tablet/GPU or whole-process peak-memory acceptance. First-stage lifecycle-gap checks, intrusive native-phase profiling, the earlier reuse-only mixed timing and the first frame-clock fixture are separately retained; they do not establish the current candidate's acceptance. The clock fixture initially paused pointer batching and was replaced with independently prepared real prefixes using the actual rendering hook.
 
@@ -145,14 +145,14 @@ The applied cache retains intermediate private epochs within the existing 32 MiB
 
 Three clean, alternating, unprofiled production pairs ran after every known correctness/setup job finished, in A/B, B/A, A/B order. On Linux/x64 AMD Ryzen 9 3900X (24 logical CPUs), HeadlessChrome 153.0.8010.12, each fresh fixture records 20 trusted moves reaching newly matching pixels copied into the connected artwork canvas. All 720 samples and 36 native task controls pass. All 108 complete before/after/undo PNGs match the earlier verified output exactly. Independent decoding of 108 project containers proves each of 36 strokes adds only one intended native operation with all 21 x/y coordinates, and one undo restores the complete model.
 
-| Fixture | Pre-cache median per-run p95 (ms) | Resident-cache median per-run p95 (ms) |
-| --- | ---: | ---: |
-| mixer-layer | 163.9 | 88.1 |
-| smudge-layer | 155.0 | 89.0 |
-| mixer-mask | 173.0 | 104.1 |
-| smudge-mask | 155.1 | 89.6 |
-| mixer-filter-mask | 177.6 | 119.7 |
-| smudge-filter-mask | 167.3 | 101.5 |
+| Fixture            | Pre-cache median per-run p95 (ms) | Resident-cache median per-run p95 (ms) |
+| ------------------ | --------------------------------: | -------------------------------------: |
+| mixer-layer        |                             163.9 |                                   88.1 |
+| smudge-layer       |                             155.0 |                                   89.0 |
+| mixer-mask         |                             173.0 |                                  104.1 |
+| smudge-mask        |                             155.1 |                                   89.6 |
+| mixer-filter-mask  |                             177.6 |                                  119.7 |
+| smudge-filter-mask |                             167.3 |                                  101.5 |
 
 These observations show **32.6–46.2% lower local median per-run p95**, with all six fixtures still above **33 ms**. No overlapping native long tasks were observed; the largest observed animation gap is 33.3 ms for the pre-cache release and 16.8 ms for the candidate. Continued animation callbacks do not establish equally frequent ink updates. This small synthetic, paced native-canvas-copy proxy on one host is not sustained/high-rate input, representative photographic work, physical GPU/display/tablet or process peak-memory acceptance. Prefix materialization and remaining worker/storage/scheduling costs still require profiling; full F06/F14 and the complete original roadmap remain open.
 
@@ -168,19 +168,18 @@ Each fresh context builds a512×128fixture through isolated Scripts and configur
 
 A preliminary alternating series completed with all720newly matched points,36native task controls and exact PNG/undo checks, but overlapped lightweight source-ownership and Markdown work early in the series. Retain its raw observations and exclude it entirely from latency acceptance. Actual head build,1,352unit/API cases,50native browser cases and82normal-production workflows now pass. The clean comparison completed after setup and correctness jobs stopped; its exact source/release identity and raw evidence are sealed below. No diagnostic timing is promoted as a speedup or latency gate. This small synthetic, paced canvas-copy proxy does not prove sustained throughput, representative-photo behavior, physical GPU/display/tablet latency, whole-process memory or completeF06/F14 acceptance. Working policies remain independent of original image resolution.
 
-
 ### Clean paired results — 2026-10-18
 
 The [sealed working-set evidence](benchmarks/brush-wet-gesture-performance-2026-10-18.json) records three alternating unprofiled release pairs on Linux/x64, AMD Ryzen9 3900X(24logical CPUs), HeadlessChrome153.0.8010.12. Both releases remained frozen. All720newly matched points,36native75mscontrols,108independently decoded full PNGs and108saved projects pass. An independent project audit proves one intended operation, all21x/y coordinates and exact one-step model undo in every fixture.
 
-| Fixture | Baseline median per-run p95(ms) | Head median per-run p95(ms) |
-| --- | ---: | ---: |
-| mixer-layer | 257.3 | 171.1 |
-| smudge-layer | 264.0 | 155.7 |
-| mixer-mask | 287.9 | 172.3 |
-| smudge-mask | 293.9 | 157.4 |
-| mixer-filter-mask | 298.4 | 187.5 |
-| smudge-filter-mask | 297.3 | 175.4 |
+| Fixture            | Baseline median per-run p95(ms) | Head median per-run p95(ms) |
+| ------------------ | ------------------------------: | --------------------------: |
+| mixer-layer        |                           257.3 |                       171.1 |
+| smudge-layer       |                           264.0 |                       155.7 |
+| mixer-mask         |                           287.9 |                       172.3 |
+| smudge-mask        |                           293.9 |                       157.4 |
+| mixer-filter-mask  |                           298.4 |                       187.5 |
+| smudge-filter-mask |                           297.3 |                       175.4 |
 
 These local observations show33.5–46.4%lower median per-runp95, but every fixture still fails the33mstarget. No overlapping native long task was observed after the36positive controls; the largest observed animation gap was16.8msin either release. Continued callbacks do not mean ink updates at60fps. Paced synthetic canvas-copy timing, one host and three pairs do not establish sustained/high-rate input, representative-photo behavior, physical GPU/display/tablet or whole-process memory acceptance. Remaining backing-store and prefix-materialization work requires further profiling. The preliminary series remains excluded entirely.
 
@@ -335,7 +334,6 @@ Cached full-frame medians are **639.1 ms without feathering** and **893.9 ms wit
 
 [Scratch-reuse report](benchmarks/filter-mask-scratch-reuse-chromium-2026-10-01.json) avoids allocating a separate coverage scratch canvas for each overlapping stroke. Full-frame cached medians measure 597.3/879.7 ms without/with feathering, versus 639.1/893.9 ms previously. Local dense edits measure 52.8/73.4 ms. The limited run shows only modest timing changes and does not resolve the interaction failure. All cached/reference pixels remain exact. A separate browser test compares clipped hide/reveal replay against fresh per-stroke surfaces and verifies changes outside the earlier clip, guarding against leaked pixels or composite state.
 
-
 ## Normal-production text input and glyph-shadow work — 2026-10-16
 
 Build with `npm run build` (without VITE_BENCHMARK), start `npm run preview`, then run:
@@ -351,7 +349,6 @@ The harness uses isolated Scripts to create eighteen 800×600 fixtures: short te
 This is an input-event-to-matching-glyph canvas-copy proxy. Browser composition and physical display can follow the observed call. There is no hardware-independent pass threshold, peak memory claim, complete F14 acceptance, or comparison against differently shaped development fixtures. The companion correctness tests compare cold/warm bounded shadows to cache-disabled native rendering, including transformed text, regions, masks, font changes, missing metrics and undo.
 
 Final three-pair observations are sealed in [text-shadow-performance-2026-10-16.json](benchmarks/text-shadow-performance-2026-10-16.json). Median per-run p95 for ordinary 64-layer shadows falls from 32.8 to 19.2 ms; larger type/blur from 35.1 to 22.0 ms; and the long shadowed line from 33.6 to 22.7 ms. This is a 32.4–41.5% reduction in these local fixtures. Corrected candidate p95 spans 15.4–22.8 ms, with a 26.0 ms maximum individual sample and no observed fixture long tasks. All six deliberate native task controls pass. Initial runs used a start-only task filter; those reports remain separate historical observations and are not pooled into the final comparison. Native pixel tests remain exact across bounded/full-region paths. All-tool, sustained-use, memory and physical-device acceptance remains open.
-
 
 ## Normal-production vector and Pen input — 2026-10-16
 
@@ -370,7 +367,6 @@ The default Pen run sends twenty real ArrowRight keys. A distinctive vector poin
 
 Import, font/control setup and pixel serialization/undo are outside the input interval. Setup time is recorded as a combined automation-assisted import/selection/fit/tool-entry observation, not a standalone import or Pen-entry benchmark. Per-key presentation means matching canvas copy and displayed anchor layout; later native paint/composition/display may follow, so overlapping long tasks are reported independently. Three short repeated rounds do not establish continuous typing, hour-long stability, heap bounds, reference-desktop/hardware input-to-photon or complete F14/all-tool acceptance.
 
-
 Final precision-corrected three-pair observations are sealed in [pen-translation-performance-2026-10-16.json](benchmarks/pen-translation-performance-2026-10-16.json). Median per-run p95 changes from **113.0 to 28.4 ms** for 1,000 paths and **537.4 to 37.1 ms** for 20,000 curved anchors. The smaller 20/200-path and 200-path/64-layer fixtures observe baseline/candidate medians of 16.5/17.5, 32.2/18.8 and 43.9/25.0 ms. All builds reuse exact native fixture bytes and all frames verify both copied geometry and displayed anchors. The 1,000-path candidate records no routine long tasks in the paired runs or the additional 60-move repeat (26.2 ms overall p95). The dense curved case remains variable: paired p95 spans 32.7–99.3 ms; the 60-move repeat records 90.4 ms overall p95 and 26 native long tasks. It therefore does not meet the <=33 ms/<50 ms gate. All eight independent native task controls pass. No physical-display, continuous-use, heap or complete F14 acceptance is claimed.
 
 ## Normal-production Pen anchor dragging — 2026-10-16
@@ -386,20 +382,18 @@ The three 800×600 constructor-built fixtures contain 20/2,000 four-anchor paths
 
 `CANOLI_PEN_DRAG_CASES=drag-8000-anchors` selects fixtures; `CANOLI_PEN_DRAG_URL` selects a frozen normal release. The harness requires the displayed Standard rendering backend. `CANOLI_PEN_DRAG_PROFILE=1` adds CDP CPU profiles and diagnostic overhead; do not use profiled samples as speedup baselines. Reports retain every frame/expected/native/SVG position, all native task intervals with overlap filtering, first/last timestamps, fixture/build/browser/CPU identity, p95 and maximum. Each run separately verifies a genuine 75 ms task that starts before the capture interval. Fresh corpus/report paths reject overwrites. Hooks restore on success; contexts and the browser close in finally. Import, handle setup, pointer-down, snapshots, release/commit, read-only verification and undo are outside the timed movement interval. This is a canvas-copy/anchor-layout proxy: later native paint, composition and physical display can follow. Paced input does not establish continuous throughput, heap bounds or complete F14/device acceptance.
 
-
 Final local-slice/capture-corrected observations are sealed in [pen-control-blocks-2026-10-16.json](benchmarks/pen-control-blocks-2026-10-16.json). Three alternating unprofiled pairs retain all 360 movement samples, exact shared fixture hashes, matched native geometry/SVG centers, one-step pixel undo and six raw native observer controls. Median per-run p95 changes from **25.9 to 22.5 ms** for one 8,000-anchor path, **28.7 to 27.3 ms** for 2,000 four-anchor paths, and **10.9 to 10.3 ms** for 20 paths. Dense candidate p95 spans 19.6–23.7 ms with one long task per run, versus 25.3–28.3 ms and 3/2/6 baseline tasks. The many-path candidate spans 26.2–32.5 ms and retains 6/12/3 long tasks; its second trial regresses. These modest local changes do not establish general Pen or <=33 ms/<50 ms F14 acceptance. Earlier full-path-prop/timestamp-after-bounds measurements and profiled pilots remain separately labeled, never pooled into final results. Blocks now retain at most 64 point references each, without a peak-memory claim. Correctness covers all markers, original overlapping paint order, length transitions, actual artwork/mask anchor and handle edits, preview/cancel and exact undo; all-tool, sustained, heap and physical-device gates remain open.
-
 
 ### Native paragraph input observations
 
 Three ordinary-production runs of the fourteen-fixture harness include the following paragraph cases. Each case verifies twenty newly shaped presentations, exact final text and exact twenty-entry document undo. Timing excludes setup, snapshots and undo; all three overlapping native-task controls pass.
 
-| Paragraph fixture | Per-run p95 (ms) | Median p95 (ms) | Maximum sample (ms) |
-| --- | --- | --- | --- |
-| paragraph-240 | 16.8 / 16.3 / 16.7 | 16.7 | 17.1 |
-| paragraph-9900 | 17.3 / 17.1 / 17.0 | 17.1 | 21.9 |
-| paragraph-64 | 21.5 / 18.0 / 18.3 | 18.3 | 24.4 |
-| paragraph-wide | 15.7 / 17.2 / 16.2 | 16.2 | 21.1 |
+| Paragraph fixture | Per-run p95 (ms)   | Median p95 (ms) | Maximum sample (ms) |
+| ----------------- | ------------------ | --------------- | ------------------- |
+| paragraph-240     | 16.8 / 16.3 / 16.7 | 16.7            | 17.1                |
+| paragraph-9900    | 17.3 / 17.1 / 17.0 | 17.1            | 21.9                |
+| paragraph-64      | 21.5 / 18.0 / 18.3 | 18.3            | 24.4                |
+| paragraph-wide    | 15.7 / 17.2 / 16.2 | 16.2            | 21.1                |
 
 Across all fourteen fixtures, the largest observed p95 is 25.5 ms; 0 overlapping native long tasks were observed. Three paced runs are local canvas-copy proxies and do not establish sustained/all-tool/heap/physical-device acceptance. Constructor measurement diagnostics are separate from input latency. Raw samples, complete point/shadow regressions, build identity and limitations are sealed in [text-paragraph-2026-10-16.json](benchmarks/text-paragraph-2026-10-16.json).
 
@@ -407,15 +401,14 @@ Across all fourteen fixtures, the largest observed p95 is 25.5 ms; 0 overlapping
 
 Three unprofiled ordinary-production runs cover eighteen point/paragraph/justified fixtures. Justified cases verify actual UI mode, expanded native word-spacing observations, twenty newly shaped presentations and exact text/pixel undo. Native task controls prove overlap observation before every run.
 
-| Justified fixture | Per-run p95 (ms) | Median p95 (ms) | Maximum sample (ms) |
-| --- | --- | --- | --- |
-| justify-240 | 17.2 / 15.7 / 15.3 | 15.7 | 23.1 |
-| justify-9900 | 18.4 / 17.5 / 18.4 | 18.4 | 18.7 |
-| justify-64 | 19.0 / 20.8 / 21.9 | 20.8 | 23.9 |
-| justify-wide | 18.9 / 20.4 / 18.7 | 18.9 | 21.1 |
+| Justified fixture | Per-run p95 (ms)   | Median p95 (ms) | Maximum sample (ms) |
+| ----------------- | ------------------ | --------------- | ------------------- |
+| justify-240       | 17.2 / 15.7 / 15.3 | 15.7            | 23.1                |
+| justify-9900      | 18.4 / 17.5 / 18.4 | 18.4            | 18.7                |
+| justify-64        | 19.0 / 20.8 / 21.9 | 20.8            | 23.9                |
+| justify-wide      | 18.9 / 20.4 / 18.7 | 18.9            | 21.1                |
 
 Across all eighteen fixtures, the largest p95 is 29.7 ms; 0 overlapping native long tasks were observed. Native spacing precision can accumulate along very wide lines; the authored frame remains exact. This is a local canvas-copy proxy, without sustained/all-tool/heap/physical-display acceptance or a before/after speedup claim. Raw data, point/shadow regressions, native precision/failure history and frozen build identity are sealed in [text-justify-2026-10-16.json](benchmarks/text-justify-2026-10-16.json).
-
 
 ## Native TIFF output scheduling — 2026-10-17
 
@@ -429,13 +422,11 @@ Three serial unprofiled bundled-app runs use a 4096 × 4096 paint/text scene, ac
 
 The separate genuine 50 MP source/save/reopen/PDF check prepares output in about **1,962.7 ms** locally, releases all 395 native render regions and passes exact independent stored/rendered-pixel checks for that fixture. This is not a reader/process peak-memory measurement. Source/row width, compressed output and PDF-reader image-plane memory remain data dependent. DPI controls physical size without resampling; one streamed image avoids the failed independently placed tile design's 300-DPI edge shifts. Raw final production/native observer reports, correctness matrices, failed experiments, code/release hashes and reproduction commands are sealed in [pdf-export-2026-10-17.json](benchmarks/pdf-export-2026-10-17.json). Earlier records remain unchanged.
 
-
 ### Native PSB delivery and remaining export stalls — 2026-10-17
 
 The normal-production suite now records the same 4096-square paint/text fixture through default-layered PSB output, with three serial unprofiled click-to-real-Blob-download samples: **3,620.0 / 3,763.3 / 3,655.1 ms**, **50 / 52 / 49** animation frames and maximum frame gaps **142.3 / 119.0 / 146.4 ms**. Every trial observes a deliberate native **75 ms** long-task positive control. No overlapping task is observed in trial one; trial two records **59 / 86 ms**, and trial three **57 ms**. This exposes remaining F14 stalls; it is not <=33 ms/<50 ms acceptance, continuous throughput, physical display, peak-memory or hardware/device proof. No controlled before/after speedup claim is made.
 
 A separate genuine 50 MP source/import/save/reopen/PSB gate prepares output in about **4,012.4 ms** locally, releases all **395** native surfaces and passes exact independent merged/layer pixels while retaining original source bytes. External 30,001- and 100,000-pixel-wide PSB inputs pass exact pixels and project/output round-trips without an import canvas wider than 96 pixels; numeric >4 GiB lengths are synthetic. Complete decoded input planes, compressed output and reader allocations remain data-dependent memory. Raw final timing/native observer controls, independent-reader and lifecycle results, frozen hashes, failed pilots/reader limits and reproduction commands are sealed in [psb-export-2026-10-17.json](benchmarks/psb-export-2026-10-17.json). Earlier TIFF/PDF evidence remains unchanged; the original roadmap and F14 remain incomplete.
-
 
 ### Photoshop private encoding: paired production evidence — 2026-10-17
 
@@ -445,7 +436,6 @@ Three alternating unprofiled pairs, three exports per release per pair, retain i
 
 A diagnostic profile identified channel/PackBits work and per-row Blob allocations on the main thread. Private per-export workers now encode captured strips into reused scratch/owned channel Blobs, with host response/source/font validation and abort termination. Only export-owned pixels transfer. Native rendering/readback stays on the host; complete source/output/reader memory, synchronous input parsing and remaining frame delays remain open. A separate 50 MP output check observes **1,916.2 ms**, exact independent pixels/source retention and all **395** native surfaces released, without a paired 50 MP or process-peak-memory claim. Full build, 1,109 unit/API, 152 affected-browser and 53 production checks pass. [Sealed evidence](benchmarks/photoshop-encoding-2026-10-17.json) includes the exact incremental source reconstruction/patch, frozen hashes, diagnostic/pilot failures, real worker ownership/error tests, final paired/raw reports and reproduction controllers. Earlier evidence remains unchanged; physical-display, sustained all-tool, heap/device and the full professional-editor roadmap remain incomplete.
 
-
 ### Photoshop input: worker parsing and remaining readiness cost — 2026-10-17
 
 `scripts/benchmark-photoshop-import.mjs` accepts fresh `CANOLI_PHOTOSHOP_IMPORT_OUTPUT`, optional URL/fixture/reference/rounds variables under the same prefix, and uses real file input/preflight/import/download controls without developer globals. It records native 75 ms task controls, complete overlapping task/frame gaps, browser/CPU/source/reference identity and independently checks every imported RGBA sample. Timing ends at matching preflight/committed-layer DOM, not physical display. Outputs refuse overwrites.
@@ -453,7 +443,6 @@ A diagnostic profile identified channel/PackBits work and per-row Blob allocatio
 Three alternating normal-release pairs use the same independently generated 50 MP RGB8/RLE PSD and opaque reference. Baseline inspection has **644 / 687 / 650 ms** main-thread tasks and two observed frames per run; worker inspection has no observed tasks and **41 / 40 / 42** frames, with maximum gap **695.3 → 88.1 ms**. Baseline commit has **644 / 680 / 688 ms** tasks; worker commit has none, with maximum gap **687.2 → 100.3 ms**. All twelve deliberate controls pass and all native output pixels match. Total median readiness increases **673.6 → 717.2 ms** for inspection and **2,097.2 → 2,212.3 ms** for import. The tradeoff removes measured half-second stalls while retaining local overhead; it is not a throughput/60fps/full-F14 claim. Commit frame counts also fall from **65/64/66 to 54/50/48**, so task removal must not be presented as a universal cadence win.
 
 Preflight now retains 423 bytes of metadata for the independent 50 MP fixture rather than decoded planes. Full parse still happens inside each worker, and legacy returned ImageData/native bitmaps/output remain memory dependent. Native bitmap decode/upload and residual frame gaps remain outside the moved parsing work; no peak-memory or hardware/device guarantee is made. [Sealed evidence](benchmarks/photoshop-import-2026-10-17.json) includes final 1,113 unit/API, 181 browser and 54 production checks, exact edit/undo/project pixels, codec/grayscale/stale/ownership/error/paging gates, paired raw measurements and controls, source reconstruction/hashes, limits and reproduction scripts. Earlier evidence remains unchanged and the full professional-editor objective stays incomplete.
-
 
 ## Photoshop ZIP decoder acceptance and scheduling limits (2026-10-17)
 
@@ -463,7 +452,6 @@ The final browser run records one native 50 MP ZIP import observation of **2,080
 
 [Sealed evidence](benchmarks/photoshop-zip-2026-10-17.json) contains the exact source/release/fixture identities, independently confirmed malformed older files, all failed/interrupted pilot history, **1,126 unit/API**, **201 browser** and **59 production** passing checks, raw attachments and reproduction controller. All six preceding evidence artifacts remain unchanged; this codec increment does not replace their separately scoped timing conclusions or complete the professional-editor roadmap.
 
-
 ## Photoshop pixel-mask correctness and memory boundary (2026-10-17)
 
 Supported eight-bit user masks now retain original-resolution bitmap coverage as separate native PNG sources instead of rectangular geometry. Black/white outside coverage, effective inversion, density, disabled state and local/document placement use the existing mask model. Private conversion reuses its decoded mask image; white backgrounds use complemented alpha plus inversion without padded document-sized coverage. Group/non-raster, feather/combined/rendered/higher-precision and standalone vector cases remain explicit unsupported layered paths with real merged fallback.
@@ -471,7 +459,6 @@ Supported eight-bit user masks now retain original-resolution bitmap coverage as
 The independent corpus includes a **50 MP image plus a full 50 MP mask**, a 100,000-pixel PSB mask, fractional small masks and known source-grid references. Final browser and production workflows retain both full-size assets, source hashes/model state, OO mask edits and exact undo/project-reopened/native PNG pixels. An initial native case was still opening sources at the default five-second assertion; the explicit longer correctness wait and complete retry preserve full dimensions and exact samples. This is not a performance target or evidence of 60fps, native long-task bounds, process peak-memory, sustained input or hardware/device acceptance. Original/decoded/result/native/output allocations still depend on source data, and inspection is not metadata-only parsing.
 
 [Sealed evidence](benchmarks/photoshop-mask-2026-10-17.json) contains independent fixtures/references, all failed/interrupted pilot history and observer diagnostics, frozen source/release identities, raw **1,140 unit/API**, **262 browser** and **65 production** passing reports/attachments, exact source patch and reproduction controller. The existing matting permission observer was corrected to hook its loaded dependency and gate preparation before revocation, preserving all cleanup/rollback checks. All seven preceding artifacts remain unchanged; their separately scoped timing results are not replaced or pooled. Photoshop feather/vector/group/color/precision fidelity and full F14/roadmap acceptance remain incomplete.
-
 
 ### Native pass-through groups: functional scope and performance boundary — 2026-10-18
 
@@ -489,7 +476,6 @@ Functional gates compare every independent 50 MP preview/source/mask sample, wid
 
 There is no controlled speedup comparison or new general frame-rate/memory acceptance claim. Source bitmaps, compressed output and row tables remain data dependent; masks currently cover the document rectangle and supported native pass-through still selects Canvas/WASM fallback. Existing production frame/long-task controls are local scheduling evidence. Full editor-wide F14, sustained input, whole-process peak memory, hardware GPU/tablet/device/physical display and independent Photoshop desktop acceptance remain open.
 
-
 ## Authored brush pressure response — functional boundary, 2026-10-18
 
 Schema-29 pressure curves now share native/SVG/supported-WGSL size/alpha/spacing/bounds, with legacy-default compatibility and explicit zero coverage. Empty response segments avoid unnecessary stamp-grid iteration; nonempty replay retains half-pixel spacing and numerical safety checks. Mixed subpixel/precision-sensitive pressure can select the complete Canvas reference path. Real WGSL checks use SwiftShader and do not certify hardware GPU performance. Pen event checks use trusted Chromium protocol input, not a physical tablet.
@@ -497,7 +483,6 @@ Schema-29 pressure curves now share native/SVG/supported-WGSL size/alpha/spacing
 Functional verification passes the final build, **1,184 unit/API tests**, **218 source-validated browser cases** and all **71 production cases**. The browser aggregate retains 208 unchanged passing cases plus ten complete final-source tools-file cases after correcting actual imported-example fixture preparation; all product/runtime inputs and all 53 release files are identical between stages. The original failure remains in [sealed evidence](benchmarks/pressure-curves-2026-10-18.json), alongside native/SVG/WGSL checks, standalone positive SVG analytic comparisons, real 50 MP source/undo/project comparisons, complete reports and frozen hashes.
 
 This is correctness, isolation, persistence and scheduling-regression evidence, not a controlled pressure speedup or frame-rate benchmark. Denser response-dependent stamps, source/native surfaces and export buffers remain data dependent. Existing recorded slow paths, sustained all-tool F14, process-peak memory, physical tablet/tilt, hardware GPU/display and broad device acceptance remain open.
-
 
 ## Saved brush presets — functional and precision boundary, 2026-10-18
 
@@ -507,13 +492,11 @@ The final build, **1,198 unit/API tests**, **233 browser cases in one final-sour
 
 This is functional, precision, isolation, persistence and scheduling-regression evidence, not a controlled preset speedup or a general frame-rate benchmark. JSON parsing, record validation, library size, browser quota and native image/export buffers remain device/data dependent. Physical tablet/tilt, textured brushes/mixer/symmetry, hardware GPU/display, process-peak memory, sustained all-tool F14 and the broader professional-editor roadmap remain unfinished.
 
-
 ## Authored brush-tip and spherical tilt correctness — 2026-10-18
 
 [Sealed tip evidence](benchmarks/brush-tip-2026-10-18.json) verifies shared Canvas/SVG/software-WGSL ellipse and rotated-pencil geometry, affine pen/mask-master input, captured clone/healing coverage, warmed cache invalidation, project/workspace undo/redo and version-2 portable presets. The native 50 MP erasure retains source bytes and independently compares all undo/reopened pixels. Final verification includes the actual build, 1,212 unit/API cases, 255 browser cases in one source-frozen run and all 74 normal-production workflows. All 1,040 input hashes, 54 release hashes and twelve preceding artifacts remain verified; reconstruction matches all 60 changed/new files.
 
 These are functional correctness checks, not a new latency benchmark, speedup, tablet/hardware-GPU certification, physical input-to-photon result, peak-process-memory measurement or universal 60fps/F14 acceptance. Thin or numerically unsuitable tips explicitly use complete Canvas fallback. The cursor avoids copying mask/master artwork on hover, without claiming measured end-to-end improvement. Existing dense vector/filter-mask/export slow paths and sustained/device gates remain open. Project 3/workspace 2 and original source resolution/bytes remain intact; no image-import cap or provider/network privilege was added.
-
 
 ## Mirror/radial brush symmetry correctness — 2026-10-18
 
@@ -539,7 +522,6 @@ These are functional checks, not a controlled speedup, universal 60fps, sustaine
 
 This is resource/source-preservation evidence, not zero whole-process memory, a controlled latency/throughput comparison, universal 60fps, sustained all-tool acceptance or tablet/hardware-GPU/physical-display certification. Source bitmaps, references, private proxies and output remain data dependent. Concurrent broad browser/production observations and the separately corrected matting run are not pooled into a performance comparison; native matting long tasks remain visible in the raw reports. Texture source controls, active gesture/cursor integration and original-source portable presets remain unfinished, alongside existing dense mask/vector/export paths and the broader F14/device/precision gates.
 
-
 ### Texture controls and source-preserving pointer workflow — functional evidence, 2026-10-18
 
 The actual source dialog and brush-family pointer tools now retain original images independently of document tabs. Native functional checks cover real brush/pencil/eraser/clone/tonal/healing coverage, masks/filter-mask master planes, exact undo/project/workspace bytes, cancellation/stale source identity, TIFF review and a genuine 50 MP source through source-document closure and project reload. A separate 16-bit TIFF dialog check requires explicit precision-loss consent while retaining the exact original TIFF bytes. A native screenshot comparison of the 128-square cursor proxy against the identical hidden-proxy frame changes the covered sample from RGB 64 to 130 and leaves the empty sample at RGB 64; this proves displayed coverage in that fixture, not general cursor visibility or frame rate.
@@ -547,7 +529,6 @@ The actual source dialog and brush-family pointer tools now retain original imag
 [Sealed evidence](benchmarks/brush-texture-controls-2026-10-18.json) records the final build, **1,274 unit/API tests**, one complete corrected-source **430-case/35-file browser run**, and **77 normal-production workflows** on the identical 54-file release. No accepted browser/production case skips, retries or flakes. The initial browser stage was interrupted to correct a separately reproduced source-identity commit bug; all of its cases are excluded. The repeated exact native audit now rejects without editing the document or deleting the foreign replacement. All 1,062 source inputs, generated WASM, eighteen prior immutable artifacts and nineteen reconstructed changed/new files verify. SHA-256: `56a17fb6960ddad74aae040e6d76722f2a833c5e1df691d7e42fdd9dfb4c6363`.
 
 The main browser and production suites ran concurrently on separate ports; their timing attachments are observations under shared load. These are functional/pixel/source-lifetime results, not controlled latency, continuous-throughput, physical-display/tablet/hardware-GPU, process peak-memory or general 60fps/F14 acceptance. Original decoded source bitmaps and compressed/output data remain workload dependent. Original-source portable texture presets and the wider F06/T16/roadmap remain unfinished.
-
 
 ### Original-source brush packs and recovery — functional evidence, 2026-10-18
 
@@ -557,7 +538,6 @@ Preset/pack4 now retains original image Blob sources separately from decoded edi
 
 A normal-production pack download/reimport in a fresh independent storage context reproduces every native output pixel, original project source bytes and one-step undo without developer globals, independently checked with PIL. The binary container concatenates compressed originals without base64; checksum array buffers, JSON metadata, decoded originals and output still consume workload-dependent memory. Native write-lock keepalive supports atomic content verification/recovery; it is not a proof of large-library throughput or continuous input responsiveness. Unsupported directory-relative File/raw non-JSON recovery values reject rather than silently erase metadata. Browser/production ran concurrently on separate ports; timing attachments are observations under shared load. Physical tablet/GPU/display, process peak-memory, sustained/all-tool F14, mixer/smudge and full-roadmap acceptance remain open; no universal60fps or speedup claim is made.
 
-
 ## Native wet-paint numerical dependency — functional verification, 2026-10-18
 
 [Sealed source evidence](benchmarks/brush-wet-paint-core-2026-10-18.json) records the actual build, 1,303 unit/API cases across 162 files, 465 accepted browser cases across 41 complete files and 78 complete normal-production cases. All 1,072 source inputs, 54 release files and generated WASM remain identical across accepted native/production verification; 20 previous artifacts remain unchanged. Seven patches plus five full additions reconstruct all 12 changed inputs exactly, and every source/assembly/server/test/script file belongs to the frozen inventory. There are zero accepted browser/production skips/retries/flakes. The five-case initial native pilot remains separate and is not pooled into acceptance.
@@ -565,7 +545,6 @@ A normal-production pack download/reimport in a fresh independent storage contex
 Fourteen new unit tests and five real browser-worker cases cover actual-WASM carried pigment, finite loading, premultiplied color/alpha deposit/lifting, pre-deposit pickup, wetness/flow/coverage, fractional Float32 reservoir retention, exact per-dab tile partition/order, separate final whole-stroke opacity/selection, buffer ownership, concurrent operations, memory growth, invalid inputs/results and disposal. The independent numerical corpus spans 65,536 alpha/coverage pairs across five settings, allowing at most one RGBA byte and 1e-7 absolute reservoir error against separately weighted equations; direct endpoint and tile-partition cases require exact values. Existing 50 MP image/matting/TIFF regressions pass, but no native wet-stroke large-image workflow exists yet.
 
 This is functional/numerical evidence for an internal dependency. Full-stroke spatial replay, ordered authored layer replacement, source/result persistence, tool controls/gestures/preview/cancel/presets and export/automation integration remain unfinished. Encoded-sRGB interpolation is not a physical/spectral paint model. Per-request working buffers admit 4,000,000 pixels independently of source/document/stroke geometry; larger regions require tiling. Original/working/caller/worker/WASM/result storage remains workload dependent. Concurrent browser/production timings do not establish speedup, throughput, universal 60fps, sustained all-tool F14, process peak memory or hardware/tablet/display acceptance. The original full roadmap remains active.
-
 
 ## Native spatial wet preparation — functional evidence, 2026-10-18
 
@@ -577,11 +556,9 @@ A real 50 MP RGBA source retains original dimensions and full blob SHA-256 throu
 
 This is internal read-only preparation. The production release changes only three generated guides, with app/worker/WASM bytes unchanged; normal-production tests do not exercise a new mixer/smudge UI. Authored ordered target replacement, neutral content planes, OO/history/assets/persistence, tool gestures/previews/cancel/presets and export/automation integration remain unfinished. Current replay has no incremental gesture prefix. Browser/production suites ran concurrently on separate ports; timing attachments are functional observations, not controlled speedup, sustained throughput, universal60fps or hardware/tablet/display acceptance. Browsers without Web Locks/database enumeration retain explicit disposal but lack automatic abandoned-job identification. The original full roadmap remains active.
 
-
 ## Authored wet integration boundary — 2026-10-18
 
 [Sealed integration evidence](benchmarks/brush-wet-authoring-2026-10-18.json) records authored prepared values, neutral native preparation, ordered alpha replacement, native reconstruction, expanded raster support/resize, persistence and isolated/REST publication. Browser comparisons use complete native composition as a reference, actual SVG/PSD exports, real gestures and a 50 MP original with recorded canvas allocations. Normal production exercises the prepared constructor through isolated Scripts and visible file controls without globals. These are functional/source-ownership checks, not throughput or process peak-memory measurements. Complete stroke replay has no incremental live gesture prefix; no sustained 60fps/all-tool/device acceptance is implied. Original decoded/source/result/backing/worker/WASM and output memory remain workload dependent. Actual mixer/smudge tools, masks/filter-mask targets, controls/presets and the rest of F06/T16/F14 remain open.
-
 
 ## 2026-10-18 — Red-eye functional conformance; F14 remains open
 
@@ -589,54 +566,50 @@ Manual selection-masked red-eye correction passes actual WASM/worker processing 
 
 This is numerical and functional evidence, not real-hardware presentation latency, portrait-quality evaluation, complete F05/F14 acceptance or a 60fps claim. Existing wet-gesture and editor-wide performance failures remain open. Working tile budgets do not cap source/document geometry.
 
-
 ## Textured input and native composition — 2026-10-20
 
 The [sealed alternating studies](benchmarks/texture-frequency-production-performance-2026-10-20.json) compare twelve synthetic opaque-texture fixtures through normal production UI, with twenty paced trusted movements per gesture and three runs per variant. Native matching-canvas-copy timestamps precede the one-pixel validation read; every sample must newly match known exact RGBA. Saved original/edited/undo projects independently preserve source blobs, all21 points and exactly one authored operation. Complete PNG/model undo and native75ms long-task controls are verified. The reference is the pre-texture-correction release; changed legacy edge appearance is recorded separately from speed.
 
-| Fixture | Reference median run p95 (ms) | Current median run p95 (ms) |
-| --- | ---: | ---: |
-| Small brush/layer | 13.4 | 14.0 |
-| Small pencil/mask | 7.9 | 14.7 |
-| Small eraser/filter mask | 23.4 | 21.2 |
-| 2048 brush/layer | 20.3 | 14.3 |
-| 2048 pencil/mask | 95.7 | 31.6 |
-| 2048 eraser/filter mask | 34.9 | 34.5 |
-| 1800 brush/layer | 17.9 | 14.6 |
-| 1800 pencil/mask | 89.0 | 31.9 |
-| 1800 eraser/filter mask | 37.7 | 36.8 |
-| 900 brush/layer | 13.9 | 14.0 |
-| 900 pencil/mask | 55.1 | 32.4 |
-| 900 eraser/filter mask | 22.8 | 28.3 |
+| Fixture                  | Reference median run p95 (ms) | Current median run p95 (ms) |
+| ------------------------ | ----------------------------: | --------------------------: |
+| Small brush/layer        |                          13.4 |                        14.0 |
+| Small pencil/mask        |                           7.9 |                        14.7 |
+| Small eraser/filter mask |                          23.4 |                        21.2 |
+| 2048 brush/layer         |                          20.3 |                        14.3 |
+| 2048 pencil/mask         |                          95.7 |                        31.6 |
+| 2048 eraser/filter mask  |                          34.9 |                        34.5 |
+| 1800 brush/layer         |                          17.9 |                        14.6 |
+| 1800 pencil/mask         |                          89.0 |                        31.9 |
+| 1800 eraser/filter mask  |                          37.7 |                        36.8 |
+| 900 brush/layer          |                          13.9 |                        14.0 |
+| 900 pencil/mask          |                          55.1 |                        32.4 |
+| 900 eraser/filter mask   |                          22.8 |                        28.3 |
 
 Two current fixture medians still fail33ms, and individual900-pixel pencil runs exceed33ms. No overlapping gesture long task is observed. Six final appearances remain identical to the old renderer; three brush-edge and three filter-mask appearances change. An independent32768-subrow circle-area integral matches every current alpha pixel in all three circle fixtures, but does not establish broader image quality. These results do not establish sustained/editor-wide, physical/tablet/display or whole-process-memory acceptance.
 
 A separate unprofiled offscreen native50MP full-frame low-retouch study compares corrected256/512 composition cores. Three alternating pairs on Linux/Chromium153.0.8010.12, AMD Ryzen9 3900X, observe median37313.6→32177.7ms (13.8% locally),3160→3081 Gaussian requests and71064000→70432320 sampled pixels. Independent complete RGBA decoding matches all six outputs; source/model hashes remain unchanged and all outputs differ from the original. Native long-task controls are positive and no overlapping export long task is reported. Animation-gap p95 is19.9–20.3ms, a headless scheduling proxy. No competing builds/tests ran. A roughly32-second export and the remaining input misses still require work; no general60fps or complete F14 claim is made.
 
-
 ### Literal-raster native band overscan
 
 The [band-overscan follow-up](benchmarks/frequency-band-overscan-2026-10-20.json) compares unchanged512-pixel composition cores with512 versus1024 native band sampling cores. The larger read is eligible only over a literal unchanged native raster, without a filter mask, under the same4MP/8192-edge halo budget. Three alternating unprofiled50MP pairs observe median32243.4→29017.1ms (10.0% locally),3081→1580 Gaussian requests and70432320→68432000 sampled pixels. All six complete outputs match RGBA exactly and contain the intended retouch; source/model identities remain unchanged. All six native long-task controls are observed and no overlapping export task is reported. No competing tests/builds ran. This is one synthetic full-frame low-retouch fixture on the same named host/browser, with headless callbacks as scheduling proxies. It does not establish general speed, physical display, sustained/editor-wide or process-memory acceptance. A29-second export still needs work.
-
 
 ### 2026-10-21 — Rectangular native frequency and blend work
 
 [Sealed strip-batching evidence](benchmarks/frequency-strip-batching-2026-10-21.json) compares the committed 1024-band/512-composition renderer against aspect-aware native sampling and independent blend partitions. Three clean alternating unprofiled pairs on Linux, Chromium153.0.8010.12, AMD Ryzen9 3900X observe:
 
-| Full-frame 50 MP low-retouch export | Reference | Candidate |
-| --- | ---: | ---: |
-| Median elapsed time | 29162.1 ms | 21795.6 ms |
-| Gaussian requests | 1580 | 395 |
-| Gaussian sampled pixels | 68432000 | 66458000 |
-| High/correction encoding requests | 3160 | 790 |
-| Encoding pixels | 136864000 | 132916000 |
-| Linear Light/Burn requests | 3160 | 790 |
-| Blended pixels | 107170560 | 106532640 |
+| Full-frame 50 MP low-retouch export |  Reference |  Candidate |
+| ----------------------------------- | ---------: | ---------: |
+| Median elapsed time                 | 29162.1 ms | 21795.6 ms |
+| Gaussian requests                   |       1580 |        395 |
+| Gaussian sampled pixels             |   68432000 |   66458000 |
+| High/correction encoding requests   |       3160 |        790 |
+| Encoding pixels                     |  136864000 |  132916000 |
+| Linear Light/Burn requests          |       3160 |        790 |
+| Blended pixels                      |  107170560 |  106532640 |
 
 Median elapsed time is 25.3% lower locally. Independent complete RGBA decoding matches all six 10000×5000 outputs and the frozen reference. All contain the intended edit, preserve model/source hashes and have positive native long-task controls; no overlapping export long task is observed. All 37 scene pairs (74 independently decoded PNGs) match exactly, including texture/wet/erase/outer-mask variants. Application engine/WASM and all39 previous benchmark artifacts remain byte-identical throughout measurement. No competing builds/tests ran.
 
 This is one synthetic offscreen full-native low-retouch workload. Headless animation callbacks are scheduling proxies. No general/editor-wide input, sustained-use, physical GPU/tablet/display, portrait-quality or process-memory acceptance follows. A roughly22-second export and the previously measured large filter-mask input misses still require work.
-
 
 ### 2026-10-21 — Extreme bitmap precision and capture scheduling
 
@@ -646,30 +619,28 @@ A full64-sample/1,000,000-pixel numerical texture batch initially starts all64 n
 
 The genuine50MP fixture retains its original10000×5000 decoded dimensions and exact source Blob through project reopening; complete extreme-view PNGs match an independent Pillow oracle and observed working canvases stay within4MP/8192 edges. This is scoped allocation evidence, not whole-process memory acceptance. All37 ordinary scene pairs and independently decoded74 PNGs remain exactly equal to the committed renderer. Existing editor-wide/sustained/release/device/quality/process-memory gates and the previous input-latency misses remain open.
 
-
 ### 2026-10-21 — Texture input candidates deferred
 
 [Sealed input-optimization evaluation](benchmarks/texture-input-optimization-evaluation-2026-10-21.json) records three separate unprofiled normal-production studies on Linux/Chromium153.0.8010.12, AMD Ryzen9 3900X. Each study uses three alternating pairs against the unchanged1ceb9b2 renderer,12 tool/target/size fixtures and20 newly matching trusted inputs per gesture. The following values are median per-run p95 in milliseconds, written control→prototype. Each column has its own contemporaneous control. Do not pool baselines across studies.
 
-| Fixture | Mask endpoints | Both coverage bounds | Opaque regions only |
-| --- | ---: | ---: | ---: |
-| brush-layer | 14.0→15.2 | 13.2→14.1 | 14.8→14.3 |
-| eraser-filter-mask | 21.3→22.7 | 24.4→24.8 | 20.9→27.1 |
-| large-brush-layer | 16.7→17.1 | 14.8→17.0 | 17.0→15.4 |
-| large-eraser-filter-mask | 37.6→39.0 | 32.0→33.2 | 32.9→32.6 |
-| large-pencil-mask | 30.1→32.3 | 30.6→38.8 | 33.0→32.1 |
-| medium-brush-layer | 15.6→15.2 | 14.8→17.1 | 14.7→15.0 |
-| medium-eraser-filter-mask | 25.1→23.9 | 25.6→29.3 | 27.1→27.1 |
-| medium-pencil-mask | 29.6→28.3 | 31.9→40.1 | 31.3→29.8 |
-| near-large-brush-layer | 19.1→14.3 | 16.9→15.5 | 16.1→16.0 |
-| near-large-eraser-filter-mask | 29.9→35.2 | 31.7→31.6 | 30.7→31.6 |
-| near-large-pencil-mask | 33.0→31.7 | 31.4→39.8 | 31.3→32.6 |
-| pencil-mask | 12.7→14.7 | 12.4→12.9 | 14.3→14.2 |
+| Fixture                       | Mask endpoints | Both coverage bounds | Opaque regions only |
+| ----------------------------- | -------------: | -------------------: | ------------------: |
+| brush-layer                   |      14.0→15.2 |            13.2→14.1 |           14.8→14.3 |
+| eraser-filter-mask            |      21.3→22.7 |            24.4→24.8 |           20.9→27.1 |
+| large-brush-layer             |      16.7→17.1 |            14.8→17.0 |           17.0→15.4 |
+| large-eraser-filter-mask      |      37.6→39.0 |            32.0→33.2 |           32.9→32.6 |
+| large-pencil-mask             |      30.1→32.3 |            30.6→38.8 |           33.0→32.1 |
+| medium-brush-layer            |      15.6→15.2 |            14.8→17.1 |           14.7→15.0 |
+| medium-eraser-filter-mask     |      25.1→23.9 |            25.6→29.3 |           27.1→27.1 |
+| medium-pencil-mask            |      29.6→28.3 |            31.9→40.1 |           31.3→29.8 |
+| near-large-brush-layer        |      19.1→14.3 |            16.9→15.5 |           16.1→16.0 |
+| near-large-eraser-filter-mask |      29.9→35.2 |            31.7→31.6 |           30.7→31.6 |
+| near-large-pencil-mask        |      33.0→31.7 |            31.4→39.8 |           31.3→32.6 |
+| pencil-mask                   |      12.7→14.7 |            12.4→12.9 |           14.3→14.2 |
 
 None is adopted. The endpoint experiment removes84 of105 diagnostic mixing requests but fails to improve large filter-mask input latency. Retaining both conservative bounds worsens all three large pencil-mask medians. Opaque-only retention reduces native coverage readbacks in a saturated-prefix regression while preserving the required one-pixel allocation probe, but its clean input results remain mixed; large individual inputs still reach81.6ms. Reduced traffic alone is not acceptance. Further mask-preparation and tile/RPC scheduling work remains necessary.
 
 Independent decoding checks all648 complete PNGs and648 checksummed projects across the18 runs. Every variant/control appearance is RGBA-exact; all21 points, one intended operation, original texture bytes and exact model/pixel undo survive. All216 native long-task controls are positive; no overlapping gesture long task is observed. Measured engine/WASM/release identities are frozen within every run, and no competing builds/tests or application edits run. Main engine behavior is unchanged. These paced synthetic Canvas-copy observations do not prove physical presentation, sustained/editor-wide response, representative-photo quality, hardware/tablet behavior or process-peak memory. The full original roadmap and33ms input gate remain open.
-
 
 ### 2026-10-21 — Native Canvas clipping consistency
 
@@ -677,15 +648,14 @@ Independent decoding checks all648 complete PNGs and648 checksummed projects acr
 
 Four unchanged-scale regression cases now have exact complete RGBA across viewport, three irregular cropped regions and streamed PNG. Independent Pillow decoding checks16 complete1080×440 images. A separate native image/cubic-command reference, composed in independent layer planes and processed by actual worker tone, matches every corrected large-vector RGBA byte without using the engine grid/vector helper. Original model/source bytes and1024×384 native source dimensions remain unchanged. Rendered appearances can change where the previous clipping-dependent rasterizer disagreed; this is not a byte-identical-renderer claim.
 
-| Regression | Prior viewport/export differing pixels | Prior maximum byte difference | Corrected differing pixels |
-| --- | ---: | ---: | ---: |
-| bitmap-mask | 11 | 4 | 0 |
-| affine-raster | 784 | 255 | 0 |
-| vector | 1226 | 255 | 0 |
-| affine-smart | 1727 | 255 | 0 |
+| Regression    | Prior viewport/export differing pixels | Prior maximum byte difference | Corrected differing pixels |
+| ------------- | -------------------------------------: | ----------------------------: | -------------------------: |
+| bitmap-mask   |                                     11 |                             4 |                          0 |
+| affine-raster |                                    784 |                           255 |                          0 |
+| vector        |                                   1226 |                           255 |                          0 |
+| affine-smart  |                                   1727 |                           255 |                          0 |
 
 The first414-case native run passes412 cases, fails the unchanged narrow-raster reference with16 alpha bytes versus its1-byte bound, and times out on real331-pixel Gaussian processing after120seconds. Complete small projected footprints restore the original reference without changing its tolerance; larger geometry retains canonical cells. A subsequent413/414 run exposes inert extreme-miter metadata selecting a different working frame. Geometry-derived join bounds fix that case; the unchanged source/SVG assertions pass in30 focused browser checks and four new unit checks. The final candidate passes414 native/browser/WGSL checks and86 normal-production workflows. The large-halo allocation-planning check explicitly stubs processing and is not native Gaussian speed/output evidence. No new input-p95, pan/zoom, sustained/editor-wide, physical-display/GPU/tablet, representative-photo or process-memory acceptance is claimed. Those gates and the original roadmap remain open.
-
 
 ### 2026-10-21 — Coincident vector tangent work
 
@@ -696,7 +666,6 @@ A deterministic5,000-case equivalence corpus includes open/closed and compound c
 [Sealed linear-tangent evidence](benchmarks/vector-tangent-linearity-2026-10-21.json) records final validation below and preserves all43 earlier sealed artifacts byte-for-byte. The previous414-check native suite predates this scheduling refinement; only explicitly rerun checks establish final-source evidence. This does not resolve the actual331-pixel Gaussian timeout or establish general F14,33ms/editor-wide/sustained, physical-device/display/tablet, representative-quality or process-memory acceptance.
 
 Final verification: production build,1451 unit/API checks across177 files,31 focused native/vector/affine browser cases and86 normal-production workflows pass. Actual served production resources match all54 built files and the live native source includes memoization. The restricted EPERM unit run is excluded; no skips/retries/flakes are accepted in final checks. Browser jobs retain frozen engine/WASM/release/test identities. These checks establish correctness and bounded coordinate work, not a new editor-wide latency result.
-
 
 ### 2026-10-21 — Exact spatial-filter transparent support
 
@@ -710,7 +679,6 @@ The actual browser candidate pilot uses eight real1999×1999 WASM jobs across vi
 
 Final main validation passes the production build,1454 unit/API checks across177 files,91 affected native cases and86 normal-production workflows, with no accepted skips/retries/flakes. The actual main sigma331 fixture renders its8×8 affine viewport in about630ms through real processing; its eight1999×1999 jobs across viewport/PNG retain all expected pixels, source bytes/dimensions and document data. All54 served production resources and the native WASM match built bytes. Relative to d501198, only the WASM and three published developer guides differ; all50 other release resources are identical. All44 prior sealed artifacts remain byte-identical. Three single-run native filter-mask probes record p95 about56.7/82.4/73.4ms and long tasks up to119ms; these diagnostics lack paired production/frame-ownership acceptance and do not close the33ms or editor-wide/sustained/release/device/quality/process-memory gates.
 
-
 ### 2026-10-21 — Reusing adjacent convolution samples
 
 Two exact Float64 SIMD prototypes are not adopted: vertical-only improves the contemporaneous dense-kernel median about1.6%, both-axis about0.8%, and small empty/sparse observations are mixed. Both retain1,200 byte-exact old/new comparisons; the scalar build of the initial feature-guarded prototype is byte-identical to the committed kernel. The source/binaries and their separate measurements are retained in [sealed convolution evidence](benchmarks/spatial-adjacent-output-2026-10-21.json). No SIMD loader, runtime feature or extra product module is introduced.
@@ -721,7 +689,6 @@ Three alternating production-browser1537×1024 sigma12 export pairs use real imp
 
 Final main build,1455 unit/API checks across177 files,91 affected native/filter/frequency/interchange/50MP/WGSL cases and86 normal-production workflows pass without accepted skips/retries/flakes. Engine/assembly/WASM/release/test identities remain frozen through both browser jobs. All54 served production resources and native WASM match built bytes; the binary imports/exports/function arities and scratch layout are unchanged. Relative to68e5e8a, only WASM and three published developer guides differ; all50 other release resources are identical. All45 earlier sealed artifacts remain byte-identical. Post-study host metadata reports Linux/WSL2 x64, Node24.0.1 and AMD Ryzen9 3900X (24 logical CPUs); this is a virtual/shared software environment, not a physical reference-device acceptance. Native interaction probes remain unpaired diagnostics without proof of input in each timed frame and do not establish33ms input, editor-wide/sustained/release, physical/tablet/display, quality or process-memory acceptance.
 
-
 ### 2026-10-21 — Native tone and filter-mask input coalescing
 
 The earlier larger-tone experiment was deferred because three complete bitmap/transformed-raster/vector scenes changed pixels. After the native Canvas correction, the same 24-scene comparison now retains exact full viewport and native PNG RGBA. Independent Pillow decoding validates all 96 complete images; original model/source data survives. Typical combined viewport/export tone and mix calls fall from 45 to 8. Eligibility remains exact unit projected scale/integer translation and enabled tone-only stacks. Existing spatial/frequency/resampling partitions stay in use. Preferred jobs include overscan and mask-feather support inside 1 MP/8192-edge work bounds.
@@ -729,20 +696,19 @@ The earlier larger-tone experiment was deferred because three complete bitmap/tr
 Three clean alternating production pairs cover 18 opaque-texture brush/pencil/eraser layer/mask/filter-mask fixtures. All 2,160 timed inputs require a trusted pointer event and a newly matching known pixel after native Canvas copy; 108 native long-task controls are positive. Independent readers validate 324 checksummed projects and 324 complete PNGs, all 2,268 authored points, exactly one intended operation per gesture, original texture bytes and exact model/pixel undo. Every complete image is RGBA-exact across variants and repeated runs. Source, harness, WASM and releases stay frozen.
 
 | Filter-mask fixture | Control median run p95 | Candidate median run p95 |
-| --- | ---: | ---: |
-| Brush | 24.4 ms | 17.8 ms |
-| Pencil | 21.0 ms | 16.9 ms |
-| Eraser | 23.7 ms | 16.9 ms |
-| 2048-pixel eraser | 33.5 ms | 30.3 ms |
-| 1800-pixel eraser | 31.7 ms | 28.1 ms |
-| 900-pixel eraser | 26.1 ms | 24.8 ms |
+| ------------------- | ---------------------: | -----------------------: |
+| Brush               |                24.4 ms |                  17.8 ms |
+| Pencil              |                21.0 ms |                  16.9 ms |
+| Eraser              |                23.7 ms |                  16.9 ms |
+| 2048-pixel eraser   |                33.5 ms |                  30.3 ms |
+| 1800-pixel eraser   |                31.7 ms |                  28.1 ms |
+| 900-pixel eraser    |                26.1 ms |                  24.8 ms |
 
 All six measured filter-mask medians improve. Other paths are mixed: the unaffected 1800-pixel pencil-mask fixture records 29.5→33.2 ms, and individual candidate filter-mask inputs still reach 37.5 ms. No overlapping gesture long task is observed in these paced runs. The software Linux/x64 host and browser identity are retained per run; Canvas-copy witness timing is not physical presentation, sustained/editor-wide, tablet/hardware-GPU, representative-photo or process-memory acceptance.
 
 The candidate also passes 19 focused grid/coverage checks, all 13 direct worker equation combinations, 24 cached/cropped styled-source comparisons and actual 50 MP original-byte/dimension/project preservation. [Sealed native-tone input evidence](benchmarks/native-tone-input-coalescing-2026-10-21.json) retains all final results and earlier experiment dependencies; all 46 previous sealed artifacts remain byte-identical. Final main validation follows below. The complete original roadmap and broader F14 gates remain active.
 
 Final verification passes the main production build, 1,458 unit/API cases across 178 files, 94 affected native cases and 86 production workflows, with no accepted skips/retries/flakes. All 54 actual served production resources and native WASM match the build; all 51 non-documentation resources match the frozen measured candidate. Only the three published developer guides differ. Engine/test/release identities are frozen across the browser jobs, WASM remains identical to the control, and all 46 prior sealed artifacts are unchanged. These checks establish this exact native-tone optimization and its measured workload; they do not establish full F14 or complete-roadmap acceptance.
-
 
 ## 2026-10-28 — Cold layer scheduling attribution and measurements
 

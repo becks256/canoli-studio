@@ -3,7 +3,7 @@ import { allLayers, BLEND_MODES, findLayer, findParent, id } from "./model";
 import type { DocumentData, LayerData } from "./model";
 import { defaultStyle, styleSchema } from "./drawing";
 import { affineSchema } from "./transform-schema";
-import {perspectiveSchema} from './perspective';
+import { perspectiveSchema } from "./perspective";
 import { execute } from "./commands";
 import type { EditorCommand, LayerPatch } from "./commands";
 
@@ -42,7 +42,7 @@ export const layerCompSchema = z
               x: coordinate,
               y: coordinate,
               transform: affineSchema,
-              perspective:perspectiveSchema.nullable().optional(),
+              perspective: perspectiveSchema.nullable().optional(),
               width: dimension.optional(),
               height: dimension.optional(),
             })
@@ -117,7 +117,9 @@ function position(layer: LayerData) {
     x: layer.x,
     y: layer.y,
     transform: layer.transform ?? identity,
-    ...((layer.kind==='raster'||layer.kind==='smart-object')?{perspective:layer.perspective??null}:{}),
+    ...(layer.kind === "raster" || layer.kind === "smart-object"
+      ? { perspective: layer.perspective ?? null }
+      : {}),
     ...("width" in layer ? { width: layer.width, height: layer.height } : {}),
   };
 }
@@ -125,7 +127,7 @@ function appearance(layer: LayerData) {
   return {
     opacity: layer.opacity,
     fillOpacity: layer.fillOpacity ?? 1,
-    ...(layer.clipped?{clipped:true}:{}),
+    ...(layer.clipped ? { clipped: true } : {}),
     blendMode: layer.blendMode,
     styles: layer.styles ?? defaultStyle(),
   };
@@ -180,7 +182,13 @@ export function planLayerComp(
     if (saved.visible !== undefined && saved.visible !== layer.visible)
       patch.visible = saved.visible;
     if (saved.position) {
-      const savedPosition=layer.kind==='raster'||layer.kind==='smart-object'?{...saved.position,perspective:saved.position.perspective??null}:saved.position;
+      const savedPosition =
+        layer.kind === "raster" || layer.kind === "smart-object"
+          ? {
+              ...saved.position,
+              perspective: saved.position.perspective ?? null,
+            }
+          : saved.position;
       if ((findParent(document.children, layer.id) ?? null) !== saved.parentId)
         throw new Error(
           `Layer '${layer.name}' changed parent since this comp was captured. Recapture its position.`,
@@ -192,11 +200,14 @@ export function planLayerComp(
       if (!equivalent(savedPosition, position(layer)))
         Object.assign(patch, savedPosition);
     }
-    if (saved.appearance && !equivalent(
-      {...saved.appearance,clipped:saved.appearance.clipped??false},
-      {...appearance(layer),clipped:layer.clipped??false},
-    ))
-      Object.assign(patch, {clipped:false}, saved.appearance);
+    if (
+      saved.appearance &&
+      !equivalent(
+        { ...saved.appearance, clipped: saved.appearance.clipped ?? false },
+        { ...appearance(layer), clipped: layer.clipped ?? false },
+      )
+    )
+      Object.assign(patch, { clipped: false }, saved.appearance);
     if (Object.keys(patch).length)
       commands.push({ type: "layer.update", id: layer.id, patch });
   }

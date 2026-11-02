@@ -7,7 +7,10 @@ let nextId = 0;
 function strokeKey(entry: NonNullable<LayerMaskData["strokes"]>[number]) {
   if (!isImmutable(entry)) return ["value", entry];
   let id = ids.get(entry);
-  if (id === undefined) { id = ++nextId; ids.set(entry, id); }
+  if (id === undefined) {
+    id = ++nextId;
+    ids.set(entry, id);
+  }
   return ["immutable", id];
 }
 /** Only registry-proven immutable stroke records may avoid value serialization. */

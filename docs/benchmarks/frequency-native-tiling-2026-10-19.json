@@ -2619,10 +2619,7 @@
         "licenses/base64-js-LICENSE.MIT.txt": "136239d1783a151cdbf6fd7935dd945082b9d0ee2cbb8497cc0ae49e8a743a47",
         "licenses/pako-LICENSE.txt": "3bc404ffa7888053253eedcc5a667619aa08dc1be0bea400e5ff28c51602180f"
       },
-      "changed": [
-        "developer/architecture.html",
-        "developer/requirements.html"
-      ],
+      "changed": ["developer/architecture.html", "developer/requirements.html"],
       "runtimeIdentical": true
     }
   },
@@ -2650,20 +2647,12 @@
     "positiveControls": 6,
     "nativeLongTasks": 0,
     "gaussianCalls": {
-      "reference": [
-        6241
-      ],
-      "candidate": [
-        3160
-      ]
+      "reference": [6241],
+      "candidate": [3160]
     },
     "gaussianPixels": {
-      "reference": [
-        75169920
-      ],
-      "candidate": [
-        71064000
-      ]
+      "reference": [75169920],
+      "candidate": [71064000]
     },
     "rows": [
       {
@@ -3008,12 +2997,7 @@
             "alphaMaxDelta": 0,
             "premultipliedRgbMaxDelta": 1,
             "changedPixels": 4,
-            "bounds": [
-              255,
-              83,
-              769,
-              285
-            ]
+            "bounds": [255, 83, 769, 285]
           },
           {
             "scenario": "retouch-high",
@@ -3024,12 +3008,7 @@
             "alphaMaxDelta": 0,
             "premultipliedRgbMaxDelta": 2,
             "changedPixels": 4,
-            "bounds": [
-              255,
-              83,
-              769,
-              285
-            ]
+            "bounds": [255, 83, 769, 285]
           },
           {
             "scenario": "retouch-both",
@@ -3040,12 +3019,7 @@
             "alphaMaxDelta": 0,
             "premultipliedRgbMaxDelta": 3,
             "changedPixels": 3,
-            "bounds": [
-              255,
-              83,
-              769,
-              285
-            ]
+            "bounds": [255, 83, 769, 285]
           }
         ]
       }

@@ -1,4 +1,4 @@
-import {PaletteColorInput} from "./PaletteColorControl";
+import { PaletteColorInput } from "./PaletteColorControl";
 import { useShortcutHint } from "./ShortcutHints";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
@@ -27,7 +27,7 @@ export interface CanvasContextMenuProps {
   settings: ToolSettings;
   controller: ToolController;
   disabled: boolean;
-  floatEditing?:boolean;
+  floatEditing?: boolean;
   hasSelection: boolean;
   hasMask: boolean;
   hasVectorMask: boolean;
@@ -37,7 +37,19 @@ export interface CanvasContextMenuProps {
   locked: boolean;
   onChooseTool(tool: Tool): void;
   onAddLayer(): void;
-  onAddAdjustmentLayer(kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye"): void;
+  onAddAdjustmentLayer(
+    kind:
+      | "curves"
+      | "levels"
+      | "tone"
+      | "hsl"
+      | "color-balance"
+      | "vibrance"
+      | "gradient-map"
+      | "white-balance"
+      | "lut"
+      | "red-eye",
+  ): void;
   onFrequencySeparation?(): void;
   onGenerateLayer?(): void;
   onGenerativeFill?(): void;
@@ -79,7 +91,7 @@ export function CanvasContextMenu({
   settings,
   controller,
   disabled,
-  floatEditing=false,
+  floatEditing = false,
   hasSelection,
   hasMask,
   hasVectorMask,
@@ -181,7 +193,7 @@ export function CanvasContextMenu({
             title={`${name} (${key})`}
             aria-label={`${name} (${key})`}
             aria-pressed={tool === id}
-            disabled={disabled||!controller.canUseTool(id)}
+            disabled={disabled || !controller.canUseTool(id)}
             onClick={() => onChooseTool(id)}
           >
             <Icon size={16} />
@@ -204,9 +216,7 @@ export function CanvasContextMenu({
                 label="Context foreground color"
                 value={settings.color}
                 disabled={disabled}
-                onChange={(color) =>
-                  controller.configure({ color: color })
-                }
+                onChange={(color) => controller.configure({ color: color })}
               />
               <span style={{ backgroundColor: settings.color }} />
             </label>
@@ -273,7 +283,11 @@ export function CanvasContextMenu({
                 value={settings.penEditTarget}
                 disabled={disabled}
                 options={[
-                  { value: "layer", label: "Layer paths", disabled:floatEditing },
+                  {
+                    value: "layer",
+                    label: "Layer paths",
+                    disabled: floatEditing,
+                  },
                   { value: "mask", label: "Mask paths" },
                 ]}
                 onChange={(value) =>
@@ -572,7 +586,10 @@ export function CanvasContextMenu({
             className="context-action-btn"
             role="menuitem"
             disabled={disabled}
-            onClick={() => { onFrequencySeparation(); onClose(); }}
+            onClick={() => {
+              onFrequencySeparation();
+              onClose();
+            }}
           >
             Frequency separation…
           </button>
@@ -581,7 +598,7 @@ export function CanvasContextMenu({
           type="button"
           className="context-action-btn"
           role="menuitem"
-          disabled={disabled||floatEditing}
+          disabled={disabled || floatEditing}
           onClick={() => {
             onAddLayer();
             onClose();
@@ -604,7 +621,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
-            disabled={disabled||floatEditing}
+            disabled={disabled || floatEditing}
             onClick={() => {
               onAddAdjustmentLayer("curves");
               onClose();
@@ -615,7 +632,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
-            disabled={disabled||floatEditing}
+            disabled={disabled || floatEditing}
             onClick={() => {
               onAddAdjustmentLayer("levels");
               onClose();
@@ -637,7 +654,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
-            disabled={disabled||floatEditing}
+            disabled={disabled || floatEditing}
             onClick={() => {
               onAddAdjustmentLayer("hsl");
               onClose();
@@ -645,8 +662,39 @@ export function CanvasContextMenu({
           >
             HSL
           </button>
-          {(["color-balance","vibrance","gradient-map","white-balance","lut","red-eye"] as const).map(kind=><button key={kind} type="button" className="button subtle button-sm" disabled={disabled||floatEditing}
-            onClick={()=>{onAddAdjustmentLayer(kind);onClose();}}>{kind==="color-balance"?"Color Balance":kind==="gradient-map"?"Gradient Map":kind==="white-balance"?"White Balance":kind==="lut"?"Color Lookup (LUT)":kind==="red-eye"?"Red Eye":"Vibrance"}</button>)}
+          {(
+            [
+              "color-balance",
+              "vibrance",
+              "gradient-map",
+              "white-balance",
+              "lut",
+              "red-eye",
+            ] as const
+          ).map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              className="button subtle button-sm"
+              disabled={disabled || floatEditing}
+              onClick={() => {
+                onAddAdjustmentLayer(kind);
+                onClose();
+              }}
+            >
+              {kind === "color-balance"
+                ? "Color Balance"
+                : kind === "gradient-map"
+                  ? "Gradient Map"
+                  : kind === "white-balance"
+                    ? "White Balance"
+                    : kind === "lut"
+                      ? "Color Lookup (LUT)"
+                      : kind === "red-eye"
+                        ? "Red Eye"
+                        : "Vibrance"}
+            </button>
+          ))}
         </div>
         {onGenerateLayer && (
           <button

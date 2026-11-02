@@ -67,17 +67,35 @@ it does not read pixels or invoke a host sampler.
 <!-- example: float-clone-prepared -->
 
 ```js
-const source = [...document.layers].find(layer => layer.name === 'Native clone source');
-if (!(source instanceof RasterLayer)) throw new Error('Import the native clone source first');
-const paint = document.layers.add(new PaintLayer({name: 'Native clone paint'}));
-paint.strokes.add(new CloneStroke({
-  precision: 'float32', points: [{x: 20.5, y: 20.5}],
-  size: 12, hardness: 1, pressureSize: false, opacity: 0.64123,
-  tiles: [{x: 20, y: 20, width: source.width, height: source.height,
-    assetId: source.assetId}]
-}));
+const source = [...document.layers].find(
+  (layer) => layer.name === "Native clone source",
+);
+if (!(source instanceof RasterLayer))
+  throw new Error("Import the native clone source first");
+const paint = document.layers.add(
+  new PaintLayer({ name: "Native clone paint" }),
+);
+paint.strokes.add(
+  new CloneStroke({
+    precision: "float32",
+    points: [{ x: 20.5, y: 20.5 }],
+    size: 12,
+    hardness: 1,
+    pressureSize: false,
+    opacity: 0.64123,
+    tiles: [
+      {
+        x: 20,
+        y: 20,
+        width: source.width,
+        height: source.height,
+        assetId: source.assetId,
+      },
+    ],
+  }),
+);
 document.selectedLayer = paint;
-print('Native clone prepared');
+print("Native clone prepared");
 ```
 
 Isolated scripts/plugins, source-bearing recipes and independent REST commands

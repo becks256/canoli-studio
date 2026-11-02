@@ -29,15 +29,30 @@ export async function buildPsd(
   options: PsdExportOptions = {},
 ): Promise<Uint8Array> {
   validatePsdDimensions(document.width, document.height);
-  if(layersWithPixels.some(item=>item.layer.clipped))throw new Error('Clipping requires rendered PSD export. Use editor.export({format: \'psd\'}).');
-  if (!layersWithPixels.length) layersWithPixels = [{
-    layer: createRaster("Background", "psd:empty", 1, 1),
-    imageData: { width: 1, height: 1, data: new Uint8ClampedArray(4), colorSpace: "srgb" } as ImageData,
-  }];
-  if (layersWithPixels.length > 32767) throw new Error("PSD cannot represent more than 32,767 layer records.");
+  if (layersWithPixels.some((item) => item.layer.clipped))
+    throw new Error(
+      "Clipping requires rendered PSD export. Use editor.export({format: 'psd'}).",
+    );
+  if (!layersWithPixels.length)
+    layersWithPixels = [
+      {
+        layer: createRaster("Background", "psd:empty", 1, 1),
+        imageData: {
+          width: 1,
+          height: 1,
+          data: new Uint8ClampedArray(4),
+          colorSpace: "srgb",
+        } as ImageData,
+      },
+    ];
+  if (layersWithPixels.length > 32767)
+    throw new Error("PSD cannot represent more than 32,767 layer records.");
   const writer = new ByteWriter();
   const finish = () => {
-    if (writer.position > 0x7fffffff) throw new Error("This output exceeds PSD's 2 GB file limit. Use trusted browser PSB export.");
+    if (writer.position > 0x7fffffff)
+      throw new Error(
+        "This output exceeds PSD's 2 GB file limit. Use trusted browser PSB export.",
+      );
     return writer.getBuffer();
   };
   const width = document.width;
@@ -208,7 +223,8 @@ export async function buildPsd(
 
     // Blend mode signature & key
     layerInfoWriter.writeAscii("8BIM");
-    if(l.blendMode==='pass-through')throw new Error('Pass-through groups require rendered Photoshop export.');
+    if (l.blendMode === "pass-through")
+      throw new Error("Pass-through groups require rendered Photoshop export.");
     const blendKey = LUMA_TO_PSD_BLEND_MAP[l.blendMode] ?? "norm";
     layerInfoWriter.writeAscii(blendKey, 4);
 
@@ -256,7 +272,7 @@ export async function buildPsd(
 
   const layerInfoBuf = layerInfoWriter.getBuffer();
   // Pad layerInfo to even 4 bytes
-  layerMaskWriter.writeUint32(layerInfoBuf.length + layerInfoBuf.length % 2);
+  layerMaskWriter.writeUint32(layerInfoBuf.length + (layerInfoBuf.length % 2));
   layerMaskWriter.writeBytes(layerInfoBuf);
   if (layerInfoBuf.length % 2) layerMaskWriter.writeUint8(0);
   layerMaskWriter.writeUint32(0); // Global layer mask information.
@@ -297,14 +313,28 @@ export async function buildPsd(
         const outA = srcA + dstA * (1 - srcA);
 
         if (outA > 0) {
-          const source: [number, number, number] = [lData[srcIdx]/255, lData[srcIdx+1]/255, lData[srcIdx+2]/255];
-          const backdrop: [number, number, number] = [compPixels[dstIdx]/255, compPixels[dstIdx+1]/255, compPixels[dstIdx+2]/255];
-          if(l.blendMode==='pass-through')throw new Error('Pass-through groups require rendered Photoshop export.');
+          const source: [number, number, number] = [
+            lData[srcIdx] / 255,
+            lData[srcIdx + 1] / 255,
+            lData[srcIdx + 2] / 255,
+          ];
+          const backdrop: [number, number, number] = [
+            compPixels[dstIdx] / 255,
+            compPixels[dstIdx + 1] / 255,
+            compPixels[dstIdx + 2] / 255,
+          ];
+          if (l.blendMode === "pass-through")
+            throw new Error(
+              "Pass-through groups require rendered Photoshop export.",
+            );
           const blended = blendColors(backdrop, source, l.blendMode);
           for (let channel = 0; channel < 3; channel++) {
-            const premultiplied = srcA * ((1-dstA)*source[channel] + dstA*blended[channel]) +
-              dstA*(1-srcA)*backdrop[channel];
-            compPixels[dstIdx+channel] = Math.round(255*premultiplied/outA);
+            const premultiplied =
+              srcA * ((1 - dstA) * source[channel] + dstA * blended[channel]) +
+              dstA * (1 - srcA) * backdrop[channel];
+            compPixels[dstIdx + channel] = Math.round(
+              (255 * premultiplied) / outA,
+            );
           }
           compPixels[dstIdx + 3] = Math.round(outA * 255);
         }
@@ -319,7 +349,13 @@ export async function buildPsd(
     for (let channel = 0; channel < 4; channel++) {
       const plane = new Uint8Array(width * height);
       for (let pixel = 0; pixel < plane.length; pixel++)
-        plane[pixel] = channel < 3 ? mattePreviewChannel(compPixels[pixel * 4 + channel], compPixels[pixel * 4 + 3]) : compPixels[pixel * 4 + channel];
+        plane[pixel] =
+          channel < 3
+            ? mattePreviewChannel(
+                compPixels[pixel * 4 + channel],
+                compPixels[pixel * 4 + 3],
+              )
+            : compPixels[pixel * 4 + channel];
       writer.writeBytes(plane);
     }
     return finish();
@@ -337,7 +373,10 @@ export async function buildPsd(
       const rowStart = y * width * 4;
       for (let x = 0; x < width; x++) {
         const index = rowStart + x * 4;
-        row[x] = c < 3 ? mattePreviewChannel(compPixels[index + c], compPixels[index + 3]) : compPixels[index + c];
+        row[x] =
+          c < 3
+            ? mattePreviewChannel(compPixels[index + c], compPixels[index + 3])
+            : compPixels[index + c];
       }
       const comp = encodePackBits(row);
       compScanlines.push(comp);

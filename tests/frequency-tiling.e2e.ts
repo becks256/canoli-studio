@@ -1,47 +1,511 @@
-import {expect,test} from '@playwright/test';
+import { expect, test } from "@playwright/test";
 
-test('native frequency tiling matches equivalent disabled-filter references across retouch seams, alpha and placement',async({page})=>{
- test.setTimeout(180000);await page.goto('/');const results=await page.evaluate(async()=>{
-  const {editor,Document,RasterLayer,PaintLayer,PaintFill,BrushStroke,SmartToneFilter,AffineTransform,LayerMask}=window.luma,{allLayers}=await import(/* @vite-ignore */String('/src/core/model.ts')),{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts')),{exportPng}=await import(/* @vite-ignore */String('/src/engine/png.ts'));
-  const width=1024,height=384,canvas=new OffscreenCanvas(width,height),ctx=canvas.getContext('2d')!,pixels=ctx.createImageData(width,height);for(let y=0;y<height;y++)for(let x=0;x<width;x++)pixels.data.set([(31*x+7*y)%256,(9*x+43*y)%256,(17*x+11*y)%256,[0,1,64,128,255][(x+y)%5]],(y*width+x)*4);ctx.putImageData(pixels,0,0);const asset=await editor.assetStore.add(await canvas.convertToBlob(),'Native tiling source',undefined,false),results=[];
-  for(const placement of ['native','affine','fractional','tone-mask'] as const){
-   const document=new Document({width:1080,height:440}),source=document.layers.add(new RasterLayer({assetId:asset.id,width,height})),snapshot=document.layers.add(new RasterLayer({assetId:asset.id,width,height}));if(placement==='affine')source.transform=new AffineTransform(.93,.17,-.09,1.04,31,14);if(placement==='fractional')source.x=.25;if(placement==='tone-mask'){source.setTone({contrast:15,saturation:-20});source.opacity=.7;source.mask=new LayerMask({base:.8,density:.7});}document.createFrequencySeparation(source,snapshot,{sigma:2});const instance=document.getLayer(allLayers(document.toJSON().children).find((layer:import('../src/core/model').LayerData)=>layer.kind==='smart-object')!.id) as import('../src/dom').SmartObjectLayer,contents=instance.editContents();
-   for(const name of ['Color retouch','Detail retouch']){const paint=contents.getLayer(allLayers(contents.toJSON().children).find((layer:import('../src/core/model').LayerData)=>layer.name===name)!.id) as InstanceType<typeof PaintLayer>;paint.strokes.add(new PaintFill({bounds:{x:0,y:0,width,height},color:'#00cc66',opacity:.4}));paint.strokes.add(new BrushStroke({points:[{x:250,y:10,pressure:.2},{x:270,y:90,pressure:.8},{x:510,y:180,pressure:.4},{x:770,y:300,pressure:1}],size:37,color:'#cc2244',hardness:.4,opacity:.6}));}instance.replaceContents(contents);
-   const reference=document.toJSON();const inert=(data:import('../src/core/model').DocumentData)=>{for(const layer of allLayers(data.children))if(layer.kind==='smart-object'&&layer.smartFilters?.some((filter:import('../src/core/smart/filters').SmartFilterData)=>filter.kind==='frequency-band'||filter.kind==='native-composition')){const filters=layer.smartFilters,index=filters.findIndex((filter:import('../src/core/smart/filters').SmartFilterData)=>filter.kind==='document-tone');filters.splice(index<0?filters.length:index,0,new SmartToneFilter({enabled:false}).toJSON());}};inert(reference);for(const component of reference.components??[])if(component.source.kind==='document')inert(component.source.document);const validated=Document.fromJSON(reference).toJSON();
-   const read=async(data:import('../src/core/model').DocumentData)=>{const renderer=new CanvasRenderer();await renderer.processor.ready;let calls=0;const spatial=renderer.processor.spatialFilter.bind(renderer.processor);renderer.processor.spatialFilter=async(...args:Parameters<import('../src/engine/processor').PixelProcessor['spatialFilter']>)=>{if(args[3].kind==='frequency-band')calls++;return spatial(...args);};try{const bitmap=await createImageBitmap(await exportPng(data,editor.assetStore,renderer)),output=new OffscreenCanvas(bitmap.width,bitmap.height),context=output.getContext('2d')!;context.drawImage(bitmap,0,0);bitmap.close();return{pixels:context.getImageData(0,0,output.width,output.height).data,calls};}finally{renderer.dispose();}};
-   const actual=await read(document.toJSON()),expected=await read(validated);let max=0,changed=0;for(let i=0;i<actual.pixels.length;i++){const delta=Math.abs(actual.pixels[i]-expected.pixels[i]);max=Math.max(max,delta);changed+=Number(delta>0);}results.push({placement,max,changed,calls:actual.calls,referenceCalls:expected.calls});
-  }return results;
- });for(const result of results){expect(result.max,JSON.stringify(result)).toBe(0);expect(result.changed).toBe(0);expect(result.calls).toBeLessThan(result.referenceCalls);}
+test("native frequency tiling matches equivalent disabled-filter references across retouch seams, alpha and placement", async ({
+  page,
+}) => {
+  test.setTimeout(180000);
+  await page.goto("/");
+  const results = await page.evaluate(async () => {
+    const {
+        editor,
+        Document,
+        RasterLayer,
+        PaintLayer,
+        PaintFill,
+        BrushStroke,
+        SmartToneFilter,
+        AffineTransform,
+        LayerMask,
+      } = window.luma,
+      { allLayers } = await import(
+        /* @vite-ignore */ String("/src/core/model.ts")
+      ),
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      ),
+      { exportPng } = await import(
+        /* @vite-ignore */ String("/src/engine/png.ts")
+      );
+    const width = 1024,
+      height = 384,
+      canvas = new OffscreenCanvas(width, height),
+      ctx = canvas.getContext("2d")!,
+      pixels = ctx.createImageData(width, height);
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++)
+        pixels.data.set(
+          [
+            (31 * x + 7 * y) % 256,
+            (9 * x + 43 * y) % 256,
+            (17 * x + 11 * y) % 256,
+            [0, 1, 64, 128, 255][(x + y) % 5],
+          ],
+          (y * width + x) * 4,
+        );
+    ctx.putImageData(pixels, 0, 0);
+    const asset = await editor.assetStore.add(
+        await canvas.convertToBlob(),
+        "Native tiling source",
+        undefined,
+        false,
+      ),
+      results = [];
+    for (const placement of [
+      "native",
+      "affine",
+      "fractional",
+      "tone-mask",
+    ] as const) {
+      const document = new Document({ width: 1080, height: 440 }),
+        source = document.layers.add(
+          new RasterLayer({ assetId: asset.id, width, height }),
+        ),
+        snapshot = document.layers.add(
+          new RasterLayer({ assetId: asset.id, width, height }),
+        );
+      if (placement === "affine")
+        source.transform = new AffineTransform(0.93, 0.17, -0.09, 1.04, 31, 14);
+      if (placement === "fractional") source.x = 0.25;
+      if (placement === "tone-mask") {
+        source.setTone({ contrast: 15, saturation: -20 });
+        source.opacity = 0.7;
+        source.mask = new LayerMask({ base: 0.8, density: 0.7 });
+      }
+      document.createFrequencySeparation(source, snapshot, { sigma: 2 });
+      const instance = document.getLayer(
+          allLayers(document.toJSON().children).find(
+            (layer: import("../src/core/model").LayerData) =>
+              layer.kind === "smart-object",
+          )!.id,
+        ) as import("../src/dom").SmartObjectLayer,
+        contents = instance.editContents();
+      for (const name of ["Color retouch", "Detail retouch"]) {
+        const paint = contents.getLayer(
+          allLayers(contents.toJSON().children).find(
+            (layer: import("../src/core/model").LayerData) =>
+              layer.name === name,
+          )!.id,
+        ) as InstanceType<typeof PaintLayer>;
+        paint.strokes.add(
+          new PaintFill({
+            bounds: { x: 0, y: 0, width, height },
+            color: "#00cc66",
+            opacity: 0.4,
+          }),
+        );
+        paint.strokes.add(
+          new BrushStroke({
+            points: [
+              { x: 250, y: 10, pressure: 0.2 },
+              { x: 270, y: 90, pressure: 0.8 },
+              { x: 510, y: 180, pressure: 0.4 },
+              { x: 770, y: 300, pressure: 1 },
+            ],
+            size: 37,
+            color: "#cc2244",
+            hardness: 0.4,
+            opacity: 0.6,
+          }),
+        );
+      }
+      instance.replaceContents(contents);
+      const reference = document.toJSON();
+      const inert = (data: import("../src/core/model").DocumentData) => {
+        for (const layer of allLayers(data.children))
+          if (
+            layer.kind === "smart-object" &&
+            layer.smartFilters?.some(
+              (filter: import("../src/core/smart/filters").SmartFilterData) =>
+                filter.kind === "frequency-band" ||
+                filter.kind === "native-composition",
+            )
+          ) {
+            const filters = layer.smartFilters,
+              index = filters.findIndex(
+                (filter: import("../src/core/smart/filters").SmartFilterData) =>
+                  filter.kind === "document-tone",
+              );
+            filters.splice(
+              index < 0 ? filters.length : index,
+              0,
+              new SmartToneFilter({ enabled: false }).toJSON(),
+            );
+          }
+      };
+      inert(reference);
+      for (const component of reference.components ?? [])
+        if (component.source.kind === "document")
+          inert(component.source.document);
+      const validated = Document.fromJSON(reference).toJSON();
+      const read = async (data: import("../src/core/model").DocumentData) => {
+        const renderer = new CanvasRenderer();
+        await renderer.processor.ready;
+        let calls = 0;
+        const spatial = renderer.processor.spatialFilter.bind(
+          renderer.processor,
+        );
+        renderer.processor.spatialFilter = async (
+          ...args: Parameters<
+            import("../src/engine/processor").PixelProcessor["spatialFilter"]
+          >
+        ) => {
+          if (args[3].kind === "frequency-band") calls++;
+          return spatial(...args);
+        };
+        try {
+          const bitmap = await createImageBitmap(
+              await exportPng(data, editor.assetStore, renderer),
+            ),
+            output = new OffscreenCanvas(bitmap.width, bitmap.height),
+            context = output.getContext("2d")!;
+          context.drawImage(bitmap, 0, 0);
+          bitmap.close();
+          return {
+            pixels: context.getImageData(0, 0, output.width, output.height)
+              .data,
+            calls,
+          };
+        } finally {
+          renderer.dispose();
+        }
+      };
+      const actual = await read(document.toJSON()),
+        expected = await read(validated);
+      let max = 0,
+        changed = 0;
+      for (let i = 0; i < actual.pixels.length; i++) {
+        const delta = Math.abs(actual.pixels[i] - expected.pixels[i]);
+        max = Math.max(max, delta);
+        changed += Number(delta > 0);
+      }
+      results.push({
+        placement,
+        max,
+        changed,
+        calls: actual.calls,
+        referenceCalls: expected.calls,
+      });
+    }
+    return results;
+  });
+  for (const result of results) {
+    expect(result.max, JSON.stringify(result)).toBe(0);
+    expect(result.changed).toBe(0);
+    expect(result.calls).toBeLessThan(result.referenceCalls);
+  }
 });
 
-test('a large frequency halo keeps the established working-tile size and native source geometry',async({page})=>{
- await page.goto('/');const result=await page.evaluate(async()=>{
-  const {editor,Document,RasterLayer,FrequencyBandFilter,SmartToneFilter}=window.luma,{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts'));const canvas=new OffscreenCanvas(1024,768),context=canvas.getContext('2d')!;context.fillStyle='#c05277';context.fillRect(0,0,1024,768);const asset=await editor.assetStore.add(await canvas.convertToBlob(),'Large halo source',undefined,false),document=new Document({width:1024,height:768}),source=document.layers.add(new RasterLayer({assetId:asset.id,width:1024,height:768})),instance=source.convertToSmartObject(),records=[];
-  for(const inert of [false,true]){instance.setFilters([new FrequencyBandFilter({sigma:280}),...(inert?[new SmartToneFilter({enabled:false})]:[])]);const renderer=new CanvasRenderer();await renderer.processor.ready;const sizes:number[][]=[];renderer.processor.spatialFilter=async(pixels:Uint8ClampedArray,width:number,height:number)=>{sizes.push([width,height,pixels.length]);throw new Error('Captured native sampling geometry before the expensive kernel.');};let error='';try{await renderer.render(document.toJSON(),editor.assetStore,{region:{x:0,y:0,width:520,height:520},cache:false,readback:true});}catch(cause){error=(cause as Error).message;}finally{renderer.dispose();}records.push({sizes,error});}return{records,size:[asset.width,asset.height]};
- });expect(result.size).toEqual([1024,768]);expect(result.records[0]).toEqual(result.records[1]);expect(result.records[0].sizes).toHaveLength(1);expect(result.records[0].error).toContain('Captured native sampling geometry');const [width,height,length]=result.records[0].sizes[0];expect(width*height).toBeLessThanOrEqual(4_000_000);expect(length).toBe(width*height*4);
+test("a large frequency halo keeps the established working-tile size and native source geometry", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const {
+        editor,
+        Document,
+        RasterLayer,
+        FrequencyBandFilter,
+        SmartToneFilter,
+      } = window.luma,
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      );
+    const canvas = new OffscreenCanvas(1024, 768),
+      context = canvas.getContext("2d")!;
+    context.fillStyle = "#c05277";
+    context.fillRect(0, 0, 1024, 768);
+    const asset = await editor.assetStore.add(
+        await canvas.convertToBlob(),
+        "Large halo source",
+        undefined,
+        false,
+      ),
+      document = new Document({ width: 1024, height: 768 }),
+      source = document.layers.add(
+        new RasterLayer({ assetId: asset.id, width: 1024, height: 768 }),
+      ),
+      instance = source.convertToSmartObject(),
+      records = [];
+    for (const inert of [false, true]) {
+      instance.setFilters([
+        new FrequencyBandFilter({ sigma: 280 }),
+        ...(inert ? [new SmartToneFilter({ enabled: false })] : []),
+      ]);
+      const renderer = new CanvasRenderer();
+      await renderer.processor.ready;
+      const sizes: number[][] = [];
+      renderer.processor.spatialFilter = async (
+        pixels: Uint8ClampedArray,
+        width: number,
+        height: number,
+      ) => {
+        sizes.push([width, height, pixels.length]);
+        throw new Error(
+          "Captured native sampling geometry before the expensive kernel.",
+        );
+      };
+      let error = "";
+      try {
+        await renderer.render(document.toJSON(), editor.assetStore, {
+          region: { x: 0, y: 0, width: 520, height: 520 },
+          cache: false,
+          readback: true,
+        });
+      } catch (cause) {
+        error = (cause as Error).message;
+      } finally {
+        renderer.dispose();
+      }
+      records.push({ sizes, error });
+    }
+    return { records, size: [asset.width, asset.height] };
+  });
+  expect(result.size).toEqual([1024, 768]);
+  expect(result.records[0]).toEqual(result.records[1]);
+  expect(result.records[0].sizes).toHaveLength(1);
+  expect(result.records[0].error).toContain(
+    "Captured native sampling geometry",
+  );
+  const [width, height, length] = result.records[0].sizes[0];
+  expect(width * height).toBeLessThanOrEqual(4_000_000);
+  expect(length).toBe(width * height * 4);
 });
 
-test('native frequency composition respects the nested Gaussian sampling budget',async({page},info)=>{
- await page.goto('/');const result=await page.evaluate(async()=>{
-  const {editor,Document,RasterLayer,PaintLayer,PaintFill,LayerGroup,SmartToneFilter}=window.luma,{allLayers}=await import(/* @vite-ignore */String('/src/core/model.ts')),{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts'));
-  const surface=new OffscreenCanvas(1024,768);surface.getContext('2d')!.fillRect(0,0,1024,768);const asset=await editor.assetStore.add(await surface.convertToBlob(),'Composition halo',undefined,false),document=new Document({width:1024,height:768}),source=document.layers.add(new RasterLayer({assetId:asset.id,width:1024,height:768})),snapshot=document.layers.add(new RasterLayer({assetId:asset.id,width:1024,height:768}));document.createFrequencySeparation(source,snapshot,{sigma:2});const instance=document.getLayer(allLayers(document.toJSON().children).find((layer:import('../src/core/model').LayerData)=>layer.kind==='smart-object')!.id) as import('../src/dom').SmartObjectLayer,contents=instance.editContents();(contents.layers.at(0) as InstanceType<typeof LayerGroup>).frequencyRadius=280;
-  const retouch=contents.getLayer(allLayers(contents.toJSON().children).find((layer:import('../src/core/model').LayerData)=>layer.name==='Color retouch')!.id) as InstanceType<typeof PaintLayer>;retouch.strokes.add(new PaintFill({bounds:{x:0,y:0,width:1024,height:768},color:'#00cc66'}));instance.replaceContents(contents);const records=[];
-  for(const inert of [false,true]){const data=document.toJSON();if(inert){const outer=allLayers(data.children).find((layer:import('../src/core/model').LayerData)=>layer.kind==='smart-object')! as import('../src/core/smart/types').SmartObjectInstanceData;outer.smartFilters!.push(new SmartToneFilter({enabled:false}).toJSON());}const renderer:import('../src/engine/renderer').CanvasRenderer=new CanvasRenderer();await renderer.processor.ready;const sizes:number[][]=[],regions:number[][]=[],render=renderer.render.bind(renderer);
-   renderer.render=async(...args:Parameters<typeof renderer.render>)=>{if(args[0].children[0]?.name==='Frequencies'&&args[2]?.region)regions.push([args[2].region.width,args[2].region.height]);return render(...args);};
-   renderer.processor.spatialFilter=async(pixels:Uint8ClampedArray,width:number,height:number)=>{sizes.push([width,height,pixels.length]);throw new Error('Captured composition sampling geometry.');};let error='';try{await renderer.render(data,editor.assetStore,{region:{x:0,y:0,width:520,height:520},cache:false,readback:true});}catch(cause){error=String(cause);}finally{renderer.dispose();}records.push({sizes,regions,error});}
-  return{records,size:[asset.width,asset.height]};
- });await info.attach('composition-halo-budget',{body:JSON.stringify(result),contentType:'application/json'});expect(result.records[0]).toEqual(result.records[1]);expect(result.records[0].regions[0]).toEqual([260,260]);expect(result.records[0].sizes).toHaveLength(1);expect(result.records[0].sizes[0][0]*result.records[0].sizes[0][1]).toBeLessThanOrEqual(4_000_000);expect(result.records[0].error).toContain('Captured composition sampling geometry');
+test("native frequency composition respects the nested Gaussian sampling budget", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const {
+        editor,
+        Document,
+        RasterLayer,
+        PaintLayer,
+        PaintFill,
+        LayerGroup,
+        SmartToneFilter,
+      } = window.luma,
+      { allLayers } = await import(
+        /* @vite-ignore */ String("/src/core/model.ts")
+      ),
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      );
+    const surface = new OffscreenCanvas(1024, 768);
+    surface.getContext("2d")!.fillRect(0, 0, 1024, 768);
+    const asset = await editor.assetStore.add(
+        await surface.convertToBlob(),
+        "Composition halo",
+        undefined,
+        false,
+      ),
+      document = new Document({ width: 1024, height: 768 }),
+      source = document.layers.add(
+        new RasterLayer({ assetId: asset.id, width: 1024, height: 768 }),
+      ),
+      snapshot = document.layers.add(
+        new RasterLayer({ assetId: asset.id, width: 1024, height: 768 }),
+      );
+    document.createFrequencySeparation(source, snapshot, { sigma: 2 });
+    const instance = document.getLayer(
+        allLayers(document.toJSON().children).find(
+          (layer: import("../src/core/model").LayerData) =>
+            layer.kind === "smart-object",
+        )!.id,
+      ) as import("../src/dom").SmartObjectLayer,
+      contents = instance.editContents();
+    (contents.layers.at(0) as InstanceType<typeof LayerGroup>).frequencyRadius =
+      280;
+    const retouch = contents.getLayer(
+      allLayers(contents.toJSON().children).find(
+        (layer: import("../src/core/model").LayerData) =>
+          layer.name === "Color retouch",
+      )!.id,
+    ) as InstanceType<typeof PaintLayer>;
+    retouch.strokes.add(
+      new PaintFill({
+        bounds: { x: 0, y: 0, width: 1024, height: 768 },
+        color: "#00cc66",
+      }),
+    );
+    instance.replaceContents(contents);
+    const records = [];
+    for (const inert of [false, true]) {
+      const data = document.toJSON();
+      if (inert) {
+        const outer = allLayers(data.children).find(
+          (layer: import("../src/core/model").LayerData) =>
+            layer.kind === "smart-object",
+        )! as import("../src/core/smart/types").SmartObjectInstanceData;
+        outer.smartFilters!.push(
+          new SmartToneFilter({ enabled: false }).toJSON(),
+        );
+      }
+      const renderer: import("../src/engine/renderer").CanvasRenderer =
+        new CanvasRenderer();
+      await renderer.processor.ready;
+      const sizes: number[][] = [],
+        regions: number[][] = [],
+        render = renderer.render.bind(renderer);
+      renderer.render = async (...args: Parameters<typeof renderer.render>) => {
+        if (args[0].children[0]?.name === "Frequencies" && args[2]?.region)
+          regions.push([args[2].region.width, args[2].region.height]);
+        return render(...args);
+      };
+      renderer.processor.spatialFilter = async (
+        pixels: Uint8ClampedArray,
+        width: number,
+        height: number,
+      ) => {
+        sizes.push([width, height, pixels.length]);
+        throw new Error("Captured composition sampling geometry.");
+      };
+      let error = "";
+      try {
+        await renderer.render(data, editor.assetStore, {
+          region: { x: 0, y: 0, width: 520, height: 520 },
+          cache: false,
+          readback: true,
+        });
+      } catch (cause) {
+        error = String(cause);
+      } finally {
+        renderer.dispose();
+      }
+      records.push({ sizes, regions, error });
+    }
+    return { records, size: [asset.width, asset.height] };
+  });
+  await info.attach("composition-halo-budget", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
+  expect(result.records[0]).toEqual(result.records[1]);
+  expect(result.records[0].regions[0]).toEqual([260, 260]);
+  expect(result.records[0].sizes).toHaveLength(1);
+  expect(
+    result.records[0].sizes[0][0] * result.records[0].sizes[0][1],
+  ).toBeLessThanOrEqual(4_000_000);
+  expect(result.records[0].error).toContain(
+    "Captured composition sampling geometry",
+  );
 });
 
-test('native raster bands absorb composition overscan with exact independently tiled RGBA',async({page},info)=>{
- await page.goto('/');const rows=await page.evaluate(async()=>{
-  const {editor,Document,RasterLayer,FrequencyBandFilter,SmartToneFilter,LayerMask}=window.luma,{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts'));
-  const source=new OffscreenCanvas(1024,768),c=source.getContext('2d')!,image=c.createImageData(1024,768);for(let y=0;y<768;y++)for(let x=0;x<1024;x++)image.data.set([(31*x+7*y)%256,(9*x+43*y)%256,(17*x+11*y)%256,[0,1,64,128,255][(x+y)%5]],(y*1024+x)*4);c.putImageData(image,0,0);const asset=await editor.assetStore.add(await source.convertToBlob(),'Band overscan pixels',undefined,false),document=new Document({width:1024,height:768}),raster=document.layers.add(new RasterLayer({assetId:asset.id,width:1024,height:768})),instance=raster.convertToSmartObject(),rows=[];
-  for(const band of ['low','high','correction']as const)for(const masked of [false,true]){
-   instance.filterMask=masked?new LayerMask({base:.6,density:.7}):null;
-   const read=async(inert:boolean)=>{instance.setFilters([new FrequencyBandFilter({sigma:2.25,band}),...(inert?[new SmartToneFilter({enabled:false})]:[])]);const renderer:import('../src/engine/renderer').CanvasRenderer=new CanvasRenderer();await renderer.processor.ready;const samples:number[][]=[],spatial=renderer.processor.spatialFilter.bind(renderer.processor);renderer.processor.spatialFilter=async(...args:Parameters<typeof spatial>)=>{samples.push([args[1],args[2],args[0].length/4]);return spatial(...args);};let surface:HTMLCanvasElement|undefined;
-    try{surface=await renderer.render(document.toJSON(),editor.assetStore,{region:{x:13,y:19,width:520,height:516},cache:false,readback:true});return{pixels:surface.getContext('2d')!.getImageData(0,0,520,516).data,samples};}finally{if(surface)surface.width=surface.height=0;renderer.dispose();}};
-   const actual=await read(false),reference=await read(true);let difference=0;for(let i=0;i<actual.pixels.length;i++)difference=Math.max(difference,Math.abs(actual.pixels[i]-reference.pixels[i]));rows.push({band,masked,difference,calls:actual.samples.length,referenceCalls:reference.samples.length,largestSample:Math.max(...actual.samples.map(s=>s[2])),nonempty:actual.pixels.some((v,i)=>i%4===3&&v>0)});
-  }return rows;
- });await info.attach('native-band-overscan-reference',{body:JSON.stringify(rows),contentType:'application/json'});for(const row of rows){expect(row.difference,JSON.stringify(row)).toBe(0);expect(row.nonempty).toBe(true);if(row.masked)expect(row.calls).toBeGreaterThan(1);else expect(row.calls).toBe(1);expect(row.referenceCalls).toBeGreaterThan(row.calls);expect(row.largestSample).toBeLessThanOrEqual(4_000_000);}
+test("native raster bands absorb composition overscan with exact independently tiled RGBA", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const rows = await page.evaluate(async () => {
+    const {
+        editor,
+        Document,
+        RasterLayer,
+        FrequencyBandFilter,
+        SmartToneFilter,
+        LayerMask,
+      } = window.luma,
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      );
+    const source = new OffscreenCanvas(1024, 768),
+      c = source.getContext("2d")!,
+      image = c.createImageData(1024, 768);
+    for (let y = 0; y < 768; y++)
+      for (let x = 0; x < 1024; x++)
+        image.data.set(
+          [
+            (31 * x + 7 * y) % 256,
+            (9 * x + 43 * y) % 256,
+            (17 * x + 11 * y) % 256,
+            [0, 1, 64, 128, 255][(x + y) % 5],
+          ],
+          (y * 1024 + x) * 4,
+        );
+    c.putImageData(image, 0, 0);
+    const asset = await editor.assetStore.add(
+        await source.convertToBlob(),
+        "Band overscan pixels",
+        undefined,
+        false,
+      ),
+      document = new Document({ width: 1024, height: 768 }),
+      raster = document.layers.add(
+        new RasterLayer({ assetId: asset.id, width: 1024, height: 768 }),
+      ),
+      instance = raster.convertToSmartObject(),
+      rows = [];
+    for (const band of ["low", "high", "correction"] as const)
+      for (const masked of [false, true]) {
+        instance.filterMask = masked
+          ? new LayerMask({ base: 0.6, density: 0.7 })
+          : null;
+        const read = async (inert: boolean) => {
+          instance.setFilters([
+            new FrequencyBandFilter({ sigma: 2.25, band }),
+            ...(inert ? [new SmartToneFilter({ enabled: false })] : []),
+          ]);
+          const renderer: import("../src/engine/renderer").CanvasRenderer =
+            new CanvasRenderer();
+          await renderer.processor.ready;
+          const samples: number[][] = [],
+            spatial = renderer.processor.spatialFilter.bind(renderer.processor);
+          renderer.processor.spatialFilter = async (
+            ...args: Parameters<typeof spatial>
+          ) => {
+            samples.push([args[1], args[2], args[0].length / 4]);
+            return spatial(...args);
+          };
+          let surface: HTMLCanvasElement | undefined;
+          try {
+            surface = await renderer.render(
+              document.toJSON(),
+              editor.assetStore,
+              {
+                region: { x: 13, y: 19, width: 520, height: 516 },
+                cache: false,
+                readback: true,
+              },
+            );
+            return {
+              pixels: surface.getContext("2d")!.getImageData(0, 0, 520, 516)
+                .data,
+              samples,
+            };
+          } finally {
+            if (surface) surface.width = surface.height = 0;
+            renderer.dispose();
+          }
+        };
+        const actual = await read(false),
+          reference = await read(true);
+        let difference = 0;
+        for (let i = 0; i < actual.pixels.length; i++)
+          difference = Math.max(
+            difference,
+            Math.abs(actual.pixels[i] - reference.pixels[i]),
+          );
+        rows.push({
+          band,
+          masked,
+          difference,
+          calls: actual.samples.length,
+          referenceCalls: reference.samples.length,
+          largestSample: Math.max(...actual.samples.map((s) => s[2])),
+          nonempty: actual.pixels.some((v, i) => i % 4 === 3 && v > 0),
+        });
+      }
+    return rows;
+  });
+  await info.attach("native-band-overscan-reference", {
+    body: JSON.stringify(rows),
+    contentType: "application/json",
+  });
+  for (const row of rows) {
+    expect(row.difference, JSON.stringify(row)).toBe(0);
+    expect(row.nonempty).toBe(true);
+    if (row.masked) expect(row.calls).toBeGreaterThan(1);
+    else expect(row.calls).toBe(1);
+    expect(row.referenceCalls).toBeGreaterThan(row.calls);
+    expect(row.largestSample).toBeLessThanOrEqual(4_000_000);
+  }
 });

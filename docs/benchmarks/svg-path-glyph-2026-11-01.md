@@ -5,19 +5,19 @@ source-owned Float32 glyph paint. Full float TextLayer editing and the original
 roadmap remain unfinished.
 [Contract](../FLOAT_TEXT.md#native-baseline-glyph-paint-private).
 
-| Verification | Result |
-| --- | --- |
-| Full build / TypeScript | Pass |
-| Complete unit/API suite | 3,399 pass across 336 files |
-| Complete affected native-browser run | 148 pass across twelve files |
-| Production emitted components and typography | Twelve pass |
-| New complete font/layout combinations | 84 exact matches: seven sources/instances, three alignments, identity/affine placement, original/reversed baselines |
-| Reflected direction/path-end combinations | 18 exact matches: twelve RTL, six LTR; six entirely hidden lines publish no glyphs |
-| Independent original-font Float32 runs | Twelve exact comparisons: ordinary/tight tracking, reflection, three alphas including 1e-8, HDR RGB and every 137px partition word |
-| New measurement faults | Abort, removal and nonfinite metadata reject, retire probes and permit retry |
-| Actual emitted baseline coverage | Original-font pixels and exact partition words under identity, affine and reflection, with a prepared fixture adapter |
-| Ordinary 50 MP curved text | All 200,000,000 independent RGBA samples and complete PNG bytes match; original source/model retained |
-| Separate 50 MP RAW/variable-font regression | Original 100,000,672-byte source, all 480,000 independent text-region samples and preceding accepted complete PNG bytes retained |
+| Verification                                 | Result                                                                                                                             |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Full build / TypeScript                      | Pass                                                                                                                               |
+| Complete unit/API suite                      | 3,399 pass across 336 files                                                                                                        |
+| Complete affected native-browser run         | 148 pass across twelve files                                                                                                       |
+| Production emitted components and typography | Twelve pass                                                                                                                        |
+| New complete font/layout combinations        | 84 exact matches: seven sources/instances, three alignments, identity/affine placement, original/reversed baselines                |
+| Reflected direction/path-end combinations    | 18 exact matches: twelve RTL, six LTR; six entirely hidden lines publish no glyphs                                                 |
+| Independent original-font Float32 runs       | Twelve exact comparisons: ordinary/tight tracking, reflection, three alphas including 1e-8, HDR RGB and every 137px partition word |
+| New measurement faults                       | Abort, removal and nonfinite metadata reject, retire probes and permit retry                                                       |
+| Actual emitted baseline coverage             | Original-font pixels and exact partition words under identity, affine and reflection, with a prepared fixture adapter              |
+| Ordinary 50 MP curved text                   | All 200,000,000 independent RGBA samples and complete PNG bytes match; original source/model retained                              |
+| Separate 50 MP RAW/variable-font regression  | Original 100,000,672-byte source, all 480,000 independent text-region samples and preceding accepted complete PNG bytes retained   |
 
 The source matrix covers original TTF, compressed WOFF2, CFF, explicit variable
 axes, optical sources and complete pinned Manrope. Original glyph IDs, ligatures

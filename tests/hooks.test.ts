@@ -430,7 +430,11 @@ describe("UI Custom Hooks", () => {
 
       const editor = {
         document: new Document(),
-        tools: { cancel: cancelMock, getSnapshot: () => ({ preview: null }), subscribe: () => () => {} },
+        tools: {
+          cancel: cancelMock,
+          getSnapshot: () => ({ preview: null }),
+          subscribe: () => () => {},
+        },
       } as unknown as Parameters<typeof useEditorShortcuts>[0]["editor"];
 
       const shortcuts = new ShortcutRegistry([]);
@@ -537,41 +541,56 @@ describe("UI Custom Hooks", () => {
       expect(onSetSpacePan).not.toHaveBeenCalled();
     });
 
-    it.each([false, true])("only allows opted-in busy shortcuts, modal=%s", (modalOpen) => {
-      const handleSpy = vi.fn();
-      const pasteSpy = vi.fn();
-      const shortcuts = new ShortcutRegistry([
-        { id: "brush", label: "Brush", keys: ["b"], run: handleSpy },
-        { id: "paste", label: "Paste", keys: ["Mod+v"], run: pasteSpy, allowWhileBusy: true },
-      ]);
+    it.each([false, true])(
+      "only allows opted-in busy shortcuts, modal=%s",
+      (modalOpen) => {
+        const handleSpy = vi.fn();
+        const pasteSpy = vi.fn();
+        const shortcuts = new ShortcutRegistry([
+          { id: "brush", label: "Brush", keys: ["b"], run: handleSpy },
+          {
+            id: "paste",
+            label: "Paste",
+            keys: ["Mod+v"],
+            run: pasteSpy,
+            allowWhileBusy: true,
+          },
+        ]);
 
-      const editor = {
-        tools: { cancel: vi.fn() },
-      } as unknown as Parameters<typeof useEditorShortcuts>[0]["editor"];
+        const editor = {
+          tools: { cancel: vi.fn() },
+        } as unknown as Parameters<typeof useEditorShortcuts>[0]["editor"];
 
-      const { win } = renderHook(() =>
-        useEditorShortcuts({
-          shortcuts,
-          editor,
-          busy: true,
-          modalOpen,
-          onDismissModals: vi.fn(),
-          onSetSpacePan: vi.fn(),
-          onClearPreview: vi.fn(),
-          onResetGestures: vi.fn(),
-        }),
-      );
+        const { win } = renderHook(() =>
+          useEditorShortcuts({
+            shortcuts,
+            editor,
+            busy: true,
+            modalOpen,
+            onDismissModals: vi.fn(),
+            onSetSpacePan: vi.fn(),
+            onClearPreview: vi.fn(),
+            onResetGestures: vi.fn(),
+          }),
+        );
 
-      const event = {
-        type: "keydown",
-        key: "b",
-      };
-      win.dispatchEvent(event as unknown as Event);
-      expect(handleSpy).not.toHaveBeenCalled();
-      win.dispatchEvent({ type: "keydown", key: "v", ctrlKey: true,
-        altKey: false, shiftKey: false, preventDefault: vi.fn() } as unknown as Event);
-      expect(pasteSpy).toHaveBeenCalledTimes(modalOpen ? 0 : 1);
-    });
+        const event = {
+          type: "keydown",
+          key: "b",
+        };
+        win.dispatchEvent(event as unknown as Event);
+        expect(handleSpy).not.toHaveBeenCalled();
+        win.dispatchEvent({
+          type: "keydown",
+          key: "v",
+          ctrlKey: true,
+          altKey: false,
+          shiftKey: false,
+          preventDefault: vi.fn(),
+        } as unknown as Event);
+        expect(pasteSpy).toHaveBeenCalledTimes(modalOpen ? 0 : 1);
+      },
+    );
 
     it("handles blur event by cancelling tools and resetting gestures", () => {
       const cancelMock = vi.fn();
@@ -581,7 +600,11 @@ describe("UI Custom Hooks", () => {
 
       const editor = {
         document: new Document(),
-        tools: { cancel: cancelMock, getSnapshot: () => ({ preview: null }), subscribe: () => () => {} },
+        tools: {
+          cancel: cancelMock,
+          getSnapshot: () => ({ preview: null }),
+          subscribe: () => () => {},
+        },
       } as unknown as Parameters<typeof useEditorShortcuts>[0]["editor"];
 
       const { win } = renderHook(() =>
@@ -606,22 +629,48 @@ describe("UI Custom Hooks", () => {
   });
 
   describe("useCanvasRenderer", () => {
-    it('starts frame-batched live strokes without a second animation-frame wait', async () => {
-      const frame = vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation(() => 1);
-      const prepared = { backend: 'canvas2d', present: vi.fn(), dispose: vi.fn() };
+    it("starts frame-batched live strokes without a second animation-frame wait", async () => {
+      const frame = vi
+        .spyOn(globalThis, "requestAnimationFrame")
+        .mockImplementation(() => 1);
+      const prepared = {
+        backend: "canvas2d",
+        present: vi.fn(),
+        dispose: vi.fn(),
+      };
       const prepareViewport = vi.fn().mockResolvedValue(prepared);
       const doc = new Document();
       const listeners = new Set<() => void>();
-      let toolState = { preview: null, paintPreview: { layerId: 'paint', stroke: { id: 'stroke', points: [] } } };
+      let toolState = {
+        preview: null,
+        paintPreview: {
+          layerId: "paint",
+          stroke: { id: "stroke", points: [] },
+        },
+      };
       const assets = {};
-      const editor = { assetStore: assets, document: doc, renderer: { prepareViewport }, tools: {
-        cancel: vi.fn(), getSnapshot: () => toolState,
-        subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
-      } };
-      const canvas = { dataset: { renderer: 'canvas2d' } };
+      const editor = {
+        assetStore: assets,
+        document: doc,
+        renderer: { prepareViewport },
+        tools: {
+          cancel: vi.fn(),
+          getSnapshot: () => toolState,
+          subscribe: (listener: () => void) => {
+            listeners.add(listener);
+            return () => {
+              listeners.delete(listener);
+            };
+          },
+        },
+      };
+      const canvas = { dataset: { renderer: "canvas2d" } };
       const options = {
-        editor, viewDocument: new Document().toJSON(), assets,
-        renderRegion: { x: 0, y: 0, width: 100, height: 100 }, zoom: 1,
+        editor,
+        viewDocument: new Document().toJSON(),
+        assets,
+        renderRegion: { x: 0, y: 0, width: 100, height: 100 },
+        zoom: 1,
         paintPreview: toolState.paintPreview,
         backendState: null,
         displayHost: { current: { querySelector: () => canvas } },
@@ -630,45 +679,120 @@ describe("UI Custom Hooks", () => {
       try {
         expect(prepareViewport).toHaveBeenCalledTimes(1);
         expect(frame).not.toHaveBeenCalled();
-        await act(async () => { await Promise.resolve(); });
+        await act(async () => {
+          await Promise.resolve();
+        });
         expect(prepared.present).toHaveBeenCalledWith(canvas);
         expect(prepared.dispose).toHaveBeenCalledTimes(1);
-        const next = { ...toolState.paintPreview, stroke: { ...toolState.paintPreview.stroke } };
+        const next = {
+          ...toolState.paintPreview,
+          stroke: { ...toolState.paintPreview.stroke },
+        };
         await act(async () => {
           toolState = { ...toolState, paintPreview: next };
-          listeners.forEach(listener => listener());
+          listeners.forEach((listener) => listener());
           await Promise.resolve();
         });
         expect(prepareViewport).toHaveBeenCalledTimes(2);
         expect(prepareViewport.mock.calls[1][2].paintPreview).toBe(next);
         expect(frame).not.toHaveBeenCalled();
         expect(prepareViewport.mock.calls[0][2].isCancelled()).toBe(false);
-        doc.name = 'Changed revision';
+        doc.name = "Changed revision";
         expect(prepareViewport.mock.calls[1][2].isCancelled()).toBe(true);
         toolState = { ...toolState, paintPreview: { ...next } };
-        listeners.forEach(listener => listener());
+        listeners.forEach((listener) => listener());
         expect(prepareViewport).toHaveBeenCalledTimes(2);
-      } finally { hook.unmount(); frame.mockRestore(); }
+      } finally {
+        hook.unmount();
+        frame.mockRestore();
+      }
     });
 
-    it('discards an older live stroke frame when proof settings change, even before React queues its next frame', async () => {
-      const frame=vi.spyOn(globalThis,'requestAnimationFrame').mockImplementation(()=>1);
-      let ready!:(value:unknown)=>void;
-      const prepared={backend:'canvas2d',present:vi.fn(),dispose:vi.fn()},prepareViewport=vi.fn(()=>new Promise(resolve=>{ready=resolve;}));
-      const doc=new Document(),assets={},listeners=new Set<()=>void>();
-      let toolState={preview:null,paintPreview:{layerId:'paint',stroke:{id:'stroke',points:[]}}};
-      const editor={assetStore:assets,document:doc,colorSettings:{proof:{profile:'srgb'}},renderer:{prepareViewport},tools:{cancel:vi.fn(),getSnapshot:()=>toolState,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};}}};
-      const options={editor,viewDocument:doc._read(),assets,renderRegion:{x:0,y:0,width:100,height:100},zoom:1,paintPreview:toolState.paintPreview,backendState:null,displayHost:{current:{querySelector:()=>({dataset:{renderer:'canvas2d'}})}}}as unknown as Parameters<typeof useCanvasRenderer>[0];
-      const hook=renderHook(()=>useCanvasRenderer(options));
-      try{
+    it("discards an older live stroke frame when proof settings change, even before React queues its next frame", async () => {
+      const frame = vi
+        .spyOn(globalThis, "requestAnimationFrame")
+        .mockImplementation(() => 1);
+      let ready!: (value: unknown) => void;
+      const prepared = {
+          backend: "canvas2d",
+          present: vi.fn(),
+          dispose: vi.fn(),
+        },
+        prepareViewport = vi.fn(
+          () =>
+            new Promise((resolve) => {
+              ready = resolve;
+            }),
+        );
+      const doc = new Document(),
+        assets = {},
+        listeners = new Set<() => void>();
+      let toolState = {
+        preview: null,
+        paintPreview: {
+          layerId: "paint",
+          stroke: { id: "stroke", points: [] },
+        },
+      };
+      const editor = {
+        assetStore: assets,
+        document: doc,
+        colorSettings: { proof: { profile: "srgb" } },
+        renderer: { prepareViewport },
+        tools: {
+          cancel: vi.fn(),
+          getSnapshot: () => toolState,
+          subscribe: (listener: () => void) => {
+            listeners.add(listener);
+            return () => {
+              listeners.delete(listener);
+            };
+          },
+        },
+      };
+      const options = {
+        editor,
+        viewDocument: doc._read(),
+        assets,
+        renderRegion: { x: 0, y: 0, width: 100, height: 100 },
+        zoom: 1,
+        paintPreview: toolState.paintPreview,
+        backendState: null,
+        displayHost: {
+          current: {
+            querySelector: () => ({ dataset: { renderer: "canvas2d" } }),
+          },
+        },
+      } as unknown as Parameters<typeof useCanvasRenderer>[0];
+      const hook = renderHook(() => useCanvasRenderer(options));
+      try {
         expect(prepareViewport).toHaveBeenCalledTimes(1);
-        const job=prepareViewport.mock.calls[0] as unknown as [unknown,unknown,{isCancelled():boolean}];
+        const job = prepareViewport.mock.calls[0] as unknown as [
+          unknown,
+          unknown,
+          { isCancelled(): boolean },
+        ];
         expect(job[2].isCancelled()).toBe(false);
-        editor.colorSettings={proof:{profile:'display-p3'}};
-        toolState={...toolState,paintPreview:{...toolState.paintPreview,stroke:{...toolState.paintPreview.stroke}}};
-        await act(async()=>{listeners.forEach(listener=>listener());ready(prepared);await Promise.resolve();});
-        expect(job[2].isCancelled()).toBe(true);expect(prepared.present).not.toHaveBeenCalled();expect(prepared.dispose).toHaveBeenCalledTimes(1);
-      }finally{hook.unmount();frame.mockRestore();}
+        editor.colorSettings = { proof: { profile: "display-p3" } };
+        toolState = {
+          ...toolState,
+          paintPreview: {
+            ...toolState.paintPreview,
+            stroke: { ...toolState.paintPreview.stroke },
+          },
+        };
+        await act(async () => {
+          listeners.forEach((listener) => listener());
+          ready(prepared);
+          await Promise.resolve();
+        });
+        expect(job[2].isCancelled()).toBe(true);
+        expect(prepared.present).not.toHaveBeenCalled();
+        expect(prepared.dispose).toHaveBeenCalledTimes(1);
+      } finally {
+        hook.unmount();
+        frame.mockRestore();
+      }
     });
 
     it("cleans up editor tools on unmount", () => {
@@ -681,7 +805,11 @@ describe("UI Custom Hooks", () => {
           prepareFallback: vi.fn(),
         },
         document: new Document(),
-        tools: { cancel: cancelMock, getSnapshot: () => ({ preview: null }), subscribe: () => () => {} },
+        tools: {
+          cancel: cancelMock,
+          getSnapshot: () => ({ preview: null }),
+          subscribe: () => () => {},
+        },
       } as unknown as Parameters<typeof useCanvasRenderer>[0]["editor"];
 
       const dom = new Document();

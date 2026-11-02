@@ -1,11 +1,19 @@
-import{isFloatDocument}from'../../core/float-document';
-import {activePerspective} from '../../core/perspective';
-import {hasMaskRefinements} from '../../core/masks';
-import {symmetryMatrices} from '../../core/brush-symmetry';
-import {paintStampSize,paintStampAlpha,paintStampGeometry,sameStrokePoint} from '../../core/paint-stamps';
+import { isFloatDocument } from "../../core/float-document";
+import { activePerspective } from "../../core/perspective";
+import { hasMaskRefinements } from "../../core/masks";
+import { symmetryMatrices } from "../../core/brush-symmetry";
+import {
+  paintStampSize,
+  paintStampAlpha,
+  paintStampGeometry,
+  sameStrokePoint,
+} from "../../core/paint-stamps";
 import { lutValues, type CubeLutData } from "../../core/lut";
 import { isImmutable } from "../../core/immutable";
-import { whiteBalanceMatrix, WHITE_BALANCE_NEUTRAL } from "../../core/white-balance";
+import {
+  whiteBalanceMatrix,
+  WHITE_BALANCE_NEUTRAL,
+} from "../../core/white-balance";
 import { checkRenderCurrent } from "../render-control";
 import { contentSignature } from "../content-signature";
 import { findLayer } from "../../core/model";
@@ -60,7 +68,10 @@ export class WebGpuRenderer {
   private pipeline!: GPURenderPipeline;
   private gradientMapPipeline!: GPURenderPipeline;
   private lookupPipeline!: GPURenderPipeline;
-  private lookupBuffers = new Map<string, { buffer: GPUBuffer; bytes: number }>();
+  private lookupBuffers = new Map<
+    string,
+    { buffer: GPUBuffer; bytes: number }
+  >();
   private lookupBytes = 0;
   private lookupCompatibility = new WeakMap<CubeLutData, boolean>();
   private stampPipeline!: GPURenderPipeline;
@@ -114,7 +125,8 @@ export class WebGpuRenderer {
       state: this.state,
       reason: this.reason,
       ...this.counters,
-      retainedBytes: this.cacheBytes + (this.active?.surface.bytes ?? 0) + this.lookupBytes,
+      retainedBytes:
+        this.cacheBytes + (this.active?.surface.bytes ?? 0) + this.lookupBytes,
       allocatedBytes: this.bytes + this.lookupBytes,
     };
   }
@@ -169,13 +181,23 @@ export class WebGpuRenderer {
       });
       const gradientModule = device.createShaderModule({ code: gradientMap });
       this.gradientMapPipeline = await device.createRenderPipelineAsync({
-        layout: "auto", vertex: { module: gradientModule, entryPoint: "vertex" },
-        fragment: { module: gradientModule, entryPoint: "fragment", targets: [{ format: "rgba8unorm" }] },
+        layout: "auto",
+        vertex: { module: gradientModule, entryPoint: "vertex" },
+        fragment: {
+          module: gradientModule,
+          entryPoint: "fragment",
+          targets: [{ format: "rgba8unorm" }],
+        },
       });
       const lookupModule = device.createShaderModule({ code: lookup });
       this.lookupPipeline = await device.createRenderPipelineAsync({
-        layout: "auto", vertex: { module: lookupModule, entryPoint: "vertex" },
-        fragment: { module: lookupModule, entryPoint: "fragment", targets: [{ format: "rgba8unorm" }] },
+        layout: "auto",
+        vertex: { module: lookupModule, entryPoint: "vertex" },
+        fragment: {
+          module: lookupModule,
+          entryPoint: "fragment",
+          targets: [{ format: "rgba8unorm" }],
+        },
       });
       const stampModule = device.createShaderModule({ code: stamps });
       this.stampPipeline = await device.createRenderPipelineAsync({
@@ -371,25 +393,47 @@ export class WebGpuRenderer {
     return result;
   }
   private lookupSupported(lut: CubeLutData): boolean {
-    const hit = this.lookupCompatibility.get(lut); if (hit !== undefined) return hit;
+    const hit = this.lookupCompatibility.get(lut);
+    if (hit !== undefined) return hit;
     const bytes = 12 * (lut.dimension === 1 ? lut.size : lut.size ** 3);
-    const safe = bytes <= 32 * 1024 * 1024 && bytes <= (this.device?.limits.maxStorageBufferBindingSize ?? 0) &&
-      lut.domainMin.every((value, c) => Math.fround(value) === value && Math.fround(lut.domainMax[c]) === lut.domainMax[c] &&
-        Math.fround(lut.domainMax[c] - value) === lut.domainMax[c] - value && lut.domainMax[c] - value >= 1.1754943508222875e-38) &&
-      lutValues(lut).every(value => Math.abs(value) <= 65504);
+    const safe =
+      bytes <= 32 * 1024 * 1024 &&
+      bytes <= (this.device?.limits.maxStorageBufferBindingSize ?? 0) &&
+      lut.domainMin.every(
+        (value, c) =>
+          Math.fround(value) === value &&
+          Math.fround(lut.domainMax[c]) === lut.domainMax[c] &&
+          Math.fround(lut.domainMax[c] - value) === lut.domainMax[c] - value &&
+          lut.domainMax[c] - value >= 1.1754943508222875e-38,
+      ) &&
+      lutValues(lut).every((value) => Math.abs(value) <= 65504);
     if (isImmutable(lut)) this.lookupCompatibility.set(lut, safe);
     return safe;
   }
   private lookupBuffer(lut: CubeLutData): GPUBuffer {
     const hit = this.lookupBuffers.get(lut.data);
-    if (hit) { this.lookupBuffers.delete(lut.data); this.lookupBuffers.set(lut.data, hit); return hit.buffer; }
-    const values = lutValues(lut), bytes = values.byteLength;
-    while (this.lookupBuffers.size && (this.lookupBuffers.size >= 4 || this.lookupBytes + bytes > 32 * 1024 * 1024)) {
-      const key = this.lookupBuffers.keys().next().value!, entry = this.lookupBuffers.get(key)!;
-      entry.buffer.destroy(); this.lookupBytes -= entry.bytes; this.lookupBuffers.delete(key);
+    if (hit) {
+      this.lookupBuffers.delete(lut.data);
+      this.lookupBuffers.set(lut.data, hit);
+      return hit.buffer;
+    }
+    const values = lutValues(lut),
+      bytes = values.byteLength;
+    while (
+      this.lookupBuffers.size &&
+      (this.lookupBuffers.size >= 4 ||
+        this.lookupBytes + bytes > 32 * 1024 * 1024)
+    ) {
+      const key = this.lookupBuffers.keys().next().value!,
+        entry = this.lookupBuffers.get(key)!;
+      entry.buffer.destroy();
+      this.lookupBytes -= entry.bytes;
+      this.lookupBuffers.delete(key);
     }
     const buffer = this.buffer(values, GPUBufferUsage.STORAGE);
-    this.lookupBuffers.set(lut.data, { buffer, bytes }); this.lookupBytes += bytes; return buffer;
+    this.lookupBuffers.set(lut.data, { buffer, bytes });
+    this.lookupBytes += bytes;
+    return buffer;
   }
   private signature(layer: LayerData) {
     const existing = this.signatures.get(layer);
@@ -404,7 +448,7 @@ export class WebGpuRenderer {
     space: RenderSpace,
     world: AffineTransform,
     assets?: AssetStore,
-    isCancelled?:()=>boolean,
+    isCancelled?: () => boolean,
   ) {
     const { x, y } = world.point({ x: 0, y: 0 });
     const translationOnly =
@@ -412,7 +456,7 @@ export class WebGpuRenderer {
     if (
       translationOnly &&
       mask.kind === "selection" &&
-      !mask.selection.regions.some(r => r.shape === "pixels") &&
+      !mask.selection.regions.some((r) => r.shape === "pixels") &&
       !mask.feather &&
       !hasMaskRefinements(mask)
     )
@@ -529,7 +573,7 @@ export class WebGpuRenderer {
     from: number,
     world = AffineTransform.translation(x, y),
   ) {
-    if(this.emptyStroke(stroke))return;
+    if (this.emptyStroke(stroke)) return;
     const matrix = renderTransform(space, world);
     const linearInverse = new AffineTransform(
       matrix.a,
@@ -537,16 +581,39 @@ export class WebGpuRenderer {
       matrix.c,
       matrix.d,
     ).inverse();
-    for(const copy of symmetryMatrices(stroke.symmetry)){
-      const combined=matrix.multiply(copy),m=Math.max(Math.abs(combined.a),Math.abs(combined.b),Math.abs(combined.c),Math.abs(combined.d));
-      const aa=combined.a/m,bb=combined.b/m,cc=combined.c/m,dd=combined.d/m,hi=(Math.hypot(aa+dd,bb-cc)+Math.hypot(aa-dd,bb+cc))/2;
-      const low=Math.abs(aa*dd-bb*cc)/hi*m;
-      if(stroke.points.some(point=>{
-        const geometry=stroke.tip?paintStampGeometry(stroke,point):null;
-        const minimum=geometry?Math.min(geometry.rx,geometry.ry)*2:paintStampSize(stroke,point);
-        const needsSampling=stroke.kind!=='pencil'||combined.b!==0||combined.c!==0||!!geometry?.sin;
-        return !Number.isFinite(low)||needsSampling&&minimum*low<2;
-      }))throw new Error('Transformed subpixel stroke requires reference coverage.');
+    for (const copy of symmetryMatrices(stroke.symmetry)) {
+      const combined = matrix.multiply(copy),
+        m = Math.max(
+          Math.abs(combined.a),
+          Math.abs(combined.b),
+          Math.abs(combined.c),
+          Math.abs(combined.d),
+        );
+      const aa = combined.a / m,
+        bb = combined.b / m,
+        cc = combined.c / m,
+        dd = combined.d / m,
+        hi = (Math.hypot(aa + dd, bb - cc) + Math.hypot(aa - dd, bb + cc)) / 2;
+      const low = (Math.abs(aa * dd - bb * cc) / hi) * m;
+      if (
+        stroke.points.some((point) => {
+          const geometry = stroke.tip
+            ? paintStampGeometry(stroke, point)
+            : null;
+          const minimum = geometry
+            ? Math.min(geometry.rx, geometry.ry) * 2
+            : paintStampSize(stroke, point);
+          const needsSampling =
+            stroke.kind !== "pencil" ||
+            combined.b !== 0 ||
+            combined.c !== 0 ||
+            !!geometry?.sin;
+          return !Number.isFinite(low) || (needsSampling && minimum * low < 2);
+        })
+      )
+        throw new Error(
+          "Transformed subpixel stroke requires reference coverage.",
+        );
     }
     const device = this.device!,
       color = this.color(stroke.color);
@@ -602,8 +669,7 @@ export class WebGpuRenderer {
       };
       visitStrokeStamps(
         (p) => {
-          let size =
-              paintStampSize(stroke,p),
+          let size = paintStampSize(stroke, p),
             cx = p.x,
             cy = p.y;
           if (stroke.kind === "pencil") {
@@ -611,19 +677,33 @@ export class WebGpuRenderer {
             cx = Math.floor(cx - size / 2) + size / 2;
             cy = Math.floor(cy - size / 2) + size / 2;
           }
-          const geometry=stroke.tip||p.copy?paintStampGeometry(stroke,p):null;
-          if(geometry){const {a,b,c,d}=geometry;const entries=[a,b,c,d].map(Math.fround);if(!entries.every(Number.isFinite)||Math.fround(Math.fround(entries[0]*entries[3])-Math.fround(entries[1]*entries[2]))===0)throw new Error('Symmetry basis requires reference precision.');}
-          const center = matrix.point(geometry?{x:geometry.cx,y:geometry.cy}:{ x: cx, y: cy });
+          const geometry =
+            stroke.tip || p.copy ? paintStampGeometry(stroke, p) : null;
+          if (geometry) {
+            const { a, b, c, d } = geometry;
+            const entries = [a, b, c, d].map(Math.fround);
+            if (
+              !entries.every(Number.isFinite) ||
+              Math.fround(
+                Math.fround(entries[0] * entries[3]) -
+                  Math.fround(entries[1] * entries[2]),
+              ) === 0
+            )
+              throw new Error("Symmetry basis requires reference precision.");
+          }
+          const center = matrix.point(
+            geometry ? { x: geometry.cx, y: geometry.cy } : { x: cx, y: cy },
+          );
           values.push(
             center.x,
             center.y,
-            geometry?.rx??size / 2,
-            geometry?.ry??size / 2,
-            paintStampAlpha(stroke,p),
-            geometry?.a??1,
-            geometry?.b??0,
-            geometry?.c??0,
-            geometry?.d??1,
+            geometry?.rx ?? size / 2,
+            geometry?.ry ?? size / 2,
+            paintStampAlpha(stroke, p),
+            geometry?.a ?? 1,
+            geometry?.b ?? 0,
+            geometry?.c ?? 0,
+            geometry?.d ?? 1,
           );
           if (values.length >= 4096 * 9) flush();
         },
@@ -656,10 +736,7 @@ export class WebGpuRenderer {
       previous &&
       previous.signature === signature &&
       previous.points.length <= points.length &&
-      previous.points.every(
-        (p, i) =>
-          sameStrokePoint(p,points[i]),
-      );
+      previous.points.every((p, i) => sameStrokePoint(p, points[i]));
     if (incremental && !reuse && this.active) {
       this.destroy(this.active.surface);
       this.active = null;
@@ -694,7 +771,7 @@ export class WebGpuRenderer {
     let content = this.make(space.width, space.height);
     for (const stroke of layer.strokes) {
       checkRenderCurrent(isCancelled);
-      if (stroke.kind === 'wet' && stroke.opacity === 0) continue;
+      if (stroke.kind === "wet" && stroke.opacity === 0) continue;
       const previousOwned = new Set(this.owned);
       let source: Surface;
       if (
@@ -793,37 +870,92 @@ export class WebGpuRenderer {
       release(canvas);
     }
   }
-  private emptyStroke(stroke:BrushStrokeData){
-    return !!stroke.pressureCurve&&stroke.points.every(point=>paintStampSize(stroke,point)===0||paintStampAlpha(stroke,point)===0);
+  private emptyStroke(stroke: BrushStrokeData) {
+    return (
+      !!stroke.pressureCurve &&
+      stroke.points.every(
+        (point) =>
+          paintStampSize(stroke, point) === 0 ||
+          paintStampAlpha(stroke, point) === 0,
+      )
+    );
   }
   private preciseStroke(stroke: BrushStrokeData, scale: number) {
-    if(this.emptyStroke(stroke))return true;
-    if(stroke.symmetry)return symmetryMatrices(stroke.symmetry).every(copy=>{
-      const m=Math.max(Math.abs(copy.a),Math.abs(copy.b),Math.abs(copy.c),Math.abs(copy.d)),a=copy.a/m,b=copy.b/m,c=copy.c/m,d=copy.d/m;
-      const high=(Math.hypot(a+d,b-c)+Math.hypot(a-d,b+c))/2,low=Math.abs(a*d-b*c)/high*m;
-      return stroke.points.every(point=>{const geometry=paintStampGeometry(stroke,point);return stroke.kind==='pencil'&&copy.b===0&&copy.c===0&&geometry.sin===0||Math.min(geometry.rx,geometry.ry)*2*scale*low>=2;});
-    });
-    if(stroke.tip)return stroke.points.every(point=>{
-      const geometry=paintStampGeometry(stroke,point);
-      return stroke.kind==='pencil'&&geometry.sin===0||Math.min(geometry.rx,geometry.ry)*2*scale>=2;
-    });
-    return (stroke.kind !== "brush" && stroke.kind !== "eraser") ||
-      stroke.points.every(point=>paintStampSize(stroke,point)*scale>=2);
+    if (this.emptyStroke(stroke)) return true;
+    if (stroke.symmetry)
+      return symmetryMatrices(stroke.symmetry).every((copy) => {
+        const m = Math.max(
+            Math.abs(copy.a),
+            Math.abs(copy.b),
+            Math.abs(copy.c),
+            Math.abs(copy.d),
+          ),
+          a = copy.a / m,
+          b = copy.b / m,
+          c = copy.c / m,
+          d = copy.d / m;
+        const high = (Math.hypot(a + d, b - c) + Math.hypot(a - d, b + c)) / 2,
+          low = (Math.abs(a * d - b * c) / high) * m;
+        return stroke.points.every((point) => {
+          const geometry = paintStampGeometry(stroke, point);
+          return (
+            (stroke.kind === "pencil" &&
+              copy.b === 0 &&
+              copy.c === 0 &&
+              geometry.sin === 0) ||
+            Math.min(geometry.rx, geometry.ry) * 2 * scale * low >= 2
+          );
+        });
+      });
+    if (stroke.tip)
+      return stroke.points.every((point) => {
+        const geometry = paintStampGeometry(stroke, point);
+        return (
+          (stroke.kind === "pencil" && geometry.sin === 0) ||
+          Math.min(geometry.rx, geometry.ry) * 2 * scale >= 2
+        );
+      });
+    return (
+      (stroke.kind !== "brush" && stroke.kind !== "eraser") ||
+      stroke.points.every((point) => paintStampSize(stroke, point) * scale >= 2)
+    );
   }
   private supported(nodes: LayerData[], scale: number): boolean {
-    if(nodes.some(node=>node.clipped||activePerspective(node.perspective)||node.mask?.plane||node.kind==='smart-object'&&node.filterMask?.plane))return false;
+    if (
+      nodes.some(
+        (node) =>
+          node.clipped ||
+          activePerspective(node.perspective) ||
+          node.mask?.plane ||
+          (node.kind === "smart-object" && node.filterMask?.plane),
+      )
+    )
+      return false;
     return nodes.every(
       (node) =>
         !node.visible ||
         node.opacity === 0 ||
-        (node.kind !== "smart-object" && !(node.kind === 'group' && node.blendMode === 'pass-through') &&
-          !(node.kind === "raster" && node.erasures?.some(entry => entry.stroke.kind !== 'wet' || entry.stroke.opacity !== 0)) &&
+        (node.kind !== "smart-object" &&
+          !(node.kind === "group" && node.blendMode === "pass-through") &&
+          !(
+            node.kind === "raster" &&
+            node.erasures?.some(
+              (entry) =>
+                entry.stroke.kind !== "wet" || entry.stroke.opacity !== 0,
+            )
+          ) &&
           !node.styles?.dropShadow.enabled &&
           (node.kind !== "adjustment" ||
             node.adjustment.kind === "hsl" ||
-            (node.adjustment.kind === "gradient-map" && node.adjustment.stops.every((stop, i, stops) =>
-              i === 0 || Math.fround(stop.position) > Math.fround(stops[i - 1].position))) ||
-            (node.adjustment.kind === "lut" && this.lookupSupported(node.adjustment.lut)) ||
+            (node.adjustment.kind === "gradient-map" &&
+              node.adjustment.stops.every(
+                (stop, i, stops) =>
+                  i === 0 ||
+                  Math.fround(stop.position) >
+                    Math.fround(stops[i - 1].position),
+              )) ||
+            (node.adjustment.kind === "lut" &&
+              this.lookupSupported(node.adjustment.lut)) ||
             node.adjustment.kind === "red-eye" ||
             node.adjustment.kind === "white-balance" ||
             node.adjustment.kind === "color-balance" ||
@@ -835,9 +967,12 @@ export class WebGpuRenderer {
               !node.adjustment.blue)) &&
           (node.kind !== "group" || this.supported(node.children, scale)) &&
           (node.kind !== "paint" ||
-            node.strokes.every(
-              (stroke) =>
-                stroke.kind === 'wet' ? stroke.opacity === 0 : !stroke.clip?.regions.some(r => r.shape === "pixels") && (stroke.kind === "fill" || (!stroke.texture&&this.preciseStroke(stroke, scale))),
+            node.strokes.every((stroke) =>
+              stroke.kind === "wet"
+                ? stroke.opacity === 0
+                : !stroke.clip?.regions.some((r) => r.shape === "pixels") &&
+                  (stroke.kind === "fill" ||
+                    (!stroke.texture && this.preciseStroke(stroke, scale))),
             ))),
     );
   }
@@ -858,7 +993,7 @@ export class WebGpuRenderer {
     options: RenderOptions,
   ): Promise<ViewportFrame | null> {
     checkRenderCurrent(options.isCancelled);
-    if(isFloatDocument(document))return null;
+    if (isFloatDocument(document)) return null;
     if (!(await this.ready) || !this.device || this.disposed) return null;
     checkRenderCurrent(options.isCancelled);
     if (this.namespace !== document.id || this.assets !== assets) {
@@ -898,7 +1033,14 @@ export class WebGpuRenderer {
       !!options.paintPreview?.filterMask ||
       !!options.paintPreview?.cloneSource ||
       !this.supported(document.children, scale) ||
-      (!!options.paintPreview && !options.paintPreview.maskMode && (options.paintPreview.stroke.clip?.regions.some(r => r.shape === "pixels") || (options.paintPreview.stroke.kind === "eraser" && findLayer(document, options.paintPreview.layerId)?.kind === "raster"))) ||
+      (!!options.paintPreview &&
+        !options.paintPreview.maskMode &&
+        (options.paintPreview.stroke.clip?.regions.some(
+          (r) => r.shape === "pixels",
+        ) ||
+          (options.paintPreview.stroke.kind === "eraser" &&
+            findLayer(document, options.paintPreview.layerId)?.kind ===
+              "raster"))) ||
       (options.paintPreview &&
         !options.paintPreview.maskMode &&
         !this.preciseStroke(options.paintPreview.stroke, scale))
@@ -923,7 +1065,10 @@ export class WebGpuRenderer {
       let target = this.make(size.width, size.height);
       for (const layer of nodes) {
         if (!layer.visible || layer.opacity === 0) continue;
-        if(layer.blendMode==='pass-through')throw new Error('Pass-through groups require the reference compositor.');
+        if (layer.blendMode === "pass-through")
+          throw new Error(
+            "Pass-through groups require the reference compositor.",
+          );
         check();
         const world = parent.multiply(localTransform(layer));
         const { x, y } = world.point({ x: 0, y: 0 });
@@ -933,30 +1078,95 @@ export class WebGpuRenderer {
           source = await compose(layer.children, world);
         else if (layer.kind === "adjustment") {
           if (layer.adjustment.kind === "lut") {
-            const effect = layer.adjustment, lut = effect.lut;
-            source = this.pass(target, target, [lut.size, lut.dimension, effect.amount, Number(effect.interpolation === "tetrahedral"),
-              ...lut.domainMin, 0, ...lut.domainMax.map((value, c) => value - lut.domainMin[c]), 0],
-              undefined, this.lookupPipeline, this.lookupBuffer(lut))!;
+            const effect = layer.adjustment,
+              lut = effect.lut;
+            source = this.pass(
+              target,
+              target,
+              [
+                lut.size,
+                lut.dimension,
+                effect.amount,
+                Number(effect.interpolation === "tetrahedral"),
+                ...lut.domainMin,
+                0,
+                ...lut.domainMax.map((value, c) => value - lut.domainMin[c]),
+                0,
+              ],
+              undefined,
+              this.lookupPipeline,
+              this.lookupBuffer(lut),
+            )!;
           } else if (layer.adjustment.kind === "red-eye") {
             // Integer RGB8 excess: ceil before float32 packing preserves threshold classification.
-            source = this.pass(target, target, [12, Math.ceil(layer.adjustment.threshold), layer.adjustment.strength])!;
+            source = this.pass(target, target, [
+              12,
+              Math.ceil(layer.adjustment.threshold),
+              layer.adjustment.strength,
+            ])!;
           } else if (layer.adjustment.kind === "white-balance") {
-            const effect = layer.adjustment, matrix = whiteBalanceMatrix(effect);
-            source = this.pass(target, target, [11, Number(effect.temperature === WHITE_BALANCE_NEUTRAL && effect.tint === 0), 0, 0,
-              ...matrix[0], 0, ...matrix[1], 0, ...matrix[2], 0])!;
+            const effect = layer.adjustment,
+              matrix = whiteBalanceMatrix(effect);
+            source = this.pass(target, target, [
+              11,
+              Number(
+                effect.temperature === WHITE_BALANCE_NEUTRAL &&
+                  effect.tint === 0,
+              ),
+              0,
+              0,
+              ...matrix[0],
+              0,
+              ...matrix[1],
+              0,
+              ...matrix[2],
+              0,
+            ])!;
           } else if (layer.adjustment.kind === "gradient-map") {
             const effect = layer.adjustment;
             const values = new Array<number>(132).fill(0);
-            values.splice(0, 4 + effect.stops.length * 4, effect.stops.length, Number(effect.reverse), 0, 0, ...packGradientStops(effect.stops));
-            source = this.pass(target, target, values, undefined, this.gradientMapPipeline)!;
+            values.splice(
+              0,
+              4 + effect.stops.length * 4,
+              effect.stops.length,
+              Number(effect.reverse),
+              0,
+              0,
+              ...packGradientStops(effect.stops),
+            );
+            source = this.pass(
+              target,
+              target,
+              values,
+              undefined,
+              this.gradientMapPipeline,
+            )!;
           } else if (layer.adjustment.kind === "color-balance") {
-            const effect=layer.adjustment;
-            source=this.pass(target,target,[9,Number(effect.preserveLuminosity),0,0,
-              effect.shadows.red,effect.shadows.green,effect.shadows.blue,0,
-              effect.midtones.red,effect.midtones.green,effect.midtones.blue,0,
-              effect.highlights.red,effect.highlights.green,effect.highlights.blue,0])!;
+            const effect = layer.adjustment;
+            source = this.pass(target, target, [
+              9,
+              Number(effect.preserveLuminosity),
+              0,
+              0,
+              effect.shadows.red,
+              effect.shadows.green,
+              effect.shadows.blue,
+              0,
+              effect.midtones.red,
+              effect.midtones.green,
+              effect.midtones.blue,
+              0,
+              effect.highlights.red,
+              effect.highlights.green,
+              effect.highlights.blue,
+              0,
+            ])!;
           } else if (layer.adjustment.kind === "vibrance") {
-            source=this.pass(target,target,[10,layer.adjustment.vibrance,layer.adjustment.saturation])!;
+            source = this.pass(target, target, [
+              10,
+              layer.adjustment.vibrance,
+              layer.adjustment.saturation,
+            ])!;
           } else if (layer.adjustment.kind === "hsl") {
             const effect = layer.adjustment;
             source = this.pass(target, target, [
@@ -1148,7 +1358,8 @@ export class WebGpuRenderer {
       check();
     } catch (error) {
       failed = true;
-      if (!options.isCancelled?.()) this.reason = error instanceof Error ? error.message : String(error);
+      if (!options.isCancelled?.())
+        this.reason = error instanceof Error ? error.message : String(error);
     }
     let validation: GPUError | null = null;
     try {
@@ -1266,7 +1477,8 @@ export class WebGpuRenderer {
     this.active = null;
     this.signatures = new WeakMap();
     for (const entry of this.lookupBuffers.values()) entry.buffer.destroy();
-    this.lookupBuffers.clear(); this.lookupBytes = 0;
+    this.lookupBuffers.clear();
+    this.lookupBytes = 0;
     this.lookupCompatibility = new WeakMap();
   }
   dispose() {

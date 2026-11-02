@@ -1,4 +1,4 @@
-import {DEFAULT_COLOR_SETTINGS} from '../core/color/color-settings';
+import { DEFAULT_COLOR_SETTINGS } from "../core/color/color-settings";
 import type { Document } from "../dom";
 import type { AssetStore } from "../core/assets";
 import { id } from "../core/model";
@@ -14,7 +14,7 @@ export class DocumentSession {
   colorProfile: StandardRgbSpaceId = "srgb";
   softProof: SoftProofOptions | null = null;
   colorSettings = DEFAULT_COLOR_SETTINGS;
-  colorWarnings:readonly string[]=[];
+  colorWarnings: readonly string[] = [];
   private unsubscribe: () => void;
   constructor(
     readonly document: Document,

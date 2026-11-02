@@ -56,17 +56,7 @@
     "milliseconds": 1953.699999988079,
     "width": 10000,
     "height": 5000,
-    "samples": [
-      255,
-      255,
-      0,
-      0,
-      255,
-      128,
-      0,
-      0,
-      0
-    ],
+    "samples": [255, 255, 0, 0, 255, 128, 0, 0, 0],
     "revisionDelta": 1,
     "inputResponseMs": 77.59999999403954,
     "inputDuringCapture": true,
@@ -101,17 +91,7 @@
       "milliseconds": 2242.2000000178814,
       "width": 10000,
       "height": 5000,
-      "samples": [
-        255,
-        255,
-        0,
-        0,
-        255,
-        128,
-        0,
-        0,
-        0
-      ],
+      "samples": [255, 255, 0, 0, 255, 128, 0, 0, 0],
       "revisionDelta": 1,
       "inputResponseMs": 65.5,
       "inputDuringCapture": true,
@@ -145,17 +125,7 @@
       "milliseconds": 1988.4000000059605,
       "width": 10000,
       "height": 5000,
-      "samples": [
-        255,
-        255,
-        0,
-        0,
-        255,
-        128,
-        0,
-        0,
-        0
-      ],
+      "samples": [255, 255, 0, 0, 255, 128, 0, 0, 0],
       "revisionDelta": 1,
       "inputResponseMs": 74.19999998807907,
       "inputDuringCapture": true,
@@ -187,17 +157,7 @@
     "milliseconds": 3984.9273259999995,
     "width": 10000,
     "height": 5000,
-    "samples": [
-      255,
-      255,
-      0,
-      0,
-      255,
-      128,
-      0,
-      0,
-      0
-    ]
+    "samples": [255, 255, 0, 0, 255, 128, 0, 0, 0]
   },
   "existingRealImage50MpRoundTrip": {
     "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
@@ -216,54 +176,17 @@
       "width": 10000,
       "height": 5000,
       "points": [
-        [
-          20,
-          5
-        ],
-        [
-          219,
-          4994
-        ],
-        [
-          80,
-          400
-        ],
-        [
-          99,
-          419
-        ],
-        [
-          100,
-          419
-        ],
-        [
-          9000,
-          4000
-        ],
-        [
-          9001,
-          4000
-        ],
-        [
-          0,
-          0
-        ],
-        [
-          9999,
-          4999
-        ]
+        [20, 5],
+        [219, 4994],
+        [80, 400],
+        [99, 419],
+        [100, 419],
+        [9000, 4000],
+        [9001, 4000],
+        [0, 0],
+        [9999, 4999]
       ],
-      "alpha": [
-        255,
-        255,
-        0,
-        0,
-        255,
-        128,
-        0,
-        0,
-        0
-      ]
+      "alpha": [255, 255, 0, 0, 255, 128, 0, 0, 0]
     },
     "smallProduction": {
       "path": "tests/fixtures/matting/cutout.png",

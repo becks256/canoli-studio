@@ -1,19 +1,35 @@
-import {paintOperationSchema,pathSchema} from '../../core/drawing';
-import {recipeFontFiles,recipeFontIds} from './fonts';
-import {documentFontFiles} from '../../core/font-files';
-import {sameFontResource} from '../../fonts/resources';
-import type {FontSourceStore} from '../../fonts/store';
-import type {HistoryOrigin} from '../../core/history-provenance';
-import {visitFontScopes} from '../../core/font-management';
-import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
-import {parseRawDevelopmentOptions} from '../../core/interchange/raw/types';
-import {rawComponentCommand} from '../../core/interchange/raw/commands';
-import type {ImageAsset} from '../../core/assets';
-import { recipeOutputBindingsUnique, stepConditionSchema, recipeActionSchema } from "./schema";
-import {recipeParagraphStyleTargetSchema} from './schema';
-import {paragraphStyleSchema,paragraphTextLayers,sameParagraphFormat,sameParagraphBase,type ParagraphStyleData} from '../../core/paragraph-styles';
+import { paintOperationSchema, pathSchema } from "../../core/drawing";
+import { recipeFontFiles, recipeFontIds } from "./fonts";
+import { documentFontFiles } from "../../core/font-files";
+import { sameFontResource } from "../../fonts/resources";
+import type { FontSourceStore } from "../../fonts/store";
+import type { HistoryOrigin } from "../../core/history-provenance";
+import { visitFontScopes } from "../../core/font-management";
+import {
+  hasLensCorrection,
+  validateLensGeometry,
+} from "../../core/interchange/raw/lens";
+import { parseRawDevelopmentOptions } from "../../core/interchange/raw/types";
+import { rawComponentCommand } from "../../core/interchange/raw/commands";
+import type { ImageAsset } from "../../core/assets";
+import {
+  recipeOutputBindingsUnique,
+  stepConditionSchema,
+  recipeActionSchema,
+} from "./schema";
+import { recipeParagraphStyleTargetSchema } from "./schema";
+import {
+  paragraphStyleSchema,
+  paragraphTextLayers,
+  sameParagraphFormat,
+  sameParagraphBase,
+  type ParagraphStyleData,
+} from "../../core/paragraph-styles";
 import type { DocumentData, LayerData } from "../../core/model";
-import {alignmentCommands,type AlignmentTarget} from '../../core/layer-layout';
+import {
+  alignmentCommands,
+  type AlignmentTarget,
+} from "../../core/layer-layout";
 import {
   allLayers,
   findLayer,
@@ -27,7 +43,7 @@ import {
 } from "../../core/model";
 import { execute } from "../../core/commands";
 import type { EditorCommand, LayerPatch } from "../../core/commands";
-import {PaintLayer,VectorLayer,type Document} from "../../dom";
+import { PaintLayer, VectorLayer, type Document } from "../../dom";
 import type {
   EditPlan,
   PlannedStepChange,
@@ -138,7 +154,14 @@ export function compileEditPlan(
   selectedId: string | null = null,
   rawParams: Record<string, unknown> = {},
   availableAssetIds?: ReadonlySet<string>,
-  rawAssets?: {get(id:string):{width:number;height:number;raw?:Pick<NonNullable<ImageAsset['raw']>,'report'>};fonts?:FontSourceStore},
+  rawAssets?: {
+    get(id: string): {
+      width: number;
+      height: number;
+      raw?: Pick<NonNullable<ImageAsset["raw"]>, "report">;
+    };
+    fonts?: FontSourceStore;
+  },
 ): EditPlan {
   const errors: string[] = [];
   if (!recipeOutputBindingsUnique(recipe))
@@ -149,8 +172,15 @@ export function compileEditPlan(
   const preconditions: PreconditionCheck[] = [];
   const plannedSteps: PlannedStepChange[] = [];
   const resolvedCommands: EditorCommand[] = [];
-  const rawDevelopments:PlannedRawDevelopment[]=[];
-  const plannedRawAssets=new Map<string,{width:number;height:number;raw?:Pick<NonNullable<ImageAsset['raw']>,'report'>}>();
+  const rawDevelopments: PlannedRawDevelopment[] = [];
+  const plannedRawAssets = new Map<
+    string,
+    {
+      width: number;
+      height: number;
+      raw?: Pick<NonNullable<ImageAsset["raw"]>, "report">;
+    }
+  >();
 
   const { values: params, errors: paramErrors } = resolveParameterValues(
     recipe.parameters,
@@ -170,32 +200,80 @@ export function compileEditPlan(
 
   // Working copy of document for simulation
   let simDoc = structuredClone(document);
-  let dependencies:ReturnType<typeof recipeFontFiles>=[];
-  try{dependencies=recipeFontFiles(recipe);if(recipe.schemaVersion!==2&&recipe.schemaVersion!==3&&recipe.steps.some(step=>step.action.type.startsWith('font.file.')))throw new Error('Font actions require recipe version 2.');}catch(error){errors.push(String(error));}
-  const fontFiles=new Map([...documentFontFiles(document),...dependencies].map(file=>[file.id,file]));
-  const apply=(command:EditorCommand):DocumentData=>{
-    for(const fontId of recipeFontIds(command)){
-      const file=fontFiles.get(fontId);if(!file)throw new Error(`Recipe requires an embedded font declaration: ${fontId}.`);
-      const sources=rawAssets?.fonts;if(!sources?.has(fontId))throw new Error(`Recipe font source is unavailable: ${file.name}. Use a portable package or embed the source first.`);
-      const resource=sources.get(fontId);if(!sameFontResource(file.resource,resource.descriptor))throw new Error('Recipe font declaration differs from its owned source.');
-      if(sources.nativeAvailable&&!sources.isActive(fontId))throw new Error('Recipe fonts require native preparation. Use awaited executeAsync() or a portable package.');
-      if(command.type!=='font.file.add'&&!documentFontFiles(simDoc).some(value=>value.id===fontId)){
-        const ensure:EditorCommand={type:'font.file.add',file};simDoc=execute(simDoc,ensure);resolvedCommands.push(ensure);
+  let dependencies: ReturnType<typeof recipeFontFiles> = [];
+  try {
+    dependencies = recipeFontFiles(recipe);
+    if (
+      recipe.schemaVersion !== 2 &&
+      recipe.schemaVersion !== 3 &&
+      recipe.steps.some((step) => step.action.type.startsWith("font.file."))
+    )
+      throw new Error("Font actions require recipe version 2.");
+  } catch (error) {
+    errors.push(String(error));
+  }
+  const fontFiles = new Map(
+    [...documentFontFiles(document), ...dependencies].map((file) => [
+      file.id,
+      file,
+    ]),
+  );
+  const apply = (command: EditorCommand): DocumentData => {
+    for (const fontId of recipeFontIds(command)) {
+      const file = fontFiles.get(fontId);
+      if (!file)
+        throw new Error(
+          `Recipe requires an embedded font declaration: ${fontId}.`,
+        );
+      const sources = rawAssets?.fonts;
+      if (!sources?.has(fontId))
+        throw new Error(
+          `Recipe font source is unavailable: ${file.name}. Use a portable package or embed the source first.`,
+        );
+      const resource = sources.get(fontId);
+      if (!sameFontResource(file.resource, resource.descriptor))
+        throw new Error(
+          "Recipe font declaration differs from its owned source.",
+        );
+      if (sources.nativeAvailable && !sources.isActive(fontId))
+        throw new Error(
+          "Recipe fonts require native preparation. Use awaited executeAsync() or a portable package.",
+        );
+      if (
+        command.type !== "font.file.add" &&
+        !documentFontFiles(simDoc).some((value) => value.id === fontId)
+      ) {
+        const ensure: EditorCommand = { type: "font.file.add", file };
+        simDoc = execute(simDoc, ensure);
+        resolvedCommands.push(ensure);
       }
     }
-    return execute(simDoc,command);
+    return execute(simDoc, command);
   };
   const stepOutputs = new Map<string, string>();
   const outputGroups = new Map<string, string[]>();
   const effectIds = new Map<string, string>();
   // Style and layer output namespaces are distinct; a style can never select a layer.
-  const styleOutputs=new Map<string,string>();
-  const resolveStyle=(input:unknown,actionValue:(value:unknown)=>unknown):ParagraphStyleData=>{
-    const target=recipeParagraphStyleTargetSchema.parse(input);
-    const style=target.by==='stepResult'
-      ?simDoc.paragraphStyles?.find(value=>value.id===styleOutputs.get(target.stepId))
-      :simDoc.paragraphStyles?.find(value=>value.name.trim().toLocaleLowerCase('en')===String(actionValue(target.name)).trim().toLocaleLowerCase('en'));
-    if(!style)throw new Error('Paragraph style reference is missing, skipped, removed or does not identify a style.');
+  const styleOutputs = new Map<string, string>();
+  const resolveStyle = (
+    input: unknown,
+    actionValue: (value: unknown) => unknown,
+  ): ParagraphStyleData => {
+    const target = recipeParagraphStyleTargetSchema.parse(input);
+    const style =
+      target.by === "stepResult"
+        ? simDoc.paragraphStyles?.find(
+            (value) => value.id === styleOutputs.get(target.stepId),
+          )
+        : simDoc.paragraphStyles?.find(
+            (value) =>
+              value.name.trim().toLocaleLowerCase("en") ===
+              String(actionValue(target.name)).trim().toLocaleLowerCase("en"),
+          );
+    if (!style)
+      throw new Error(
+        "Paragraph style reference is missing, skipped, removed or does not identify a style.",
+      );
     return paragraphStyleSchema.parse(style);
   };
   const bindOutput = (key: string, layer: LayerData): void => {
@@ -261,9 +339,20 @@ export function compileEditPlan(
       }
     }
 
-    if(step.action.type==='layer.align'&&step.target){errors.push(`Step '${step.name}': Alignment actions use their own targets and reference.`);continue;}
-    if((step.action.type.startsWith('paragraphStyle.')||step.action.type.startsWith('font.file.'))&&step.target){
-      errors.push(`Step '${step.name}': Style and font library actions do not accept layer targets.`);
+    if (step.action.type === "layer.align" && step.target) {
+      errors.push(
+        `Step '${step.name}': Alignment actions use their own targets and reference.`,
+      );
+      continue;
+    }
+    if (
+      (step.action.type.startsWith("paragraphStyle.") ||
+        step.action.type.startsWith("font.file.")) &&
+      step.target
+    ) {
+      errors.push(
+        `Step '${step.name}': Style and font library actions do not accept layer targets.`,
+      );
       continue;
     }
     // Resolve the complete set once; earlier targets cannot change later matches.
@@ -303,10 +392,13 @@ export function compileEditPlan(
         return true;
       });
     }
-    if(step.action.type==='raw.develop'){
-      const masters=new Set<string>();targets=targets.filter(layer=>{
-        if(layer.kind!=='smart-object')return true;
-        if(masters.has(layer.componentId))return false;masters.add(layer.componentId);return true;
+    if (step.action.type === "raw.develop") {
+      const masters = new Set<string>();
+      targets = targets.filter((layer) => {
+        if (layer.kind !== "smart-object") return true;
+        if (masters.has(layer.componentId)) return false;
+        masters.add(layer.componentId);
+        return true;
       });
     }
     for (const targetId of step.target
@@ -343,88 +435,224 @@ export function compileEditPlan(
         const stepCommands: EditorCommand[] = [];
 
         switch (step.action.type) {
-          case 'font.file.add':
-          case 'font.file.rename':
-          case 'font.file.remove': {
-            const action=recipeActionSchema.parse(step.action);if(!action.type.startsWith('font.file.'))throw new Error('Invalid font action.');
-            const input=step.action,file=fontFiles.get(input.id);if(!file)throw new Error('Font action has no declared source dependency.');
-            const cmd:EditorCommand=input.type==='font.file.add'?{type:input.type,file}
-              :input.type==='font.file.rename'?{type:input.type,id:input.id,name:String(actionValue(input.name))}
-              :{type:input.type,id:input.id,...(input.replaceWith!==undefined?{replaceWith:String(actionValue(input.replaceWith))}:{})};
-            simDoc=apply(cmd);stepCommands.push(cmd);visualChange=`${input.type==='font.file.add'?'Embed':input.type==='font.file.rename'?'Rename':'Remove'} font file '${file.name}' through shared validation`;break;
+          case "font.file.add":
+          case "font.file.rename":
+          case "font.file.remove": {
+            const action = recipeActionSchema.parse(step.action);
+            if (!action.type.startsWith("font.file."))
+              throw new Error("Invalid font action.");
+            const input = step.action,
+              file = fontFiles.get(input.id);
+            if (!file)
+              throw new Error("Font action has no declared source dependency.");
+            const cmd: EditorCommand =
+              input.type === "font.file.add"
+                ? { type: input.type, file }
+                : input.type === "font.file.rename"
+                  ? {
+                      type: input.type,
+                      id: input.id,
+                      name: String(actionValue(input.name)),
+                    }
+                  : {
+                      type: input.type,
+                      id: input.id,
+                      ...(input.replaceWith !== undefined
+                        ? {
+                            replaceWith: String(actionValue(input.replaceWith)),
+                          }
+                        : {}),
+                    };
+            simDoc = apply(cmd);
+            stepCommands.push(cmd);
+            visualChange = `${input.type === "font.file.add" ? "Embed" : input.type === "font.file.rename" ? "Rename" : "Remove"} font file '${file.name}' through shared validation`;
+            break;
           }
-          case 'raw.develop': {
+          case "raw.develop": {
             recipeActionSchema.parse(step.action);
-            if(!targetLayer||targetLayer.kind!=='smart-object')throw new Error('RAW development requires a smart-object target with a retained original.');
-            const definition=simDoc.components?.find(value=>value.id===targetLayer.componentId);
-            if(!definition||definition.source.kind!=='asset')throw new Error('RAW target has no retained original.');
-            const sourceId=definition.source.assetId,source=plannedRawAssets.get(sourceId)??rawAssets?.get(sourceId);
-            if(!source?.raw)throw new Error('RAW recipe preflight requires the target document original and asset metadata.');
-            const options=parseRawDevelopmentOptions({allowPrecisionLoss:step.action.allowPrecisionLoss,development:actionValue(step.action.development) as never});
-            if(options.development.image>=source.raw.report.imageCount)throw new Error('RAW source image index is unavailable.');
-            if(options.development.image===source.raw.report.image&&(!source.raw.report.canDevelop||options.development.whiteBalance==='camera'&&source.raw.report.channels>1&&!source.raw.report.hasCameraWhiteBalance))throw new Error('RAW source does not support the selected development settings.');
-            if(hasLensCorrection(options.development.lens)&&options.development.image===source.raw.report.image)validateLensGeometry(options.development.lens!,source.raw.report.displayWidth,source.raw.report.displayHeight);
-            const assetId=id(),command=rawComponentCommand(simDoc,targetLayer.id,{id:assetId,width:source.width,height:source.height});
-            simDoc = apply(command);stepCommands.push(command);
-            rawDevelopments.push({assetId,sourceAssetId:sourceId,options});plannedRawAssets.set(assetId,source);
-            layersModified++;affectedLayerNames.add(targetLayer.name);
-            visualChange=`Develop retained RAW for '${targetLayer.name}' and its shared instances; native pixels are prepared before one atomic commit`;
+            if (!targetLayer || targetLayer.kind !== "smart-object")
+              throw new Error(
+                "RAW development requires a smart-object target with a retained original.",
+              );
+            const definition = simDoc.components?.find(
+              (value) => value.id === targetLayer.componentId,
+            );
+            if (!definition || definition.source.kind !== "asset")
+              throw new Error("RAW target has no retained original.");
+            const sourceId = definition.source.assetId,
+              source =
+                plannedRawAssets.get(sourceId) ?? rawAssets?.get(sourceId);
+            if (!source?.raw)
+              throw new Error(
+                "RAW recipe preflight requires the target document original and asset metadata.",
+              );
+            const options = parseRawDevelopmentOptions({
+              allowPrecisionLoss: step.action.allowPrecisionLoss,
+              development: actionValue(step.action.development) as never,
+            });
+            if (options.development.image >= source.raw.report.imageCount)
+              throw new Error("RAW source image index is unavailable.");
+            if (
+              options.development.image === source.raw.report.image &&
+              (!source.raw.report.canDevelop ||
+                (options.development.whiteBalance === "camera" &&
+                  source.raw.report.channels > 1 &&
+                  !source.raw.report.hasCameraWhiteBalance))
+            )
+              throw new Error(
+                "RAW source does not support the selected development settings.",
+              );
+            if (
+              hasLensCorrection(options.development.lens) &&
+              options.development.image === source.raw.report.image
+            )
+              validateLensGeometry(
+                options.development.lens!,
+                source.raw.report.displayWidth,
+                source.raw.report.displayHeight,
+              );
+            const assetId = id(),
+              command = rawComponentCommand(simDoc, targetLayer.id, {
+                id: assetId,
+                width: source.width,
+                height: source.height,
+              });
+            simDoc = apply(command);
+            stepCommands.push(command);
+            rawDevelopments.push({ assetId, sourceAssetId: sourceId, options });
+            plannedRawAssets.set(assetId, source);
+            layersModified++;
+            affectedLayerNames.add(targetLayer.name);
+            visualChange = `Develop retained RAW for '${targetLayer.name}' and its shared instances; native pixels are prepared before one atomic commit`;
             break;
           }
-          case 'paragraphStyle.ensure':
-          case 'paragraphStyle.update': {
-            if(step.target)throw new Error('Style and font library actions do not accept layer targets.');
-            const action=step.action;
-            const definition=paragraphStyleSchema.parse({id:id(),name:actionValue(action.name),format:actionValue(action.format),
-              ...(action.basedOn?{basedOn:{id:resolveStyle(action.basedOn.style,actionValue).id,overrides:actionValue(action.basedOn.overrides)}}:{})});
-            let command:EditorCommand|undefined;
-            if(action.type==='paragraphStyle.ensure'){
-              const existing=simDoc.paragraphStyles?.find(style=>style.name.trim().toLocaleLowerCase('en')===definition.name.toLocaleLowerCase('en'));
-              if(existing){
-                if(!sameParagraphFormat(paragraphStyleSchema.parse(existing).format,definition.format)||!sameParagraphBase(existing.basedOn,definition.basedOn))
-                  throw new Error(`Paragraph style '${definition.name}' already exists with different formatting. Rename it or review a style update before replay.`);
-                definition.id=existing.id;
-                visualChange=`Reuse paragraph style '${existing.name}'`;
-              }else{
-                command={type:'paragraphStyle.set',style:definition};
-                visualChange=`Create paragraph style '${definition.name}'`;
+          case "paragraphStyle.ensure":
+          case "paragraphStyle.update": {
+            if (step.target)
+              throw new Error(
+                "Style and font library actions do not accept layer targets.",
+              );
+            const action = step.action;
+            const definition = paragraphStyleSchema.parse({
+              id: id(),
+              name: actionValue(action.name),
+              format: actionValue(action.format),
+              ...(action.basedOn
+                ? {
+                    basedOn: {
+                      id: resolveStyle(action.basedOn.style, actionValue).id,
+                      overrides: actionValue(action.basedOn.overrides),
+                    },
+                  }
+                : {}),
+            });
+            let command: EditorCommand | undefined;
+            if (action.type === "paragraphStyle.ensure") {
+              const existing = simDoc.paragraphStyles?.find(
+                (style) =>
+                  style.name.trim().toLocaleLowerCase("en") ===
+                  definition.name.toLocaleLowerCase("en"),
+              );
+              if (existing) {
+                if (
+                  !sameParagraphFormat(
+                    paragraphStyleSchema.parse(existing).format,
+                    definition.format,
+                  ) ||
+                  !sameParagraphBase(existing.basedOn, definition.basedOn)
+                )
+                  throw new Error(
+                    `Paragraph style '${definition.name}' already exists with different formatting. Rename it or review a style update before replay.`,
+                  );
+                definition.id = existing.id;
+                visualChange = `Reuse paragraph style '${existing.name}'`;
+              } else {
+                command = { type: "paragraphStyle.set", style: definition };
+                visualChange = `Create paragraph style '${definition.name}'`;
               }
-            }else{
-              const previous=resolveStyle(action.style,actionValue);definition.id=previous.id;
-              command={type:'paragraphStyle.set',style:definition};
-              visualChange=`Update paragraph style '${previous.name}' to '${definition.name}' and reflow linked text`;
+            } else {
+              const previous = resolveStyle(action.style, actionValue);
+              definition.id = previous.id;
+              command = { type: "paragraphStyle.set", style: definition };
+              visualChange = `Update paragraph style '${previous.name}' to '${definition.name}' and reflow linked text`;
             }
-            const previousText=paragraphTextLayers(simDoc.children);
-            if(command){stepCommands.push(command);simDoc = apply(command);}
-            for(const layer of paragraphTextLayers(simDoc.children)){
-              const previous=previousText.find(value=>value.id===layer.id);
-              if(previous&&JSON.stringify(previous)!==JSON.stringify(layer)){layersModified++;affectedLayerNames.add(layer.name);}
+            const previousText = paragraphTextLayers(simDoc.children);
+            if (command) {
+              stepCommands.push(command);
+              simDoc = apply(command);
             }
-            styleOutputs.set(step.id,definition.id);
-            if(step.outputVar)styleOutputs.set(step.outputVar,definition.id);
+            for (const layer of paragraphTextLayers(simDoc.children)) {
+              const previous = previousText.find(
+                (value) => value.id === layer.id,
+              );
+              if (
+                previous &&
+                JSON.stringify(previous) !== JSON.stringify(layer)
+              ) {
+                layersModified++;
+                affectedLayerNames.add(layer.name);
+              }
+            }
+            styleOutputs.set(step.id, definition.id);
+            if (step.outputVar) styleOutputs.set(step.outputVar, definition.id);
             break;
           }
-          case 'paragraphStyle.remove': {
-            if(step.target)throw new Error('Style and font library actions do not accept layer targets.');
-            const style=resolveStyle(step.action.style,actionValue);
-            const followers=paragraphTextLayers(simDoc.children).filter(layer=>layer.paragraphStyle?.id===style.id);
-            const command:EditorCommand={type:'paragraphStyle.remove',id:style.id};
-            stepCommands.push(command);simDoc = apply(command);
-            for(const layer of followers){layersModified++;affectedLayerNames.add(layer.name);}
-            visualChange=`Remove paragraph style '${style.name}' and detach ${followers.length} linked text layers, keeping their appearance`;
+          case "paragraphStyle.remove": {
+            if (step.target)
+              throw new Error(
+                "Style and font library actions do not accept layer targets.",
+              );
+            const style = resolveStyle(step.action.style, actionValue);
+            const followers = paragraphTextLayers(simDoc.children).filter(
+              (layer) => layer.paragraphStyle?.id === style.id,
+            );
+            const command: EditorCommand = {
+              type: "paragraphStyle.remove",
+              id: style.id,
+            };
+            stepCommands.push(command);
+            simDoc = apply(command);
+            for (const layer of followers) {
+              layersModified++;
+              affectedLayerNames.add(layer.name);
+            }
+            visualChange = `Remove paragraph style '${style.name}' and detach ${followers.length} linked text layers, keeping their appearance`;
             break;
           }
-          case 'text.paragraphStyle':
-          case 'text.paragraphOverrides.clear': {
-            if(!targetLayer||targetLayer.kind!=='text')throw new Error('Paragraph style edits require a text layer target.');
-            const action=step.action;
-            const style=action.type==='text.paragraphStyle'&&action.style!==null?resolveStyle(action.style,actionValue):undefined;
-            const command:EditorCommand=action.type==='text.paragraphStyle'
-              ?{type:'text.paragraphStyle',id:targetLayer.id,styleId:style?.id??null,keepOverrides:action.keepOverrides}
-              :{type:'text.paragraphOverrides.clear',id:targetLayer.id,keys:action.keys};
-            stepCommands.push(command);simDoc = apply(command);layersModified++;affectedLayerNames.add(targetLayer.name);
-            visualChange=action.type==='text.paragraphOverrides.clear'?`Reset paragraph overrides on '${targetLayer.name}'`
-              :style?`Apply paragraph style '${style.name}' to '${targetLayer.name}'`:`Detach paragraph style from '${targetLayer.name}', keeping its appearance`;
+          case "text.paragraphStyle":
+          case "text.paragraphOverrides.clear": {
+            if (!targetLayer || targetLayer.kind !== "text")
+              throw new Error(
+                "Paragraph style edits require a text layer target.",
+              );
+            const action = step.action;
+            const style =
+              action.type === "text.paragraphStyle" && action.style !== null
+                ? resolveStyle(action.style, actionValue)
+                : undefined;
+            const command: EditorCommand =
+              action.type === "text.paragraphStyle"
+                ? {
+                    type: "text.paragraphStyle",
+                    id: targetLayer.id,
+                    styleId: style?.id ?? null,
+                    keepOverrides: action.keepOverrides,
+                  }
+                : {
+                    type: "text.paragraphOverrides.clear",
+                    id: targetLayer.id,
+                    keys: action.keys,
+                  };
+            stepCommands.push(command);
+            simDoc = apply(command);
+            layersModified++;
+            affectedLayerNames.add(targetLayer.name);
+            visualChange =
+              action.type === "text.paragraphOverrides.clear"
+                ? `Reset paragraph overrides on '${targetLayer.name}'`
+                : style
+                  ? `Apply paragraph style '${style.name}' to '${targetLayer.name}'`
+                  : `Detach paragraph style from '${targetLayer.name}', keeping its appearance`;
             break;
           }
           case "layer.translate": {
@@ -456,33 +684,141 @@ export function compileEditPlan(
           }
 
           case "layer.place": {
-            if(!targetLayer)throw new Error(`Step '${step.name}' requires a layer.`);
-            let targetId:string|null=null;
-            if(step.action.reference){const resolved=resolveTargets(step.action.reference,simDoc,selectedId,stepOutputs,params,outputGroups);if(resolved.error||resolved.layers.length!==1)throw new Error('Placement reference must resolve to exactly one layer.');targetId=resolved.layers[0].id;}
-            const unlock=step.target?.ignoreLocked&&targetLayer.locked;
-            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:false}};stepCommands.push(command);simDoc=apply(command);}
-            const command:EditorCommand={type:'layer.place',id:targetLayer.id,targetId,placement:step.action.placement,preservePosition:step.action.preservePosition};stepCommands.push(command);simDoc=apply(command);
-            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
-            layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Place '${targetLayer.name}' ${step.action.placement} its semantic reference`;break;
+            if (!targetLayer)
+              throw new Error(`Step '${step.name}' requires a layer.`);
+            let targetId: string | null = null;
+            if (step.action.reference) {
+              const resolved = resolveTargets(
+                step.action.reference,
+                simDoc,
+                selectedId,
+                stepOutputs,
+                params,
+                outputGroups,
+              );
+              if (resolved.error || resolved.layers.length !== 1)
+                throw new Error(
+                  "Placement reference must resolve to exactly one layer.",
+                );
+              targetId = resolved.layers[0].id;
+            }
+            const unlock = step.target?.ignoreLocked && targetLayer.locked;
+            if (unlock) {
+              const command: EditorCommand = {
+                type: "layer.update",
+                id: targetLayer.id,
+                patch: { locked: false },
+              };
+              stepCommands.push(command);
+              simDoc = apply(command);
+            }
+            const command: EditorCommand = {
+              type: "layer.place",
+              id: targetLayer.id,
+              targetId,
+              placement: step.action.placement,
+              preservePosition: step.action.preservePosition,
+            };
+            stepCommands.push(command);
+            simDoc = apply(command);
+            if (unlock) {
+              const command: EditorCommand = {
+                type: "layer.update",
+                id: targetLayer.id,
+                patch: { locked: true },
+              };
+              stepCommands.push(command);
+              simDoc = apply(command);
+            }
+            layersModified++;
+            affectedLayerNames.add(targetLayer.name);
+            visualChange = `Place '${targetLayer.name}' ${step.action.placement} its semantic reference`;
+            break;
           }
           case "paint.add": {
-            if(!targetLayer||targetLayer.kind!=='paint')throw new Error(`Step '${step.name}' requires a paint layer.`);
-            const stroke=paintOperationSchema.parse(actionValue(step.action.stroke)),wasLocked=targetLayer.locked;
-            const unlock=step.target?.ignoreLocked&&wasLocked;
-            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:false}};stepCommands.push(command);simDoc=apply(command);}
-            const command:EditorCommand={type:'paint.add',id:targetLayer.id,stroke:{...stroke,id:id()}};
-            stepCommands.push(command);simDoc=apply(command);
-            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
-            layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Add ${stroke.kind} stroke to '${targetLayer.name}'`;break;
+            if (!targetLayer || targetLayer.kind !== "paint")
+              throw new Error(`Step '${step.name}' requires a paint layer.`);
+            const stroke = paintOperationSchema.parse(
+                actionValue(step.action.stroke),
+              ),
+              wasLocked = targetLayer.locked;
+            const unlock = step.target?.ignoreLocked && wasLocked;
+            if (unlock) {
+              const command: EditorCommand = {
+                type: "layer.update",
+                id: targetLayer.id,
+                patch: { locked: false },
+              };
+              stepCommands.push(command);
+              simDoc = apply(command);
+            }
+            const command: EditorCommand = {
+              type: "paint.add",
+              id: targetLayer.id,
+              stroke: { ...stroke, id: id() },
+            };
+            stepCommands.push(command);
+            simDoc = apply(command);
+            if (unlock) {
+              const command: EditorCommand = {
+                type: "layer.update",
+                id: targetLayer.id,
+                patch: { locked: true },
+              };
+              stepCommands.push(command);
+              simDoc = apply(command);
+            }
+            layersModified++;
+            affectedLayerNames.add(targetLayer.name);
+            visualChange = `Add ${stroke.kind} stroke to '${targetLayer.name}'`;
+            break;
           }
           case "path.add": {
-            if(!targetLayer||targetLayer.kind!=='vector')throw new Error(`Step '${step.name}' requires a vector layer.`);
-            const path=pathSchema.parse(actionValue(step.action.path)),wasLocked=targetLayer.locked,unlock=step.target?.ignoreLocked&&wasLocked;
-            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:false}};stepCommands.push(command);simDoc=apply(command);}
-            const command:EditorCommand={type:'path.add',id:targetLayer.id,path:{...path,id:id(),...(path.subpaths?{subpaths:path.subpaths.map(contour=>({...contour,id:id()}))}:{})}};
-            stepCommands.push(command);simDoc=apply(command);
-            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
-            layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Add path to '${targetLayer.name}'`;break;
+            if (!targetLayer || targetLayer.kind !== "vector")
+              throw new Error(`Step '${step.name}' requires a vector layer.`);
+            const path = pathSchema.parse(actionValue(step.action.path)),
+              wasLocked = targetLayer.locked,
+              unlock = step.target?.ignoreLocked && wasLocked;
+            if (unlock) {
+              const command: EditorCommand = {
+                type: "layer.update",
+                id: targetLayer.id,
+                patch: { locked: false },
+              };
+              stepCommands.push(command);
+              simDoc = apply(command);
+            }
+            const command: EditorCommand = {
+              type: "path.add",
+              id: targetLayer.id,
+              path: {
+                ...path,
+                id: id(),
+                ...(path.subpaths
+                  ? {
+                      subpaths: path.subpaths.map((contour) => ({
+                        ...contour,
+                        id: id(),
+                      })),
+                    }
+                  : {}),
+              },
+            };
+            stepCommands.push(command);
+            simDoc = apply(command);
+            if (unlock) {
+              const command: EditorCommand = {
+                type: "layer.update",
+                id: targetLayer.id,
+                patch: { locked: true },
+              };
+              stepCommands.push(command);
+              simDoc = apply(command);
+            }
+            layersModified++;
+            affectedLayerNames.add(targetLayer.name);
+            visualChange = `Add path to '${targetLayer.name}'`;
+            break;
           }
           case "layer.update": {
             if (!targetLayer) {
@@ -667,10 +1003,10 @@ export function compileEditPlan(
             let newLayerData: LayerData;
             switch (templateKind) {
               case "paint":
-                newLayerData = new PaintLayer({name:templateName}).toJSON();
+                newLayerData = new PaintLayer({ name: templateName }).toJSON();
                 break;
               case "vector":
-                newLayerData = new VectorLayer({name:templateName}).toJSON();
+                newLayerData = new VectorLayer({ name: templateName }).toJSON();
                 break;
               case "adjustment":
                 newLayerData = createAdjustmentLayer(
@@ -732,12 +1068,17 @@ export function compileEditPlan(
             }
 
             // Root document libraries do not include independently scoped embedded masters.
-            for(const text of paragraphTextLayers([newLayerData]))if(text.paragraphStyle){
-              const reference=step.action.paragraphStyles?.[text.paragraphStyle.id];
-              if(!reference)throw new Error('Linked text templates require a portable paragraphStyles reference for every binding.');
-              const style=resolveStyle(reference,actionValue);
-              text.paragraphStyle={...text.paragraphStyle,id:style.id};
-            }
+            for (const text of paragraphTextLayers([newLayerData]))
+              if (text.paragraphStyle) {
+                const reference =
+                  step.action.paragraphStyles?.[text.paragraphStyle.id];
+                if (!reference)
+                  throw new Error(
+                    "Linked text templates require a portable paragraphStyles reference for every binding.",
+                  );
+                const style = resolveStyle(reference, actionValue);
+                text.paragraphStyle = { ...text.paragraphStyle, id: style.id };
+              }
 
             let parentId: string | undefined = undefined;
             if (step.action.parentTarget) {
@@ -952,35 +1293,96 @@ export function compileEditPlan(
             break;
           }
 
-          case 'document.font.replace': {
-            const cmd:EditorCommand={type:'document.font.replace',from:String(actionValue(step.action.from)),to:String(actionValue(step.action.to))};
-            const previous=new Map<string,string>();
-            visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text')previous.set(JSON.stringify([...path,layer.id]),layer.fontFamily);});
-            stepCommands.push(cmd);simDoc = apply(cmd);
-            visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text'&&previous.get(JSON.stringify([...path,layer.id]))!==layer.fontFamily){layersModified++;affectedLayerNames.add(layer.name);}});
-            visualChange=`Replace font request '${cmd.from}' with '${cmd.to}' across text, styles and embedded documents`;break;
+          case "document.font.replace": {
+            const cmd: EditorCommand = {
+              type: "document.font.replace",
+              from: String(actionValue(step.action.from)),
+              to: String(actionValue(step.action.to)),
+            };
+            const previous = new Map<string, string>();
+            visitFontScopes(simDoc, (scope, path) => {
+              for (const layer of allLayers(scope.children))
+                if (layer.kind === "text")
+                  previous.set(
+                    JSON.stringify([...path, layer.id]),
+                    layer.fontFamily,
+                  );
+            });
+            stepCommands.push(cmd);
+            simDoc = apply(cmd);
+            visitFontScopes(simDoc, (scope, path) => {
+              for (const layer of allLayers(scope.children))
+                if (
+                  layer.kind === "text" &&
+                  previous.get(JSON.stringify([...path, layer.id])) !==
+                    layer.fontFamily
+                ) {
+                  layersModified++;
+                  affectedLayerNames.add(layer.name);
+                }
+            });
+            visualChange = `Replace font request '${cmd.from}' with '${cmd.to}' across text, styles and embedded documents`;
+            break;
           }
-          case 'layer.align': {
-            const resolve=(reference:import('./types').SemanticTarget)=>{
-              const resolution=resolveTargets(reference,simDoc,selectedId,stepOutputs,params,outputGroups);
-              if(resolution.error||!resolution.layers.length)throw new Error(resolution.error??'No alignment layers match.');
+          case "layer.align": {
+            const resolve = (reference: import("./types").SemanticTarget) => {
+              const resolution = resolveTargets(
+                reference,
+                simDoc,
+                selectedId,
+                stepOutputs,
+                params,
+                outputGroups,
+              );
+              if (resolution.error || !resolution.layers.length)
+                throw new Error(
+                  resolution.error ?? "No alignment layers match.",
+                );
               return resolution.layers;
             };
-            const ids=step.action.targets.flatMap(reference=>resolve(reference).map(layer=>layer.id));
-            if(new Set(ids).size!==ids.length)throw new Error('Alignment selectors resolve to duplicate layers.');
-            const reference=step.action.reference??{type:'selection'};
-            let target:AlignmentTarget;
-            if(reference.type==='layer'){
-              const layers=resolve(reference.layer);if(layers.length!==1)throw new Error('Choose exactly one alignment key layer.');
-              target={type:'layer',id:layers[0].id};
-            }else target=reference;
-            const changes=alignmentCommands(simDoc,ids,step.action.alignment,target),cmd:EditorCommand={type:'layer.align',ids,alignment:step.action.alignment,target};
-            stepCommands.push(cmd);simDoc=apply(cmd);layersModified+=changes.length;
-            for(const change of changes)if(change.type==='layer.update')affectedLayerNames.add(findLayer(simDoc,change.id)!.name);
-            visualChange=`Align layers ${step.action.alignment} relative to ${reference.type}`;break;
+            const ids = step.action.targets.flatMap((reference) =>
+              resolve(reference).map((layer) => layer.id),
+            );
+            if (new Set(ids).size !== ids.length)
+              throw new Error(
+                "Alignment selectors resolve to duplicate layers.",
+              );
+            const reference = step.action.reference ?? { type: "selection" };
+            let target: AlignmentTarget;
+            if (reference.type === "layer") {
+              const layers = resolve(reference.layer);
+              if (layers.length !== 1)
+                throw new Error("Choose exactly one alignment key layer.");
+              target = { type: "layer", id: layers[0].id };
+            } else target = reference;
+            const changes = alignmentCommands(
+                simDoc,
+                ids,
+                step.action.alignment,
+                target,
+              ),
+              cmd: EditorCommand = {
+                type: "layer.align",
+                ids,
+                alignment: step.action.alignment,
+                target,
+              };
+            stepCommands.push(cmd);
+            simDoc = apply(cmd);
+            layersModified += changes.length;
+            for (const change of changes)
+              if (change.type === "layer.update")
+                affectedLayerNames.add(findLayer(simDoc, change.id)!.name);
+            visualChange = `Align layers ${step.action.alignment} relative to ${reference.type}`;
+            break;
           }
-          case 'document.precision.float':{
-            const cmd:EditorCommand={type:'document.precision.float'};stepCommands.push(cmd);simDoc=apply(cmd);visualChange='Use 32-bit linear editing from retained original float sources';break;
+          case "document.precision.float": {
+            const cmd: EditorCommand = { type: "document.precision.float" };
+            stepCommands.push(cmd);
+            simDoc = apply(cmd);
+            visualChange =
+              "Use 32-bit linear editing from retained original float sources";
+            break;
           }
           case "document.rename": {
             const name = String(actionValue(step.action.name));
@@ -1025,7 +1427,8 @@ export function compileEditPlan(
             });
             break;
           }
-          default:throw new Error('Unsupported recipe action.');
+          default:
+            throw new Error("Unsupported recipe action.");
         }
 
         resolvedCommands.push(...stepCommands);
@@ -1066,7 +1469,8 @@ export function compileEditPlan(
 
   if (availableAssetIds) {
     const missing = [...referencedAssets(simDoc)].filter(
-      (assetId) => !availableAssetIds.has(assetId)&&!plannedRawAssets.has(assetId),
+      (assetId) =>
+        !availableAssetIds.has(assetId) && !plannedRawAssets.has(assetId),
     );
     if (missing.length) {
       const error = `Recipe requires unavailable image assets: ${missing.join(", ")}. Import the source assets or use a recipe that references this document's artwork.`;
@@ -1090,7 +1494,7 @@ export function compileEditPlan(
     preconditions,
     steps: plannedSteps,
     resolvedCommands,
-    ...(rawDevelopments.length?{rawDevelopments}:{}),
+    ...(rawDevelopments.length ? { rawDevelopments } : {}),
     summary: {
       layersAdded,
       layersModified,
@@ -1109,7 +1513,7 @@ export interface ExecuteRecipeResult {
   success: boolean;
   plan: EditPlan;
   error?: string;
-  warning?:string;
+  warning?: string;
 }
 
 /**
@@ -1130,16 +1534,27 @@ export function executeRecipe(
     document.assetStore
       ? new Set(document.assetStore.values().map((asset) => asset.id))
       : undefined,
-    document.assetStore??undefined,
+    document.assetStore ?? undefined,
   );
 
-  if(plan.rawDevelopments?.length)return {success:false,plan,error:"RAW recipes require awaited asynchronous execution. Use executeAsync()."};
-  return commitRecipePlan(recipe,document,plan);
+  if (plan.rawDevelopments?.length)
+    return {
+      success: false,
+      plan,
+      error:
+        "RAW recipes require awaited asynchronous execution. Use executeAsync().",
+    };
+  return commitRecipePlan(recipe, document, plan);
 }
 
 /** Commit only a fully validated plan; asynchronous callers own private asset preparation. */
-export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan,origin:HistoryOrigin=document._getHistoryOrigin()):ExecuteRecipeResult {
-  const revision=document.getSnapshot().revision;
+export function commitRecipePlan(
+  recipe: Recipe,
+  document: Document,
+  plan: EditPlan,
+  origin: HistoryOrigin = document._getHistoryOrigin(),
+): ExecuteRecipeResult {
+  const revision = document.getSnapshot().revision;
   if (!plan.valid || plan.errors.length > 0) {
     const errorMsg = `Recipe '${recipe.name}' validation failed: ${plan.errors.join("; ")}`;
     return {
@@ -1150,11 +1565,15 @@ export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan,o
   }
 
   try {
-    document._withHistoryOrigin({...origin,recipe:{id:recipe.id,version:recipe.version}},()=>document.transaction(`Execute Recipe: ${recipe.name}`, () => {
-      for (const cmd of plan.resolvedCommands) {
-        document._dispatch(cmd);
-      }
-    }));
+    document._withHistoryOrigin(
+      { ...origin, recipe: { id: recipe.id, version: recipe.version } },
+      () =>
+        document.transaction(`Execute Recipe: ${recipe.name}`, () => {
+          for (const cmd of plan.resolvedCommands) {
+            document._dispatch(cmd);
+          }
+        }),
+    );
 
     if (plan.stepOutputs && plan.stepOutputs.size > 0) {
       const lastCreatedId = Array.from(plan.stepOutputs.values()).pop();
@@ -1172,7 +1591,13 @@ export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan,o
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    if(document.getSnapshot().revision!==revision)return {success:true,plan,warning:'Recipe accepted, but an observer failed. Inspect the document before retrying.'};
+    if (document.getSnapshot().revision !== revision)
+      return {
+        success: true,
+        plan,
+        warning:
+          "Recipe accepted, but an observer failed. Inspect the document before retrying.",
+      };
     return {
       success: false,
       plan,

@@ -549,8 +549,5 @@
       "synthetic": true
     }
   ],
-  "unsupported": [
-    "no-calibration.dng",
-    "extra-samples.dng"
-  ]
+  "unsupported": ["no-calibration.dng", "extra-samples.dng"]
 }

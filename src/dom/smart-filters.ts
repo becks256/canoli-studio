@@ -1,7 +1,16 @@
 import { id } from "../core/model";
-import { medianFilterSchema } from '../core/smart/median-filter';
-import {bilateralFilterSchema,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
-import { documentToneFilterSchema, nativeCompositionFilterSchema, frequencyBandFilterSchema, smartFilterSchema, type SmartFilterData } from "../core/smart/filters";
+import { medianFilterSchema } from "../core/smart/median-filter";
+import {
+  bilateralFilterSchema,
+  type BilateralFilterOptions,
+} from "../core/smart/bilateral-filter";
+import {
+  documentToneFilterSchema,
+  nativeCompositionFilterSchema,
+  frequencyBandFilterSchema,
+  smartFilterSchema,
+  type SmartFilterData,
+} from "../core/smart/filters";
 export abstract class SmartFilter {
   private readonly data: SmartFilterData;
   protected constructor(data: SmartFilterData) {
@@ -23,16 +32,35 @@ export abstract class SmartFilter {
 }
 type Options = { id?: string; enabled?: boolean };
 export class BilateralDenoiseFilter extends SmartFilter {
-  constructor(options:Options & Partial<BilateralFilterOptions>={}) {
-    const settings=bilateralFilterSchema.omit({kind:true}).partial().strict().parse(options);
-    super({kind:'bilateral-denoise',id:settings.id??id(),enabled:settings.enabled??true,
-      radius:settings.radius??2,colorSigma:settings.colorSigma??25,amount:settings.amount??.5});
+  constructor(options: Options & Partial<BilateralFilterOptions> = {}) {
+    const settings = bilateralFilterSchema
+      .omit({ kind: true })
+      .partial()
+      .strict()
+      .parse(options);
+    super({
+      kind: "bilateral-denoise",
+      id: settings.id ?? id(),
+      enabled: settings.enabled ?? true,
+      radius: settings.radius ?? 2,
+      colorSigma: settings.colorSigma ?? 25,
+      amount: settings.amount ?? 0.5,
+    });
   }
 }
 export class MedianFilter extends SmartFilter {
   constructor(options: Options & { radius?: number } = {}) {
-    const settings = medianFilterSchema.omit({kind:true}).partial().strict().parse(options);
-    super({kind:'median', id:settings.id ?? id(), enabled:settings.enabled ?? true, radius:settings.radius ?? 1});
+    const settings = medianFilterSchema
+      .omit({ kind: true })
+      .partial()
+      .strict()
+      .parse(options);
+    super({
+      kind: "median",
+      id: settings.id ?? id(),
+      enabled: settings.enabled ?? true,
+      radius: settings.radius ?? 1,
+    });
   }
 }
 export class GaussianBlurFilter extends SmartFilter {
@@ -83,28 +111,62 @@ export class SmartToneFilter extends SmartFilter {
 }
 
 export class FrequencyBandFilter extends SmartFilter {
-  constructor(options: Options & { sigma?: number; band?: "low" | "high" | "correction" } = {}) {
-    const settings = frequencyBandFilterSchema.omit({kind:true}).partial().parse(options);
-    super({kind:"frequency-band", id:settings.id === undefined ? id() : settings.id,
-      enabled:settings.enabled === undefined ? true : settings.enabled,
-      sigma:settings.sigma === undefined ? 4 : settings.sigma, band:settings.band === undefined ? "high" : settings.band});
+  constructor(
+    options: Options & {
+      sigma?: number;
+      band?: "low" | "high" | "correction";
+    } = {},
+  ) {
+    const settings = frequencyBandFilterSchema
+      .omit({ kind: true })
+      .partial()
+      .parse(options);
+    super({
+      kind: "frequency-band",
+      id: settings.id === undefined ? id() : settings.id,
+      enabled: settings.enabled === undefined ? true : settings.enabled,
+      sigma: settings.sigma === undefined ? 4 : settings.sigma,
+      band: settings.band === undefined ? "high" : settings.band,
+    });
   }
 }
 
 /** Keep this master's RGBA composition on its native grid before instance resampling. */
 export class NativeCompositionFilter extends SmartFilter {
   constructor(options: Options = {}) {
-    const settings=nativeCompositionFilterSchema.omit({kind:true}).partial().parse(options);
-    const values={kind:'native-composition' as const,id:settings.id===undefined?id():settings.id,enabled:settings.enabled===undefined?true:settings.enabled};
+    const settings = nativeCompositionFilterSchema
+      .omit({ kind: true })
+      .partial()
+      .parse(options);
+    const values = {
+      kind: "native-composition" as const,
+      id: settings.id === undefined ? id() : settings.id,
+      enabled: settings.enabled === undefined ? true : settings.enabled,
+    };
     super(values);
   }
 }
 
 /** Tone in document pixels after instance placement, before its ordinary layer mask. */
 export class DocumentToneFilter extends SmartFilter {
-  constructor(options: Options & {exposure?:number;contrast?:number;saturation?:number} = {}) {
-    const values=documentToneFilterSchema.omit({kind:true}).partial().parse(options);
-    super({kind:'document-tone',id:values.id===undefined?id():values.id,enabled:values.enabled===undefined?true:values.enabled,
-      exposure:values.exposure===undefined?0:values.exposure,contrast:values.contrast===undefined?0:values.contrast,saturation:values.saturation===undefined?0:values.saturation});
+  constructor(
+    options: Options & {
+      exposure?: number;
+      contrast?: number;
+      saturation?: number;
+    } = {},
+  ) {
+    const values = documentToneFilterSchema
+      .omit({ kind: true })
+      .partial()
+      .parse(options);
+    super({
+      kind: "document-tone",
+      id: values.id === undefined ? id() : values.id,
+      enabled: values.enabled === undefined ? true : values.enabled,
+      exposure: values.exposure === undefined ? 0 : values.exposure,
+      contrast: values.contrast === undefined ? 0 : values.contrast,
+      saturation: values.saturation === undefined ? 0 : values.saturation,
+    });
   }
 }

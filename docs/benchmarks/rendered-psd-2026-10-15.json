@@ -16,10 +16,7 @@
     "cases": [
       {
         "sha256": "36a072267f1c5019b5eb76b3712c43cf8f719695d0137a9fcc031e4edec53b77",
-        "size": [
-          96,
-          64
-        ],
+        "size": [96, 64],
         "preview": {
           "maxPremultipliedRgbError": 0.9960784313725526,
           "maxAlphaError": 0.0
@@ -31,36 +28,21 @@
         "layers": [
           {
             "name": "Merged through Gradient",
-            "bbox": [
-              0,
-              0,
-              96,
-              64
-            ],
+            "bbox": [0, 0, 96, 64],
             "visible": true,
             "opacity": 255,
             "blendMode": "norm"
           },
           {
             "name": "Top pixel layer",
-            "bbox": [
-              0,
-              0,
-              96,
-              64
-            ],
+            "bbox": [0, 0, 96, 64],
             "visible": true,
             "opacity": 153,
             "blendMode": "mul "
           },
           {
             "name": "Hidden work",
-            "bbox": [
-              0,
-              0,
-              96,
-              64
-            ],
+            "bbox": [0, 0, 96, 64],
             "visible": false,
             "opacity": 255,
             "blendMode": "norm"
@@ -69,10 +51,7 @@
       },
       {
         "sha256": "5361443714676156ea632b5f1058cc6e5fea4c3514438e01448ee4de3057e7c0",
-        "size": [
-          96,
-          64
-        ],
+        "size": [96, 64],
         "preview": {
           "maxPremultipliedRgbError": 0.9960784313725526,
           "maxAlphaError": 0.0
@@ -84,12 +63,7 @@
         "layers": [
           {
             "name": "Untitled",
-            "bbox": [
-              0,
-              0,
-              96,
-              64
-            ],
+            "bbox": [0, 0, 96, 64],
             "visible": true,
             "opacity": 255,
             "blendMode": "norm"
@@ -174,29 +148,12 @@
     "largestReturnedRenderTilePixels": 51200,
     "bytes": 6400704,
     "sha256": "b0e42ac420837c1e6450b81c53300a9f1b253329f46ecd6109fbf2f0f49734f5",
-    "rgbaSamples": [
-      127,
-      0,
-      128,
-      255
-    ],
+    "rgbaSamples": [127, 0, 128, 255],
     "sampleCoordinates": [
-      [
-        0,
-        0
-      ],
-      [
-        2047,
-        63
-      ],
-      [
-        2048,
-        64
-      ],
-      [
-        9999,
-        4999
-      ]
+      [0, 0],
+      [2047, 63],
+      [2048, 64],
+      [9999, 4999]
     ],
     "independentPillowDimensionsAndSamplesPassed": true
   },

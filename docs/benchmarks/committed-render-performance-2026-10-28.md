@@ -15,13 +15,13 @@ Instrumented CPU/frame diagnostics are separate from clean measurements. Baselin
 Each cell is median / p95 milliseconds, with nearest-rank p95. Twelve samples make p95 the maximum; all samples remain in the archive. There is no claim that median improvements satisfy tail-latency or sustained 60fps acceptance.
 
 | Pair | Layers | Baseline click → canvas | Candidate click → canvas | Baseline click → preparation p95 | Candidate click → preparation p95 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | 16 | 53.3 / 65.9 | 11.6 / 57.6 | 55.3 | 10.1 |
-| 1 | 64 | 60.4 / 104.7 | 16.7 / 96.6 | 64.6 | 10.6 |
-| 2 | 16 | 55.5 / 72.5 | 10.3 / 59.5 | 69.7 | 8.4 |
-| 2 | 64 | 59.3 / 122.8 | 17.0 / 70.9 | 70.3 | 9.9 |
-| 3 | 16 | 52.6 / 67.9 | 10.3 / 27.7 | 65.1 | 7.2 |
-| 3 | 64 | 56.5 / 98.8 | 17.9 / 149.4 | 66.0 | 17.7 |
+| ---- | -----: | ----------------------: | -----------------------: | -------------------------------: | --------------------------------: |
+| 1    |     16 |             53.3 / 65.9 |              11.6 / 57.6 |                             55.3 |                              10.1 |
+| 1    |     64 |            60.4 / 104.7 |              16.7 / 96.6 |                             64.6 |                              10.6 |
+| 2    |     16 |             55.5 / 72.5 |              10.3 / 59.5 |                             69.7 |                               8.4 |
+| 2    |     64 |            59.3 / 122.8 |              17.0 / 70.9 |                             70.3 |                               9.9 |
+| 3    |     16 |             52.6 / 67.9 |              10.3 / 27.7 |                             65.1 |                               7.2 |
+| 3    |     64 |             56.5 / 98.8 |             17.9 / 149.4 |                             66.0 |                              17.7 |
 
 Typical completion is substantially earlier. Cold completion remains mixed: the third 64-layer candidate reaches 149.4 ms versus 98.8 ms baseline, with 131.6 ms inside preparation. This is retained as an unresolved tail, not discarded or hidden by warm-only statistics. Preparation also grows in other samples despite earlier admission; this change removes the extra frame gate and does not claim cheaper native font preparation.
 
@@ -43,26 +43,26 @@ All paired font-test long tasks are retained with timestamps. None intersects it
 
 The following are recorded p95 metrics above 33 ms from the full candidate sweep, sorted by duration. These are observations from mixed fixtures and operations, not a uniform SLO or attribution of all setup/long tasks to the named control. The full audit retains every extracted metric.
 
-| Case | Metric | p95 ms |
-| --- | --- | ---: |
-| scripts on a stroke-heavy document record snapshot transport latency | script-transport-latency / [].ms | 269.9 |
-| fresh isolated script workers report initialization, document and command costs | script-runtime-phases / [].totalMs | 194.4 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / longTasks | 189.0 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / taskDetails[].duration | 189.0 |
-| crop resize and isolated scripts with 64 layers record presentation latency | document-operations-latency / samples[].presentMs | 181.2 |
-| spot-heal repeated gestures record completion and main-thread stalls | retouch-latency / samples | 180.9 |
-| crop resize and isolated scripts with 64 layers record presentation latency | document-operations-latency / samples[].commitMs | 178.3 |
-| crop resize and isolated scripts with 64 layers record presentation latency | document-operations-latency / samples[].scriptRuntimeMs | 167.0 |
-| crop resize and isolated scripts with 5 layers record presentation latency | document-operations-latency / samples[].presentMs | 148.5 |
-| crop resize and isolated scripts with 5 layers record presentation latency | document-operations-latency / samples[].commitMs | 147.0 |
-| crop resize and isolated scripts with 5 layers record presentation latency | document-operations-latency / samples[].scriptRuntimeMs | 140.8 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / samples[].presentMs | 139.0 |
-| scripts on a stroke-heavy document record snapshot transport latency | document-reconstruction-latency / [].ms | 132.1 |
-| pixel operations 2000x1500 record completion and frame gaps | pixel-operation-latency / samples[].ms | 128.8 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / samples[].prepareMs | 128.4 |
-| spot-heal repeated gestures record completion and main-thread stalls | retouch-latency / phases[].ms | 116.5 |
-| filter-mask brush on 2000px smart filter stack with 16 strokes records live response | filter-mask-latency / samples | 110.5 |
-| float gradient-map controls record matching model and independently checked canvas pixels | float-control-latency / samples[].verifiedReadbackMs | 95.0 |
+| Case                                                                                      | Metric                                                  | p95 ms |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------- | -----: |
+| scripts on a stroke-heavy document record snapshot transport latency                      | script-transport-latency / [].ms                        |  269.9 |
+| fresh isolated script workers report initialization, document and command costs           | script-runtime-phases / [].totalMs                      |  194.4 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / longTasks                    |  189.0 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / taskDetails[].duration       |  189.0 |
+| crop resize and isolated scripts with 64 layers record presentation latency               | document-operations-latency / samples[].presentMs       |  181.2 |
+| spot-heal repeated gestures record completion and main-thread stalls                      | retouch-latency / samples                               |  180.9 |
+| crop resize and isolated scripts with 64 layers record presentation latency               | document-operations-latency / samples[].commitMs        |  178.3 |
+| crop resize and isolated scripts with 64 layers record presentation latency               | document-operations-latency / samples[].scriptRuntimeMs |  167.0 |
+| crop resize and isolated scripts with 5 layers record presentation latency                | document-operations-latency / samples[].presentMs       |  148.5 |
+| crop resize and isolated scripts with 5 layers record presentation latency                | document-operations-latency / samples[].commitMs        |  147.0 |
+| crop resize and isolated scripts with 5 layers record presentation latency                | document-operations-latency / samples[].scriptRuntimeMs |  140.8 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / samples[].presentMs          |  139.0 |
+| scripts on a stroke-heavy document record snapshot transport latency                      | document-reconstruction-latency / [].ms                 |  132.1 |
+| pixel operations 2000x1500 record completion and frame gaps                               | pixel-operation-latency / samples[].ms                  |  128.8 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / samples[].prepareMs          |  128.4 |
+| spot-heal repeated gestures record completion and main-thread stalls                      | retouch-latency / phases[].ms                           |  116.5 |
+| filter-mask brush on 2000px smart filter stack with 16 strokes records live response      | filter-mask-latency / samples                           |  110.5 |
+| float gradient-map controls record matching model and independently checked canvas pixels | float-control-latency / samples[].verifiedReadbackMs    |   95.0 |
 
 ## Evidence and boundaries
 

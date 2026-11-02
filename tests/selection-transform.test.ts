@@ -1,4 +1,4 @@
-import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
+import { SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA } from "../src/core/model";
 import { expect, it } from "vitest";
 import {
   AffineTransform,

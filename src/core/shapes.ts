@@ -1,6 +1,6 @@
-import {vectorFillData,type VectorFillOptions} from './vector-gradient';
-import {vectorStrokeData,type VectorStrokeOptions} from './vector-stroke';
-import {parseSvgContours} from './svg-path-import';
+import { vectorFillData, type VectorFillOptions } from "./vector-gradient";
+import { vectorStrokeData, type VectorStrokeOptions } from "./vector-stroke";
+import { parseSvgContours } from "./svg-path-import";
 /**
  * Vector shape primitives, SVG path serialization, and SVG parsing
  * for Ticket T16 / F07 ("Vector and shape editing").
@@ -59,7 +59,7 @@ export function createRectanglePath(
       stroke,
       strokeWidth,
       ...vectorStrokeData(options),
-    ...vectorFillData(options),
+      ...vectorFillData(options),
     };
   }
 
@@ -211,8 +211,13 @@ export function createPolygonPath(
 }
 
 /** Single-contour SVG path conversion. Invalid or compound data rejects explicitly. */
-export function parseSvgPath(d:string):(Point & {in?:Point;out?:Point})[]{
- const {contours}=parseSvgContours(d);
- if(contours.length>1)throw new Error('VectorPath accepts one SVG contour. Import the SVG document for compound geometry.');
- return contours[0]?.points??[];
+export function parseSvgPath(
+  d: string,
+): (Point & { in?: Point; out?: Point })[] {
+  const { contours } = parseSvgContours(d);
+  if (contours.length > 1)
+    throw new Error(
+      "VectorPath accepts one SVG contour. Import the SVG document for compound geometry.",
+    );
+  return contours[0]?.points ?? [];
 }

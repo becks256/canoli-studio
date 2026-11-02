@@ -1,55 +1,551 @@
-import {expect,test} from '@playwright/test';
+import { expect, test } from "@playwright/test";
 
-for(const kind of ['bitmap-mask','affine-raster','vector','affine-smart'])test(`${kind} preserves complete viewport, cropped regions and native PNG pixels`,async({page},info)=>{
- await page.goto('/');const result=await page.evaluate(async kind=>{
-  const {editor,Document,RasterLayer,VectorLayer,VectorPath,SmartToneFilter,LayerMask,AffineTransform}=window.luma,{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts')),{exportPng}=await import(/* @vite-ignore */String('/src/engine/png.ts'));
-  const width=1024,height=384,source=new OffscreenCanvas(width,height),sc=source.getContext('2d')!,image=sc.createImageData(width,height);for(let y=0;y<height;y++)for(let x=0;x<width;x++)image.data.set([(x*31+y*7)%256,(x*9+y*43)%256,(x*17+y*11)%256,[0,1,64,128,255][(x+y)%5]],(y*width+x)*4);sc.putImageData(image,0,0);const blob=await source.convertToBlob(),asset=await editor.assetStore.add(blob,'Canonical native source',undefined,false);
-  const master=new Document({width,height}),raster=master.layers.add(new RasterLayer({assetId:asset.id,width,height}));if(kind==='affine-raster')raster.transform=new AffineTransform(.93,.17,-.09,1.04,31,14);if(kind==='vector'){const vector=master.layers.add(new VectorLayer());vector.paths.add(VectorPath.ellipse({x:47.25,y:13.5,width:900.3,height:330.7},{fill:'#eedd44',stroke:null}));}
-  const document=new Document({width:1080,height:440}),instance=document.placeSmartObject(document.defineComponent(master));instance.setFilters([new SmartToneFilter({exposure:.7,contrast:13,saturation:-30})]);if(kind==='affine-smart')instance.transform=new AffineTransform(.93,.17,-.09,1.04,31,14);
-  if(kind==='bitmap-mask'){const tip=new OffscreenCanvas(16,12),tc=tip.getContext('2d')!,data=tc.createImageData(16,12);for(let y=0;y<12;y++)for(let x=0;x<16;x++)data.data.set([(x*31+y*7)%256,(x*9+y*43)%256,(x*17+y*11)%256,[0,64,128,255][(x+y)%4]],(y*16+x)*4);tc.putImageData(data,0,0);const texture=await editor.assetStore.add(await tip.convertToBlob(),'Canonical bitmap mask',undefined,false);instance.filterMask=new LayerMask({assetId:texture.id,density:.7,x:31,y:14,basis:new AffineTransform(55,.17,-.09,25,0,0)});}
-  const renderer:import('../src/engine/renderer').CanvasRenderer=new CanvasRenderer();await renderer.processor.ready;const before=JSON.stringify(document.toJSON()),hash=async(bytes:ArrayBuffer)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join(''),sourceHash=await hash(await blob.arrayBuffer());
-  try{
-   const full=await renderer.render(document.toJSON(),editor.assetStore,{cache:false,readback:true}),expected=full.getContext('2d')!.getImageData(0,0,1080,440).data,viewportPng=full.toDataURL().split(',')[1];full.width=full.height=0;const crops=[];
-   for(const region of [{x:13,y:7,width:257,height:193},{x:251,y:61,width:260,height:67},{x:0,y:64,width:1080,height:64}]){const output=await renderer.render(document.toJSON(),editor.assetStore,{region,cache:false,readback:true});try{const actual=output.getContext('2d')!.getImageData(0,0,region.width,region.height).data;let maximum=0,changed=0;for(let y=0;y<region.height;y++)for(let x=0;x<region.width;x++){let different=false;for(let c=0;c<4;c++){const delta=Math.abs(actual[(y*region.width+x)*4+c]-expected[((y+region.y)*1080+x+region.x)*4+c]);maximum=Math.max(maximum,delta);different||=delta>0;}if(different)changed++;}crops.push({region,maximum,changed});}finally{output.width=output.height=0;}}
-   const png=await exportPng(document.toJSON(),editor.assetStore,renderer),bitmap=await createImageBitmap(png),surface=new OffscreenCanvas(1080,440),c=surface.getContext('2d')!;c.drawImage(bitmap,0,0);bitmap.close();const actual=c.getImageData(0,0,1080,440).data;let maximum=0,changed=0;for(let i=0;i<actual.length;i+=4){let different=false;for(let c=0;c<4;c++){const delta=Math.abs(actual[i+c]-expected[i+c]);maximum=Math.max(maximum,delta);different||=delta>0;}if(different)changed++;}
-   const pngBase64=await new Promise<string>((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=()=>reject(r.error);r.readAsDataURL(png);});return{kind,crops,maximum,changed,nonempty:expected.some((v,i)=>i%4===3&&v>0),viewportPng,pngBase64,modelUnchanged:before===JSON.stringify(document.toJSON()),sourceUnchanged:sourceHash===await hash(await asset.blob.arrayBuffer()),sourceHash,width:asset.bitmap.width,height:asset.bitmap.height};
-  }finally{renderer.dispose();}
- },kind);
- const {viewportPng,pngBase64,...report}=result;await info.attach('canonical-canvas-pixels',{body:JSON.stringify(report),contentType:'application/json'});await info.attach('complete-viewport.png',{body:Buffer.from(viewportPng,'base64'),contentType:'image/png'});await info.attach('native-export.png',{body:Buffer.from(pngBase64,'base64'),contentType:'image/png'});expect(result.nonempty).toBe(true);expect(result.maximum).toBe(0);expect(result.changed).toBe(0);for(const crop of result.crops){expect(crop.maximum,JSON.stringify(crop)).toBe(0);expect(crop.changed).toBe(0);}expect(result.modelUnchanged).toBe(true);expect(result.sourceUnchanged).toBe(true);expect([result.width,result.height]).toEqual([1024,384]);
+for (const kind of ["bitmap-mask", "affine-raster", "vector", "affine-smart"])
+  test(`${kind} preserves complete viewport, cropped regions and native PNG pixels`, async ({
+    page,
+  }, info) => {
+    await page.goto("/");
+    const result = await page.evaluate(async (kind) => {
+      const {
+          editor,
+          Document,
+          RasterLayer,
+          VectorLayer,
+          VectorPath,
+          SmartToneFilter,
+          LayerMask,
+          AffineTransform,
+        } = window.luma,
+        { CanvasRenderer } = await import(
+          /* @vite-ignore */ String("/src/engine/renderer.ts")
+        ),
+        { exportPng } = await import(
+          /* @vite-ignore */ String("/src/engine/png.ts")
+        );
+      const width = 1024,
+        height = 384,
+        source = new OffscreenCanvas(width, height),
+        sc = source.getContext("2d")!,
+        image = sc.createImageData(width, height);
+      for (let y = 0; y < height; y++)
+        for (let x = 0; x < width; x++)
+          image.data.set(
+            [
+              (x * 31 + y * 7) % 256,
+              (x * 9 + y * 43) % 256,
+              (x * 17 + y * 11) % 256,
+              [0, 1, 64, 128, 255][(x + y) % 5],
+            ],
+            (y * width + x) * 4,
+          );
+      sc.putImageData(image, 0, 0);
+      const blob = await source.convertToBlob(),
+        asset = await editor.assetStore.add(
+          blob,
+          "Canonical native source",
+          undefined,
+          false,
+        );
+      const master = new Document({ width, height }),
+        raster = master.layers.add(
+          new RasterLayer({ assetId: asset.id, width, height }),
+        );
+      if (kind === "affine-raster")
+        raster.transform = new AffineTransform(0.93, 0.17, -0.09, 1.04, 31, 14);
+      if (kind === "vector") {
+        const vector = master.layers.add(new VectorLayer());
+        vector.paths.add(
+          VectorPath.ellipse(
+            { x: 47.25, y: 13.5, width: 900.3, height: 330.7 },
+            { fill: "#eedd44", stroke: null },
+          ),
+        );
+      }
+      const document = new Document({ width: 1080, height: 440 }),
+        instance = document.placeSmartObject(document.defineComponent(master));
+      instance.setFilters([
+        new SmartToneFilter({ exposure: 0.7, contrast: 13, saturation: -30 }),
+      ]);
+      if (kind === "affine-smart")
+        instance.transform = new AffineTransform(
+          0.93,
+          0.17,
+          -0.09,
+          1.04,
+          31,
+          14,
+        );
+      if (kind === "bitmap-mask") {
+        const tip = new OffscreenCanvas(16, 12),
+          tc = tip.getContext("2d")!,
+          data = tc.createImageData(16, 12);
+        for (let y = 0; y < 12; y++)
+          for (let x = 0; x < 16; x++)
+            data.data.set(
+              [
+                (x * 31 + y * 7) % 256,
+                (x * 9 + y * 43) % 256,
+                (x * 17 + y * 11) % 256,
+                [0, 64, 128, 255][(x + y) % 4],
+              ],
+              (y * 16 + x) * 4,
+            );
+        tc.putImageData(data, 0, 0);
+        const texture = await editor.assetStore.add(
+          await tip.convertToBlob(),
+          "Canonical bitmap mask",
+          undefined,
+          false,
+        );
+        instance.filterMask = new LayerMask({
+          assetId: texture.id,
+          density: 0.7,
+          x: 31,
+          y: 14,
+          basis: new AffineTransform(55, 0.17, -0.09, 25, 0, 0),
+        });
+      }
+      const renderer: import("../src/engine/renderer").CanvasRenderer =
+        new CanvasRenderer();
+      await renderer.processor.ready;
+      const before = JSON.stringify(document.toJSON()),
+        hash = async (bytes: ArrayBuffer) =>
+          [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]
+            .map((v) => v.toString(16).padStart(2, "0"))
+            .join(""),
+        sourceHash = await hash(await blob.arrayBuffer());
+      try {
+        const full = await renderer.render(
+            document.toJSON(),
+            editor.assetStore,
+            { cache: false, readback: true },
+          ),
+          expected = full.getContext("2d")!.getImageData(0, 0, 1080, 440).data,
+          viewportPng = full.toDataURL().split(",")[1];
+        full.width = full.height = 0;
+        const crops = [];
+        for (const region of [
+          { x: 13, y: 7, width: 257, height: 193 },
+          { x: 251, y: 61, width: 260, height: 67 },
+          { x: 0, y: 64, width: 1080, height: 64 },
+        ]) {
+          const output = await renderer.render(
+            document.toJSON(),
+            editor.assetStore,
+            { region, cache: false, readback: true },
+          );
+          try {
+            const actual = output
+              .getContext("2d")!
+              .getImageData(0, 0, region.width, region.height).data;
+            let maximum = 0,
+              changed = 0;
+            for (let y = 0; y < region.height; y++)
+              for (let x = 0; x < region.width; x++) {
+                let different = false;
+                for (let c = 0; c < 4; c++) {
+                  const delta = Math.abs(
+                    actual[(y * region.width + x) * 4 + c] -
+                      expected[((y + region.y) * 1080 + x + region.x) * 4 + c],
+                  );
+                  maximum = Math.max(maximum, delta);
+                  different ||= delta > 0;
+                }
+                if (different) changed++;
+              }
+            crops.push({ region, maximum, changed });
+          } finally {
+            output.width = output.height = 0;
+          }
+        }
+        const png = await exportPng(
+            document.toJSON(),
+            editor.assetStore,
+            renderer,
+          ),
+          bitmap = await createImageBitmap(png),
+          surface = new OffscreenCanvas(1080, 440),
+          c = surface.getContext("2d")!;
+        c.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        const actual = c.getImageData(0, 0, 1080, 440).data;
+        let maximum = 0,
+          changed = 0;
+        for (let i = 0; i < actual.length; i += 4) {
+          let different = false;
+          for (let c = 0; c < 4; c++) {
+            const delta = Math.abs(actual[i + c] - expected[i + c]);
+            maximum = Math.max(maximum, delta);
+            different ||= delta > 0;
+          }
+          if (different) changed++;
+        }
+        const pngBase64 = await new Promise<string>((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(String(r.result).split(",")[1]);
+          r.onerror = () => reject(r.error);
+          r.readAsDataURL(png);
+        });
+        return {
+          kind,
+          crops,
+          maximum,
+          changed,
+          nonempty: expected.some((v, i) => i % 4 === 3 && v > 0),
+          viewportPng,
+          pngBase64,
+          modelUnchanged: before === JSON.stringify(document.toJSON()),
+          sourceUnchanged:
+            sourceHash === (await hash(await asset.blob.arrayBuffer())),
+          sourceHash,
+          width: asset.bitmap.width,
+          height: asset.bitmap.height,
+        };
+      } finally {
+        renderer.dispose();
+      }
+    }, kind);
+    const { viewportPng, pngBase64, ...report } = result;
+    await info.attach("canonical-canvas-pixels", {
+      body: JSON.stringify(report),
+      contentType: "application/json",
+    });
+    await info.attach("complete-viewport.png", {
+      body: Buffer.from(viewportPng, "base64"),
+      contentType: "image/png",
+    });
+    await info.attach("native-export.png", {
+      body: Buffer.from(pngBase64, "base64"),
+      contentType: "image/png",
+    });
+    expect(result.nonempty).toBe(true);
+    expect(result.maximum).toBe(0);
+    expect(result.changed).toBe(0);
+    for (const crop of result.crops) {
+      expect(crop.maximum, JSON.stringify(crop)).toBe(0);
+      expect(crop.changed).toBe(0);
+    }
+    expect(result.modelUnchanged).toBe(true);
+    expect(result.sourceUnchanged).toBe(true);
+    expect([result.width, result.height]).toEqual([1024, 384]);
+  });
+
+test("affine sampling planner bounds large-halo jobs before native processing", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const {
+        editor,
+        Document,
+        RasterLayer,
+        GaussianBlurFilter,
+        AffineTransform,
+      } = window.luma,
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      );
+    const source = new OffscreenCanvas(1, 1);
+    source.getContext("2d")!.fillRect(0, 0, 1, 1);
+    const asset = await editor.assetStore.add(
+        await source.convertToBlob(),
+        "Tiny source with large halo",
+        undefined,
+        false,
+      ),
+      master = new Document({ width: 8, height: 8 });
+    master.layers.add(
+      new RasterLayer({ assetId: asset.id, width: 1, height: 1 }),
+    );
+    const document = new Document({ width: 8, height: 8 }),
+      instance = document.placeSmartObject(document.defineComponent(master));
+    instance.addFilter(new GaussianBlurFilter({ sigma: 331 }));
+    instance.transform = new AffineTransform(1, 0.1, 0.1, 1, 0, 0);
+    const renderer: import("../src/engine/renderer").CanvasRenderer =
+      new CanvasRenderer();
+    await renderer.processor.ready;
+    const jobs: { width: number; height: number }[] = [];
+    renderer.processor.spatialFilter = (...args) => {
+      jobs.push({ width: args[1], height: args[2] });
+      return Promise.resolve(args[0]);
+    };
+    try {
+      const output = await renderer.render(
+        document.toJSON(),
+        editor.assetStore,
+        { cache: false, readback: true },
+      );
+      try {
+        return {
+          nativeProcessingStubbed: true,
+          jobs,
+          width: output.width,
+          height: output.height,
+          sourceAlive: asset.bitmap.width === 1,
+        };
+      } finally {
+        output.width = output.height = 0;
+      }
+    } finally {
+      renderer.dispose();
+    }
+  });
+  await info.attach("canonical-spatial-halo-planning-budget", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
+  expect([result.width, result.height]).toEqual([8, 8]);
+  expect(result.sourceAlive).toBe(true);
+  expect(result.jobs.length).toBeGreaterThan(0);
+  for (const job of result.jobs) {
+    expect(job.width * job.height).toBeLessThanOrEqual(4_000_000);
+    expect(Math.max(job.width, job.height)).toBeLessThanOrEqual(8192);
+  }
 });
 
-test('affine sampling planner bounds large-halo jobs before native processing',async({page},info)=>{
- await page.goto('/');const result=await page.evaluate(async()=>{
-  const {editor,Document,RasterLayer,GaussianBlurFilter,AffineTransform}=window.luma,{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts'));
-  const source=new OffscreenCanvas(1,1);source.getContext('2d')!.fillRect(0,0,1,1);const asset=await editor.assetStore.add(await source.convertToBlob(),'Tiny source with large halo',undefined,false),master=new Document({width:8,height:8});master.layers.add(new RasterLayer({assetId:asset.id,width:1,height:1}));const document=new Document({width:8,height:8}),instance=document.placeSmartObject(document.defineComponent(master));instance.addFilter(new GaussianBlurFilter({sigma:331}));instance.transform=new AffineTransform(1,.1,.1,1,0,0);
-  const renderer:import('../src/engine/renderer').CanvasRenderer=new CanvasRenderer();await renderer.processor.ready;const jobs:{width:number;height:number}[]=[];renderer.processor.spatialFilter=(...args)=>{jobs.push({width:args[1],height:args[2]});return Promise.resolve(args[0]);};
-  try{const output=await renderer.render(document.toJSON(),editor.assetStore,{cache:false,readback:true});try{return{nativeProcessingStubbed:true,jobs,width:output.width,height:output.height,sourceAlive:asset.bitmap.width===1};}finally{output.width=output.height=0;}}finally{renderer.dispose();}
- });await info.attach('canonical-spatial-halo-planning-budget',{body:JSON.stringify(result),contentType:'application/json'});expect([result.width,result.height]).toEqual([8,8]);expect(result.sourceAlive).toBe(true);expect(result.jobs.length).toBeGreaterThan(0);for(const job of result.jobs){expect(job.width*job.height).toBeLessThanOrEqual(4_000_000);expect(Math.max(job.width,job.height)).toBeLessThanOrEqual(8192);}
+test("maximum-size coincident vector contours retain native pixels, authored anchors and project reopening", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { editor, Document, VectorLayer, VectorPath } = window.luma,
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      ),
+      { exportPng } = await import(
+        /* @vite-ignore */ String("/src/engine/png.ts")
+      ),
+      { serializeProject, readProject } = await import(
+        /* @vite-ignore */ String("/src/core/project.ts")
+      );
+    const document = new Document({ width: 160, height: 128 }),
+      layer = document.layers.add(new VectorLayer()),
+      points = Array.from({ length: 19998 }, () => ({ x: 24, y: 112 }));
+    points.push({ x: 64, y: 16 }, { x: 104, y: 112 });
+    layer.paths.add(
+      new VectorPath({
+        points,
+        closed: true,
+        fill: "#4477cc",
+        stroke: "#ff0000",
+        strokeWidth: 16,
+        strokeJoin: "miter",
+        strokeMiterLimit: 12,
+      }),
+    );
+    const before = document.toJSON(),
+      expected = new OffscreenCanvas(160, 128),
+      c = expected.getContext("2d")!;
+    c.beginPath();
+    c.moveTo(24, 112);
+    for (const p of points.slice(1)) c.lineTo(p.x, p.y);
+    c.closePath();
+    c.fillStyle = "#4477cc";
+    c.fill();
+    c.lineWidth = 16;
+    c.lineCap = "round";
+    c.lineJoin = "miter";
+    c.miterLimit = 12;
+    c.strokeStyle = "#ff0000";
+    c.stroke();
+    const independent = c.getImageData(0, 0, 160, 128).data;
+    const renderer: import("../src/engine/renderer").CanvasRenderer =
+      new CanvasRenderer();
+    await renderer.processor.ready;
+    try {
+      const sparse = new Document({ width: 160, height: 128 });
+      sparse.layers.add(new VectorLayer()).paths.add(
+        new VectorPath({
+          points: [
+            { x: 24, y: 112 },
+            { x: 64, y: 16 },
+            { x: 104, y: 112 },
+          ],
+          closed: true,
+          fill: "#4477cc",
+          stroke: "#ff0000",
+          strokeWidth: 16,
+          strokeJoin: "miter",
+          strokeMiterLimit: 12,
+        }),
+      );
+      const baseline = await renderer.render(
+          sparse.toJSON(),
+          editor.assetStore,
+          { cache: false, readback: true },
+        ),
+        reference = baseline
+          .getContext("2d")!
+          .getImageData(0, 0, 160, 128).data;
+      baseline.width = baseline.height = 0;
+      const full = await renderer.render(before, editor.assetStore, {
+        cache: false,
+        readback: true,
+      });
+      let directChanged = 0;
+      const actual = full.getContext("2d")!.getImageData(0, 0, 160, 128).data;
+      for (let i = 0; i < actual.length; i++)
+        if (actual[i] !== reference[i]) directChanged++;
+      full.width = full.height = 0;
+      const { compareImportPixels } = await import(
+          /* @vite-ignore */ String("/tests/svg-import-pixels.ts")
+        ),
+        nativeReference = compareImportPixels(independent, actual, 160, 128);
+      const project = await serializeProject(before, editor.assetStore),
+        reopened = await readProject(project),
+        modelExact =
+          JSON.stringify(reopened.document) === JSON.stringify(before),
+        png = await exportPng(reopened.document, editor.assetStore, renderer),
+        bitmap = await createImageBitmap(png),
+        output = new OffscreenCanvas(160, 128),
+        out = output.getContext("2d")!;
+      out.drawImage(bitmap, 0, 0);
+      bitmap.close();
+      const restored = out.getImageData(0, 0, 160, 128).data;
+      let reopenedChanged = 0;
+      for (let i = 0; i < restored.length; i++)
+        if (restored[i] !== reference[i]) reopenedChanged++;
+      return {
+        anchors: layer.paths.at(0)!.points.length,
+        directChanged,
+        reopenedChanged,
+        modelExact,
+        nativeReference,
+        nonempty: reference.some((value, i) => i % 4 === 3 && value > 0),
+        modelUnchanged:
+          JSON.stringify(document.toJSON()) === JSON.stringify(before),
+      };
+    } finally {
+      renderer.dispose();
+    }
+  });
+  await info.attach("coincident-vector-native-result", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
+  expect(result.anchors).toBe(20000);
+  expect(result.nativeReference.interiorErrors).toBe(0);
+  expect(result.nativeReference.contourErrors).toBe(0);
+  expect(result.nativeReference.areaError).toBeLessThan(0.005);
+  expect(result.nativeReference.centroidError).toBeLessThan(0.15);
+  expect(result.directChanged).toBe(0);
+  expect(result.reopenedChanged).toBe(0);
+  expect(result.modelExact).toBe(true);
+  expect(result.nonempty).toBe(true);
+  expect(result.modelUnchanged).toBe(true);
 });
 
-test('maximum-size coincident vector contours retain native pixels, authored anchors and project reopening',async({page},info)=>{
- await page.goto('/');const result=await page.evaluate(async()=>{
-  const{editor,Document,VectorLayer,VectorPath}=window.luma,{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts')),{exportPng}=await import(/* @vite-ignore */String('/src/engine/png.ts')),{serializeProject,readProject}=await import(/* @vite-ignore */String('/src/core/project.ts'));
-  const document=new Document({width:160,height:128}),layer=document.layers.add(new VectorLayer()),points=Array.from({length:19998},()=>({x:24,y:112}));points.push({x:64,y:16},{x:104,y:112});layer.paths.add(new VectorPath({points,closed:true,fill:'#4477cc',stroke:'#ff0000',strokeWidth:16,strokeJoin:'miter',strokeMiterLimit:12}));
-  const before=document.toJSON(),expected=new OffscreenCanvas(160,128),c=expected.getContext('2d')!;c.beginPath();c.moveTo(24,112);for(const p of points.slice(1))c.lineTo(p.x,p.y);c.closePath();c.fillStyle='#4477cc';c.fill();c.lineWidth=16;c.lineCap='round';c.lineJoin='miter';c.miterLimit=12;c.strokeStyle='#ff0000';c.stroke();const independent=c.getImageData(0,0,160,128).data;
-  const renderer:import('../src/engine/renderer').CanvasRenderer=new CanvasRenderer();await renderer.processor.ready;
-  try{
-   const sparse=new Document({width:160,height:128});sparse.layers.add(new VectorLayer()).paths.add(new VectorPath({points:[{x:24,y:112},{x:64,y:16},{x:104,y:112}],closed:true,fill:'#4477cc',stroke:'#ff0000',strokeWidth:16,strokeJoin:'miter',strokeMiterLimit:12}));const baseline=await renderer.render(sparse.toJSON(),editor.assetStore,{cache:false,readback:true}),reference=baseline.getContext('2d')!.getImageData(0,0,160,128).data;baseline.width=baseline.height=0;
-   const full=await renderer.render(before,editor.assetStore,{cache:false,readback:true});let directChanged=0;const actual=full.getContext('2d')!.getImageData(0,0,160,128).data;for(let i=0;i<actual.length;i++)if(actual[i]!==reference[i])directChanged++;full.width=full.height=0;const{compareImportPixels}=await import(/* @vite-ignore */String('/tests/svg-import-pixels.ts')),nativeReference=compareImportPixels(independent,actual,160,128);
-   const project=await serializeProject(before,editor.assetStore),reopened=await readProject(project),modelExact=JSON.stringify(reopened.document)===JSON.stringify(before),png=await exportPng(reopened.document,editor.assetStore,renderer),bitmap=await createImageBitmap(png),output=new OffscreenCanvas(160,128),out=output.getContext('2d')!;out.drawImage(bitmap,0,0);bitmap.close();const restored=out.getImageData(0,0,160,128).data;let reopenedChanged=0;for(let i=0;i<restored.length;i++)if(restored[i]!==reference[i])reopenedChanged++;
-   return{anchors:layer.paths.at(0)!.points.length,directChanged,reopenedChanged,modelExact,nativeReference,nonempty:reference.some((value,i)=>i%4===3&&value>0),modelUnchanged:JSON.stringify(document.toJSON())===JSON.stringify(before)};
-  }finally{renderer.dispose();}
- });await info.attach('coincident-vector-native-result',{body:JSON.stringify(result),contentType:'application/json'});expect(result.anchors).toBe(20000);expect(result.nativeReference.interiorErrors).toBe(0);expect(result.nativeReference.contourErrors).toBe(0);expect(result.nativeReference.areaError).toBeLessThan(.005);expect(result.nativeReference.centroidError).toBeLessThan(.15);expect(result.directChanged).toBe(0);expect(result.reopenedChanged).toBe(0);expect(result.modelExact).toBe(true);expect(result.nonempty).toBe(true);expect(result.modelUnchanged).toBe(true);
-});
-
-test('real sigma331 Gaussian processing completes bounded affine rendering and native PNG without stubs',async({page},info)=>{
- await page.goto('/');const result=await page.evaluate(async()=>{
-  const{editor,Document,RasterLayer,GaussianBlurFilter,AffineTransform}=window.luma,{CanvasRenderer}=await import(/* @vite-ignore */String('/src/engine/renderer.ts')),{exportPng}=await import(/* @vite-ignore */String('/src/engine/png.ts'));
-  const source=new OffscreenCanvas(1,1);source.getContext('2d')!.fillRect(0,0,1,1);const blob=await source.convertToBlob(),asset=await editor.assetStore.add(blob,'Actual large Gaussian source',undefined,false),master=new Document({width:8,height:8});master.layers.add(new RasterLayer({assetId:asset.id,width:1,height:1}));const document=new Document({width:8,height:8}),instance=document.placeSmartObject(document.defineComponent(master));instance.addFilter(new GaussianBlurFilter({sigma:331}));instance.transform=new AffineTransform(1,.1,.1,1,0,0);const before=JSON.stringify(document.toJSON()),sourceBytes=new Uint8Array(await blob.arrayBuffer());
-  const renderer:import('../src/engine/renderer').CanvasRenderer=new CanvasRenderer();await renderer.processor.ready;const real=renderer.processor.spatialFilter.bind(renderer.processor),jobs:{width:number;height:number;elapsedMs:number}[]=[];renderer.processor.spatialFilter=async(...args)=>{const start=performance.now(),output=await real(...args);jobs.push({width:args[1],height:args[2],elapsedMs:performance.now()-start});return output;};
-  try{
-   const start=performance.now(),output=await renderer.render(document.toJSON(),editor.assetStore,{cache:false,readback:true}),renderMs=performance.now()-start;let viewportTransparent=false;try{viewportTransparent=output.getContext('2d')!.getImageData(0,0,8,8).data.every(v=>v===0);}finally{output.width=output.height=0;}
-   const png=await exportPng(document.toJSON(),editor.assetStore,renderer),bitmap=await createImageBitmap(png),surface=new OffscreenCanvas(8,8),c=surface.getContext('2d')!;c.drawImage(bitmap,0,0);const dimensions=[bitmap.width,bitmap.height];bitmap.close();const afterBytes=new Uint8Array(await asset.blob.arrayBuffer());return{nativeProcessingStubbed:false,jobs,renderMs,viewportTransparent,pngTransparent:c.getImageData(0,0,8,8).data.every(v=>v===0),dimensions,modelUnchanged:before===JSON.stringify(document.toJSON()),sourceUnchanged:sourceBytes.length===afterBytes.length&&sourceBytes.every((v,i)=>v===afterBytes[i]),sourceDimensions:[asset.bitmap.width,asset.bitmap.height]};
-  }finally{renderer.dispose();}
- });await info.attach('actual-large-gaussian-result',{body:JSON.stringify(result),contentType:'application/json'});expect(result.nativeProcessingStubbed).toBe(false);expect(result.jobs.length).toBeGreaterThan(0);for(const job of result.jobs){expect(job.width*job.height).toBeLessThanOrEqual(4_000_000);expect(Math.max(job.width,job.height)).toBeLessThanOrEqual(8192);}expect(result.viewportTransparent).toBe(true);expect(result.pngTransparent).toBe(true);expect(result.dimensions).toEqual([8,8]);expect(result.modelUnchanged).toBe(true);expect(result.sourceUnchanged).toBe(true);expect(result.sourceDimensions).toEqual([1,1]);
+test("real sigma331 Gaussian processing completes bounded affine rendering and native PNG without stubs", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const {
+        editor,
+        Document,
+        RasterLayer,
+        GaussianBlurFilter,
+        AffineTransform,
+      } = window.luma,
+      { CanvasRenderer } = await import(
+        /* @vite-ignore */ String("/src/engine/renderer.ts")
+      ),
+      { exportPng } = await import(
+        /* @vite-ignore */ String("/src/engine/png.ts")
+      );
+    const source = new OffscreenCanvas(1, 1);
+    source.getContext("2d")!.fillRect(0, 0, 1, 1);
+    const blob = await source.convertToBlob(),
+      asset = await editor.assetStore.add(
+        blob,
+        "Actual large Gaussian source",
+        undefined,
+        false,
+      ),
+      master = new Document({ width: 8, height: 8 });
+    master.layers.add(
+      new RasterLayer({ assetId: asset.id, width: 1, height: 1 }),
+    );
+    const document = new Document({ width: 8, height: 8 }),
+      instance = document.placeSmartObject(document.defineComponent(master));
+    instance.addFilter(new GaussianBlurFilter({ sigma: 331 }));
+    instance.transform = new AffineTransform(1, 0.1, 0.1, 1, 0, 0);
+    const before = JSON.stringify(document.toJSON()),
+      sourceBytes = new Uint8Array(await blob.arrayBuffer());
+    const renderer: import("../src/engine/renderer").CanvasRenderer =
+      new CanvasRenderer();
+    await renderer.processor.ready;
+    const real = renderer.processor.spatialFilter.bind(renderer.processor),
+      jobs: { width: number; height: number; elapsedMs: number }[] = [];
+    renderer.processor.spatialFilter = async (...args) => {
+      const start = performance.now(),
+        output = await real(...args);
+      jobs.push({
+        width: args[1],
+        height: args[2],
+        elapsedMs: performance.now() - start,
+      });
+      return output;
+    };
+    try {
+      const start = performance.now(),
+        output = await renderer.render(document.toJSON(), editor.assetStore, {
+          cache: false,
+          readback: true,
+        }),
+        renderMs = performance.now() - start;
+      let viewportTransparent = false;
+      try {
+        viewportTransparent = output
+          .getContext("2d")!
+          .getImageData(0, 0, 8, 8)
+          .data.every((v) => v === 0);
+      } finally {
+        output.width = output.height = 0;
+      }
+      const png = await exportPng(
+          document.toJSON(),
+          editor.assetStore,
+          renderer,
+        ),
+        bitmap = await createImageBitmap(png),
+        surface = new OffscreenCanvas(8, 8),
+        c = surface.getContext("2d")!;
+      c.drawImage(bitmap, 0, 0);
+      const dimensions = [bitmap.width, bitmap.height];
+      bitmap.close();
+      const afterBytes = new Uint8Array(await asset.blob.arrayBuffer());
+      return {
+        nativeProcessingStubbed: false,
+        jobs,
+        renderMs,
+        viewportTransparent,
+        pngTransparent: c.getImageData(0, 0, 8, 8).data.every((v) => v === 0),
+        dimensions,
+        modelUnchanged: before === JSON.stringify(document.toJSON()),
+        sourceUnchanged:
+          sourceBytes.length === afterBytes.length &&
+          sourceBytes.every((v, i) => v === afterBytes[i]),
+        sourceDimensions: [asset.bitmap.width, asset.bitmap.height],
+      };
+    } finally {
+      renderer.dispose();
+    }
+  });
+  await info.attach("actual-large-gaussian-result", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
+  expect(result.nativeProcessingStubbed).toBe(false);
+  expect(result.jobs.length).toBeGreaterThan(0);
+  for (const job of result.jobs) {
+    expect(job.width * job.height).toBeLessThanOrEqual(4_000_000);
+    expect(Math.max(job.width, job.height)).toBeLessThanOrEqual(8192);
+  }
+  expect(result.viewportTransparent).toBe(true);
+  expect(result.pngTransparent).toBe(true);
+  expect(result.dimensions).toEqual([8, 8]);
+  expect(result.modelUnchanged).toBe(true);
+  expect(result.sourceUnchanged).toBe(true);
+  expect(result.sourceDimensions).toEqual([1, 1]);
 });

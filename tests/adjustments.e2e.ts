@@ -1,4 +1,4 @@
-import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
+import { SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA } from "../src/core/model";
 import { test, expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 

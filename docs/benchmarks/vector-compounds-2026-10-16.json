@@ -86,7 +86,7 @@
       "maxAlphaResidual": 6,
       "maxPremultipliedResidual": 5.015686274509804,
       "maxInteriorResidual": 0,
-      "maxAreaRelativeError": 8.612346003051232e-05,
+      "maxAreaRelativeError": 8.612346003051232e-5,
       "maxCentroidErrorPixels": 0.002127755759522083
     },
     "largeImage": {
@@ -94,71 +94,18 @@
       "bytes": 259935,
       "reopened": true,
       "sourceUnchanged": true,
-      "dimensions": [
-        10000,
-        5000
-      ],
+      "dimensions": [10000, 5000],
       "samples": [
-        [
-          255,
-          0,
-          0,
-          255
-        ],
-        [
-          255,
-          0,
-          0,
-          255
-        ],
-        [
-          40,
-          60,
-          80,
-          255
-        ],
-        [
-          40,
-          60,
-          80,
-          255
-        ],
-        [
-          255,
-          0,
-          0,
-          255
-        ],
-        [
-          255,
-          0,
-          0,
-          255
-        ],
-        [
-          40,
-          60,
-          80,
-          255
-        ],
-        [
-          40,
-          60,
-          80,
-          255
-        ],
-        [
-          255,
-          0,
-          0,
-          255
-        ],
-        [
-          255,
-          0,
-          0,
-          255
-        ]
+        [255, 0, 0, 255],
+        [255, 0, 0, 255],
+        [40, 60, 80, 255],
+        [40, 60, 80, 255],
+        [255, 0, 0, 255],
+        [255, 0, 0, 255],
+        [40, 60, 80, 255],
+        [40, 60, 80, 255],
+        [255, 0, 0, 255],
+        [255, 0, 0, 255]
       ],
       "tiles": 395,
       "released": true
@@ -173,71 +120,18 @@
         "bytes": 259935,
         "reopened": true,
         "sourceUnchanged": true,
-        "dimensions": [
-          10000,
-          5000
-        ],
+        "dimensions": [10000, 5000],
         "samples": [
-          [
-            255,
-            0,
-            0,
-            255
-          ],
-          [
-            255,
-            0,
-            0,
-            255
-          ],
-          [
-            40,
-            60,
-            80,
-            255
-          ],
-          [
-            40,
-            60,
-            80,
-            255
-          ],
-          [
-            255,
-            0,
-            0,
-            255
-          ],
-          [
-            255,
-            0,
-            0,
-            255
-          ],
-          [
-            40,
-            60,
-            80,
-            255
-          ],
-          [
-            40,
-            60,
-            80,
-            255
-          ],
-          [
-            255,
-            0,
-            0,
-            255
-          ],
-          [
-            255,
-            0,
-            0,
-            255
-          ]
+          [255, 0, 0, 255],
+          [255, 0, 0, 255],
+          [40, 60, 80, 255],
+          [40, 60, 80, 255],
+          [255, 0, 0, 255],
+          [255, 0, 0, 255],
+          [40, 60, 80, 255],
+          [40, 60, 80, 255],
+          [255, 0, 0, 255],
+          [255, 0, 0, 255]
         ],
         "tiles": 395,
         "released": true
@@ -259,18 +153,8 @@
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "island": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "center": [0, 0, 0, 0],
+        "island": [0, 0, 0, 0]
       }
     },
     "canoli-vector-compound-dashes.json": {
@@ -289,18 +173,8 @@
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "island": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "center": [0, 0, 0, 0],
+        "island": [0, 0, 0, 0]
       }
     },
     "canoli-vector-compound-evenodd.json": {
@@ -319,18 +193,8 @@
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "island": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "center": [0, 0, 0, 0],
+        "island": [0, 0, 0, 0]
       }
     },
     "canoli-vector-compound-gpu.json": {
@@ -341,18 +205,8 @@
             "stage": "initial",
             "alpha": 0,
             "premult": 0,
-            "hole": [
-              0,
-              0,
-              0,
-              0
-            ],
-            "island": [
-              128,
-              64,
-              32,
-              255
-            ],
+            "hole": [0, 0, 0, 0],
+            "island": [128, 64, 32, 255],
             "uploads": 1,
             "changed": true
           },
@@ -360,18 +214,8 @@
             "stage": "changed",
             "alpha": 0,
             "premult": 0.4941176470588289,
-            "hole": [
-              0,
-              0,
-              0,
-              0
-            ],
-            "island": [
-              128,
-              64,
-              32,
-              255
-            ],
+            "hole": [0, 0, 0, 0],
+            "island": [128, 64, 32, 255],
             "uploads": 2,
             "changed": true
           },
@@ -379,18 +223,8 @@
             "stage": "repeat",
             "alpha": 0,
             "premult": 0.4941176470588289,
-            "hole": [
-              0,
-              0,
-              0,
-              0
-            ],
-            "island": [
-              128,
-              64,
-              32,
-              255
-            ],
+            "hole": [0, 0, 0, 0],
+            "island": [128, 64, 32, 255],
             "uploads": 2,
             "changed": false
           }
@@ -417,25 +251,15 @@
         "interior": 0,
         "interiorErrors": 0,
         "contourErrors": 0,
-        "areaError": 8.612346003051232e-05,
+        "areaError": 8.612346003051232e-5,
         "centroidError": 0.002127755759522083,
         "coverage": 731571,
         "reopened": true,
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "island": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "center": [0, 0, 0, 0],
+        "island": [0, 0, 0, 0]
       }
     },
     "canoli-vector-compound-islands.json": {
@@ -454,18 +278,8 @@
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "island": [
-          255,
-          0,
-          0,
-          255
-        ]
+        "center": [0, 0, 0, 0],
+        "island": [255, 0, 0, 255]
       }
     },
     "canoli-vector-compound-nonzero-filled.json": {
@@ -484,18 +298,8 @@
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          255,
-          0,
-          0,
-          255
-        ],
-        "island": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "center": [255, 0, 0, 255],
+        "island": [0, 0, 0, 0]
       }
     },
     "canoli-vector-compound-nonzero-hole.json": {
@@ -514,18 +318,8 @@
         "editable": true,
         "svgNoMask": true,
         "roundtrip": true,
-        "center": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "island": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "center": [0, 0, 0, 0],
+        "island": [0, 0, 0, 0]
       }
     },
     "canoli-vector-compound-translucent.json": {
@@ -533,18 +327,8 @@
       "data": {
         "alpha": 1,
         "premult": 0.7764705882352914,
-        "overlap": [
-          83,
-          0,
-          172,
-          114
-        ],
-        "hole": [
-          0,
-          0,
-          0,
-          0
-        ],
+        "overlap": [83, 0, 172, 114],
+        "hole": [0, 0, 0, 0],
         "degraded": [
           "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
           "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
@@ -1548,9 +1332,7 @@
     ],
     "jsCssWasmUnchangedAfterProseCorrection": true,
     "postDevelopmentTestOnlyCorrection": {
-      "changed": [
-        "tests/production.e2e.ts"
-      ],
+      "changed": ["tests/production.e2e.ts"],
       "reason": "Existing production SVG preflight assertion now expects native path contours."
     },
     "docsHashes": {

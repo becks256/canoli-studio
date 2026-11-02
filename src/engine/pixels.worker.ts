@@ -1,49 +1,75 @@
-import{FloatLookupProcessor}from'./float-lookup';
-import type {FloatWetLoadSettings} from '../core/float-wet';
-import type {ProjectiveSampleOptions} from '../core/projective-sampling';
-import type {ProjectiveFieldOptions} from '../core/projective-field';
-import type {MappedFieldOptions} from '../core/mapped-field';
-import type {FloatTonalOptions} from '../core/float-tonal';
-import type{FloatConvolutionOptions}from'../core/float-shadow';
-import type{FloatTransferAdjustment}from'../core/float-transfer';
-import{FloatPixelProcessor,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
+import { FloatLookupProcessor } from "./float-lookup";
+import type { FloatWetLoadSettings } from "../core/float-wet";
+import type { ProjectiveSampleOptions } from "../core/projective-sampling";
+import type { ProjectiveFieldOptions } from "../core/projective-field";
+import type { MappedFieldOptions } from "../core/mapped-field";
+import type { FloatTonalOptions } from "../core/float-tonal";
+import type { FloatConvolutionOptions } from "../core/float-shadow";
+import type { FloatTransferAdjustment } from "../core/float-transfer";
+import {
+  FloatPixelProcessor,
+  validateFloatWorkerWindow,
+  type FloatCompositeOptions,
+  type FloatToneOptions,
+} from "./float-pixels";
 import type { RedEyeAdjustmentData } from "../core/red-eye";
 import type { LutAdjustmentData } from "../core/lut";
-import type { TextureMaskSettings } from '../core/brush-texture';
-import type { WetPaintLoadSettings, WetPaintMixSettings } from '../core/wet-paint';
-import { loadWetPaint, mixWetPaint } from './wet-paint';
-import { prepareBrushTexture } from './wasm';
+import type { TextureMaskSettings } from "../core/brush-texture";
+import type {
+  WetPaintLoadSettings,
+  WetPaintMixSettings,
+} from "../core/wet-paint";
+import { loadWetPaint, mixWetPaint } from "./wet-paint";
+import { prepareBrushTexture } from "./wasm";
 import type { ColorRangeSettings } from "../core/color-range";
 import type { WhiteBalanceAdjustmentData } from "../core/white-balance";
 import type { GradientMapAdjustmentData } from "../core/gradient-map";
 import { featherRegion } from "./feather-region";
 import { modifySelectionCoverage } from "./selection-modification";
-import { composeChannelSelection } from './channel-selection';
-import { growQuickSelection } from './quick-selection';
-import { selectNativeSubject } from './subject-selection';
-import type { SubjectRequest } from '../core/subject-selection';
-import {prepareMattingTile,refineMattingTile,type MattingTileRequest} from './matting-tile';
-import {wasmMattingIterations} from './matting-iterations';
-import {ClosedFormMatting} from '../intelligence/matting/closed-form';
-import type { QuickSelectionRequest } from '../core/quick-selection';
-import type { ChannelCoverageRequest } from '../core/alpha-channels';
+import { composeChannelSelection } from "./channel-selection";
+import { growQuickSelection } from "./quick-selection";
+import { selectNativeSubject } from "./subject-selection";
+import type { SubjectRequest } from "../core/subject-selection";
+import {
+  prepareMattingTile,
+  refineMattingTile,
+  type MattingTileRequest,
+} from "./matting-tile";
+import { wasmMattingIterations } from "./matting-iterations";
+import { ClosedFormMatting } from "../intelligence/matting/closed-form";
+import type { QuickSelectionRequest } from "../core/quick-selection";
+import type { ChannelCoverageRequest } from "../core/alpha-channels";
 import type { SelectionModificationRequest } from "../core/selection-modification";
 import { encodeCapturedPng } from "./png";
 import { prepareClipboard, type ClipboardRequest } from "./clipboard";
-import { encodeCoverage, wandCoverage, type CoverageRequest } from "../core/pixel-selection";
-import { applyEncodedFrequencyBand, applyLinearBlend, applyRedEye, applyHsl, applyChromatic, applyGradientMap, applyWhiteBalance, applyLookup, applyColorRange } from "./wasm";
-import type{FloatColorAdjustment}from'../core/float-color';
+import {
+  encodeCoverage,
+  wandCoverage,
+  type CoverageRequest,
+} from "../core/pixel-selection";
+import {
+  applyEncodedFrequencyBand,
+  applyLinearBlend,
+  applyRedEye,
+  applyHsl,
+  applyChromatic,
+  applyGradientMap,
+  applyWhiteBalance,
+  applyLookup,
+  applyColorRange,
+} from "./wasm";
+import type { FloatColorAdjustment } from "../core/float-color";
 import type { ChromaticAdjustmentData } from "../core/adjustments";
 import type { HslAdjustmentData } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
-import type {BilateralFilterOptions} from '../core/smart/bilateral-filter';
+import type { BilateralFilterOptions } from "../core/smart/bilateral-filter";
 import {
   findRetouchDonor,
   findFloatRetouchDonor,
   type DonorSearchOptions,
 } from "../core/retouch/donor";
 import { applyDodgeBurn } from "../core/retouch/dodgeBurn";
-import { poissonBlend,floatPoissonBlend } from "../core/retouch/poisson";
+import { poissonBlend, floatPoissonBlend } from "../core/retouch/poisson";
 import type { PoissonBlendOptions } from "../core/retouch/types";
 import type { DodgeBurnOptions } from "../core/retouch/types";
 import {
@@ -63,7 +89,7 @@ import {
   renderSelection,
 } from "./wasm";
 import type { SelectionTile, FeatherTile } from "./wasm";
-import type { BlendIfData,LayerStyleData } from "../core/drawing";
+import type { BlendIfData, LayerStyleData } from "../core/drawing";
 import type { ToneEffectData } from "../core/model";
 
 const kernel = fetch(`${import.meta.env.BASE_URL}wasm/pixels.wasm`)
@@ -82,38 +108,98 @@ kernel
     self.postMessage({ type: "fatal", error: error.message }),
   );
 
-let matting:ClosedFormMatting|undefined;
-let floating:FloatPixelProcessor|undefined;
-let floatLookups:FloatLookupProcessor|undefined;
+let matting: ClosedFormMatting | undefined;
+let floating: FloatPixelProcessor | undefined;
+let floatLookups: FloatLookupProcessor | undefined;
 self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
-    floatPoisson?:{pixels:Float32Array;donor:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:PoissonBlendOptions};
-    floatDonor?:{pixels:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:DonorSearchOptions};
-    floatCompositeHdrWet?:{pixels:Float32Array;field:Float64Array;opacity:number};
-    floatProjectiveHdrWet?:{field:Float64Array;options:ProjectiveFieldOptions};
-    floatMappedHdrWet?:{field:Float64Array;options:MappedFieldOptions};
-    floatWetLoad?:{pixels:Float32Array;options:FloatWetLoadSettings};
-    floatWetMix?:{pixels:Float32Array;carried:Float32Array;coverage:Float32Array;options:WetPaintMixSettings};
-    floatWetEnvelope?:{before:Float32Array;after:Float32Array;coverage:Float32Array;opacity:number};
-    floatConvolveAlpha?:{alpha:Float32Array;settings:FloatConvolutionOptions};
-    floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
-    floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
-    floatAffine?:{pixels:Float32Array;matrix:number[]};
-    floatProjective?:{pixels:Float32Array;options:ProjectiveSampleOptions};
-    floatProjectiveField?:{alpha:Float32Array;options:ProjectiveFieldOptions};
-    floatMappedWet?:{alpha:Float32Array;options:MappedFieldOptions};
-    floatMappedField?:{alpha:Float32Array;options:MappedFieldOptions};
-    floatProjectiveWet?:{alpha:Float32Array;options:ProjectiveFieldOptions};
-    floatTone?:{pixels:Float32Array;options:FloatToneOptions};
-    floatTonal?:{pixels:Float32Array;coverage:Float32Array;options:FloatTonalOptions};
-      floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
-    floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
-    floatGradient?:{pixels:Float32Array;adjustment:GradientMapAdjustmentData};
-    floatLookupPrepare?:LutAdjustmentData;
-    floatLookupApply?:{handle:number;pixels:Float32Array};
-    floatLookupRelease?:number;
+    floatPoisson?: {
+      pixels: Float32Array;
+      donor: Float32Array;
+      width: number;
+      height: number;
+      coverage: Uint8Array | Uint8ClampedArray;
+      options: PoissonBlendOptions;
+    };
+    floatDonor?: {
+      pixels: Float32Array;
+      width: number;
+      height: number;
+      coverage: Uint8Array | Uint8ClampedArray;
+      options: DonorSearchOptions;
+    };
+    floatCompositeHdrWet?: {
+      pixels: Float32Array;
+      field: Float64Array;
+      opacity: number;
+    };
+    floatProjectiveHdrWet?: {
+      field: Float64Array;
+      options: ProjectiveFieldOptions;
+    };
+    floatMappedHdrWet?: { field: Float64Array; options: MappedFieldOptions };
+    floatWetLoad?: { pixels: Float32Array; options: FloatWetLoadSettings };
+    floatWetMix?: {
+      pixels: Float32Array;
+      carried: Float32Array;
+      coverage: Float32Array;
+      options: WetPaintMixSettings;
+    };
+    floatWetEnvelope?: {
+      before: Float32Array;
+      after: Float32Array;
+      coverage: Float32Array;
+      opacity: number;
+    };
+    floatConvolveAlpha?: {
+      alpha: Float32Array;
+      settings: FloatConvolutionOptions;
+    };
+    floatStyle?: {
+      source: Float32Array;
+      backdrop: Float32Array;
+      style: LayerStyleData;
+    };
+    floatComposite?: {
+      source: Float32Array;
+      backdrop: Float32Array;
+      options: FloatCompositeOptions;
+    };
+    floatAffine?: { pixels: Float32Array; matrix: number[] };
+    floatProjective?: {
+      pixels: Float32Array;
+      options: ProjectiveSampleOptions;
+    };
+    floatProjectiveField?: {
+      alpha: Float32Array;
+      options: ProjectiveFieldOptions;
+    };
+    floatMappedWet?: { alpha: Float32Array; options: MappedFieldOptions };
+    floatMappedField?: { alpha: Float32Array; options: MappedFieldOptions };
+    floatProjectiveWet?: {
+      alpha: Float32Array;
+      options: ProjectiveFieldOptions;
+    };
+    floatTone?: { pixels: Float32Array; options: FloatToneOptions };
+    floatTonal?: {
+      pixels: Float32Array;
+      coverage: Float32Array;
+      options: FloatTonalOptions;
+    };
+    floatTransfer?: {
+      pixels: Float32Array;
+      adjustment: FloatTransferAdjustment;
+    };
+    floatColor?: { pixels: Float32Array; adjustment: FloatColorAdjustment };
+    floatGradient?: {
+      pixels: Float32Array;
+      adjustment: GradientMapAdjustmentData;
+    };
+    floatLookupPrepare?: LutAdjustmentData;
+    floatLookupApply?: { handle: number; pixels: Float32Array };
+    floatLookupRelease?: number;
     filteredMix?: {
       filtered: Uint8ClampedArray;
       mask: Uint8ClampedArray;
@@ -125,8 +211,12 @@ self.onmessage = async (
       height: number;
       options: SpatialFilterOptions;
     };
-    medianFilter?: {width:number;height:number;radius:number};
-    bilateralFilter?: {width:number;height:number;options:BilateralFilterOptions};
+    medianFilter?: { width: number; height: number; radius: number };
+    bilateralFilter?: {
+      width: number;
+      height: number;
+      options: BilateralFilterOptions;
+    };
     donorSearch?: {
       width: number;
       height: number;
@@ -148,21 +238,33 @@ self.onmessage = async (
     };
     hsl?: HslAdjustmentData;
     chromatic?: ChromaticAdjustmentData;
-    frequencyEncoding?: {low:Uint8ClampedArray;band:"high"|"correction"};
-    linearBlend?: { backdrop: Uint8ClampedArray; opacity: number; mode: "linear-light" | "linear-burn" };
+    frequencyEncoding?: { low: Uint8ClampedArray; band: "high" | "correction" };
+    linearBlend?: {
+      backdrop: Uint8ClampedArray;
+      opacity: number;
+      mode: "linear-light" | "linear-burn";
+    };
     redEye?: RedEyeAdjustmentData;
     gradientMap?: GradientMapAdjustmentData;
     whiteBalance?: WhiteBalanceAdjustmentData;
     lookup?: LutAdjustmentData;
-    colorRange?:ColorRangeSettings;
+    colorRange?: ColorRangeSettings;
     brushTexture?: TextureMaskSettings;
-    brushTextureSupport?:Uint8ClampedArray;
-    wetPaintLoad?:WetPaintLoadSettings;
-    wetPaintMix?:{carried:Float32Array;coverage:Uint8Array;settings:WetPaintMixSettings};
+    brushTextureSupport?: Uint8ClampedArray;
+    wetPaintLoad?: WetPaintLoadSettings;
+    wetPaintMix?: {
+      carried: Float32Array;
+      coverage: Uint8Array;
+      settings: WetPaintMixSettings;
+    };
     effects?: ToneEffectData[];
     underlying?: Uint8ClampedArray;
     blend?: BlendIfData;
-    featheredSelection?: { tile: SelectionTile; radiusX: number; radiusY: number };
+    featheredSelection?: {
+      tile: SelectionTile;
+      radiusX: number;
+      radiusY: number;
+    };
     selection?: SelectionTile;
     feather?: FeatherTile;
     lut?: Uint8Array;
@@ -180,78 +282,319 @@ self.onmessage = async (
     quickSelection?: QuickSelectionRequest;
     subject?: SubjectRequest;
     matting?: MattingTileRequest;
-    mattingBegin?:{width:number;height:number};
-    mattingAccumulate?:MattingTileRequest;
-    mattingSolve?:boolean;
+    mattingBegin?: { width: number; height: number };
+    mattingAccumulate?: MattingTileRequest;
+    mattingSolve?: boolean;
   }>,
 ) => {
   try {
     const data = event.data;
-    if(data.floatPoisson){const r=data.floatPoisson,floatPoissonResult=floatPoissonBlend(r.pixels,r.donor,r.width,r.height,r.coverage,r.options,wasmPoissonSolver(await kernel));self.postMessage({id:data.id,floatPoissonResult},{transfer:[floatPoissonResult.pixels.buffer as ArrayBuffer]});return;}
-    if(data.floatDonor){const r=data.floatDonor,floatDonorResult=findFloatRetouchDonor(r.pixels,r.width,r.height,r.coverage,r.options,wasmDonorValidity(await kernel));self.postMessage({id:data.id,floatDonorResult});return;}
-    if(data.floatCompositeHdrWet||data.floatProjectiveHdrWet||data.floatMappedHdrWet){
-      const owned=floating??=new FloatPixelProcessor(await kernel),c=data.floatCompositeHdrWet,p=data.floatProjectiveHdrWet,m=data.floatMappedHdrWet;
-      const pixels=c?owned.compositeHdrWet(c.pixels,c.field,c.opacity):p?owned.projectiveHdrWet(p.field,p.options):owned.mappedHdrWet(m!.field,m!.options);
-      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
+    if (data.floatPoisson) {
+      const r = data.floatPoisson,
+        floatPoissonResult = floatPoissonBlend(
+          r.pixels,
+          r.donor,
+          r.width,
+          r.height,
+          r.coverage,
+          r.options,
+          wasmPoissonSolver(await kernel),
+        );
+      self.postMessage(
+        { id: data.id, floatPoissonResult },
+        { transfer: [floatPoissonResult.pixels.buffer as ArrayBuffer] },
+      );
+      return;
     }
-    if(data.floatWetLoad||data.floatWetMix||data.floatWetEnvelope){
-      const owned=floating??=new FloatPixelProcessor(await kernel);
-      if(data.floatWetMix){const r=data.floatWetMix,floatWetPaint=owned.wetMix(r.pixels,r.carried,r.coverage,r.options);self.postMessage({id:data.id,floatWetPaint},{transfer:[floatWetPaint.pixels.buffer as ArrayBuffer,floatWetPaint.carried.buffer as ArrayBuffer]});}
-      else{const r=data.floatWetLoad,e=data.floatWetEnvelope,pixels=r?owned.wetLoad(r.pixels,r.options):owned.wetEnvelope(e!.before,e!.after,e!.coverage,e!.opacity);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});}return;
+    if (data.floatDonor) {
+      const r = data.floatDonor,
+        floatDonorResult = findFloatRetouchDonor(
+          r.pixels,
+          r.width,
+          r.height,
+          r.coverage,
+          r.options,
+          wasmDonorValidity(await kernel),
+        );
+      self.postMessage({ id: data.id, floatDonorResult });
+      return;
     }
-    if(data.floatLookupPrepare||data.floatLookupApply||data.floatLookupRelease!==undefined){
-      const seed=await kernel,owner=floatLookups??=new FloatLookupProcessor(seed);
-      if(data.floatLookupPrepare){const floatLookupHandle=owner.prepare(data.floatLookupPrepare);self.postMessage({id:data.id,floatLookupHandle});}
-      else if(data.floatLookupApply){const pixels=owner.apply(data.floatLookupApply.handle,data.floatLookupApply.pixels);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});}
-      else{owner.release(data.floatLookupRelease!);self.postMessage({id:data.id});}return;
+    if (
+      data.floatCompositeHdrWet ||
+      data.floatProjectiveHdrWet ||
+      data.floatMappedHdrWet
+    ) {
+      const owned = (floating ??= new FloatPixelProcessor(await kernel)),
+        c = data.floatCompositeHdrWet,
+        p = data.floatProjectiveHdrWet,
+        m = data.floatMappedHdrWet;
+      const pixels = c
+        ? owned.compositeHdrWet(c.pixels, c.field, c.opacity)
+        : p
+          ? owned.projectiveHdrWet(p.field, p.options)
+          : owned.mappedHdrWet(m!.field, m!.options);
+      self.postMessage(
+        { id: data.id, pixels },
+        { transfer: [pixels.buffer as ArrayBuffer] },
+      );
+      return;
     }
-    if(data.floatConvolveAlpha){
-      const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatConvolveAlpha,pixels=owned.convolveAlpha(request.alpha,request.settings);
-      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
+    if (data.floatWetLoad || data.floatWetMix || data.floatWetEnvelope) {
+      const owned = (floating ??= new FloatPixelProcessor(await kernel));
+      if (data.floatWetMix) {
+        const r = data.floatWetMix,
+          floatWetPaint = owned.wetMix(
+            r.pixels,
+            r.carried,
+            r.coverage,
+            r.options,
+          );
+        self.postMessage(
+          { id: data.id, floatWetPaint },
+          {
+            transfer: [
+              floatWetPaint.pixels.buffer as ArrayBuffer,
+              floatWetPaint.carried.buffer as ArrayBuffer,
+            ],
+          },
+        );
+      } else {
+        const r = data.floatWetLoad,
+          e = data.floatWetEnvelope,
+          pixels = r
+            ? owned.wetLoad(r.pixels, r.options)
+            : owned.wetEnvelope(e!.before, e!.after, e!.coverage, e!.opacity);
+        self.postMessage(
+          { id: data.id, pixels },
+          { transfer: [pixels.buffer as ArrayBuffer] },
+        );
+      }
+      return;
     }
-    if(data.floatStyle){
-      const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatStyle;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);const floatStyle=owned.style(request.source,request.backdrop,request.style);
-      self.postMessage({id:data.id,floatStyle},{transfer:[floatStyle.pixels.buffer as ArrayBuffer,floatStyle.coverage.buffer as ArrayBuffer]});return;
+    if (
+      data.floatLookupPrepare ||
+      data.floatLookupApply ||
+      data.floatLookupRelease !== undefined
+    ) {
+      const seed = await kernel,
+        owner = (floatLookups ??= new FloatLookupProcessor(seed));
+      if (data.floatLookupPrepare) {
+        const floatLookupHandle = owner.prepare(data.floatLookupPrepare);
+        self.postMessage({ id: data.id, floatLookupHandle });
+      } else if (data.floatLookupApply) {
+        const pixels = owner.apply(
+          data.floatLookupApply.handle,
+          data.floatLookupApply.pixels,
+        );
+        self.postMessage(
+          { id: data.id, pixels },
+          { transfer: [pixels.buffer as ArrayBuffer] },
+        );
+      } else {
+        owner.release(data.floatLookupRelease!);
+        self.postMessage({ id: data.id });
+      }
+      return;
     }
-    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTonal||data.floatTransfer||data.floatColor||data.floatGradient||data.floatProjective||data.floatProjectiveField||data.floatMappedField||data.floatMappedWet||data.floatProjectiveWet){
-      const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
-      if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
-      else if(data.floatProjectiveWet){const request=data.floatProjectiveWet;pixels=owned.projectiveWet(request.alpha,request.options);}
-      else if(data.floatProjectiveField){const request=data.floatProjectiveField;pixels=owned.projectiveField(request.alpha,request.options);}
-      else if(data.floatMappedWet){const request=data.floatMappedWet;pixels=owned.mappedWet(request.alpha,request.options);}
-      else if(data.floatMappedField){const request=data.floatMappedField;pixels=owned.mappedField(request.alpha,request.options);}
-      else if(data.floatProjective){const request=data.floatProjective;pixels=owned.projective(request.pixels,request.options);}
-      else if(data.floatTransfer){const request=data.floatTransfer;validateFloatWorkerWindow(request.pixels);pixels=owned.transfer(request.pixels,request.adjustment);}
-      else if(data.floatColor){const request=data.floatColor;validateFloatWorkerWindow(request.pixels);pixels=owned.color(request.pixels,request.adjustment);}
-      else if(data.floatGradient){const request=data.floatGradient;validateFloatWorkerWindow(request.pixels);pixels=owned.gradient(request.pixels,request.adjustment);}
-      else if(data.floatTone){const request=data.floatTone;validateFloatWorkerWindow(request.pixels);pixels=owned.tone(request.pixels,request.options);}
-      else if(data.floatTonal){const request=data.floatTonal;validateFloatWorkerWindow(request.pixels);pixels=owned.tonal(request.pixels,request.coverage,request.options);}
-      else{const request=data.floatAffine!;validateFloatWorkerWindow(request.pixels);pixels=owned.affine(request.pixels,request.matrix);}
-      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
+    if (data.floatConvolveAlpha) {
+      const owned = (floating ??= new FloatPixelProcessor(await kernel)),
+        request = data.floatConvolveAlpha,
+        pixels = owned.convolveAlpha(request.alpha, request.settings);
+      self.postMessage(
+        { id: data.id, pixels },
+        { transfer: [pixels.buffer as ArrayBuffer] },
+      );
+      return;
     }
-    if(data.mattingBegin){matting?.dispose();matting=new ClosedFormMatting(data.mattingBegin.width,data.mattingBegin.height);self.postMessage({id:data.id});return;}
-    if(data.mattingAccumulate){if(!matting)throw new Error('Missing matting session.');matting.add({...data.mattingAccumulate,...prepareMattingTile(data.pixels,data.mattingAccumulate)});self.postMessage({id:data.id});return;}
-    if(data.mattingSolve){if(!matting)throw new Error('Missing matting session.');const mattingDiagnostics=await matting.solve((iteration,residual)=>self.postMessage({id:data.id,type:'progress',progress:{completed:iteration,total:2000,relativeResidual:residual}}),2000,'ic0',true,wasmMattingIterations(await kernel));self.postMessage({id:data.id,mattingDiagnostics});return;}
-    if(data.matting){
-      const mattingTile=refineMattingTile(await kernel,data.pixels,data.matting,matting);
-      self.postMessage({id:data.id,mattingTile},{transfer:[mattingTile.alpha.buffer as ArrayBuffer,mattingTile.rgba.buffer as ArrayBuffer]});return;
+    if (data.floatStyle) {
+      const owned = (floating ??= new FloatPixelProcessor(await kernel)),
+        request = data.floatStyle;
+      validateFloatWorkerWindow(request.source);
+      validateFloatWorkerWindow(request.backdrop);
+      const floatStyle = owned.style(
+        request.source,
+        request.backdrop,
+        request.style,
+      );
+      self.postMessage(
+        { id: data.id, floatStyle },
+        {
+          transfer: [
+            floatStyle.pixels.buffer as ArrayBuffer,
+            floatStyle.coverage.buffer as ArrayBuffer,
+          ],
+        },
+      );
+      return;
     }
-    if(data.subject){
-      const selectionResult=await selectNativeSubject(await kernel,data.pixels,data.subject,progress=>self.postMessage({id:data.id,type:'progress',progress}));
-      self.postMessage({id:data.id,selectionResult});return;
+    if (
+      data.floatComposite ||
+      data.floatAffine ||
+      data.floatTone ||
+      data.floatTonal ||
+      data.floatTransfer ||
+      data.floatColor ||
+      data.floatGradient ||
+      data.floatProjective ||
+      data.floatProjectiveField ||
+      data.floatMappedField ||
+      data.floatMappedWet ||
+      data.floatProjectiveWet
+    ) {
+      const owned = (floating ??= new FloatPixelProcessor(await kernel));
+      let pixels: Float32Array;
+      if (data.floatComposite) {
+        const request = data.floatComposite;
+        validateFloatWorkerWindow(request.source);
+        validateFloatWorkerWindow(request.backdrop);
+        pixels = owned.composite(
+          request.source,
+          request.backdrop,
+          request.options,
+        );
+      } else if (data.floatProjectiveWet) {
+        const request = data.floatProjectiveWet;
+        pixels = owned.projectiveWet(request.alpha, request.options);
+      } else if (data.floatProjectiveField) {
+        const request = data.floatProjectiveField;
+        pixels = owned.projectiveField(request.alpha, request.options);
+      } else if (data.floatMappedWet) {
+        const request = data.floatMappedWet;
+        pixels = owned.mappedWet(request.alpha, request.options);
+      } else if (data.floatMappedField) {
+        const request = data.floatMappedField;
+        pixels = owned.mappedField(request.alpha, request.options);
+      } else if (data.floatProjective) {
+        const request = data.floatProjective;
+        pixels = owned.projective(request.pixels, request.options);
+      } else if (data.floatTransfer) {
+        const request = data.floatTransfer;
+        validateFloatWorkerWindow(request.pixels);
+        pixels = owned.transfer(request.pixels, request.adjustment);
+      } else if (data.floatColor) {
+        const request = data.floatColor;
+        validateFloatWorkerWindow(request.pixels);
+        pixels = owned.color(request.pixels, request.adjustment);
+      } else if (data.floatGradient) {
+        const request = data.floatGradient;
+        validateFloatWorkerWindow(request.pixels);
+        pixels = owned.gradient(request.pixels, request.adjustment);
+      } else if (data.floatTone) {
+        const request = data.floatTone;
+        validateFloatWorkerWindow(request.pixels);
+        pixels = owned.tone(request.pixels, request.options);
+      } else if (data.floatTonal) {
+        const request = data.floatTonal;
+        validateFloatWorkerWindow(request.pixels);
+        pixels = owned.tonal(request.pixels, request.coverage, request.options);
+      } else {
+        const request = data.floatAffine!;
+        validateFloatWorkerWindow(request.pixels);
+        pixels = owned.affine(request.pixels, request.matrix);
+      }
+      self.postMessage(
+        { id: data.id, pixels },
+        { transfer: [pixels.buffer as ArrayBuffer] },
+      );
+      return;
     }
-    if(data.quickSelection){
-      const selectionResult=await growQuickSelection(await kernel,data.pixels,data.quickSelection,progress=>self.postMessage({id:data.id,type:'progress',progress}));
-      self.postMessage({id:data.id,selectionResult});return;
+    if (data.mattingBegin) {
+      matting?.dispose();
+      matting = new ClosedFormMatting(
+        data.mattingBegin.width,
+        data.mattingBegin.height,
+      );
+      self.postMessage({ id: data.id });
+      return;
     }
-    if(data.channelSelection){
-      const selectionResult=await composeChannelSelection(await kernel,data.channelSelection,progress=>self.postMessage({id:data.id,type:'progress',progress}));
-      self.postMessage({id:data.id,selectionResult});return;
+    if (data.mattingAccumulate) {
+      if (!matting) throw new Error("Missing matting session.");
+      matting.add({
+        ...data.mattingAccumulate,
+        ...prepareMattingTile(data.pixels, data.mattingAccumulate),
+      });
+      self.postMessage({ id: data.id });
+      return;
+    }
+    if (data.mattingSolve) {
+      if (!matting) throw new Error("Missing matting session.");
+      const mattingDiagnostics = await matting.solve(
+        (iteration, residual) =>
+          self.postMessage({
+            id: data.id,
+            type: "progress",
+            progress: {
+              completed: iteration,
+              total: 2000,
+              relativeResidual: residual,
+            },
+          }),
+        2000,
+        "ic0",
+        true,
+        wasmMattingIterations(await kernel),
+      );
+      self.postMessage({ id: data.id, mattingDiagnostics });
+      return;
+    }
+    if (data.matting) {
+      const mattingTile = refineMattingTile(
+        await kernel,
+        data.pixels,
+        data.matting,
+        matting,
+      );
+      self.postMessage(
+        { id: data.id, mattingTile },
+        {
+          transfer: [
+            mattingTile.alpha.buffer as ArrayBuffer,
+            mattingTile.rgba.buffer as ArrayBuffer,
+          ],
+        },
+      );
+      return;
+    }
+    if (data.subject) {
+      const selectionResult = await selectNativeSubject(
+        await kernel,
+        data.pixels,
+        data.subject,
+        (progress) =>
+          self.postMessage({ id: data.id, type: "progress", progress }),
+      );
+      self.postMessage({ id: data.id, selectionResult });
+      return;
+    }
+    if (data.quickSelection) {
+      const selectionResult = await growQuickSelection(
+        await kernel,
+        data.pixels,
+        data.quickSelection,
+        (progress) =>
+          self.postMessage({ id: data.id, type: "progress", progress }),
+      );
+      self.postMessage({ id: data.id, selectionResult });
+      return;
+    }
+    if (data.channelSelection) {
+      const selectionResult = await composeChannelSelection(
+        await kernel,
+        data.channelSelection,
+        (progress) =>
+          self.postMessage({ id: data.id, type: "progress", progress }),
+      );
+      self.postMessage({ id: data.id, selectionResult });
+      return;
     }
     if (data.selectionModification) {
-      const selectionResult = await modifySelectionCoverage(await kernel, data.selectionModification,
-        progress => self.postMessage({id:data.id,type:"progress",progress}));
-      self.postMessage({id:data.id,selectionResult});
+      const selectionResult = await modifySelectionCoverage(
+        await kernel,
+        data.selectionModification,
+        (progress) =>
+          self.postMessage({ id: data.id, type: "progress", progress }),
+      );
+      self.postMessage({ id: data.id, selectionResult });
       return;
     }
     if (data.png) {
@@ -261,21 +604,44 @@ self.onmessage = async (
       return;
     }
     if (data.clipboard) {
-      const clipboard = await prepareClipboard(await kernel, data.pixels, data.clipboard);
+      const clipboard = await prepareClipboard(
+        await kernel,
+        data.pixels,
+        data.clipboard,
+      );
       self.postMessage({ id: data.id, clipboard });
       return;
     }
     if (data.coverage) {
       const { width, height, wand } = data.coverage;
-      if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0 || data.pixels.length !== width * height * 4)
+      if (
+        !Number.isSafeInteger(width) ||
+        !Number.isSafeInteger(height) ||
+        width <= 0 ||
+        height <= 0 ||
+        data.pixels.length !== width * height * 4
+      )
         throw new Error("Pixel coverage requires matching RGBA dimensions.");
       let alpha: Uint8Array;
-      if (wand) alpha = wandCoverage(data.pixels, width, height, wand.x, wand.y, wand.tolerance, wand.contiguous);
+      if (wand)
+        alpha = wandCoverage(
+          data.pixels,
+          width,
+          height,
+          wand.x,
+          wand.y,
+          wand.tolerance,
+          wand.contiguous,
+        );
       else {
         alpha = new Uint8Array(width * height);
-        for (let i = 0; i < alpha.length; i++) alpha[i] = data.pixels[i * 4 + 3];
+        for (let i = 0; i < alpha.length; i++)
+          alpha[i] = data.pixels[i * 4 + 3];
       }
-      self.postMessage({ id: data.id, coverage: encodeCoverage(alpha, width, height) });
+      self.postMessage({
+        id: data.id,
+        coverage: encodeCoverage(alpha, width, height),
+      });
       return;
     }
     if (data.hsl) {
@@ -283,39 +649,92 @@ self.onmessage = async (
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
-    if(data.colorRange){
-      const colorRangeCoverage=applyColorRange(await kernel,data.pixels,data.colorRange);
-      self.postMessage({id:data.id,colorRangeCoverage},{transfer:[colorRangeCoverage.buffer]});return;
+    if (data.colorRange) {
+      const colorRangeCoverage = applyColorRange(
+        await kernel,
+        data.pixels,
+        data.colorRange,
+      );
+      self.postMessage(
+        { id: data.id, colorRangeCoverage },
+        { transfer: [colorRangeCoverage.buffer] },
+      );
+      return;
     }
     if (data.brushTexture) {
-      const pixels = prepareBrushTexture(await kernel, data.pixels, data.brushTexture,data.brushTextureSupport);
+      const pixels = prepareBrushTexture(
+        await kernel,
+        data.pixels,
+        data.brushTexture,
+        data.brushTextureSupport,
+      );
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
     if (data.wetPaintLoad) {
-      const wetPaintCarried = loadWetPaint(await kernel, data.pixels, data.wetPaintLoad);
-      self.postMessage({ id:data.id, wetPaintCarried }, { transfer:[wetPaintCarried.buffer] });
+      const wetPaintCarried = loadWetPaint(
+        await kernel,
+        data.pixels,
+        data.wetPaintLoad,
+      );
+      self.postMessage(
+        { id: data.id, wetPaintCarried },
+        { transfer: [wetPaintCarried.buffer] },
+      );
       return;
     }
     if (data.wetPaintMix) {
-      const {carried,coverage,settings}=data.wetPaintMix;
-      const wetPaint=mixWetPaint(await kernel,data.pixels,carried,coverage,settings);
-      self.postMessage({id:data.id,wetPaint},{transfer:[wetPaint.pixels.buffer,wetPaint.carried.buffer]});
+      const { carried, coverage, settings } = data.wetPaintMix;
+      const wetPaint = mixWetPaint(
+        await kernel,
+        data.pixels,
+        carried,
+        coverage,
+        settings,
+      );
+      self.postMessage(
+        { id: data.id, wetPaint },
+        { transfer: [wetPaint.pixels.buffer, wetPaint.carried.buffer] },
+      );
       return;
     }
     if (data.lookup) {
       const pixels = applyLookup(await kernel, data.pixels, data.lookup);
-      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer as ArrayBuffer] }); return;
+      self.postMessage(
+        { id: data.id, pixels },
+        { transfer: [pixels.buffer as ArrayBuffer] },
+      );
+      return;
     }
     if (data.whiteBalance) {
-      const pixels = applyWhiteBalance(await kernel, data.pixels, data.whiteBalance);
+      const pixels = applyWhiteBalance(
+        await kernel,
+        data.pixels,
+        data.whiteBalance,
+      );
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
-    if(data.frequencyEncoding){const pixels=applyEncodedFrequencyBand(await kernel,data.pixels,data.frequencyEncoding.low,data.frequencyEncoding.band);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});return;}
+    if (data.frequencyEncoding) {
+      const pixels = applyEncodedFrequencyBand(
+        await kernel,
+        data.pixels,
+        data.frequencyEncoding.low,
+        data.frequencyEncoding.band,
+      );
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
     if (data.linearBlend) {
-      const pixels=applyLinearBlend(await kernel,data.pixels,data.linearBlend.backdrop,data.linearBlend.opacity,data.linearBlend.mode);
-      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});return;
+      const pixels = applyLinearBlend(
+        await kernel,
+        data.pixels,
+        data.linearBlend.backdrop,
+        data.linearBlend.opacity,
+        data.linearBlend.mode,
+      );
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
     }
     if (data.redEye) {
       const pixels = applyRedEye(await kernel, data.pixels, data.redEye);
@@ -323,7 +742,11 @@ self.onmessage = async (
       return;
     }
     if (data.gradientMap) {
-      const pixels = applyGradientMap(await kernel, data.pixels, data.gradientMap);
+      const pixels = applyGradientMap(
+        await kernel,
+        data.pixels,
+        data.gradientMap,
+      );
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
@@ -345,14 +768,28 @@ self.onmessage = async (
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
-    if(data.bilateralFilter){
-      const {width,height,options}=data.bilateralFilter,pixels=applyBilateralFilter(await kernel,data.pixels,width,height,options);
-      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});return;
+    if (data.bilateralFilter) {
+      const { width, height, options } = data.bilateralFilter,
+        pixels = applyBilateralFilter(
+          await kernel,
+          data.pixels,
+          width,
+          height,
+          options,
+        );
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
     }
     if (data.medianFilter) {
-      const {width,height,radius}=data.medianFilter;
-      const pixels=applyMedianFilter(await kernel,data.pixels,width,height,radius);
-      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});
+      const { width, height, radius } = data.medianFilter;
+      const pixels = applyMedianFilter(
+        await kernel,
+        data.pixels,
+        width,
+        height,
+        radius,
+      );
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
     if (data.spatialFilter) {
@@ -421,11 +858,17 @@ self.onmessage = async (
       const pixels = renderSelection(await kernel, tile);
       const region = featherRegion(pixels, { ...tile, radiusX, radiusY });
       if (region) {
-        const softened = featherAlpha(await kernel, region.pixels,
-          { width: region.width, height: region.height, radiusX, radiusY });
-        for (let y = 0; y < region.height; y++) pixels.set(
-          softened.subarray(y * region.width * 4, (y + 1) * region.width * 4),
-          ((y + region.y) * tile.width + region.x) * 4);
+        const softened = featherAlpha(await kernel, region.pixels, {
+          width: region.width,
+          height: region.height,
+          radiusX,
+          radiusY,
+        });
+        for (let y = 0; y < region.height; y++)
+          pixels.set(
+            softened.subarray(y * region.width * 4, (y + 1) * region.width * 4),
+            ((y + region.y) * tile.width + region.x) * 4,
+          );
       }
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;

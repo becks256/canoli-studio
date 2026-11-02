@@ -1,47 +1,137 @@
-import {normalizeCharacterText,characterInputForLayer} from './character-layout';
-import {documentFontFiles} from './font-files';
-import {fontFamilyNames} from './font-families';
-import{compileFloatColor,isFloatColorAdjustment}from'./float-color';
-import {floatTonalOptionsSchema} from './float-tonal';
-import{compileFloatGradient}from'./float-gradient';
-import{captureLutHeader}from'./lut';
-import{compileFloatTransfer}from'./float-transfer';
-import{compileFloatWhiteBalance}from'./float-white-balance';
-import type {DocumentData,LayerData} from './model';
-import type{AssetStore}from'./assets';
-import{visitLayerAssets}from'./asset-references';
-export function isFloatDocument(document:{colorSpace:string;precision?:string}):boolean{return document.colorSpace==='linear-srgb'&&document.precision==='float32';}
+import {
+  normalizeCharacterText,
+  characterInputForLayer,
+} from "./character-layout";
+import { documentFontFiles } from "./font-files";
+import { fontFamilyNames } from "./font-families";
+import { compileFloatColor, isFloatColorAdjustment } from "./float-color";
+import { floatTonalOptionsSchema } from "./float-tonal";
+import { compileFloatGradient } from "./float-gradient";
+import { captureLutHeader } from "./lut";
+import { compileFloatTransfer } from "./float-transfer";
+import { compileFloatWhiteBalance } from "./float-white-balance";
+import type { DocumentData, LayerData } from "./model";
+import type { AssetStore } from "./assets";
+import { visitLayerAssets } from "./asset-references";
+export function isFloatDocument(document: {
+  colorSpace: string;
+  precision?: string;
+}): boolean {
+  return (
+    document.colorSpace === "linear-srgb" && document.precision === "float32"
+  );
+}
 
 /** Initial connected float scene support. This is a validation gate, not an
  * instruction to bake unsupported operations through the byte compositor. */
-export function floatSceneIssue(document:DocumentData):string|null {
-  const visit=(layers:LayerData[]):string|null=>{
-    for(const layer of layers){
-      const style=layer.styles;
-      if(style?.dropShadow.enabled&&layer.kind==='adjustment')return 'Float adjustment layers have no intrinsic shadow silhouette. Apply the shadow to an isolated artwork group.';
-      if(layer.kind==='group'){
-        if(layer.blendMode==='pass-through'&&(layer.fillOpacity??1)!==1)return 'Float pass-through groups currently require full fill opacity.';
-        if(layer.frequencyRadius!=null)return 'Frequency separation requires its float document integration.';
-        const issue=visit(layer.children);if(issue)return issue;
-      }else if(layer.kind==='raster'){
-        if(layer.erasures?.some(entry=>entry.stroke.kind==='wet'&&entry.stroke.precision!=='float32'))return 'Float raster replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
-      }else if(layer.kind==='paint'){
-        if(layer.strokes.some(stroke=>stroke.kind==='clone'&&stroke.precision!=='float32'))return 'Float clone strokes require explicit native float sources.';
-        if(layer.strokes.some(stroke=>stroke.kind==='wet'&&stroke.precision!=='float32'))return 'Float paint replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
-      }else if(layer.kind==='text'){
-        try{const files=documentFontFiles(document),source=normalizeCharacterText(characterInputForLayer(layer));for(const style of source.styles){const primary=fontFamilyNames(style.fontFamily)[0];if(!files.some(file=>file.resource.report.faces[0].cssFamily.toLowerCase()===primary))return 'Float text requires a declared original font as its first requested family.';}}catch(error){return String(error);}
-      }else if(layer.kind==='vector'){
+export function floatSceneIssue(document: DocumentData): string | null {
+  const visit = (layers: LayerData[]): string | null => {
+    for (const layer of layers) {
+      const style = layer.styles;
+      if (style?.dropShadow.enabled && layer.kind === "adjustment")
+        return "Float adjustment layers have no intrinsic shadow silhouette. Apply the shadow to an isolated artwork group.";
+      if (layer.kind === "group") {
+        if (
+          layer.blendMode === "pass-through" &&
+          (layer.fillOpacity ?? 1) !== 1
+        )
+          return "Float pass-through groups currently require full fill opacity.";
+        if (layer.frequencyRadius != null)
+          return "Frequency separation requires its float document integration.";
+        const issue = visit(layer.children);
+        if (issue) return issue;
+      } else if (layer.kind === "raster") {
+        if (
+          layer.erasures?.some(
+            (entry) =>
+              entry.stroke.kind === "wet" &&
+              entry.stroke.precision !== "float32",
+          )
+        )
+          return "Float raster replacements require explicit HDR wet paint; byte prepared pixels are not float originals.";
+      } else if (layer.kind === "paint") {
+        if (
+          layer.strokes.some(
+            (stroke) =>
+              stroke.kind === "clone" && stroke.precision !== "float32",
+          )
+        )
+          return "Float clone strokes require explicit native float sources.";
+        if (
+          layer.strokes.some(
+            (stroke) => stroke.kind === "wet" && stroke.precision !== "float32",
+          )
+        )
+          return "Float paint replacements require explicit HDR wet paint; byte prepared pixels are not float originals.";
+      } else if (layer.kind === "text") {
+        try {
+          const files = documentFontFiles(document),
+            source = normalizeCharacterText(characterInputForLayer(layer));
+          for (const style of source.styles) {
+            const primary = fontFamilyNames(style.fontFamily)[0];
+            if (
+              !files.some(
+                (file) =>
+                  file.resource.report.faces[0].cssFamily.toLowerCase() ===
+                  primary,
+              )
+            )
+              return "Float text requires a declared original font as its first requested family.";
+          }
+        } catch (error) {
+          return String(error);
+        }
+      } else if (layer.kind === "vector") {
         // Existing strict paths and paint transforms are native geometry.
-      }else if(layer.kind==='adjustment'){
-        if(layer.adjustment.kind==='patch'){if(layer.adjustment.precision!=='float32')return 'Float patch adjustments require explicit native float corrected sources.';}
-        else if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind==='white-balance'){try{compileFloatWhiteBalance(layer.adjustment);}catch(error){return String(error);}}
-        else if(isFloatColorAdjustment(layer.adjustment)){try{compileFloatColor(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind==='gradient-map'){try{compileFloatGradient(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind==='lut'){try{captureLutHeader(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup editable Dodge/Burn and native Patch only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, editable paint and vector layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup editable Dodge/Burn and native Patch adjustments. Other layer types require their float integration.';
+      } else if (layer.kind === "adjustment") {
+        if (layer.adjustment.kind === "patch") {
+          if (layer.adjustment.precision !== "float32")
+            return "Float patch adjustments require explicit native float corrected sources.";
+        } else if (layer.adjustment.kind === "tonal") {
+          try {
+            for (const { brush: _brush, ...options } of layer.adjustment
+              .strokes)
+              floatTonalOptionsSchema.parse(options);
+          } catch (error) {
+            return String(error);
+          }
+        } else if (
+          layer.adjustment.kind === "curves" ||
+          layer.adjustment.kind === "levels"
+        ) {
+          try {
+            compileFloatTransfer(layer.adjustment);
+          } catch (error) {
+            return String(error);
+          }
+        } else if (layer.adjustment.kind === "white-balance") {
+          try {
+            compileFloatWhiteBalance(layer.adjustment);
+          } catch (error) {
+            return String(error);
+          }
+        } else if (isFloatColorAdjustment(layer.adjustment)) {
+          try {
+            compileFloatColor(layer.adjustment);
+          } catch (error) {
+            return String(error);
+          }
+        } else if (layer.adjustment.kind === "gradient-map") {
+          try {
+            compileFloatGradient(layer.adjustment);
+          } catch (error) {
+            return String(error);
+          }
+        } else if (layer.adjustment.kind === "lut") {
+          try {
+            captureLutHeader(layer.adjustment);
+          } catch (error) {
+            return String(error);
+          }
+        } else if (layer.adjustment.kind !== "tone")
+          return "Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup editable Dodge/Burn and native Patch only.";
+      } else
+        return "This float document mode currently supports original high-precision TIFF raster layers, editable paint and vector layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup editable Dodge/Burn and native Patch adjustments. Other layer types require their float integration.";
     }
     return null;
   };
@@ -49,22 +139,69 @@ export function floatSceneIssue(document:DocumentData):string|null {
 }
 /** Reference objects, not IDs: the same image used as a brush texture or mask
  * must still meet that role's native-byte contract. */
-export function floatPaintAssetReferences(layer:LayerData):ReadonlySet<object>{
- const references=new Set<object>();
- if(layer.kind==='adjustment'&&layer.adjustment.kind==='patch'&&layer.adjustment.precision==='float32')references.add(layer.adjustment);
- if(layer.kind==='raster')for(const entry of layer.erasures??[])if(entry.stroke.kind==='wet'&&entry.stroke.precision==='float32')for(const tile of entry.stroke.tiles){references.add(tile);references.add(tile.coverage);}
- if(layer.kind==='paint')for(const stroke of layer.strokes)if(stroke.kind==='clone'&&stroke.precision==='float32'){for(const tile of stroke.tiles)references.add(tile);}else if(stroke.kind==='wet'&&stroke.precision==='float32')for(const tile of stroke.tiles){references.add(tile);references.add(tile.coverage);}
- return references;
+export function floatPaintAssetReferences(
+  layer: LayerData,
+): ReadonlySet<object> {
+  const references = new Set<object>();
+  if (
+    layer.kind === "adjustment" &&
+    layer.adjustment.kind === "patch" &&
+    layer.adjustment.precision === "float32"
+  )
+    references.add(layer.adjustment);
+  if (layer.kind === "raster")
+    for (const entry of layer.erasures ?? [])
+      if (entry.stroke.kind === "wet" && entry.stroke.precision === "float32")
+        for (const tile of entry.stroke.tiles) {
+          references.add(tile);
+          references.add(tile.coverage);
+        }
+  if (layer.kind === "paint")
+    for (const stroke of layer.strokes)
+      if (stroke.kind === "clone" && stroke.precision === "float32") {
+        for (const tile of stroke.tiles) references.add(tile);
+      } else if (stroke.kind === "wet" && stroke.precision === "float32")
+        for (const tile of stroke.tiles) {
+          references.add(tile);
+          references.add(tile.coverage);
+        }
+  return references;
 }
-export function assertFloatSources(document:DocumentData,assets:Pick<AssetStore,'get'>):void{
- const float=isFloatDocument(document);
- const checkByteRole=(id:string)=>{if(assets.get(id).tiff?.editingPrecision==='float32')throw new Error('This operation requires native byte pixels. A float source thumbnail is display-only; use the float document renderer.');};
- const visit=(layers:LayerData[])=>{for(const layer of layers){
-  const hdrReferences=floatPaintAssetReferences(layer);
-  if(layer.kind==='raster'&&float){const asset=assets.get(layer.assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF raster sources.');}
-  visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'||float&&hdrReferences.has(reference)){assets.get(reference.assetId);return;}if(!(float&&layer.kind==='raster'&&reference===layer))checkByteRole(reference.assetId);});
-  if(layer.kind==='group')visit(layer.children);
- }};
- visit(document.children);
- for(const definition of document.components??[])if(definition.source.kind==='asset')checkByteRole(definition.source.assetId);else visit(definition.source.document.children);
+export function assertFloatSources(
+  document: DocumentData,
+  assets: Pick<AssetStore, "get">,
+): void {
+  const float = isFloatDocument(document);
+  const checkByteRole = (id: string) => {
+    if (assets.get(id).tiff?.editingPrecision === "float32")
+      throw new Error(
+        "This operation requires native byte pixels. A float source thumbnail is display-only; use the float document renderer.",
+      );
+  };
+  const visit = (layers: LayerData[]) => {
+    for (const layer of layers) {
+      const hdrReferences = floatPaintAssetReferences(layer);
+      if (layer.kind === "raster" && float) {
+        const asset = assets.get(layer.assetId);
+        if (!asset.tiff || !asset.tiffColor)
+          throw new Error(
+            "Float documents require retained original high-precision TIFF raster sources.",
+          );
+      }
+      visitLayerAssets(layer, (reference, role) => {
+        if (role === "geometry" || (float && hdrReferences.has(reference))) {
+          assets.get(reference.assetId);
+          return;
+        }
+        if (!(float && layer.kind === "raster" && reference === layer))
+          checkByteRole(reference.assetId);
+      });
+      if (layer.kind === "group") visit(layer.children);
+    }
+  };
+  visit(document.children);
+  for (const definition of document.components ?? [])
+    if (definition.source.kind === "asset")
+      checkByteRole(definition.source.assetId);
+    else visit(definition.source.document.children);
 }

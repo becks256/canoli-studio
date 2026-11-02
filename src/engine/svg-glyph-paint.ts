@@ -1,60 +1,509 @@
-import {textWritingSchema,verticalWriting,applyNativeTextWriting} from '../core/text-writing';
-import {snapshotGlyphPath} from './native-glyph-path';
-import {AffineTransform} from '../core/affine';
-import {validateWindow,type FloatSourceWindow} from '../core/float-source/types';
-import {applyNativeCharacterStyle} from '../core/character-layout';
-import {characterFormatSchema,DEFAULT_CHARACTER_FORMAT} from '../core/character-format';
-import {yieldTask} from '../core/task-yield';
-import {createCanvas,release} from './canvas';
-import type {FloatGlyph} from './float-glyph';
-import type {NativeGlyphFontControl} from './native-glyph-font';
-const NS='http://www.w3.org/2000/svg';
+import {
+  textWritingSchema,
+  verticalWriting,
+  applyNativeTextWriting,
+} from "../core/text-writing";
+import { snapshotGlyphPath } from "./native-glyph-path";
+import { AffineTransform } from "../core/affine";
+import {
+  validateWindow,
+  type FloatSourceWindow,
+} from "../core/float-source/types";
+import { applyNativeCharacterStyle } from "../core/character-layout";
+import {
+  characterFormatSchema,
+  DEFAULT_CHARACTER_FORMAT,
+} from "../core/character-format";
+import { yieldTask } from "../core/task-yield";
+import { createCanvas, release } from "./canvas";
+import type { FloatGlyph } from "./float-glyph";
+import type { NativeGlyphFontControl } from "./native-glyph-font";
+const NS = "http://www.w3.org/2000/svg";
 
 /** Renderer-private native SVG primitives. Definitions contain checked complete
  * selector sources; authored text, public font records and paint RGB stay out. */
-export async function captureSvgGlyphDocument(input:readonly FloatGlyph[],control:NativeGlyphFontControl={}):Promise<Element>{
- const glyphs=input.map(g=>{if(g.baseline!==undefined&&(!['central','alphabetic'].includes(g.baseline)||g.surface!=='svg')||g.writing&&g.surface!=='svg'||g.path&&g.surface!=='svg'||g.rotation!==undefined&&(!Number.isFinite(g.rotation)||g.surface!=='svg')||!g.font.monochrome||g.origin&&![g.origin.x,g.origin.y].every(Number.isFinite)||g.paintLetterSpacing!==undefined&&(!Number.isFinite(g.paintLetterSpacing)||g.surface!=='svg')||g.paintFontSize!==undefined&&(!Number.isFinite(g.paintFontSize)||g.paintFontSize<=0))throw new Error('Invalid monochrome SVG glyph placement.');return {...g,...(g.writing?{writing:Object.freeze(textWritingSchema.parse(g.writing))}:{}),...(g.path?{path:snapshotGlyphPath(g.path)}:{}),...(g.origin?{origin:Object.freeze({...g.origin})}:{}),style:characterFormatSchema.parse({...DEFAULT_CHARACTER_FORMAT,...g.style}),transform:AffineTransform.fromJSON(g.transform)};}),owners=[...new Set(glyphs.map(g=>g.font))],options={...control,signal:AbortSignal.any([...(control.signal?[control.signal]:[]),...owners.flatMap(font=>font.signal?[font.signal]:[])])},check=()=>{options.signal?.throwIfAborted();options.check?.();for(const font of owners)font.check();options.signal?.throwIfAborted();};check();
- const doc=document.implementation.createDocument(NS,'svg'),root=doc.documentElement;root.setAttribute('xmlns',NS);const fonts=new Map< FloatGlyph['font'],Readonly<{definitions:string;features:string}>>();
- for(const glyph of glyphs){if(fonts.has(glyph.font))continue;if(!glyph.font.svgFont)throw new Error('The glyph owner cannot supply native SVG paint.');const source=await glyph.font.svgFont({...options,check});check();const parsed=new DOMParser().parseFromString('<svg xmlns="'+NS+'">'+source.definitions+'</svg>','image/svg+xml');if(parsed.querySelector('parsererror'))throw new Error('Invalid captured SVG glyph font.');for(const node of [...parsed.documentElement.children])root.append(doc.importNode(node,true));fonts.set(glyph.font,source);}
- const paths=new Map<string,string>();let previous:string|undefined,parent:SVGGElement|undefined,deadline=performance.now()+2;for(const glyph of glyphs){check();const node=doc.createElementNS(NS,'text'),m=glyph.transform,key=`matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;if(key!==previous){parent=doc.createElementNS(NS,'g');parent.setAttribute('transform',key);root.append(parent);previous=key;}node.setAttribute('x',String(glyph.origin?.x??0));node.setAttribute('y',String(glyph.origin?.y??0));if(glyph.rotation!==undefined)node.setAttribute('rotate',String(glyph.rotation));node.setAttribute('text-anchor','start');node.setAttribute('direction','ltr');node.setAttribute('fill','#fff');node.style.whiteSpace='pre';applyNativeCharacterStyle(node as unknown as SVGTSpanElement,{...DEFAULT_CHARACTER_FORMAT,...glyph.style,fontSize:glyph.paintFontSize??glyph.style.fontSize,fontFamily:glyph.font.family,color:'#fff',fontVariationSettings:'normal',fontKerning:'none',fontVariantCaps:'normal',letterSpacing:glyph.paintLetterSpacing??0,wordSpacing:0});applyNativeTextWriting(node,glyph.writing);if(glyph.baseline)node.style.dominantBaseline=glyph.baseline;node.style.fontFeatureSettings=fonts.get(glyph.font)!.features;if(glyph.path){let id=paths.get(glyph.path.data);if(!id){id='canoli-glyph-path-'+paths.size;const defs=doc.createElementNS(NS,'defs'),path=doc.createElementNS(NS,'path');path.setAttribute('id',id);path.setAttribute('d',glyph.path.data);defs.append(path);root.prepend(defs);paths.set(glyph.path.data,id);}const content=doc.createElementNS(NS,'textPath');content.setAttribute('href','#'+id);content.setAttribute('startOffset',String(glyph.path.startOffset));content.setAttribute('method','align');content.setAttribute('spacing','exact');content.textContent=glyph.font.character(glyph.glyphId);node.setAttribute('x','0');node.setAttribute('y','0');node.setAttribute(verticalWriting(glyph.writing)?'dx':'dy',String(glyph.path.baselineOffset));if(glyph.origin)node.setAttribute('transform',`translate(${glyph.origin.x} ${glyph.origin.y})`);node.append(content);}else node.textContent=glyph.font.character(glyph.glyphId);parent!.append(node);if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+2;}}
- check();return root;
+export async function captureSvgGlyphDocument(
+  input: readonly FloatGlyph[],
+  control: NativeGlyphFontControl = {},
+): Promise<Element> {
+  const glyphs = input.map((g) => {
+      if (
+        (g.baseline !== undefined &&
+          (!["central", "alphabetic"].includes(g.baseline) ||
+            g.surface !== "svg")) ||
+        (g.writing && g.surface !== "svg") ||
+        (g.path && g.surface !== "svg") ||
+        (g.rotation !== undefined &&
+          (!Number.isFinite(g.rotation) || g.surface !== "svg")) ||
+        !g.font.monochrome ||
+        (g.origin && ![g.origin.x, g.origin.y].every(Number.isFinite)) ||
+        (g.paintLetterSpacing !== undefined &&
+          (!Number.isFinite(g.paintLetterSpacing) || g.surface !== "svg")) ||
+        (g.paintFontSize !== undefined &&
+          (!Number.isFinite(g.paintFontSize) || g.paintFontSize <= 0))
+      )
+        throw new Error("Invalid monochrome SVG glyph placement.");
+      return {
+        ...g,
+        ...(g.writing
+          ? { writing: Object.freeze(textWritingSchema.parse(g.writing)) }
+          : {}),
+        ...(g.path ? { path: snapshotGlyphPath(g.path) } : {}),
+        ...(g.origin ? { origin: Object.freeze({ ...g.origin }) } : {}),
+        style: characterFormatSchema.parse({
+          ...DEFAULT_CHARACTER_FORMAT,
+          ...g.style,
+        }),
+        transform: AffineTransform.fromJSON(g.transform),
+      };
+    }),
+    owners = [...new Set(glyphs.map((g) => g.font))],
+    options = {
+      ...control,
+      signal: AbortSignal.any([
+        ...(control.signal ? [control.signal] : []),
+        ...owners.flatMap((font) => (font.signal ? [font.signal] : [])),
+      ]),
+    },
+    check = () => {
+      options.signal?.throwIfAborted();
+      options.check?.();
+      for (const font of owners) font.check();
+      options.signal?.throwIfAborted();
+    };
+  check();
+  const doc = document.implementation.createDocument(NS, "svg"),
+    root = doc.documentElement;
+  root.setAttribute("xmlns", NS);
+  const fonts = new Map<
+    FloatGlyph["font"],
+    Readonly<{ definitions: string; features: string }>
+  >();
+  for (const glyph of glyphs) {
+    if (fonts.has(glyph.font)) continue;
+    if (!glyph.font.svgFont)
+      throw new Error("The glyph owner cannot supply native SVG paint.");
+    const source = await glyph.font.svgFont({ ...options, check });
+    check();
+    const parsed = new DOMParser().parseFromString(
+      '<svg xmlns="' + NS + '">' + source.definitions + "</svg>",
+      "image/svg+xml",
+    );
+    if (parsed.querySelector("parsererror"))
+      throw new Error("Invalid captured SVG glyph font.");
+    for (const node of [...parsed.documentElement.children])
+      root.append(doc.importNode(node, true));
+    fonts.set(glyph.font, source);
+  }
+  const paths = new Map<string, string>();
+  let previous: string | undefined,
+    parent: SVGGElement | undefined,
+    deadline = performance.now() + 2;
+  for (const glyph of glyphs) {
+    check();
+    const node = doc.createElementNS(NS, "text"),
+      m = glyph.transform,
+      key = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
+    if (key !== previous) {
+      parent = doc.createElementNS(NS, "g");
+      parent.setAttribute("transform", key);
+      root.append(parent);
+      previous = key;
+    }
+    node.setAttribute("x", String(glyph.origin?.x ?? 0));
+    node.setAttribute("y", String(glyph.origin?.y ?? 0));
+    if (glyph.rotation !== undefined)
+      node.setAttribute("rotate", String(glyph.rotation));
+    node.setAttribute("text-anchor", "start");
+    node.setAttribute("direction", "ltr");
+    node.setAttribute("fill", "#fff");
+    node.style.whiteSpace = "pre";
+    applyNativeCharacterStyle(node as unknown as SVGTSpanElement, {
+      ...DEFAULT_CHARACTER_FORMAT,
+      ...glyph.style,
+      fontSize: glyph.paintFontSize ?? glyph.style.fontSize,
+      fontFamily: glyph.font.family,
+      color: "#fff",
+      fontVariationSettings: "normal",
+      fontKerning: "none",
+      fontVariantCaps: "normal",
+      letterSpacing: glyph.paintLetterSpacing ?? 0,
+      wordSpacing: 0,
+    });
+    applyNativeTextWriting(node, glyph.writing);
+    if (glyph.baseline) node.style.dominantBaseline = glyph.baseline;
+    node.style.fontFeatureSettings = fonts.get(glyph.font)!.features;
+    if (glyph.path) {
+      let id = paths.get(glyph.path.data);
+      if (!id) {
+        id = "canoli-glyph-path-" + paths.size;
+        const defs = doc.createElementNS(NS, "defs"),
+          path = doc.createElementNS(NS, "path");
+        path.setAttribute("id", id);
+        path.setAttribute("d", glyph.path.data);
+        defs.append(path);
+        root.prepend(defs);
+        paths.set(glyph.path.data, id);
+      }
+      const content = doc.createElementNS(NS, "textPath");
+      content.setAttribute("href", "#" + id);
+      content.setAttribute("startOffset", String(glyph.path.startOffset));
+      content.setAttribute("method", "align");
+      content.setAttribute("spacing", "exact");
+      content.textContent = glyph.font.character(glyph.glyphId);
+      node.setAttribute("x", "0");
+      node.setAttribute("y", "0");
+      node.setAttribute(
+        verticalWriting(glyph.writing) ? "dx" : "dy",
+        String(glyph.path.baselineOffset),
+      );
+      if (glyph.origin)
+        node.setAttribute(
+          "transform",
+          `translate(${glyph.origin.x} ${glyph.origin.y})`,
+        );
+      node.append(content);
+    } else node.textContent = glyph.font.character(glyph.glyphId);
+    parent!.append(node);
+    if (performance.now() >= deadline) {
+      await yieldTask();
+      check();
+      deadline = performance.now() + 2;
+    }
+  }
+  check();
+  return root;
 }
 
 /** Complete candidate geometry participates in verification and culling, so
  * unexpected ink outside the original line's box cannot escape comparison. */
-export async function measureSvgGlyphBounds(root:Element,check:()=>void):Promise<Readonly<{x:number;y:number;width:number;height:number}>>{return(await measureSvgGlyphLayout(root,check,false)).bounds;}
-export async function measureSvgGlyphAdvances(root:Element,check:()=>void):Promise<readonly number[]>{return(await measureSvgGlyphLayout(root,check,true)).advances;}
-export async function measureSvgGlyphOrigins(root:Element,check:()=>void){return(await measureSvgGlyphLayout(root,check,true,true)).origins;}
-async function measureSvgGlyphLayout(root:Element,check:()=>void,withAdvances:boolean,withOrigins=false){
- check();const host=document.createElement('div');host.setAttribute('data-canoli-svg-glyph-probe','');host.setAttribute('inert','');host.setAttribute('aria-hidden','true');host.style.cssText='position:fixed;left:-100000px;top:0;width:1px;height:1px;visibility:hidden;pointer-events:none;contain:strict';
- const shadow=host.attachShadow({mode:'closed'}),svg=document.createElementNS(NS,'svg');svg.setAttribute('width','1');svg.setAttribute('height','1');svg.style.fontWeight='normal';svg.style.fontStyle='normal';shadow.append(svg);document.body.append(host);
- const active=()=>{check();if(!host.isConnected)throw new Error('The native SVG glyph measurement host was removed.');};
- try{let deadline=performance.now()+2;for(const node of root.children){if(node.localName==='defs'){const defs=document.createElementNS(NS,'defs');for(const path of node.children)if(path.localName==='path')defs.append(document.importNode(path,true));svg.append(defs);continue;}if(node.localName!=='g'||[...node.children].some(c=>c.localName!=='text'))throw new Error('Invalid native SVG glyph measurement source.');svg.append(document.importNode(node,true));if(performance.now()>=deadline){await yieldTask();active();deadline=performance.now()+2;}}active();const b=svg.getBBox();active();if(![b.x,b.y,b.width,b.height].every(Number.isFinite)||b.width<0||b.height<0)throw new Error('Native SVG glyph bounds are invalid.');const advances:number[]=[],origins:{start:{x:number;y:number};end:{x:number;y:number};rotation:number;advance:number}[]=[];if(withAdvances)for(const text of svg.querySelectorAll('text')){active();const advance=text.getComputedTextLength();active();if(!Number.isFinite(advance)||advance<0)throw new Error('Native SVG glyph advance is invalid.');advances.push(advance);if(withOrigins){const count=text.getNumberOfChars();active();if(!count)throw new Error('Native SVG glyph origin is unavailable.');const a=text.getStartPositionOfChar(0);active();const b=text.getEndPositionOfChar(count-1);active();const rotation=text.getRotationOfChar(0);active();if(![a.x,a.y,b.x,b.y,rotation].every(Number.isFinite))throw new Error('Native SVG glyph origin is invalid.');origins.push(Object.freeze({start:Object.freeze({x:a.x,y:a.y}),end:Object.freeze({x:b.x,y:b.y}),rotation,advance}));}if(performance.now()>=deadline){await yieldTask();active();deadline=performance.now()+2;}}return Object.freeze({bounds:Object.freeze({x:b.x,y:b.y,width:b.width,height:b.height}),advances:Object.freeze(advances),origins:Object.freeze(origins)});}finally{host.remove();}
+export async function measureSvgGlyphBounds(
+  root: Element,
+  check: () => void,
+): Promise<Readonly<{ x: number; y: number; width: number; height: number }>> {
+  return (await measureSvgGlyphLayout(root, check, false)).bounds;
+}
+export async function measureSvgGlyphAdvances(
+  root: Element,
+  check: () => void,
+): Promise<readonly number[]> {
+  return (await measureSvgGlyphLayout(root, check, true)).advances;
+}
+export async function measureSvgGlyphOrigins(root: Element, check: () => void) {
+  return (await measureSvgGlyphLayout(root, check, true, true)).origins;
+}
+async function measureSvgGlyphLayout(
+  root: Element,
+  check: () => void,
+  withAdvances: boolean,
+  withOrigins = false,
+) {
+  check();
+  const host = document.createElement("div");
+  host.setAttribute("data-canoli-svg-glyph-probe", "");
+  host.setAttribute("inert", "");
+  host.setAttribute("aria-hidden", "true");
+  host.style.cssText =
+    "position:fixed;left:-100000px;top:0;width:1px;height:1px;visibility:hidden;pointer-events:none;contain:strict";
+  const shadow = host.attachShadow({ mode: "closed" }),
+    svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("width", "1");
+  svg.setAttribute("height", "1");
+  svg.style.fontWeight = "normal";
+  svg.style.fontStyle = "normal";
+  shadow.append(svg);
+  document.body.append(host);
+  const active = () => {
+    check();
+    if (!host.isConnected)
+      throw new Error("The native SVG glyph measurement host was removed.");
+  };
+  try {
+    let deadline = performance.now() + 2;
+    for (const node of root.children) {
+      if (node.localName === "defs") {
+        const defs = document.createElementNS(NS, "defs");
+        for (const path of node.children)
+          if (path.localName === "path")
+            defs.append(document.importNode(path, true));
+        svg.append(defs);
+        continue;
+      }
+      if (
+        node.localName !== "g" ||
+        [...node.children].some((c) => c.localName !== "text")
+      )
+        throw new Error("Invalid native SVG glyph measurement source.");
+      svg.append(document.importNode(node, true));
+      if (performance.now() >= deadline) {
+        await yieldTask();
+        active();
+        deadline = performance.now() + 2;
+      }
+    }
+    active();
+    const b = svg.getBBox();
+    active();
+    if (
+      ![b.x, b.y, b.width, b.height].every(Number.isFinite) ||
+      b.width < 0 ||
+      b.height < 0
+    )
+      throw new Error("Native SVG glyph bounds are invalid.");
+    const advances: number[] = [],
+      origins: {
+        start: { x: number; y: number };
+        end: { x: number; y: number };
+        rotation: number;
+        advance: number;
+      }[] = [];
+    if (withAdvances)
+      for (const text of svg.querySelectorAll("text")) {
+        active();
+        const advance = text.getComputedTextLength();
+        active();
+        if (!Number.isFinite(advance) || advance < 0)
+          throw new Error("Native SVG glyph advance is invalid.");
+        advances.push(advance);
+        if (withOrigins) {
+          const count = text.getNumberOfChars();
+          active();
+          if (!count)
+            throw new Error("Native SVG glyph origin is unavailable.");
+          const a = text.getStartPositionOfChar(0);
+          active();
+          const b = text.getEndPositionOfChar(count - 1);
+          active();
+          const rotation = text.getRotationOfChar(0);
+          active();
+          if (![a.x, a.y, b.x, b.y, rotation].every(Number.isFinite))
+            throw new Error("Native SVG glyph origin is invalid.");
+          origins.push(
+            Object.freeze({
+              start: Object.freeze({ x: a.x, y: a.y }),
+              end: Object.freeze({ x: b.x, y: b.y }),
+              rotation,
+              advance,
+            }),
+          );
+        }
+        if (performance.now() >= deadline) {
+          await yieldTask();
+          active();
+          deadline = performance.now() + 2;
+        }
+      }
+    return Object.freeze({
+      bounds: Object.freeze({
+        x: b.x,
+        y: b.y,
+        width: b.width,
+        height: b.height,
+      }),
+      advances: Object.freeze(advances),
+      origins: Object.freeze(origins),
+    });
+  } finally {
+    host.remove();
+  }
 }
 
 /** A fixed world-cell native SVG alpha read. Changing viewBox is a work-window
  * projection, never a font-size or source-geometry change. No bitmap survives. */
-export async function renderSvgCellAlpha(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl={}):Promise<Uint8ClampedArray>{return await renderSvgCellPlane(root,x,y,cell,gutter,alpha,control,false)as Uint8ClampedArray;}
+export async function renderSvgCellAlpha(
+  root: Element,
+  x: number,
+  y: number,
+  cell: number,
+  gutter: number,
+  alpha: number,
+  control: NativeGlyphFontControl = {},
+): Promise<Uint8ClampedArray> {
+  return (await renderSvgCellPlane(
+    root,
+    x,
+    y,
+    cell,
+    gutter,
+    alpha,
+    control,
+    false,
+  )) as Uint8ClampedArray;
+}
 /** Canonical black/white paint ownership only. The scalar red-times-alpha
  * weight is a verification oracle; it never supplies working RGB or coverage. */
-export async function renderSvgCellWeight(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl={}):Promise<Uint16Array>{return await renderSvgCellPlane(root,x,y,cell,gutter,alpha,control,true)as Uint16Array;}
-async function renderSvgCellPlane(root:Element,x:number,y:number,cell:number,gutter:number,alpha:number,control:NativeGlyphFontControl,weights:boolean):Promise<Uint8ClampedArray|Uint16Array>{
- const options={...control},check=()=>{options.signal?.throwIfAborted();options.check?.();options.signal?.throwIfAborted();},timeout=options.timeoutMs??60000;check();if(!Number.isInteger(timeout)||timeout<=0||timeout>0x7fffffff)throw new Error('Invalid SVG glyph read time budget.');const size=cell+gutter*2;root.setAttribute('width',String(size));root.setAttribute('height',String(size));root.setAttribute('viewBox',`${x-gutter} ${y-gutter} ${size} ${size}`);
- for(const node of root.querySelectorAll('text,tspan')){if(!weights&&!root.hasAttribute('data-canoli-verification-palette'))node.setAttribute('fill','#fff');node.setAttribute('fill-opacity',String(alpha));}
- const canvas=createCanvas(size,size,true),image=new Image();let url:string|undefined,timer:ReturnType<typeof setTimeout>|undefined,abort=()=>{};
- try{
-  url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(root)],{type:'image/svg+xml'}));
-  await new Promise<void>((resolve,reject)=>{let ended=false;const finish=(error?:unknown)=>{if(ended)return;ended=true;error===undefined?resolve():reject(error);};abort=()=>finish(options.signal?.reason??new Error('Native SVG glyph paint cancelled.'));image.onload=()=>{void Promise.resolve().then(()=>image.decode()).then(()=>finish(),finish);};image.onerror=()=>finish(new Error('Cannot load the captured native SVG glyph paint.'));timer=setTimeout(()=>finish(new Error('Native SVG glyph paint exceeded its time budget.')),timeout);options.signal?.addEventListener('abort',abort,{once:true});image.src=url!;if(options.signal?.aborted)abort();});
-  check();const c=canvas.getContext('2d')!;c.drawImage(image,0,0);check();const bytes=c.getImageData(gutter,gutter,cell,cell).data;if(!(bytes instanceof Uint8ClampedArray)||bytes.length!==cell*cell*4)throw new Error('Native SVG glyph pixels are invalid.');const output=weights?new Uint16Array(cell*cell):new Uint8ClampedArray(cell*cell);for(let i=0;i<output.length;i++)output[i]=weights?bytes[i*4]*bytes[i*4+3]:bytes[i*4+3];check();return output;
- }finally{clearTimeout(timer);options.signal?.removeEventListener('abort',abort);image.onload=image.onerror=null;image.src='';if(url)URL.revokeObjectURL(url);release(canvas);}
+export async function renderSvgCellWeight(
+  root: Element,
+  x: number,
+  y: number,
+  cell: number,
+  gutter: number,
+  alpha: number,
+  control: NativeGlyphFontControl = {},
+): Promise<Uint16Array> {
+  return (await renderSvgCellPlane(
+    root,
+    x,
+    y,
+    cell,
+    gutter,
+    alpha,
+    control,
+    true,
+  )) as Uint16Array;
+}
+async function renderSvgCellPlane(
+  root: Element,
+  x: number,
+  y: number,
+  cell: number,
+  gutter: number,
+  alpha: number,
+  control: NativeGlyphFontControl,
+  weights: boolean,
+): Promise<Uint8ClampedArray | Uint16Array> {
+  const options = { ...control },
+    check = () => {
+      options.signal?.throwIfAborted();
+      options.check?.();
+      options.signal?.throwIfAborted();
+    },
+    timeout = options.timeoutMs ?? 60000;
+  check();
+  if (!Number.isInteger(timeout) || timeout <= 0 || timeout > 0x7fffffff)
+    throw new Error("Invalid SVG glyph read time budget.");
+  const size = cell + gutter * 2;
+  root.setAttribute("width", String(size));
+  root.setAttribute("height", String(size));
+  root.setAttribute("viewBox", `${x - gutter} ${y - gutter} ${size} ${size}`);
+  for (const node of root.querySelectorAll("text,tspan")) {
+    if (!weights && !root.hasAttribute("data-canoli-verification-palette"))
+      node.setAttribute("fill", "#fff");
+    node.setAttribute("fill-opacity", String(alpha));
+  }
+  const canvas = createCanvas(size, size, true),
+    image = new Image();
+  let url: string | undefined,
+    timer: ReturnType<typeof setTimeout> | undefined,
+    abort = () => {};
+  try {
+    url = URL.createObjectURL(
+      new Blob([new XMLSerializer().serializeToString(root)], {
+        type: "image/svg+xml",
+      }),
+    );
+    await new Promise<void>((resolve, reject) => {
+      let ended = false;
+      const finish = (error?: unknown) => {
+        if (ended) return;
+        ended = true;
+        error === undefined ? resolve() : reject(error);
+      };
+      abort = () =>
+        finish(
+          options.signal?.reason ??
+            new Error("Native SVG glyph paint cancelled."),
+        );
+      image.onload = () => {
+        void Promise.resolve()
+          .then(() => image.decode())
+          .then(() => finish(), finish);
+      };
+      image.onerror = () =>
+        finish(new Error("Cannot load the captured native SVG glyph paint."));
+      timer = setTimeout(
+        () =>
+          finish(new Error("Native SVG glyph paint exceeded its time budget.")),
+        timeout,
+      );
+      options.signal?.addEventListener("abort", abort, { once: true });
+      image.src = url!;
+      if (options.signal?.aborted) abort();
+    });
+    check();
+    const c = canvas.getContext("2d")!;
+    c.drawImage(image, 0, 0);
+    check();
+    const bytes = c.getImageData(gutter, gutter, cell, cell).data;
+    if (
+      !(bytes instanceof Uint8ClampedArray) ||
+      bytes.length !== cell * cell * 4
+    )
+      throw new Error("Native SVG glyph pixels are invalid.");
+    const output = weights
+      ? new Uint16Array(cell * cell)
+      : new Uint8ClampedArray(cell * cell);
+    for (let i = 0; i < output.length; i++)
+      output[i] = weights ? bytes[i * 4] * bytes[i * 4 + 3] : bytes[i * 4 + 3];
+    check();
+    return output;
+  } finally {
+    clearTimeout(timer);
+    options.signal?.removeEventListener("abort", abort);
+    image.onload = image.onerror = null;
+    image.src = "";
+    if (url) URL.revokeObjectURL(url);
+    release(canvas);
+  }
 }
 
-export async function renderFloatSvgGlyphCoverage(glyph:Readonly<FloatGlyph>,input:FloatSourceWindow,check:()=>void):Promise<Float32Array>{
- const area=validateWindow(input),output=new Float32Array(area.width*area.height),cell=256,gutter=2;check();glyph.font.check();const root=await captureSvgGlyphDocument([glyph],{signal:glyph.font.signal,check}),bounds=await measureSvgGlyphBounds(root,()=>{check();glyph.font.check();});
- for(let y=Math.floor(area.y/cell)*cell;y<area.y+area.height;y+=cell)for(let x=Math.floor(area.x/cell)*cell;x<area.x+area.width;x+=cell){
-  check();glyph.font.check();
-  if(bounds.x>=x+cell+4||bounds.y>=y+cell+4||bounds.x+bounds.width<=x-4||bounds.y+bounds.height<=y-4)continue;
-  check();glyph.font.check();const bytes=await renderSvgCellAlpha(root,x,y,cell,gutter,1,{signal:glyph.font.signal,check}),left=Math.max(x,area.x),top=Math.max(y,area.y),right=Math.min(x+cell,area.x+area.width),bottom=Math.min(y+cell,area.y+area.height);
-  for(let row=top;row<bottom;row++)for(let column=left;column<right;column++)output[(row-area.y)*area.width+column-area.x]=bytes[(row-y)*cell+column-x]/255;await yieldTask();check();glyph.font.check();
- }check();glyph.font.check();return output;
+export async function renderFloatSvgGlyphCoverage(
+  glyph: Readonly<FloatGlyph>,
+  input: FloatSourceWindow,
+  check: () => void,
+): Promise<Float32Array> {
+  const area = validateWindow(input),
+    output = new Float32Array(area.width * area.height),
+    cell = 256,
+    gutter = 2;
+  check();
+  glyph.font.check();
+  const root = await captureSvgGlyphDocument([glyph], {
+      signal: glyph.font.signal,
+      check,
+    }),
+    bounds = await measureSvgGlyphBounds(root, () => {
+      check();
+      glyph.font.check();
+    });
+  for (
+    let y = Math.floor(area.y / cell) * cell;
+    y < area.y + area.height;
+    y += cell
+  )
+    for (
+      let x = Math.floor(area.x / cell) * cell;
+      x < area.x + area.width;
+      x += cell
+    ) {
+      check();
+      glyph.font.check();
+      if (
+        bounds.x >= x + cell + 4 ||
+        bounds.y >= y + cell + 4 ||
+        bounds.x + bounds.width <= x - 4 ||
+        bounds.y + bounds.height <= y - 4
+      )
+        continue;
+      check();
+      glyph.font.check();
+      const bytes = await renderSvgCellAlpha(root, x, y, cell, gutter, 1, {
+          signal: glyph.font.signal,
+          check,
+        }),
+        left = Math.max(x, area.x),
+        top = Math.max(y, area.y),
+        right = Math.min(x + cell, area.x + area.width),
+        bottom = Math.min(y + cell, area.y + area.height);
+      for (let row = top; row < bottom; row++)
+        for (let column = left; column < right; column++)
+          output[(row - area.y) * area.width + column - area.x] =
+            bytes[(row - y) * cell + column - x] / 255;
+      await yieldTask();
+      check();
+      glyph.font.check();
+    }
+  check();
+  glyph.font.check();
+  return output;
 }

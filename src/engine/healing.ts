@@ -1,6 +1,6 @@
 import type { AssetStore } from "../core/assets";
-import {isFloatDocument} from '../core/float-document';
-import {prepareFloatHealingStroke} from './float-retouch';
+import { isFloatDocument } from "../core/float-document";
+import { prepareFloatHealingStroke } from "./float-retouch";
 import { strokeBounds, type BrushStrokeData } from "../core/drawing";
 import { maskStrokeSchema } from "../core/masks";
 import type { DocumentData } from "../core/model";
@@ -24,9 +24,21 @@ export async function prepareHealingStroke(
   options: PoissonBlendOptions = {},
   radius = 64,
   signal?: AbortSignal,
-  current?:()=>void,
+  current?: () => void,
 ) {
-  if(isFloatDocument(document))return prepareFloatHealingStroke(document,assets,renderer,processor,brush,sampling,options,radius,signal,current);
+  if (isFloatDocument(document))
+    return prepareFloatHealingStroke(
+      document,
+      assets,
+      renderer,
+      processor,
+      brush,
+      sampling,
+      options,
+      radius,
+      signal,
+      current,
+    );
   if (!Number.isSafeInteger(radius) || radius < 1)
     throw new Error("Healing search radius must be a positive safe integer.");
   const captured = maskStrokeSchema.parse({
@@ -64,7 +76,7 @@ export async function prepareHealingStroke(
     undefined,
     assets,
     undefined,
-    ()=>signal?.aborted??false,
+    () => signal?.aborted ?? false,
   );
   signal?.throwIfAborted();
   const pixels = await sampleRetouchRegion(

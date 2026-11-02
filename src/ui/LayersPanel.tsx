@@ -1,8 +1,8 @@
-import {LayerAlignmentControls} from './LayerAlignmentControls';
-import {visibleLayerTree} from './layer-tree';
-import {useLayerTreeKeyboard} from './hooks/useLayerTreeKeyboard';
-import {isImmutable} from '../core/immutable';
-import type {AlignmentTarget,LayerAlignment} from '../core/layer-layout';
+import { LayerAlignmentControls } from "./LayerAlignmentControls";
+import { visibleLayerTree } from "./layer-tree";
+import { useLayerTreeKeyboard } from "./hooks/useLayerTreeKeyboard";
+import { isImmutable } from "../core/immutable";
+import type { AlignmentTarget, LayerAlignment } from "../core/layer-layout";
 import { LayerTreeRow } from "./LayerTreeRow";
 import type { RasterEditing } from "../raster-editing";
 import { LayerFilterBar } from "./LayerFilterBar";
@@ -62,9 +62,9 @@ export interface LayersPanelProps {
   onCancelTools(): void;
   onClearPreview(): void;
   onAttempt(action: () => void): void;
-  onAlign?(alignment:LayerAlignment,target:AlignmentTarget):void;
-  alignmentKeyId?:string;
-  onAlignmentKeyChange?(id:string):void;
+  onAlign?(alignment: LayerAlignment, target: AlignmentTarget): void;
+  alignmentKeyId?: string;
+  onAlignmentKeyChange?(id: string): void;
   onSelectLayer(layer: Layer, additive?: boolean): void;
   onLoadTransparency?(id: string): void;
   onAddLayer(): void;
@@ -128,20 +128,53 @@ export function LayersPanel({
     setFilter({ ...emptyLayerFilter });
   }, [dom]);
   const modelKey = isImmutable(viewDocument) ? viewDocument : {};
-  const filtered = useMemo(() => filterLayers(viewDocument.children, filter), [modelKey, filter]);
+  const filtered = useMemo(
+    () => filterLayers(viewDocument.children, filter),
+    [modelKey, filter],
+  );
   const isCollapsed = (id: string) => !filtered.active && collapsed.has(id);
   const [showHistory, setShowHistory] = useState(false);
   const [collapsed, setCollapsed] = useState(new Set<string>());
-  const treeRows = useMemo(() => visibleLayerTree(viewDocument.children, filtered.included, collapsed, filtered.active), [modelKey, filtered, collapsed]);
-  const treeRowIndex = useMemo(() => new Map(treeRows.map(row => [row.node.id, row])), [treeRows]);
-  const tree = useLayerTreeKeyboard({document: dom, rows: treeRows, matches: filtered.matches, filtered: filtered.active, collapsed, isCurrent,
-    collapse: (id, value) => setCollapsed(old => { const next = new Set(old); if (value) next.add(id); else next.delete(id); return next; }),
-    select: ids => {
+  const treeRows = useMemo(
+    () =>
+      visibleLayerTree(
+        viewDocument.children,
+        filtered.included,
+        collapsed,
+        filtered.active,
+      ),
+    [modelKey, filtered, collapsed],
+  );
+  const treeRowIndex = useMemo(
+    () => new Map(treeRows.map((row) => [row.node.id, row])),
+    [treeRows],
+  );
+  const tree = useLayerTreeKeyboard({
+    document: dom,
+    rows: treeRows,
+    matches: filtered.matches,
+    filtered: filtered.active,
+    collapsed,
+    isCurrent,
+    collapse: (id, value) =>
+      setCollapsed((old) => {
+        const next = new Set(old);
+        if (value) next.add(id);
+        else next.delete(id);
+        return next;
+      }),
+    select: (ids) => {
       if (!isCurrent()) return false;
-      onCancelTools(); onClearPreview(); if (!isCurrent()) return false;
-      const layers = ids.map(id => dom.getLayer(id)); if (layers.some(layer => !layer)) return false;
+      onCancelTools();
+      onClearPreview();
+      if (!isCurrent()) return false;
+      const layers = ids.map((id) => dom.getLayer(id));
+      if (layers.some((layer) => !layer)) return false;
       dom.selectLayers(layers as Layer[]);
-      return isCurrent() && JSON.stringify(dom.getSnapshot().selectedIds) === JSON.stringify(ids);
+      return (
+        isCurrent() &&
+        JSON.stringify(dom.getSnapshot().selectedIds) === JSON.stringify(ids)
+      );
     },
   });
   const [draggedLayer, setDraggedLayer] = useState<string | null>(null);
@@ -178,70 +211,156 @@ export function LayersPanel({
     });
   }
 
-  function eventRow(event:SyntheticEvent<HTMLDivElement>) {
-    const target=event.target instanceof Element?event.target:event.target instanceof Node?event.target.parentElement:null;
-    const row=target?.closest<HTMLDivElement>('.layer-row[data-layer-id]');
-    return row&&event.currentTarget.contains(row)?{row,target,id:row.dataset.layerId!}:null;
+  function eventRow(event: SyntheticEvent<HTMLDivElement>) {
+    const target =
+      event.target instanceof Element
+        ? event.target
+        : event.target instanceof Node
+          ? event.target.parentElement
+          : null;
+    const row = target?.closest<HTMLDivElement>(".layer-row[data-layer-id]");
+    return row && event.currentTarget.contains(row)
+      ? { row, target, id: row.dataset.layerId! }
+      : null;
   }
 
-  function clickRow(event:MouseEvent<HTMLDivElement>) {
-    if(!isCurrent())return;
-    const hit=eventRow(event);if(!hit)return;
-    const node=findLayer(viewDocument,hit.id);if(!node)return;
-    if(hit.target?.closest('img.pixel-thumb')&&(event.ctrlKey||event.metaKey)&&!busy&&onLoadTransparency){
-      event.preventDefault();event.stopPropagation();onLoadTransparency(hit.id);return;
+  function clickRow(event: MouseEvent<HTMLDivElement>) {
+    if (!isCurrent()) return;
+    const hit = eventRow(event);
+    if (!hit) return;
+    const node = findLayer(viewDocument, hit.id);
+    if (!node) return;
+    if (
+      hit.target?.closest("img.pixel-thumb") &&
+      (event.ctrlKey || event.metaKey) &&
+      !busy &&
+      onLoadTransparency
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      onLoadTransparency(hit.id);
+      return;
     }
-    const button=hit.target?.closest<HTMLButtonElement>('button[data-layer-action]');
-    if(!button||!hit.row.contains(button)||button.disabled)return;
-    const action=button.dataset.layerAction;
-    if(action==='toggle'){
-      setCollapsed(old=>{const next=new Set(old);if(next.has(hit.id))next.delete(hit.id);else next.add(hit.id);return next;});
-    }else if(action==='select'){
-      onCancelTools();onClearPreview();
-      if(!isCurrent())return;
-      const object=dom.getLayer(hit.id);
-      if(object)onSelectLayer(object,event.ctrlKey||event.metaKey||event.shiftKey);
-      tree.markAnchor(hit.id);tree.focus(hit.id);
-    }else if(action==='lock'||action==='visibility'){
-      onAttempt(()=>{
-        const object=dom.getLayer(hit.id);if(!object)return;
-        if(action==='lock')object.locked=!node.locked;else object.visible=!node.visible;
+    const button = hit.target?.closest<HTMLButtonElement>(
+      "button[data-layer-action]",
+    );
+    if (!button || !hit.row.contains(button) || button.disabled) return;
+    const action = button.dataset.layerAction;
+    if (action === "toggle") {
+      setCollapsed((old) => {
+        const next = new Set(old);
+        if (next.has(hit.id)) next.delete(hit.id);
+        else next.add(hit.id);
+        return next;
+      });
+    } else if (action === "select") {
+      onCancelTools();
+      onClearPreview();
+      if (!isCurrent()) return;
+      const object = dom.getLayer(hit.id);
+      if (object)
+        onSelectLayer(object, event.ctrlKey || event.metaKey || event.shiftKey);
+      tree.markAnchor(hit.id);
+      tree.focus(hit.id);
+    } else if (action === "lock" || action === "visibility") {
+      onAttempt(() => {
+        const object = dom.getLayer(hit.id);
+        if (!object) return;
+        if (action === "lock") object.locked = !node.locked;
+        else object.visible = !node.visible;
       });
     }
   }
 
-  function startRowDrag(event:DragEvent<HTMLDivElement>) {
-    const hit=eventRow(event);if(!hit||!hit.row.draggable)return;
-    onCancelTools();event.dataTransfer.setData('application/x-luma-layer',hit.id);
-    event.dataTransfer.effectAllowed='move';setDraggedLayer(hit.id);
+  function startRowDrag(event: DragEvent<HTMLDivElement>) {
+    const hit = eventRow(event);
+    if (!hit || !hit.row.draggable) return;
+    onCancelTools();
+    event.dataTransfer.setData("application/x-luma-layer", hit.id);
+    event.dataTransfer.effectAllowed = "move";
+    setDraggedLayer(hit.id);
   }
-  function overRowDrag(event:DragEvent<HTMLDivElement>) {
-    const hit=eventRow(event);if(!hit||!draggedLayer||draggedLayer===hit.id)return;
-    const node=findLayer(viewDocument,hit.id);if(!node)return;
-    event.preventDefault();event.stopPropagation();
-    const box=hit.row.getBoundingClientRect(),y=(event.clientY-box.top)/box.height;
-    setDropTarget({id:hit.id,placement:node.kind==='group'&&y>0.25&&y<0.75?'inside':y<0.5?'after':'before'});
+  function overRowDrag(event: DragEvent<HTMLDivElement>) {
+    const hit = eventRow(event);
+    if (!hit || !draggedLayer || draggedLayer === hit.id) return;
+    const node = findLayer(viewDocument, hit.id);
+    if (!node) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const box = hit.row.getBoundingClientRect(),
+      y = (event.clientY - box.top) / box.height;
+    setDropTarget({
+      id: hit.id,
+      placement:
+        node.kind === "group" && y > 0.25 && y < 0.75
+          ? "inside"
+          : y < 0.5
+            ? "after"
+            : "before",
+    });
   }
-  function dropRow(event:DragEvent<HTMLDivElement>) {
-    const hit=eventRow(event);if(hit)dropLayer(event,hit.id,dropTarget?.id===hit.id?dropTarget.placement:'after');
+  function dropRow(event: DragEvent<HTMLDivElement>) {
+    const hit = eventRow(event);
+    if (hit)
+      dropLayer(
+        event,
+        hit.id,
+        dropTarget?.id === hit.id ? dropTarget.placement : "after",
+      );
   }
 
-  function renderLayers(nodes:LayerData[],depth=0) {
-    return [...nodes].reverse().filter(node=>filtered.included.has(node.id)).map(node=>{
-      const thumbnailPixels=node.kind==='raster'||node.kind==='paint'?pixels:undefined;
-      const info=treeRowIndex.get(node.id)!;
-      return <div key={node.id} className={`layer-tree-node ${tree.hasFocus&&tree.focusId===node.id?'keyboard-active':''}`} data-layer-node-id={node.id} role="treeitem" aria-label={node.name}
-        aria-selected={dom.getSnapshot().selectedIds.includes(node.id)} aria-level={info.level} aria-posinset={info.position} aria-setsize={info.siblings}
-        aria-expanded={info.hasChildren?!isCollapsed(node.id):undefined} tabIndex={tree.focusId===node.id?0:-1}>
-        <LayerTreeRow node={node} depth={depth} selected={dom.getSnapshot().selectedIds.includes(node.id)}
-          locked={isLocked(viewDocument,node.id)} busy={busy} filterContext={filtered.active&&!filtered.matches.has(node.id)}
-          tabbable={tree.focusId===node.id}
-          filtered={filtered.active} collapsed={isCollapsed(node.id)} dropPlacement={dropTarget?.id===node.id?dropTarget.placement:undefined}
-          pixels={thumbnailPixels} thumbnailDocument={thumbnailPixels?dom.getSnapshot().document:undefined}
-          paused={!!thumbnailPixels&&deferThumbnails} fallback={node.kind==='raster'?getThumbnail(node.assetId):undefined}/>
-        {node.kind==='group'&&!isCollapsed(node.id)&&info.hasChildren&&<div role="group">{renderLayers(node.children,depth+1)}</div>}
-      </div>;
-    });
+  function renderLayers(nodes: LayerData[], depth = 0) {
+    return [...nodes]
+      .reverse()
+      .filter((node) => filtered.included.has(node.id))
+      .map((node) => {
+        const thumbnailPixels =
+          node.kind === "raster" || node.kind === "paint" ? pixels : undefined;
+        const info = treeRowIndex.get(node.id)!;
+        return (
+          <div
+            key={node.id}
+            className={`layer-tree-node ${tree.hasFocus && tree.focusId === node.id ? "keyboard-active" : ""}`}
+            data-layer-node-id={node.id}
+            role="treeitem"
+            aria-label={node.name}
+            aria-selected={dom.getSnapshot().selectedIds.includes(node.id)}
+            aria-level={info.level}
+            aria-posinset={info.position}
+            aria-setsize={info.siblings}
+            aria-expanded={info.hasChildren ? !isCollapsed(node.id) : undefined}
+            tabIndex={tree.focusId === node.id ? 0 : -1}
+          >
+            <LayerTreeRow
+              node={node}
+              depth={depth}
+              selected={dom.getSnapshot().selectedIds.includes(node.id)}
+              locked={isLocked(viewDocument, node.id)}
+              busy={busy}
+              filterContext={filtered.active && !filtered.matches.has(node.id)}
+              tabbable={tree.focusId === node.id}
+              filtered={filtered.active}
+              collapsed={isCollapsed(node.id)}
+              dropPlacement={
+                dropTarget?.id === node.id ? dropTarget.placement : undefined
+              }
+              pixels={thumbnailPixels}
+              thumbnailDocument={
+                thumbnailPixels ? dom.getSnapshot().document : undefined
+              }
+              paused={!!thumbnailPixels && deferThumbnails}
+              fallback={
+                node.kind === "raster" ? getThumbnail(node.assetId) : undefined
+              }
+            />
+            {node.kind === "group" &&
+              !isCollapsed(node.id) &&
+              info.hasChildren && (
+                <div role="group">{renderLayers(node.children, depth + 1)}</div>
+              )}
+          </div>
+        );
+      });
   }
 
   return (
@@ -336,9 +455,26 @@ export function LayersPanel({
                 Selected layer: {selected?.name}. Outside current filter.
               </p>
             )}
-          <div className="layer-list" role="tree" aria-label="Layers" aria-multiselectable="true" aria-description="Arrow keys move focus. Enter selects; Space toggles selection; Shift extends a range. Ctrl or Command+A selects visible matches." ref={tree.root} tabIndex={treeRows.length?-1:0}
-            onKeyDown={tree.onKeyDown} onFocusCapture={tree.onFocusCapture} onBlurCapture={tree.onBlurCapture}
-            onClick={clickRow} onDragStart={startRowDrag} onDragOver={overRowDrag} onDrop={dropRow} onDragEnd={()=>{setDraggedLayer(null);setDropTarget(null);}}>
+          <div
+            className="layer-list"
+            role="tree"
+            aria-label="Layers"
+            aria-multiselectable="true"
+            aria-description="Arrow keys move focus. Enter selects; Space toggles selection; Shift extends a range. Ctrl or Command+A selects visible matches."
+            ref={tree.root}
+            tabIndex={treeRows.length ? -1 : 0}
+            onKeyDown={tree.onKeyDown}
+            onFocusCapture={tree.onFocusCapture}
+            onBlurCapture={tree.onBlurCapture}
+            onClick={clickRow}
+            onDragStart={startRowDrag}
+            onDragOver={overRowDrag}
+            onDrop={dropRow}
+            onDragEnd={() => {
+              setDraggedLayer(null);
+              setDropTarget(null);
+            }}
+          >
             {filtered.active && !filtered.matches.size && (
               <p className="panel-empty">No matching layers.</p>
             )}
@@ -360,294 +496,338 @@ export function LayersPanel({
           >
             Drop here to move to document
           </div>
-          <LayerAlignmentControls document={dom} viewDocument={viewDocument} busy={busy} keyLayerId={alignmentKeyId} onKeyChange={onAlignmentKeyChange} onAlign={(alignment,target)=>{
-            if(onAlign)onAlign(alignment,target);else{onCancelTools();onClearPreview();onAttempt(()=>dom.layerSelection.align(alignment,target.type==='layer'?dom.getLayer(target.id)!:target.type));}
-          }}/>
-          {dom.selectedLayers.length>0&&<div className="layer-extra-controls" role="region" aria-label="Additional layer controls" tabIndex={0} onKeyDown={event=>{
-            if(event.target===event.currentTarget&&['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key))event.stopPropagation();
-          }}>
-          {dom.selectedLayers.length > 1 && (
-            <div className="layer-filter-bar">
-              <span>{dom.selectedLayers.length} layers selected</span>
-              <label>
-                Distribute layers{" "}
-                <select
-                  aria-label="Distribute selected layers"
-                  disabled={
-                    busy ||
-                    dom.layerSelection.rootLayers.length < 3 ||
-                    dom.layerSelection.rootLayers.some((layer) =>
-                      isLocked(viewDocument, layer.id),
-                    )
-                  }
-                  defaultValue=""
-                  onChange={(event) => {
-                    const [axis, mode] = event.target.value.split(":") as [
-                      import("../core/layer-layout").DistributionAxis,
-                      import("../core/layer-layout").DistributionMode,
-                    ];
-                    onCancelTools();
-                    onClearPreview();
-                    onAttempt(() => dom.layerSelection.distribute(axis, mode));
-                    event.target.value = "";
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose spacing
-                  </option>
-                  <option value="horizontal:gaps">Horizontal gaps</option>
-                  <option value="vertical:gaps">Vertical gaps</option>
-                  <option value="horizontal:centers">Horizontal centers</option>
-                  <option value="vertical:centers">Vertical centers</option>
-                </select>
-              </label>
-              <label>
-                Rotate layers{" "}
-                <select
-                  aria-label="Rotate selected layers"
-                  disabled={
-                    busy ||
-                    dom.layerSelection.rootLayers.some((layer) =>
-                      isLocked(viewDocument, layer.id),
-                    )
-                  }
-                  defaultValue=""
-                  onChange={(event) => {
-                    const degrees = Number(event.target.value);
-                    onCancelTools();
-                    onClearPreview();
-                    onAttempt(() => dom.layerSelection.rotate(degrees));
-                    event.target.value = "";
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose rotation
-                  </option>
-                  <option value="90">90° clockwise</option>
-                  <option value="-90">90° counterclockwise</option>
-                  <option value="180">180°</option>
-                </select>
-              </label>
-              <label>
-                Scale layers{" "}
-                <select
-                  aria-label="Scale selected layers"
-                  disabled={
-                    busy ||
-                    dom.layerSelection.rootLayers.some((layer) =>
-                      isLocked(viewDocument, layer.id),
-                    )
-                  }
-                  defaultValue=""
-                  onChange={(event) => {
-                    const factor = Number(event.target.value);
-                    onCancelTools();
-                    onClearPreview();
-                    onAttempt(() => dom.layerSelection.scale(factor));
-                    event.target.value = "";
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose scale
-                  </option>
-                  <option value="0.5">50%</option>
-                  <option value="2">200%</option>
-                </select>
-              </label>
-            </div>
-          )}
+          <LayerAlignmentControls
+            document={dom}
+            viewDocument={viewDocument}
+            busy={busy}
+            keyLayerId={alignmentKeyId}
+            onKeyChange={onAlignmentKeyChange}
+            onAlign={(alignment, target) => {
+              if (onAlign) onAlign(alignment, target);
+              else {
+                onCancelTools();
+                onClearPreview();
+                onAttempt(() =>
+                  dom.layerSelection.align(
+                    alignment,
+                    target.type === "layer"
+                      ? dom.getLayer(target.id)!
+                      : target.type,
+                  ),
+                );
+              }
+            }}
+          />
           {dom.selectedLayers.length > 0 && (
-            <div className="layer-filter-bar">
-              <label>
-                Flip layers{" "}
-                <select
-                  aria-label="Flip selected layers"
-                  defaultValue=""
+            <div
+              className="layer-extra-controls"
+              role="region"
+              aria-label="Additional layer controls"
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (
+                  event.target === event.currentTarget &&
+                  [
+                    "ArrowUp",
+                    "ArrowDown",
+                    "PageUp",
+                    "PageDown",
+                    "Home",
+                    "End",
+                    " ",
+                  ].includes(event.key)
+                )
+                  event.stopPropagation();
+              }}
+            >
+              {dom.selectedLayers.length > 1 && (
+                <div className="layer-filter-bar">
+                  <span>{dom.selectedLayers.length} layers selected</span>
+                  <label>
+                    Distribute layers{" "}
+                    <select
+                      aria-label="Distribute selected layers"
+                      disabled={
+                        busy ||
+                        dom.layerSelection.rootLayers.length < 3 ||
+                        dom.layerSelection.rootLayers.some((layer) =>
+                          isLocked(viewDocument, layer.id),
+                        )
+                      }
+                      defaultValue=""
+                      onChange={(event) => {
+                        const [axis, mode] = event.target.value.split(":") as [
+                          import("../core/layer-layout").DistributionAxis,
+                          import("../core/layer-layout").DistributionMode,
+                        ];
+                        onCancelTools();
+                        onClearPreview();
+                        onAttempt(() =>
+                          dom.layerSelection.distribute(axis, mode),
+                        );
+                        event.target.value = "";
+                      }}
+                    >
+                      <option value="" disabled>
+                        Choose spacing
+                      </option>
+                      <option value="horizontal:gaps">Horizontal gaps</option>
+                      <option value="vertical:gaps">Vertical gaps</option>
+                      <option value="horizontal:centers">
+                        Horizontal centers
+                      </option>
+                      <option value="vertical:centers">Vertical centers</option>
+                    </select>
+                  </label>
+                  <label>
+                    Rotate layers{" "}
+                    <select
+                      aria-label="Rotate selected layers"
+                      disabled={
+                        busy ||
+                        dom.layerSelection.rootLayers.some((layer) =>
+                          isLocked(viewDocument, layer.id),
+                        )
+                      }
+                      defaultValue=""
+                      onChange={(event) => {
+                        const degrees = Number(event.target.value);
+                        onCancelTools();
+                        onClearPreview();
+                        onAttempt(() => dom.layerSelection.rotate(degrees));
+                        event.target.value = "";
+                      }}
+                    >
+                      <option value="" disabled>
+                        Choose rotation
+                      </option>
+                      <option value="90">90° clockwise</option>
+                      <option value="-90">90° counterclockwise</option>
+                      <option value="180">180°</option>
+                    </select>
+                  </label>
+                  <label>
+                    Scale layers{" "}
+                    <select
+                      aria-label="Scale selected layers"
+                      disabled={
+                        busy ||
+                        dom.layerSelection.rootLayers.some((layer) =>
+                          isLocked(viewDocument, layer.id),
+                        )
+                      }
+                      defaultValue=""
+                      onChange={(event) => {
+                        const factor = Number(event.target.value);
+                        onCancelTools();
+                        onClearPreview();
+                        onAttempt(() => dom.layerSelection.scale(factor));
+                        event.target.value = "";
+                      }}
+                    >
+                      <option value="" disabled>
+                        Choose scale
+                      </option>
+                      <option value="0.5">50%</option>
+                      <option value="2">200%</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+              {dom.selectedLayers.length > 0 && (
+                <div className="layer-filter-bar">
+                  <label>
+                    Flip layers{" "}
+                    <select
+                      aria-label="Flip selected layers"
+                      defaultValue=""
+                      disabled={
+                        busy ||
+                        dom.layerSelection.rootLayers.some((layer) =>
+                          isLocked(viewDocument, layer.id),
+                        )
+                      }
+                      onChange={(event) => {
+                        const axis = event.target.value as
+                          "horizontal" | "vertical";
+                        onCancelTools();
+                        onClearPreview();
+                        onAttempt(() => dom.layerSelection.flip(axis));
+                        event.target.value = "";
+                      }}
+                    >
+                      <option value="" disabled>
+                        Choose direction
+                      </option>
+                      <option value="horizontal">Horizontal</option>
+                      <option value="vertical">Vertical</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+              {dom.selectedLayers.length > 1 && (
+                <div className="selection-scale-controls">
+                  <Slider
+                    label="Selection scale"
+                    value={scalePercent}
+                    min={1}
+                    max={400}
+                    step={0.1}
+                    suffix="%"
+                    disabled={
+                      busy ||
+                      dom.layerSelection.rootLayers.some((layer) =>
+                        isLocked(viewDocument, layer.id),
+                      )
+                    }
+                    onPreview={setScalePercent}
+                    onCommit={setScalePercent}
+                  />
+                  <Button
+                    disabled={
+                      busy ||
+                      scalePercent === 100 ||
+                      dom.layerSelection.rootLayers.some((layer) =>
+                        isLocked(viewDocument, layer.id),
+                      )
+                    }
+                    onClick={() => {
+                      onCancelTools();
+                      onClearPreview();
+                      onAttempt(() => {
+                        dom.layerSelection.scale(scalePercent / 100);
+                        setScalePercent(100);
+                      });
+                    }}
+                  >
+                    Apply selection scale
+                  </Button>
+                </div>
+              )}
+              {selected && (
+                <Button
                   disabled={
                     busy ||
-                    dom.layerSelection.rootLayers.some((layer) =>
+                    dom.selectedLayers.some((layer) =>
                       isLocked(viewDocument, layer.id),
                     )
                   }
-                  onChange={(event) => {
-                    const axis = event.target.value as
-                      "horizontal" | "vertical";
+                  onClick={() => {
                     onCancelTools();
                     onClearPreview();
-                    onAttempt(() => dom.layerSelection.flip(axis));
-                    event.target.value = "";
+                    onAttempt(() => {
+                      dom.createSmartObject(dom.selectedLayers);
+                    });
                   }}
                 >
-                  <option value="" disabled>
-                    Choose direction
-                  </option>
-                  <option value="horizontal">Horizontal</option>
-                  <option value="vertical">Vertical</option>
-                </select>
-              </label>
-            </div>
-          )}
-          {dom.selectedLayers.length > 1 && (
-            <div className="selection-scale-controls">
-              <Slider
-                label="Selection scale"
-                value={scalePercent}
-                min={1}
-                max={400}
-                step={0.1}
-                suffix="%"
-                disabled={
-                  busy ||
-                  dom.layerSelection.rootLayers.some((layer) =>
-                    isLocked(viewDocument, layer.id),
-                  )
-                }
-                onPreview={setScalePercent}
-                onCommit={setScalePercent}
-              />
-              <Button
-                disabled={
-                  busy ||
-                  scalePercent === 100 ||
-                  dom.layerSelection.rootLayers.some((layer) =>
-                    isLocked(viewDocument, layer.id),
-                  )
-                }
-                onClick={() => {
-                  onCancelTools();
-                  onClearPreview();
-                  onAttempt(() => {
-                    dom.layerSelection.scale(scalePercent / 100);
-                    setScalePercent(100);
-                  });
-                }}
-              >
-                Apply selection scale
-              </Button>
-            </div>
-          )}
-          {selected && (
-            <Button
-              disabled={
-                busy ||
-                dom.selectedLayers.some((layer) =>
-                  isLocked(viewDocument, layer.id),
-                )
-              }
-              onClick={() => {
-                onCancelTools();
-                onClearPreview();
-                onAttempt(() => {
-                  dom.createSmartObject(dom.selectedLayers);
-                });
-              }}
-            >
-              Convert to smart object
-            </Button>
-          )}
-          {selected instanceof SmartObjectLayer && onRasterizeSmartObject && (
-            <Button
-              disabled={
-                busy ||
-                dom.selectedLayers.length !== 1 ||
-                isLocked(viewDocument, selected.id)
-              }
-              onClick={() => {
-                onCancelTools();
-                onClearPreview();
-                onRasterizeSmartObject(selected);
-              }}
-            >
-              Rasterize smart object
-            </Button>
-          )}
-          {selected instanceof SmartObjectLayer && onRelinkSmartObject && (
-            <>
-              <input
-                ref={linkedFileInput}
-                type="file"
-                accept="image/*"
-                hidden
-                aria-label="Linked source image"
-                onChange={(event) => {
-                  const file = event.currentTarget.files?.[0],
-                    target = linkedFileTarget.current;
-                  event.currentTarget.value = "";
-                  linkedFileTarget.current = null;
-                  if (file && target) onRelinkSmartObject(target, file);
-                }}
-              />
-              <Button
-                disabled={
-                  busy ||
-                  dom.selectedLayers.length !== 1 ||
-                  isLocked(viewDocument, selected.id)
-                }
-                onClick={() => {
-                  linkedFileTarget.current = selected;
-                  linkedFileInput.current?.click();
-                }}
-              >
-                {selected.linkedSource
-                  ? "Relink image file"
-                  : "Link image file"}
-              </Button>
-              {selected.linkedSource && (
-                <>
-                  <span className="linked-source-status">
-                    <span
-                      className="linked-source-name"
-                      title={selected.linkedSource.name}
-                    >
-                      {selected.linkedSource.name}
-                    </span>
-                    <span>Saved snapshot; select file to refresh</span>
-                  </span>
+                  Convert to smart object
+                </Button>
+              )}
+              {selected instanceof SmartObjectLayer &&
+                onRasterizeSmartObject && (
                   <Button
-                    disabled={busy || isLocked(viewDocument, selected.id)}
-                    onClick={() => onAttempt(() => selected.embedSource())}
+                    disabled={
+                      busy ||
+                      dom.selectedLayers.length !== 1 ||
+                      isLocked(viewDocument, selected.id)
+                    }
+                    onClick={() => {
+                      onCancelTools();
+                      onClearPreview();
+                      onRasterizeSmartObject(selected);
+                    }}
                   >
-                    Embed source snapshot
+                    Rasterize smart object
                   </Button>
+                )}
+              {selected instanceof SmartObjectLayer && onRelinkSmartObject && (
+                <>
+                  <input
+                    ref={linkedFileInput}
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    aria-label="Linked source image"
+                    onChange={(event) => {
+                      const file = event.currentTarget.files?.[0],
+                        target = linkedFileTarget.current;
+                      event.currentTarget.value = "";
+                      linkedFileTarget.current = null;
+                      if (file && target) onRelinkSmartObject(target, file);
+                    }}
+                  />
+                  <Button
+                    disabled={
+                      busy ||
+                      dom.selectedLayers.length !== 1 ||
+                      isLocked(viewDocument, selected.id)
+                    }
+                    onClick={() => {
+                      linkedFileTarget.current = selected;
+                      linkedFileInput.current?.click();
+                    }}
+                  >
+                    {selected.linkedSource
+                      ? "Relink image file"
+                      : "Link image file"}
+                  </Button>
+                  {selected.linkedSource && (
+                    <>
+                      <span className="linked-source-status">
+                        <span
+                          className="linked-source-name"
+                          title={selected.linkedSource.name}
+                        >
+                          {selected.linkedSource.name}
+                        </span>
+                        <span>Saved snapshot; select file to refresh</span>
+                      </span>
+                      <Button
+                        disabled={busy || isLocked(viewDocument, selected.id)}
+                        onClick={() => onAttempt(() => selected.embedSource())}
+                      >
+                        Embed source snapshot
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
-            </>
+              {selected instanceof SmartObjectLayer && onEditSmartObject && (
+                <Button
+                  disabled={
+                    busy ||
+                    dom.selectedLayers.length !== 1 ||
+                    !!selected.linkedSource
+                  }
+                  onClick={() => {
+                    onCancelTools();
+                    onClearPreview();
+                    onEditSmartObject(selected);
+                  }}
+                >
+                  Edit contents
+                </Button>
+              )}
+              {selected instanceof SmartObjectLayer && (
+                <Button
+                  disabled={
+                    busy ||
+                    isLocked(viewDocument, selected.id) ||
+                    dom.selectedLayers.length !== 1
+                  }
+                  onClick={() => {
+                    onCancelTools();
+                    onClearPreview();
+                    onAttempt(() => {
+                      selected.duplicateIndependent();
+                    });
+                  }}
+                >
+                  New smart object via copy
+                </Button>
+              )}
+            </div>
           )}
-          {selected instanceof SmartObjectLayer && onEditSmartObject && (
-            <Button
-              disabled={
-                busy ||
-                dom.selectedLayers.length !== 1 ||
-                !!selected.linkedSource
-              }
-              onClick={() => {
-                onCancelTools();
-                onClearPreview();
-                onEditSmartObject(selected);
-              }}
-            >
-              Edit contents
-            </Button>
-          )}
-          {selected instanceof SmartObjectLayer && (
-            <Button
-              disabled={
-                busy ||
-                isLocked(viewDocument, selected.id) ||
-                dom.selectedLayers.length !== 1
-              }
-              onClick={() => {
-                onCancelTools();
-                onClearPreview();
-                onAttempt(() => {
-                  selected.duplicateIndependent();
-                });
-              }}
-            >
-              New smart object via copy
-            </Button>
-          )}
-          </div>}
           <div className="layer-actions">
             <IconButton
               shortcutId="duplicate"
@@ -686,7 +866,9 @@ export function LayersPanel({
       ) : (
         <div className="history-list">
           <p className="section-caption">RETAINED HISTORY</p>
-          <Button disabled={busy} onClick={onInspectHistory}>Inspect retained history</Button>
+          <Button disabled={busy} onClick={onInspectHistory}>
+            Inspect retained history
+          </Button>
           <div className="history-entry">
             <span className="history-dot" />
             Oldest retained state

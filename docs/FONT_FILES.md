@@ -56,7 +56,6 @@ Raster exports render with owned native faces. Referenced source/native identiti
 
 Character runs, arbitrary axis authoring, path text, broader shaping/font/device quality, broader automation and mixed-source acceptance, and sustained editor-wide performance remain required.
 
-
 ## Private glyph paint sources
 
 Native text preparation may retain an independent private glyph-selector face

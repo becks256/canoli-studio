@@ -186,7 +186,6 @@ replacement assets cannot represent HDR results. The current float wet-tool
 admission guard stays in force; no schema, scripting/REST signature, plugin
 permission or public mutation authority changes in this increment.
 
-
 ## Retained linear float wet sessions
 
 Private `createFloatWetStrokeSession(stroke, readSource, processor, options = {},
@@ -247,7 +246,6 @@ Float Smudge/Mixer stay unavailable. No document schema, isolated service, REST
 route, plugin permission, account/upload or browser/headless synchronization
 contract changes in this increment.
 
-
 ## Prepared HDR wet asset and field dependency
 
 Private lossless Float32 TIFF tiles retain completed straight samples. Validated
@@ -258,7 +256,6 @@ derived intermediates, not a new document precision or public wet DTO.
 [Format, equations, ownership, budgets and remaining integration](HDR_WET_FIELDS.md).
 Public HDR wet assets/commands, FloatScene replay, original-bearing persistence
 and authoring/tools remain required; float Smudge/Mixer stay disabled.
-
 
 ## Current trusted wet authoring integration
 

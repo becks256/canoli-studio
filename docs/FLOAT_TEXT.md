@@ -636,7 +636,6 @@ and [compact receipt](../docs/benchmarks/float-text-color-2026-11-01.json.gz)
 retain the successful checks, failed pilot and glyph probes. No native glyph
 or float TextLayer acceptance is claimed here.
 
-
 ## Native preparation verification (2026-11-01)
 
 Full build/typecheck and all 3,357 unit/API cases across 331 files pass. One
@@ -653,7 +652,6 @@ and limitations](../docs/benchmarks/native-text-plan-2026-11-01.md) and
 [compact receipt](../docs/benchmarks/native-text-plan-2026-11-01.json.gz) retain
 successful runs, failed pilots, source/release identities and complete large
 outputs. Full native glyph painting and the original roadmap remain required.
-
 
 ## Private glyph paint verification (2026-11-01)
 
@@ -742,7 +740,6 @@ pixels and preceding accepted PNG bytes; this is not full 50 MP/float acceptance
 retain failed/corrected pilots. Full native typography, float TextLayer/tool
 integration and all remaining original roadmap gates stay required.
 
-
 ## Native vertical glyph paint (private)
 
 Captured uniform monochrome SVG lines can now use original source-font glyph
@@ -803,7 +800,6 @@ required. VORG reader unit coverage alone does not establish native CFF/VORG
 interop. Current browser/build/large-original acceptance is recorded in the dated
 implementation log; do not infer universal font or device support.
 
-
 ## Native vertical glyph verification (2026-11-01)
 
 Full build/typecheck, all 3,405 unit/API tests across 337 files, one complete
@@ -827,7 +823,6 @@ establish admitted Float32 TextLayer or universal native-font/device support.
 retain failed/corrected baseline, metric, path, direction and production-namespace
 pilots. Full connected text/tool/scene/export/shared transport/persistence and
 every unfinished original roadmap requirement remain active.
-
 
 ## Styled source-glyph items (private)
 
@@ -883,7 +878,6 @@ native script/bidi/font fallback, missing/intrinsic/host/extents behavior, conne
 Float32 TextLayer authoring/scenes/export/shared transport/persistence and all
 unfinished original roadmap/device/quality/performance requirements remain.
 
-
 The complete affected source run passes all 196 cases across twenty files and
 the complete production run passes fifteen cases, without retries/skips/flakes.
 All 3,406 unit/API tests across 338 files and full build/typecheck pass. The
@@ -898,7 +892,6 @@ public Float32 TextLayer or universal host support.
 [Findings and remaining scope](benchmarks/svg-styled-glyph-2026-11-01.md) and
 [compact verification receipt](benchmarks/svg-styled-glyph-2026-11-01.json.gz)
 retain failed/corrected pilots, raw results and source/release identities.
-
 
 ## Owned native fallback under verification (private)
 
@@ -954,7 +947,6 @@ from pixels or substitute a rewritten text layout. Complete fallback and native
 layout handling, durable owner lifetimes, all connected public Float32 text
 controls/scenes/export/shared transport/persistence, and every unfinished
 original roadmap gate remain required.
-
 
 ### Durable glyph ownership after matching
 

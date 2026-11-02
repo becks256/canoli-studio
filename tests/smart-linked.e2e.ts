@@ -305,15 +305,13 @@ test("opening a project rejects a linked fingerprint that disagrees with real em
     if (source.kind !== "asset") throw new Error("Expected asset");
     source.link!.sha256 = "0".repeat(64);
     const assets = await Promise.all(
-      editor.assetStore
-        .values()
-        .map(async (asset) => ({
-          id: asset.id,
-          name: asset.name,
-          width: asset.width,
-          height: asset.height,
-          dataUrl: `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(await asset.blob.arrayBuffer())))}`,
-        })),
+      editor.assetStore.values().map(async (asset) => ({
+        id: asset.id,
+        name: asset.name,
+        width: asset.width,
+        height: asset.height,
+        dataUrl: `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(await asset.blob.arrayBuffer())))}`,
+      })),
     );
     const before = JSON.stringify(owner.toJSON()),
       count = editor.openDocuments.length;

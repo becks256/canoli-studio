@@ -8,7 +8,6 @@ declare global {
   }
 }
 
-
 test("editing, constructors in scripts, keyboard focus, and project round trip", async ({
   page,
 }) => {
@@ -660,26 +659,31 @@ test("add empty layer button and shortcut create paint layers and support undo/r
   expect(errors).toEqual([]);
 });
 
-test("scripts retain their starting snapshot while host edits or staged rollback occur", async ({page}) => {
+test("scripts retain their starting snapshot while host edits or staged rollback occur", async ({
+  page,
+}) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
     const e = window.luma.editor;
     e.document.name = "Starting revision";
-    const first = e.scripts.run(e.document, 'print(document.name); document.name = "Worker edit";');
+    const first = e.scripts.run(
+      e.document,
+      'print(document.name); document.name = "Worker edit";',
+    );
     e.document.name = "New host revision";
     const captured = await first;
     let staged: ReturnType<typeof e.scripts.run> | undefined;
     try {
       e.document.transaction("Discarded host edit", () => {
         e.document.name = "Staged revision";
-        staged = e.scripts.run(e.document, 'print(document.name);');
+        staged = e.scripts.run(e.document, "print(document.name);");
         throw new Error("Rollback");
       });
     } catch (error) {
       if ((error as Error).message !== "Rollback") throw error;
     }
     const rolledBack = await staged!;
-    return {captured, rolledBack, hostName:e.document.name};
+    return { captured, rolledBack, hostName: e.document.name };
   });
   expect(result.captured.logs).toEqual(["Starting revision"]);
   expect(result.captured.commands).toHaveLength(1);

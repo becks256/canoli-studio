@@ -61,27 +61,9 @@
     },
     "generator": "scripts/generate-matting-fixtures.py uses independent Python struct/zlib PNG encoding",
     "colorLine": {
-      "nativeSize": [
-        9,
-        5
-      ],
-      "expectedMatteRow": [
-        255,
-        255,
-        204,
-        166,
-        128,
-        89,
-        51,
-        0,
-        0
-      ],
-      "actualCorrectedCenter": [
-        199,
-        20,
-        11,
-        255
-      ],
+      "nativeSize": [9, 5],
+      "expectedMatteRow": [255, 255, 204, 166, 128, 89, 51, 0, 0],
+      "actualCorrectedCenter": [199, 20, 11, 255],
       "exportedPremultipliedRgbToleranceBytes": 1,
       "alphaToleranceBytes": 0
     },
@@ -92,17 +74,7 @@
     "revisionDelta": 1,
     "width": 10000,
     "height": 5000,
-    "alpha": [
-      255,
-      255,
-      0,
-      0,
-      255,
-      255,
-      0,
-      0,
-      0
-    ],
+    "alpha": [255, 255, 0, 0, 255, 255, 0, 0, 0],
     "inputResponseMs": 4.699999988079071,
     "longTasks": [
       {
@@ -137,17 +109,7 @@
     "milliseconds": 11138.656734,
     "width": 10000,
     "height": 5000,
-    "samples": [
-      255,
-      255,
-      0,
-      0,
-      255,
-      255,
-      0,
-      0,
-      0
-    ]
+    "samples": [255, 255, 0, 0, 255, 255, 0, 0, 0]
   },
   "verification": {
     "build": "Actual WASM, isolated runtime, generated developer docs, TypeScript and Vite pass",

@@ -29,24 +29,35 @@ Attached assignments use `layer.update`, shared validation, effective ancestor l
 ## Executable isolated example
 
 <!-- example: native-font-features -->
+
 ```js
-document.transaction('Native font study', () => {
-  const body = document.paragraphStyles.add(new ParagraphStyle({
-    name: 'Native caption',
-    format: {
-      fontFamily: 'serif', fontSize: 36, color: '#315b2a',
-      fontWeight: '553.25', fontVariantCaps: 'small-caps',
-      fontStretch: 'semi-condensed',
-    },
-  }));
-  const text = document.layers.add(new TextLayer({
-    name: 'Native font study', text: 'Canoli Studio — original ß é',
-    x: 32, y: 32, wrapWidth: 500,
-  }));
+document.transaction("Native font study", () => {
+  const body = document.paragraphStyles.add(
+    new ParagraphStyle({
+      name: "Native caption",
+      format: {
+        fontFamily: "serif",
+        fontSize: 36,
+        color: "#315b2a",
+        fontWeight: "553.25",
+        fontVariantCaps: "small-caps",
+        fontStretch: "semi-condensed",
+      },
+    }),
+  );
+  const text = document.layers.add(
+    new TextLayer({
+      name: "Native font study",
+      text: "Canoli Studio — original ß é",
+      x: 32,
+      y: 32,
+      wrapWidth: 500,
+    }),
+  );
   text.paragraphStyle = body;
   document.selectedLayer = text;
 });
-print('Native font study ready');
+print("Native font study ready");
 ```
 
 This is the existing isolated constructor/command boundary, with no font-file, network, credential, account or export capability. Independent REST sessions use the same fields in validated commands; they do not synchronize with the browser:
@@ -54,15 +65,17 @@ This is the existing isolated constructor/command boundary, with no font-file, n
 ```json
 {
   "expectedRevision": 7,
-  "commands": [{
-    "type": "layer.update",
-    "id": "existing-text-layer",
-    "patch": {
-      "fontVariantCaps": "all-small-caps",
-      "fontStretch": "condensed",
-      "fontWeight": "553.25"
+  "commands": [
+    {
+      "type": "layer.update",
+      "id": "existing-text-layer",
+      "patch": {
+        "fontVariantCaps": "all-small-caps",
+        "fontStretch": "condensed",
+        "fontWeight": "553.25"
+      }
     }
-  }]
+  ]
 }
 ```
 

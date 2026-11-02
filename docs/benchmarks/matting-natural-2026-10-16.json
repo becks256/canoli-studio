@@ -73,10 +73,7 @@
       "options": {
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -100,7 +97,7 @@
             "unknownPixels": 38573,
             "unresolvedPixels": 0,
             "iterations": 984,
-            "relativeResidual": 9.856036218430359e-08,
+            "relativeResidual": 9.856036218430359e-8,
             "estimatedGraphBytes": 17276928
           },
           "outputs": [
@@ -151,7 +148,7 @@
             "unknownPixels": 67603,
             "unresolvedPixels": 0,
             "iterations": 1816,
-            "relativeResidual": 9.856168028268302e-08,
+            "relativeResidual": 9.856168028268302e-8,
             "estimatedGraphBytes": 30916608
           },
           "outputs": [
@@ -205,7 +202,7 @@
             "total": 37,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 1.723961566632202e-06
+            "relativeResidual": 1.723961566632202e-6
           },
           "elapsedMs": 10764.211365
         },
@@ -229,7 +226,7 @@
             "total": 37,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 8.840880413034123e-06
+            "relativeResidual": 8.840880413034123e-6
           },
           "elapsedMs": 20655.150454000002
         },
@@ -253,7 +250,7 @@
             "total": 37,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 1.5220719276716236e-06
+            "relativeResidual": 1.5220719276716236e-6
           },
           "elapsedMs": 32930.128734
         },
@@ -277,7 +274,7 @@
             "total": 37,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 8.437824836031356e-06
+            "relativeResidual": 8.437824836031356e-6
           },
           "elapsedMs": 40199.870545
         },
@@ -298,7 +295,7 @@
             "unknownPixels": 29357,
             "unresolvedPixels": 0,
             "iterations": 1274,
-            "relativeResidual": 9.735630929187283e-08,
+            "relativeResidual": 9.735630929187283e-8,
             "estimatedGraphBytes": 13639680
           },
           "outputs": [
@@ -349,7 +346,7 @@
             "unknownPixels": 50092,
             "unresolvedPixels": 0,
             "iterations": 1953,
-            "relativeResidual": 9.61971356293414e-08,
+            "relativeResidual": 9.61971356293414e-8,
             "estimatedGraphBytes": 22732800
           },
           "outputs": [
@@ -400,7 +397,7 @@
             "unknownPixels": 52970,
             "unresolvedPixels": 0,
             "iterations": 1326,
-            "relativeResidual": 9.949592037585846e-08,
+            "relativeResidual": 9.949592037585846e-8,
             "estimatedGraphBytes": 23642112
           },
           "outputs": [
@@ -451,7 +448,7 @@
             "unknownPixels": 81857,
             "unresolvedPixels": 0,
             "iterations": 1860,
-            "relativeResidual": 9.829700003736112e-08,
+            "relativeResidual": 9.829700003736112e-8,
             "estimatedGraphBytes": 36372480
           },
           "outputs": [
@@ -505,7 +502,7 @@
             "total": 53,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 1.6895524205217113e-05
+            "relativeResidual": 1.6895524205217113e-5
           },
           "elapsedMs": 26297.30524700001
         },
@@ -529,7 +526,7 @@
             "total": 53,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 3.7080716991389204e-05
+            "relativeResidual": 3.7080716991389204e-5
           },
           "elapsedMs": 35756.34483399999
         },
@@ -550,7 +547,7 @@
             "unknownPixels": 51540,
             "unresolvedPixels": 0,
             "iterations": 1058,
-            "relativeResidual": 9.972474991476198e-08,
+            "relativeResidual": 9.972474991476198e-8,
             "estimatedGraphBytes": 23642112
           },
           "outputs": [
@@ -601,7 +598,7 @@
             "unknownPixels": 78358,
             "unresolvedPixels": 0,
             "iterations": 1423,
-            "relativeResidual": 9.941304423529025e-08,
+            "relativeResidual": 9.941304423529025e-8,
             "estimatedGraphBytes": 35463168
           },
           "outputs": [
@@ -652,7 +649,7 @@
             "unknownPixels": 61930,
             "unresolvedPixels": 0,
             "iterations": 1207,
-            "relativeResidual": 9.889097439468851e-08,
+            "relativeResidual": 9.889097439468851e-8,
             "estimatedGraphBytes": 28188672
           },
           "outputs": [
@@ -703,7 +700,7 @@
             "unknownPixels": 92540,
             "unresolvedPixels": 0,
             "iterations": 1576,
-            "relativeResidual": 9.788634639767796e-08,
+            "relativeResidual": 9.788634639767796e-8,
             "estimatedGraphBytes": 41828352
           },
           "outputs": [
@@ -757,7 +754,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 1.927568454611169e-05
+            "relativeResidual": 1.927568454611169e-5
           },
           "elapsedMs": 29711.78620100001
         },
@@ -781,7 +778,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 3.10951887654834e-05
+            "relativeResidual": 3.10951887654834e-5
           },
           "elapsedMs": 40543.452541999985
         },
@@ -802,7 +799,7 @@
             "unknownPixels": 37039,
             "unresolvedPixels": 0,
             "iterations": 707,
-            "relativeResidual": 9.996101680566772e-08,
+            "relativeResidual": 9.996101680566772e-8,
             "estimatedGraphBytes": 17276928
           },
           "outputs": [
@@ -853,7 +850,7 @@
             "unknownPixels": 55759,
             "unresolvedPixels": 0,
             "iterations": 923,
-            "relativeResidual": 9.791561956573284e-08,
+            "relativeResidual": 9.791561956573284e-8,
             "estimatedGraphBytes": 25460736
           },
           "outputs": [
@@ -907,7 +904,7 @@
             "total": 37,
             "phase": "solve",
             "iteration": 1999,
-            "relativeResidual": 1.5877096947476997e-05
+            "relativeResidual": 1.5877096947476997e-5
           },
           "elapsedMs": 16424.261628000007
         },
@@ -931,7 +928,7 @@
             "total": 37,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 3.097341460762601e-05
+            "relativeResidual": 3.097341460762601e-5
           },
           "elapsedMs": 20410.197535999992
         },
@@ -952,7 +949,7 @@
             "unknownPixels": 51098,
             "unresolvedPixels": 0,
             "iterations": 1509,
-            "relativeResidual": 9.831573926051889e-08,
+            "relativeResidual": 9.831573926051889e-8,
             "estimatedGraphBytes": 22732800
           },
           "outputs": [
@@ -1003,7 +1000,7 @@
             "unknownPixels": 72743,
             "unresolvedPixels": 0,
             "iterations": 1910,
-            "relativeResidual": 9.968062830208889e-08,
+            "relativeResidual": 9.968062830208889e-8,
             "estimatedGraphBytes": 32735232
           },
           "outputs": [
@@ -1054,7 +1051,7 @@
             "unknownPixels": 25462,
             "unresolvedPixels": 0,
             "iterations": 506,
-            "relativeResidual": 9.72935942930271e-08,
+            "relativeResidual": 9.72935942930271e-8,
             "estimatedGraphBytes": 11821056
           },
           "outputs": [
@@ -1105,7 +1102,7 @@
             "unknownPixels": 47105,
             "unresolvedPixels": 0,
             "iterations": 786,
-            "relativeResidual": 9.871652366523235e-08,
+            "relativeResidual": 9.871652366523235e-8,
             "estimatedGraphBytes": 21823488
           },
           "outputs": [
@@ -1156,7 +1153,7 @@
             "unknownPixels": 49105,
             "unresolvedPixels": 0,
             "iterations": 1022,
-            "relativeResidual": 9.988640737901715e-08,
+            "relativeResidual": 9.988640737901715e-8,
             "estimatedGraphBytes": 21823488
           },
           "outputs": [
@@ -1207,7 +1204,7 @@
             "unknownPixels": 73816,
             "unresolvedPixels": 0,
             "iterations": 1556,
-            "relativeResidual": 9.920348646235775e-08,
+            "relativeResidual": 9.920348646235775e-8,
             "estimatedGraphBytes": 33644544
           },
           "outputs": [
@@ -1258,7 +1255,7 @@
             "unknownPixels": 65605,
             "unresolvedPixels": 0,
             "iterations": 870,
-            "relativeResidual": 9.83083500008708e-08,
+            "relativeResidual": 9.83083500008708e-8,
             "estimatedGraphBytes": 30007296
           },
           "outputs": [
@@ -1309,7 +1306,7 @@
             "unknownPixels": 98345,
             "unresolvedPixels": 0,
             "iterations": 1745,
-            "relativeResidual": 9.886260281684002e-08,
+            "relativeResidual": 9.886260281684002e-8,
             "estimatedGraphBytes": 44556288
           },
           "outputs": [
@@ -1360,7 +1357,7 @@
             "unknownPixels": 63437,
             "unresolvedPixels": 0,
             "iterations": 910,
-            "relativeResidual": 9.720268664645102e-08,
+            "relativeResidual": 9.720268664645102e-8,
             "estimatedGraphBytes": 28188672
           },
           "outputs": [
@@ -1411,7 +1408,7 @@
             "unknownPixels": 90987,
             "unresolvedPixels": 0,
             "iterations": 1229,
-            "relativeResidual": 9.980070095479463e-08,
+            "relativeResidual": 9.980070095479463e-8,
             "estimatedGraphBytes": 40919040
           },
           "outputs": [
@@ -1462,7 +1459,7 @@
             "unknownPixels": 59459,
             "unresolvedPixels": 0,
             "iterations": 1362,
-            "relativeResidual": 9.945289566265348e-08,
+            "relativeResidual": 9.945289566265348e-8,
             "estimatedGraphBytes": 27279360
           },
           "outputs": [
@@ -1513,7 +1510,7 @@
             "unknownPixels": 80337,
             "unresolvedPixels": 0,
             "iterations": 1938,
-            "relativeResidual": 9.855426018313453e-08,
+            "relativeResidual": 9.855426018313453e-8,
             "estimatedGraphBytes": 36372480
           },
           "outputs": [
@@ -1567,7 +1564,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 1.6550464432531624e-07
+            "relativeResidual": 1.6550464432531624e-7
           },
           "elapsedMs": 31165.880152999947
         },
@@ -1591,7 +1588,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 2.57077113722465e-05
+            "relativeResidual": 2.57077113722465e-5
           },
           "elapsedMs": 43150.77262299997
         }
@@ -1715,10 +1712,7 @@
         "preconditioner": "ic0",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -1742,7 +1736,7 @@
             "unknownPixels": 38573,
             "unresolvedPixels": 0,
             "iterations": 236,
-            "relativeResidual": 9.730357822424051e-08,
+            "relativeResidual": 9.730357822424051e-8,
             "estimatedGraphBytes": 25059328,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -1795,7 +1789,7 @@
             "unknownPixels": 67603,
             "unresolvedPixels": 0,
             "iterations": 435,
-            "relativeResidual": 9.452461477193364e-08,
+            "relativeResidual": 9.452461477193364e-8,
             "estimatedGraphBytes": 44843008,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -1848,7 +1842,7 @@
             "unknownPixels": 57461,
             "unresolvedPixels": 0,
             "iterations": 515,
-            "relativeResidual": 9.807945896434677e-08,
+            "relativeResidual": 9.807945896434677e-8,
             "estimatedGraphBytes": 38248448,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1901,7 +1895,7 @@
             "unknownPixels": 111308,
             "unresolvedPixels": 0,
             "iterations": 873,
-            "relativeResidual": 9.840603868234577e-08,
+            "relativeResidual": 9.840603868234577e-8,
             "estimatedGraphBytes": 72540160,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -1954,7 +1948,7 @@
             "unknownPixels": 178728,
             "unresolvedPixels": 0,
             "iterations": 636,
-            "relativeResidual": 9.788217782992555e-08,
+            "relativeResidual": 9.788217782992555e-8,
             "estimatedGraphBytes": 116064256,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2007,7 +2001,7 @@
             "unknownPixels": 218709,
             "unresolvedPixels": 0,
             "iterations": 797,
-            "relativeResidual": 9.939132918623136e-08,
+            "relativeResidual": 9.939132918623136e-8,
             "estimatedGraphBytes": 141123584,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2060,7 +2054,7 @@
             "unknownPixels": 29357,
             "unresolvedPixels": 0,
             "iterations": 210,
-            "relativeResidual": 9.101644827865377e-08,
+            "relativeResidual": 9.101644827865377e-8,
             "estimatedGraphBytes": 19783680,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2113,7 +2107,7 @@
             "unknownPixels": 50092,
             "unresolvedPixels": 0,
             "iterations": 306,
-            "relativeResidual": 9.322306680683413e-08,
+            "relativeResidual": 9.322306680683413e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2166,7 +2160,7 @@
             "unknownPixels": 52970,
             "unresolvedPixels": 0,
             "iterations": 241,
-            "relativeResidual": 9.13542445995549e-08,
+            "relativeResidual": 9.13542445995549e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2219,7 +2213,7 @@
             "unknownPixels": 81857,
             "unresolvedPixels": 0,
             "iterations": 314,
-            "relativeResidual": 9.845719121846429e-08,
+            "relativeResidual": 9.845719121846429e-8,
             "estimatedGraphBytes": 52756480,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2272,7 +2266,7 @@
             "unknownPixels": 142232,
             "unresolvedPixels": 0,
             "iterations": 636,
-            "relativeResidual": 9.78721652695106e-08,
+            "relativeResidual": 9.78721652695106e-8,
             "estimatedGraphBytes": 92323840,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2325,7 +2319,7 @@
             "unknownPixels": 177134,
             "unresolvedPixels": 0,
             "iterations": 987,
-            "relativeResidual": 9.81524905557495e-08,
+            "relativeResidual": 9.81524905557495e-8,
             "estimatedGraphBytes": 114745344,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2378,7 +2372,7 @@
             "unknownPixels": 51540,
             "unresolvedPixels": 0,
             "iterations": 263,
-            "relativeResidual": 9.301674885507688e-08,
+            "relativeResidual": 9.301674885507688e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -2431,7 +2425,7 @@
             "unknownPixels": 78358,
             "unresolvedPixels": 0,
             "iterations": 281,
-            "relativeResidual": 9.449914247822428e-08,
+            "relativeResidual": 9.449914247822428e-8,
             "estimatedGraphBytes": 51437568,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2484,7 +2478,7 @@
             "unknownPixels": 61930,
             "unresolvedPixels": 0,
             "iterations": 284,
-            "relativeResidual": 9.821772403916338e-08,
+            "relativeResidual": 9.821772403916338e-8,
             "estimatedGraphBytes": 40886272,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2537,7 +2531,7 @@
             "unknownPixels": 92540,
             "unresolvedPixels": 0,
             "iterations": 389,
-            "relativeResidual": 9.584192017620666e-08,
+            "relativeResidual": 9.584192017620666e-8,
             "estimatedGraphBytes": 60669952,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2590,7 +2584,7 @@
             "unknownPixels": 143935,
             "unresolvedPixels": 0,
             "iterations": 1797,
-            "relativeResidual": 9.825817431178149e-08,
+            "relativeResidual": 9.825817431178149e-8,
             "estimatedGraphBytes": 93642752,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -2646,7 +2640,7 @@
             "total": 41,
             "phase": "solve",
             "iteration": 2000,
-            "relativeResidual": 7.224678958248489e-07
+            "relativeResidual": 7.224678958248489e-7
           },
           "elapsedMs": 108325.913528
         },
@@ -2667,7 +2661,7 @@
             "unknownPixels": 37039,
             "unresolvedPixels": 0,
             "iterations": 150,
-            "relativeResidual": 9.987222908586434e-08,
+            "relativeResidual": 9.987222908586434e-8,
             "estimatedGraphBytes": 25059328,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -2720,7 +2714,7 @@
             "unknownPixels": 55759,
             "unresolvedPixels": 0,
             "iterations": 236,
-            "relativeResidual": 9.758472490798238e-08,
+            "relativeResidual": 9.758472490798238e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -2773,7 +2767,7 @@
             "unknownPixels": 87834,
             "unresolvedPixels": 0,
             "iterations": 716,
-            "relativeResidual": 9.670577458572506e-08,
+            "relativeResidual": 9.670577458572506e-8,
             "estimatedGraphBytes": 56713216,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2826,7 +2820,7 @@
             "unknownPixels": 109718,
             "unresolvedPixels": 0,
             "iterations": 898,
-            "relativeResidual": 9.53531213651368e-08,
+            "relativeResidual": 9.53531213651368e-8,
             "estimatedGraphBytes": 71221248,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2879,7 +2873,7 @@
             "unknownPixels": 51098,
             "unresolvedPixels": 0,
             "iterations": 241,
-            "relativeResidual": 9.602178971360096e-08,
+            "relativeResidual": 9.602178971360096e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2932,7 +2926,7 @@
             "unknownPixels": 72743,
             "unresolvedPixels": 0,
             "iterations": 278,
-            "relativeResidual": 9.350063122887908e-08,
+            "relativeResidual": 9.350063122887908e-8,
             "estimatedGraphBytes": 47480832,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -2985,7 +2979,7 @@
             "unknownPixels": 25462,
             "unresolvedPixels": 0,
             "iterations": 81,
-            "relativeResidual": 7.933486776352193e-08,
+            "relativeResidual": 7.933486776352193e-8,
             "estimatedGraphBytes": 17145856,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3038,7 +3032,7 @@
             "unknownPixels": 47105,
             "unresolvedPixels": 0,
             "iterations": 158,
-            "relativeResidual": 9.66093073057121e-08,
+            "relativeResidual": 9.66093073057121e-8,
             "estimatedGraphBytes": 31653888,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3091,7 +3085,7 @@
             "unknownPixels": 49105,
             "unresolvedPixels": 0,
             "iterations": 193,
-            "relativeResidual": 9.367493430031215e-08,
+            "relativeResidual": 9.367493430031215e-8,
             "estimatedGraphBytes": 31653888,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3144,7 +3138,7 @@
             "unknownPixels": 73816,
             "unresolvedPixels": 0,
             "iterations": 281,
-            "relativeResidual": 9.922697518232908e-08,
+            "relativeResidual": 9.922697518232908e-8,
             "estimatedGraphBytes": 48799744,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3197,7 +3191,7 @@
             "unknownPixels": 65605,
             "unresolvedPixels": 0,
             "iterations": 184,
-            "relativeResidual": 9.826237953721452e-08,
+            "relativeResidual": 9.826237953721452e-8,
             "estimatedGraphBytes": 43524096,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3250,7 +3244,7 @@
             "unknownPixels": 98345,
             "unresolvedPixels": 0,
             "iterations": 404,
-            "relativeResidual": 9.557767876470168e-08,
+            "relativeResidual": 9.557767876470168e-8,
             "estimatedGraphBytes": 64626688,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3303,7 +3297,7 @@
             "unknownPixels": 63437,
             "unresolvedPixels": 0,
             "iterations": 187,
-            "relativeResidual": 9.108563307684159e-08,
+            "relativeResidual": 9.108563307684159e-8,
             "estimatedGraphBytes": 40886272,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3356,7 +3350,7 @@
             "unknownPixels": 90987,
             "unresolvedPixels": 0,
             "iterations": 247,
-            "relativeResidual": 9.63826057788625e-08,
+            "relativeResidual": 9.63826057788625e-8,
             "estimatedGraphBytes": 59351040,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3409,7 +3403,7 @@
             "unknownPixels": 59459,
             "unresolvedPixels": 0,
             "iterations": 220,
-            "relativeResidual": 9.795658648817884e-08,
+            "relativeResidual": 9.795658648817884e-8,
             "estimatedGraphBytes": 39567360,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3462,7 +3456,7 @@
             "unknownPixels": 80337,
             "unresolvedPixels": 0,
             "iterations": 340,
-            "relativeResidual": 9.469901758486465e-08,
+            "relativeResidual": 9.469901758486465e-8,
             "estimatedGraphBytes": 52756480,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3515,7 +3509,7 @@
             "unknownPixels": 153224,
             "unresolvedPixels": 0,
             "iterations": 504,
-            "relativeResidual": 9.871051227118185e-08,
+            "relativeResidual": 9.871051227118185e-8,
             "estimatedGraphBytes": 98918400,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3568,7 +3562,7 @@
             "unknownPixels": 210628,
             "unresolvedPixels": 0,
             "iterations": 1021,
-            "relativeResidual": 9.811424747383478e-08,
+            "relativeResidual": 9.811424747383478e-8,
             "estimatedGraphBytes": 135847936,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3612,9 +3606,7 @@
         "expectedCases": 36,
         "completedCases": 36,
         "successes": 35,
-        "failures": [
-          "GT13-Trimap2"
-        ]
+        "failures": ["GT13-Trimap2"]
       },
       "qualityMeans": {
         "0": {
@@ -3713,10 +3705,7 @@
         "preconditioner": "ic0",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -3740,7 +3729,7 @@
             "unknownPixels": 121014,
             "unresolvedPixels": 0,
             "iterations": 465,
-            "relativeResidual": 9.662679713887596e-08,
+            "relativeResidual": 9.662679713887596e-8,
             "estimatedGraphBytes": 79134720,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3793,7 +3782,7 @@
             "unknownPixels": 151510,
             "unresolvedPixels": 0,
             "iterations": 586,
-            "relativeResidual": 9.754043875428587e-08,
+            "relativeResidual": 9.754043875428587e-8,
             "estimatedGraphBytes": 97599488,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -3846,7 +3835,7 @@
             "unknownPixels": 55831,
             "unresolvedPixels": 0,
             "iterations": 151,
-            "relativeResidual": 8.970426808760561e-08,
+            "relativeResidual": 8.970426808760561e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3899,7 +3888,7 @@
             "unknownPixels": 88082,
             "unresolvedPixels": 0,
             "iterations": 251,
-            "relativeResidual": 9.646942107122223e-08,
+            "relativeResidual": 9.646942107122223e-8,
             "estimatedGraphBytes": 58032128,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -3952,7 +3941,7 @@
             "unknownPixels": 90208,
             "unresolvedPixels": 0,
             "iterations": 314,
-            "relativeResidual": 9.382116304159059e-08,
+            "relativeResidual": 9.382116304159059e-8,
             "estimatedGraphBytes": 59351040,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4005,7 +3994,7 @@
             "unknownPixels": 123891,
             "unresolvedPixels": 0,
             "iterations": 466,
-            "relativeResidual": 9.382508172611547e-08,
+            "relativeResidual": 9.382508172611547e-8,
             "estimatedGraphBytes": 80453632,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4058,7 +4047,7 @@
             "unknownPixels": 33836,
             "unresolvedPixels": 0,
             "iterations": 305,
-            "relativeResidual": 9.94546537081889e-08,
+            "relativeResidual": 9.94546537081889e-8,
             "estimatedGraphBytes": 22421504,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4111,7 +4100,7 @@
             "unknownPixels": 52464,
             "unresolvedPixels": 0,
             "iterations": 489,
-            "relativeResidual": 9.793457783927433e-08,
+            "relativeResidual": 9.793457783927433e-8,
             "estimatedGraphBytes": 34291712,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4164,7 +4153,7 @@
             "unknownPixels": 43538,
             "unresolvedPixels": 0,
             "iterations": 247,
-            "relativeResidual": 9.859574478510447e-08,
+            "relativeResidual": 9.859574478510447e-8,
             "estimatedGraphBytes": 29016064,
             "preconditioner": "ic0",
             "preconditionerShift": 0
@@ -4217,7 +4206,7 @@
             "unknownPixels": 61104,
             "unresolvedPixels": 0,
             "iterations": 216,
-            "relativeResidual": 9.396156449087584e-08,
+            "relativeResidual": 9.396156449087584e-8,
             "estimatedGraphBytes": 39567360,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4270,7 +4259,7 @@
             "unknownPixels": 56751,
             "unresolvedPixels": 0,
             "iterations": 313,
-            "relativeResidual": 9.602717665368543e-08,
+            "relativeResidual": 9.602717665368543e-8,
             "estimatedGraphBytes": 36929536,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4323,7 +4312,7 @@
             "unknownPixels": 93433,
             "unresolvedPixels": 0,
             "iterations": 401,
-            "relativeResidual": 9.88454958888798e-08,
+            "relativeResidual": 9.88454958888798e-8,
             "estimatedGraphBytes": 60669952,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4376,7 +4365,7 @@
             "unknownPixels": 121177,
             "unresolvedPixels": 0,
             "iterations": 908,
-            "relativeResidual": 9.957932930586268e-08,
+            "relativeResidual": 9.957932930586268e-8,
             "estimatedGraphBytes": 79134720,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4429,7 +4418,7 @@
             "unknownPixels": 194674,
             "unresolvedPixels": 0,
             "iterations": 1475,
-            "relativeResidual": 9.993102986917041e-08,
+            "relativeResidual": 9.993102986917041e-8,
             "estimatedGraphBytes": 126615552,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4482,7 +4471,7 @@
             "unknownPixels": 49174,
             "unresolvedPixels": 0,
             "iterations": 227,
-            "relativeResidual": 8.927146760995895e-08,
+            "relativeResidual": 8.927146760995895e-8,
             "estimatedGraphBytes": 32972800,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4535,7 +4524,7 @@
             "unknownPixels": 68323,
             "unresolvedPixels": 0,
             "iterations": 316,
-            "relativeResidual": 9.616807756169324e-08,
+            "relativeResidual": 9.616807756169324e-8,
             "estimatedGraphBytes": 44843008,
             "preconditioner": "ic0",
             "preconditionerShift": 0.01
@@ -4588,7 +4577,7 @@
             "unknownPixels": 102471,
             "unresolvedPixels": 0,
             "iterations": 567,
-            "relativeResidual": 9.874405869908742e-08,
+            "relativeResidual": 9.874405869908742e-8,
             "estimatedGraphBytes": 67264512,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -4641,7 +4630,7 @@
             "unknownPixels": 141224,
             "unresolvedPixels": 0,
             "iterations": 1076,
-            "relativeResidual": 9.843080733365466e-08,
+            "relativeResidual": 9.843080733365466e-8,
             "estimatedGraphBytes": 91004928,
             "preconditioner": "ic0",
             "preconditionerShift": 0.1
@@ -5307,7 +5296,7 @@
       "reportSha256": "352c2b38a12898e08d01e87ce9956fecaa385e8b0d593265dbb3ada557d7ca46",
       "candidateAlphaSha256": "e64156d2e7e429acc76af09a9a870fafe69acf6e42df232b6f9179eb3deefe5a",
       "maximumByteError": 1,
-      "meanByteError": 3.5211267605633805e-05
+      "meanByteError": 3.5211267605633805e-5
     },
     {
       "case": "GT04-Trimap2",
@@ -5349,7 +5338,7 @@
       "reportSha256": "02ffe9c0a5c965d5a02d8ff1a03fb0d52094a5d6935de1bb4bdbe7a50d28f54b",
       "candidateAlphaSha256": "0b3e964d2fe50b9ddefe614c2e682c802fccdee74c4499d7290fe00d0e6c57e5",
       "maximumByteError": 1,
-      "meanByteError": 6.109022556390978e-05
+      "meanByteError": 6.109022556390978e-5
     }
   ],
   "remaining": [
@@ -5370,18 +5359,13 @@
       "elapsedMs": 3533.100000023842,
       "responseMs": 1,
       "revisionDelta": 1,
-      "longTasks": [
-        65,
-        60,
-        108,
-        80
-      ],
+      "longTasks": [65, 60, 108, 80],
       "solveLast": {
         "completed": 16,
         "total": 33,
         "phase": "solve",
         "iteration": 236,
-        "relativeResidual": 9.730357822424051e-08
+        "relativeResidual": 9.730357822424051e-8
       },
       "sourceUnchanged": true,
       "maximumByteError": 0,
@@ -5393,19 +5377,13 @@
       "elapsedMs": 42671.69999998808,
       "responseMs": 1.300000011920929,
       "revisionDelta": 1,
-      "longTasks": [
-        56,
-        57,
-        51,
-        125,
-        88
-      ],
+      "longTasks": [56, 57, 51, 125, 88],
       "solveLast": {
         "completed": 18,
         "total": 37,
         "phase": "solve",
         "iteration": 797,
-        "relativeResidual": 9.939132918623136e-08
+        "relativeResidual": 9.939132918623136e-8
       },
       "sourceUnchanged": true,
       "maximumByteError": 0,
@@ -5417,16 +5395,13 @@
       "elapsedMs": 6883.699999988079,
       "responseMs": 0.8999999761581421,
       "revisionDelta": 1,
-      "longTasks": [
-        88,
-        102
-      ],
+      "longTasks": [88, 102],
       "solveLast": {
         "completed": 18,
         "total": 37,
         "phase": "solve",
         "iteration": 340,
-        "relativeResidual": 9.469901758486465e-08
+        "relativeResidual": 9.469901758486465e-8
       },
       "sourceUnchanged": true,
       "maximumByteError": 0,
@@ -5520,7 +5495,7 @@
         "total": 3161,
         "phase": "solve",
         "iteration": 211,
-        "relativeResidual": 6.013183082417665e-08
+        "relativeResidual": 6.013183082417665e-8
       },
       "longTasks": [
         {

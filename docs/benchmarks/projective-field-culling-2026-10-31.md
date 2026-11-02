@@ -66,14 +66,14 @@ Readback is included; complete frame hashing happens after timing. Twelve sample
 make p95 the maximum. These small headless observations are descriptive, not
 sustained or editor-wide acceptance.
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 67.2 → 72.5 ms | 86.7 → 96.2 ms |
-| Affine mask | 72.8 → 73.7 ms | 82.1 → 91.3 ms |
-| Affine filter mask | 71.6 → 85.3 ms | 104.6 → 97.9 ms |
-| Projected raster | 88.4 → 88.4 ms | 131.0 → 130.8 ms |
-| Projected mask | 104.3 → 104.4 ms | 147.5 → 148.6 ms |
-| Projected filter mask | 122.2 → 106.3 ms | 197.3 → 181.7 ms |
+| Target                | Median before → after | P95 before → after |
+| --------------------- | --------------------: | -----------------: |
+| Affine raster         |        67.2 → 72.5 ms |     86.7 → 96.2 ms |
+| Affine mask           |        72.8 → 73.7 ms |     82.1 → 91.3 ms |
+| Affine filter mask    |        71.6 → 85.3 ms |    104.6 → 97.9 ms |
+| Projected raster      |        88.4 → 88.4 ms |   131.0 → 130.8 ms |
+| Projected mask        |      104.3 → 104.4 ms |   147.5 → 148.6 ms |
+| Projected filter mask |      122.2 → 106.3 ms |   197.3 → 181.7 ms |
 
 All **72 complete foreground hashes and six final PNGs** match exactly. Each
 operation retains original PNG bytes, twelve accepted samples, one Undo restoring
@@ -108,13 +108,13 @@ one Undo/Redo. The field trace on the final guard still makes 13 coupled calls.
 The second-pair measurements are:
 
 | Final counterbalanced target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine layer | 62.9 → 59.7 ms | 81.4 → 80.7 ms |
-| Affine mask | 61.7 → 62.7 ms | 80.8 → 84.7 ms |
-| Affine filter-mask | 72.1 → 72.1 ms | 94.0 → 87.4 ms |
-| Projected layer | 88.0 → 88.3 ms | 114.7 → 114.9 ms |
-| Projected mask | 103.0 → 103.3 ms | 147.9 → 143.5 ms |
-| Projected filter-mask | 120.6 → 105.1 ms | 180.9 → 181.0 ms |
+| ---------------------------- | --------------------: | -----------------: |
+| Affine layer                 |        62.9 → 59.7 ms |     81.4 → 80.7 ms |
+| Affine mask                  |        61.7 → 62.7 ms |     80.8 → 84.7 ms |
+| Affine filter-mask           |        72.1 → 72.1 ms |     94.0 → 87.4 ms |
+| Projected layer              |        88.0 → 88.3 ms |   114.7 → 114.9 ms |
+| Projected mask               |      103.0 → 103.3 ms |   147.9 → 143.5 ms |
+| Projected filter-mask        |      120.6 → 105.1 ms |   180.9 → 181.0 ms |
 
 The targeted projected filter-mask median improves in both pairs (122.2→106.3 ms
 and 120.6→105.1 ms), while final targeted p95 is essentially unchanged at

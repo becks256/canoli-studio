@@ -46,9 +46,7 @@
           "prepareMs": 9
         }
       ],
-      "longTasks": [
-        123
-      ]
+      "longTasks": [123]
     },
     {
       "paths": 1,
@@ -63,12 +61,7 @@
           "prepareMs": 6.4000000059604645
         }
       ],
-      "longTasks": [
-        96,
-        82,
-        57,
-        53
-      ]
+      "longTasks": [96, 82, 57, 53]
     }
   ],
   "unprofiledAfter": [
@@ -115,10 +108,7 @@
           "prepareMs": 8
         }
       ],
-      "longTasks": [
-        183,
-        59
-      ]
+      "longTasks": [183, 59]
     },
     {
       "paths": 1,
@@ -133,10 +123,7 @@
           "prepareMs": 7.5
         }
       ],
-      "longTasks": [
-        104,
-        98
-      ]
+      "longTasks": [104, 98]
     }
   ],
   "denseRepeat": [
@@ -153,11 +140,7 @@
           "prepareMs": 9
         }
       ],
-      "longTasks": [
-        126,
-        108,
-        61
-      ]
+      "longTasks": [126, 108, 61]
     }
   ],
   "profiledBefore": [
@@ -174,10 +157,7 @@
           "prepareMs": 6.5
         }
       ],
-      "longTasks": [
-        136,
-        111
-      ]
+      "longTasks": [136, 111]
     }
   ],
   "profiledAfter": [
@@ -194,10 +174,7 @@
           "prepareMs": 7.5
         }
       ],
-      "longTasks": [
-        117,
-        88
-      ]
+      "longTasks": [117, 88]
     }
   ],
   "beforeCpu": [
@@ -529,12 +506,7 @@
               "prepareMs": 7.300000011920929
             }
           ],
-          "longTasks": [
-            186,
-            134,
-            79,
-            75
-          ]
+          "longTasks": [186, 134, 79, 75]
         }
       ]
     },
@@ -554,11 +526,7 @@
               "prepareMs": 7.300000011920929
             }
           ],
-          "longTasks": [
-            124,
-            90,
-            57
-          ]
+          "longTasks": [124, 90, 57]
         }
       ]
     }

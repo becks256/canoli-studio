@@ -23,12 +23,12 @@ reuse evidence, not a latency, speedup or sustained-performance claim.
 
 ## Verified checks
 
-| Check | Result |
-| --- | --- |
-| `npm test`, two workers, required loopback/subprocess permissions | 3,216 passed, 0 failed, 312 files |
-| Complete affected browser matrix | 83 passed across 5 files; no skips, retries, flakes or runner errors |
-| Normal production workflows | 3 passed across 3 files, without developer globals |
-| Source freeze | Product and test hashes unchanged throughout acceptance |
+| Check                                                             | Result                                                               |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `npm test`, two workers, required loopback/subprocess permissions | 3,216 passed, 0 failed, 312 files                                    |
+| Complete affected browser matrix                                  | 83 passed across 5 files; no skips, retries, flakes or runner errors |
+| Normal production workflows                                       | 3 passed across 3 files, without developer globals                   |
+| Source freeze                                                     | Product and test hashes unchanged throughout acceptance              |
 
 The 15 new browser cases cover the appearance regression and these owner paths:
 

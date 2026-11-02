@@ -5,17 +5,17 @@ shapes retained original SFNT runs and matches complete uniform Canvas paint;
 it does not enable float TextLayer or close the original professional-editor
 roadmap. [Contract and remaining scope](../FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
 
-| Verification | Result |
-| --- | --- |
-| Full build and TypeScript | Pass |
-| Full unit/API suite | 3,374 pass across 333 files |
-| Font-source/native-plan/glyph/shaping browser run | 29 pass across four files |
-| Existing variable-font browser workflows | 10 pass |
-| Production worker and existing typography regressions | 5 pass |
-| Whole native Canvas versus positioned original glyphs | 60 exact matches, alpha error 0 at opacity 1 and 0.5 |
-| Independent system-native HarfBuzz 2.7.4 versus full WASM 15.0.0 | Six runs / 12 glyphs: exact IDs, UTF-16 clusters, flags and signed metrics |
-| Actual WASM float paint after native matching | Exact per-pixel alpha from independent original-font coverage; signed HDR RGB and alpha 1e-8; exact window words |
-| Existing 50 MP RAW/variable text workflow | Original 100,000,672 bytes and SHA retained; 10,000 × 5,000 output; all 480,000 RGBA samples in its complete 600 × 200 independent text reference region match |
+| Verification                                                     | Result                                                                                                                                                         |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full build and TypeScript                                        | Pass                                                                                                                                                           |
+| Full unit/API suite                                              | 3,374 pass across 333 files                                                                                                                                    |
+| Font-source/native-plan/glyph/shaping browser run                | 29 pass across four files                                                                                                                                      |
+| Existing variable-font browser workflows                         | 10 pass                                                                                                                                                        |
+| Production worker and existing typography regressions            | 5 pass                                                                                                                                                         |
+| Whole native Canvas versus positioned original glyphs            | 60 exact matches, alpha error 0 at opacity 1 and 0.5                                                                                                           |
+| Independent system-native HarfBuzz 2.7.4 versus full WASM 15.0.0 | Six runs / 12 glyphs: exact IDs, UTF-16 clusters, flags and signed metrics                                                                                     |
+| Actual WASM float paint after native matching                    | Exact per-pixel alpha from independent original-font coverage; signed HDR RGB and alpha 1e-8; exact window words                                               |
+| Existing 50 MP RAW/variable text workflow                        | Original 100,000,672 bytes and SHA retained; 10,000 × 5,000 output; all 480,000 RGBA samples in its complete 600 × 200 independent text reference region match |
 
 The 60 native matches cover original geometric ligatures, AV kerning, combining
 marks, contextual Arabic and RTL Hebrew; source TTF, CFF and exact variable

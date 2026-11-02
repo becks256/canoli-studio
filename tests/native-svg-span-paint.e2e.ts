@@ -1,38 +1,450 @@
-import {test,expect} from '@playwright/test';
-import {readFile,writeFile,appendFile} from 'node:fs/promises';
-import {createHash} from 'node:crypto';
+import { test, expect } from "@playwright/test";
+import { readFile, writeFile, appendFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 
-test('original span paint retains independent source GIDs, colored overlap and every Float32 word in twelve direction and affine controls',async({page},info)=>{
- test.setTimeout(600000);const primary=await readFile('tests/fixtures/native-fallback/Latin-no-mark.ttf'),source=await readFile('tests/fixtures/shaping-font/Shaping.ttf'),reference=await readFile('tests/fixtures/vertical-glyph/Shaping-glyphs.ttf'),manifest=JSON.parse(await readFile('tests/fixtures/vertical-glyph/manifest.json','utf8'))as{sourceSha256:string;referenceSha256:string;referenceSelectorBase:number;featuresDisabled:string[]};expect(createHash('sha256').update(source).digest('hex')).toBe(manifest.sourceSha256);expect(createHash('sha256').update(reference).digest('hex')).toBe(manifest.referenceSha256);await page.exposeFunction('__keepFallbackFloat',async(row:unknown)=>appendFile(info.outputPath('native-fallback-float-progress.jsonl'),JSON.stringify(row)+'\n'));await page.goto('/');
- const rows=await page.evaluate(async({primary,source,reference,manifest})=>{
-  const{captureStyledTextPlan}=await import(/* @vite-ignore */String('/src/engine/styled-text.ts'))as typeof import('../src/engine/styled-text');const{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts'))as typeof import('../src/core/assets');const{FloatPixelProcessor}=await import(/* @vite-ignore */String('/src/engine/float-pixels.ts'))as typeof import('../src/engine/float-pixels');const{instantiateKernel}=await import(/* @vite-ignore */String('/src/engine/wasm.ts'))as typeof import('../src/engine/wasm');
-  const assets=new AssetStore(),doc=new window.luma.Document({assets}),firstFont=await doc.fonts.embed(new Blob([new Uint8Array(primary)])),file=await doc.fonts.embed(new Blob([new Uint8Array(source)])),before=JSON.stringify(doc.toJSON()),native=new FloatPixelProcessor(await instantiateKernel(new Uint8Array(await(await fetch('/wasm/pixels.wasm')).arrayBuffer()))),processor={floatComposite:async(...args:Parameters<typeof native.composite>)=>native.composite(...args)},data=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsDataURL(new Blob([new Uint8Array(reference)],{type:'font/ttf'}));}),rows=[];
-  let published=0;
-  const mask=async(g:import('../src/engine/float-glyph').FloatGlyph)=>{
-   const ns='http://www.w3.org/2000/svg',root=document.createElementNS(ns,'svg'),defs=document.createElementNS(ns,'defs'),style=document.createElementNS(ns,'style'),group=document.createElementNS(ns,'g'),node=document.createElementNS(ns,'text'),m=g.transform;
-   style.textContent=`@font-face{font-family:IndependentTrackedItem;src:url("${data}");font-style:normal;font-weight:400;}`;defs.append(style);root.append(defs,group);group.setAttribute('transform',`matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`);node.setAttribute('x',String(g.origin?.x??0));node.setAttribute('y',String(g.origin?.y??0));node.setAttribute('fill','#fff');node.setAttribute('direction','ltr');if(g.rotation!==undefined)node.setAttribute('rotate',String(g.rotation));node.style.cssText=`font-family:IndependentTrackedItem;font-size:${g.paintFontSize??g.style.fontSize}px;font-style:normal;font-weight:400;font-kerning:none;font-variant-caps:normal;letter-spacing:${g.paintLetterSpacing??0}px;word-spacing:0px;white-space:pre;font-feature-settings:${manifest.featuresDisabled.map(tag=>JSON.stringify(tag)+' 0').join(',')}`;
-   if(g.writing){node.style.writingMode=g.writing.mode;node.style.textOrientation=g.writing.orientation;}if(g.baseline)node.style.dominantBaseline=g.baseline;
-   const value=String.fromCodePoint(manifest.referenceSelectorBase+g.glyphId);
-   if(g.path){const path=document.createElementNS(ns,'path'),content=document.createElementNS(ns,'textPath');path.setAttribute('id','independent-item-path');path.setAttribute('d',g.path.data);defs.append(path);node.setAttribute('x','0');node.setAttribute('y','0');node.setAttribute(g.writing&&g.writing.mode!=='horizontal-tb'?'dx':'dy',String(g.path.baselineOffset));if(g.origin)node.setAttribute('transform',`translate(${g.origin.x} ${g.origin.y})`);content.setAttribute('href','#independent-item-path');content.setAttribute('startOffset',String(g.path.startOffset));content.setAttribute('method','align');content.setAttribute('spacing','exact');content.textContent=value;node.append(content);}else node.textContent=value;group.append(node);
-   const result=new Uint8Array(512*512),canvas=document.createElement('canvas');canvas.width=canvas.height=260;const context=canvas.getContext('2d')!;
-   // The canonical world lattice is part of the native sampling contract.
-   // Original FontTools source glyphs and independently authored SVG provide
-   // coverage; no engine selector compiler or coverage painter is used here.
-   for(const y of [0,256])for(const x of [0,256]){root.setAttribute('width','260');root.setAttribute('height','260');root.setAttribute('viewBox',`${x-2} ${y-2} 260 260`);const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(root)],{type:'image/svg+xml'})),image=new Image();
-    try{await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(new Error('Independent tracked source glyph failed'));image.src=url;});await image.decode();context.clearRect(0,0,260,260);context.drawImage(image,0,0);const bytes=context.getImageData(2,2,256,256).data;for(let row=0;row<256;row++)for(let column=0;column<256;column++)result[(y+row)*512+x+column]=bytes[(row*256+column)*4+3];}finally{image.src='';URL.revokeObjectURL(url);}
-   }return result;
-  };
-  try{for(const name of ['mark'])for(const vertical of [true])for(const curved of [false])for(const affine of [false,true])for(const direction of ['ltr','rtl']as const)for(const alpha of [.5,.64123012345,1e-8]){
-   const colors=[[4,-.25,1.5,alpha],[-.5,3,.125,alpha/2]].map(color=>color.map(Math.fround)),pieces=name==='mark'?[{text:'AV ',paint:0},{text:'a\u0301',paint:1},{text:' fi',paint:0}]:name==='bidi'?[{text:'A ',paint:0},{text:'אב ',paint:1},{text:'V',paint:0}]:[{text:'ببلا ',paint:1},{text:'AV',paint:0}],offsets:number[]=[];let length=0;for(const piece of pieces){offsets.push(length);length+=piece.text.length;}
-   const spans=pieces.map(piece=>({text:piece.text,style:{color:piece.paint?`color(srgb-linear -.5 3 .125 / ${alpha/2})`:`color(srgb-linear 4 -.25 1.5 / ${alpha})`}})),plan=await captureStyledTextPlan({width:512,height:512,transform:affine?[1.25,.125,-.25,.9,15,14]:[1,0,0,1,0,0],style:{fontFamily:firstFont.family+', '+file.family,fontSize:40,letterSpacing:-30},lines:[{x:220,y:160,direction,align:'center',...(vertical?{writing:{mode:'vertical-rl'as const,orientation:'mixed'as const}}:{}),...(curved?{path:{points:[{x:24,y:150,in:{x:24,y:150},out:{x:100,y:30}},{x:420,y:150,in:{x:340,y:30},out:{x:420,y:150}}],startOffset:210,baselineOffset:7}}:{}),spans}]},doc.toJSON(),assets,{captureLinearPaint:true});
-   try{const match=await plan.matchStyledGlyphLine(0);if(match.status!=='matched'){rows.push({name,vertical,curved,affine,direction,alpha,status:match.status,evidence:match.evidence});continue;}const expected=new Float32Array(512*512*4),owners=new Uint8Array(512*512);let tracked=0;
-    for(const glyph of match.glyphs){const cluster=glyph.sourceCluster;if(cluster===undefined||!Number.isInteger(cluster)||cluster<0||cluster>=length)throw new Error('Original styled cluster provenance is missing');let source=0;while(source+1<offsets.length&&offsets[source+1]<=cluster)source++;const paint=pieces[source].paint,color=colors[paint];const fallback=name==='mark'?cluster===3:name==='bidi'?cluster===2||cluster===3:cluster<4;if(glyph.font.sourceFamily!==(fallback?file.family:firstFont.family)||glyph.color.some((v,i)=>v!==color[i]))throw new Error('Original styled font or source color differs');if(glyph.paintLetterSpacing)tracked++;const coverage=await mask(glyph);
-     for(let i=0;i<coverage.length;i++){if(coverage[i])owners[i]|=1<<paint;const p=i*4,sa=Math.fround(color[3]*Math.fround(coverage[i]/255)),ba=expected[p+3],a=sa+ba*(1-sa);if(!sa)continue;for(let c=0;c<3;c++)expected[p+c]=(sa*(1-ba)*color[c]+sa*ba*color[c]+(1-sa)*ba*expected[p+c])/a;expected[p+3]=a;}
-    }
-    const area={x:0,y:0,width:512,height:512},full=await plan.renderGlyphs(match.glyphs,area,processor),parts=new Float32Array(full.length);let alphaError=0,rgbError=0,overlap=0;for(const owner of owners)if(owner===3)overlap++;for(let i=0;i<full.length;i++)if(i%4===3)alphaError=Math.max(alphaError,Math.abs(full[i]-expected[i]));else rgbError=Math.max(rgbError,Math.abs(full[i]-expected[i]));
-    for(let x=0;x<512;x+=137){const width=Math.min(137,512-x),part=await plan.renderGlyphs(match.glyphs,{...area,x,width},processor);for(let y=0;y<512;y++)parts.set(part.subarray(y*width*4,(y+1)*width*4),(y*512+x)*4);}rows.push({name,vertical,curved,affine,direction,alpha,status:match.status,evidence:match.evidence,tracked,alphaError,rgbError,overlap,unchanged:JSON.stringify(doc.toJSON())===before,partitions:new Uint32Array(full.buffer).every((value,index)=>value===new Uint32Array(parts.buffer)[index])});
-   }catch(error){rows.push({name,vertical,curved,affine,direction,alpha,status:'error',error:String(error)});}finally{plan.release();if(rows.length>published){await(globalThis as unknown as{__keepFallbackFloat(row:unknown):Promise<void>}).__keepFallbackFloat(rows.at(-1));published=rows.length;}}
-  }return rows;}finally{assets.dispose();}
- },{primary:[...primary],source:[...source],reference:[...reference],manifest});
- await writeFile(info.outputPath('native-fallback-float.json'),JSON.stringify(rows,null,2));expect(rows).toHaveLength(12);for(const row of rows){expect(row).toMatchObject({status:'matched',alphaError:0,rgbError:0,unchanged:true,partitions:true});if(!('overlap'in row))throw new Error('The original styled bidi fixture did not match');expect(row.overlap!).toBeGreaterThan(0);}
+test("original span paint retains independent source GIDs, colored overlap and every Float32 word in twelve direction and affine controls", async ({
+  page,
+}, info) => {
+  test.setTimeout(600000);
+  const primary = await readFile(
+      "tests/fixtures/native-fallback/Latin-no-mark.ttf",
+    ),
+    source = await readFile("tests/fixtures/shaping-font/Shaping.ttf"),
+    reference = await readFile(
+      "tests/fixtures/vertical-glyph/Shaping-glyphs.ttf",
+    ),
+    manifest = JSON.parse(
+      await readFile("tests/fixtures/vertical-glyph/manifest.json", "utf8"),
+    ) as {
+      sourceSha256: string;
+      referenceSha256: string;
+      referenceSelectorBase: number;
+      featuresDisabled: string[];
+    };
+  expect(createHash("sha256").update(source).digest("hex")).toBe(
+    manifest.sourceSha256,
+  );
+  expect(createHash("sha256").update(reference).digest("hex")).toBe(
+    manifest.referenceSha256,
+  );
+  await page.exposeFunction("__keepFallbackFloat", async (row: unknown) =>
+    appendFile(
+      info.outputPath("native-fallback-float-progress.jsonl"),
+      JSON.stringify(row) + "\n",
+    ),
+  );
+  await page.goto("/");
+  const rows = await page.evaluate(
+    async ({ primary, source, reference, manifest }) => {
+      const { captureStyledTextPlan } = (await import(
+        /* @vite-ignore */ String("/src/engine/styled-text.ts")
+      )) as typeof import("../src/engine/styled-text");
+      const { AssetStore } = (await import(
+        /* @vite-ignore */ String("/src/core/assets.ts")
+      )) as typeof import("../src/core/assets");
+      const { FloatPixelProcessor } = (await import(
+        /* @vite-ignore */ String("/src/engine/float-pixels.ts")
+      )) as typeof import("../src/engine/float-pixels");
+      const { instantiateKernel } = (await import(
+        /* @vite-ignore */ String("/src/engine/wasm.ts")
+      )) as typeof import("../src/engine/wasm");
+      const assets = new AssetStore(),
+        doc = new window.luma.Document({ assets }),
+        firstFont = await doc.fonts.embed(new Blob([new Uint8Array(primary)])),
+        file = await doc.fonts.embed(new Blob([new Uint8Array(source)])),
+        before = JSON.stringify(doc.toJSON()),
+        native = new FloatPixelProcessor(
+          await instantiateKernel(
+            new Uint8Array(
+              await (await fetch("/wasm/pixels.wasm")).arrayBuffer(),
+            ),
+          ),
+        ),
+        processor = {
+          floatComposite: async (
+            ...args: Parameters<typeof native.composite>
+          ) => native.composite(...args),
+        },
+        data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(
+            new Blob([new Uint8Array(reference)], { type: "font/ttf" }),
+          );
+        }),
+        rows = [];
+      let published = 0;
+      const mask = async (
+        g: import("../src/engine/float-glyph").FloatGlyph,
+      ) => {
+        const ns = "http://www.w3.org/2000/svg",
+          root = document.createElementNS(ns, "svg"),
+          defs = document.createElementNS(ns, "defs"),
+          style = document.createElementNS(ns, "style"),
+          group = document.createElementNS(ns, "g"),
+          node = document.createElementNS(ns, "text"),
+          m = g.transform;
+        style.textContent = `@font-face{font-family:IndependentTrackedItem;src:url("${data}");font-style:normal;font-weight:400;}`;
+        defs.append(style);
+        root.append(defs, group);
+        group.setAttribute(
+          "transform",
+          `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`,
+        );
+        node.setAttribute("x", String(g.origin?.x ?? 0));
+        node.setAttribute("y", String(g.origin?.y ?? 0));
+        node.setAttribute("fill", "#fff");
+        node.setAttribute("direction", "ltr");
+        if (g.rotation !== undefined)
+          node.setAttribute("rotate", String(g.rotation));
+        node.style.cssText = `font-family:IndependentTrackedItem;font-size:${g.paintFontSize ?? g.style.fontSize}px;font-style:normal;font-weight:400;font-kerning:none;font-variant-caps:normal;letter-spacing:${g.paintLetterSpacing ?? 0}px;word-spacing:0px;white-space:pre;font-feature-settings:${manifest.featuresDisabled.map((tag) => JSON.stringify(tag) + " 0").join(",")}`;
+        if (g.writing) {
+          node.style.writingMode = g.writing.mode;
+          node.style.textOrientation = g.writing.orientation;
+        }
+        if (g.baseline) node.style.dominantBaseline = g.baseline;
+        const value = String.fromCodePoint(
+          manifest.referenceSelectorBase + g.glyphId,
+        );
+        if (g.path) {
+          const path = document.createElementNS(ns, "path"),
+            content = document.createElementNS(ns, "textPath");
+          path.setAttribute("id", "independent-item-path");
+          path.setAttribute("d", g.path.data);
+          defs.append(path);
+          node.setAttribute("x", "0");
+          node.setAttribute("y", "0");
+          node.setAttribute(
+            g.writing && g.writing.mode !== "horizontal-tb" ? "dx" : "dy",
+            String(g.path.baselineOffset),
+          );
+          if (g.origin)
+            node.setAttribute(
+              "transform",
+              `translate(${g.origin.x} ${g.origin.y})`,
+            );
+          content.setAttribute("href", "#independent-item-path");
+          content.setAttribute("startOffset", String(g.path.startOffset));
+          content.setAttribute("method", "align");
+          content.setAttribute("spacing", "exact");
+          content.textContent = value;
+          node.append(content);
+        } else node.textContent = value;
+        group.append(node);
+        const result = new Uint8Array(512 * 512),
+          canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 260;
+        const context = canvas.getContext("2d")!;
+        // The canonical world lattice is part of the native sampling contract.
+        // Original FontTools source glyphs and independently authored SVG provide
+        // coverage; no engine selector compiler or coverage painter is used here.
+        for (const y of [0, 256])
+          for (const x of [0, 256]) {
+            root.setAttribute("width", "260");
+            root.setAttribute("height", "260");
+            root.setAttribute("viewBox", `${x - 2} ${y - 2} 260 260`);
+            const url = URL.createObjectURL(
+                new Blob([new XMLSerializer().serializeToString(root)], {
+                  type: "image/svg+xml",
+                }),
+              ),
+              image = new Image();
+            try {
+              await new Promise<void>((resolve, reject) => {
+                image.onload = () => resolve();
+                image.onerror = () =>
+                  reject(new Error("Independent tracked source glyph failed"));
+                image.src = url;
+              });
+              await image.decode();
+              context.clearRect(0, 0, 260, 260);
+              context.drawImage(image, 0, 0);
+              const bytes = context.getImageData(2, 2, 256, 256).data;
+              for (let row = 0; row < 256; row++)
+                for (let column = 0; column < 256; column++)
+                  result[(y + row) * 512 + x + column] =
+                    bytes[(row * 256 + column) * 4 + 3];
+            } finally {
+              image.src = "";
+              URL.revokeObjectURL(url);
+            }
+          }
+        return result;
+      };
+      try {
+        for (const name of ["mark"])
+          for (const vertical of [true])
+            for (const curved of [false])
+              for (const affine of [false, true])
+                for (const direction of ["ltr", "rtl"] as const)
+                  for (const alpha of [0.5, 0.64123012345, 1e-8]) {
+                    const colors = [
+                        [4, -0.25, 1.5, alpha],
+                        [-0.5, 3, 0.125, alpha / 2],
+                      ].map((color) => color.map(Math.fround)),
+                      pieces =
+                        name === "mark"
+                          ? [
+                              { text: "AV ", paint: 0 },
+                              { text: "a\u0301", paint: 1 },
+                              { text: " fi", paint: 0 },
+                            ]
+                          : name === "bidi"
+                            ? [
+                                { text: "A ", paint: 0 },
+                                { text: "אב ", paint: 1 },
+                                { text: "V", paint: 0 },
+                              ]
+                            : [
+                                { text: "ببلا ", paint: 1 },
+                                { text: "AV", paint: 0 },
+                              ],
+                      offsets: number[] = [];
+                    let length = 0;
+                    for (const piece of pieces) {
+                      offsets.push(length);
+                      length += piece.text.length;
+                    }
+                    const spans = pieces.map((piece) => ({
+                        text: piece.text,
+                        style: {
+                          color: piece.paint
+                            ? `color(srgb-linear -.5 3 .125 / ${alpha / 2})`
+                            : `color(srgb-linear 4 -.25 1.5 / ${alpha})`,
+                        },
+                      })),
+                      plan = await captureStyledTextPlan(
+                        {
+                          width: 512,
+                          height: 512,
+                          transform: affine
+                            ? [1.25, 0.125, -0.25, 0.9, 15, 14]
+                            : [1, 0, 0, 1, 0, 0],
+                          style: {
+                            fontFamily: firstFont.family + ", " + file.family,
+                            fontSize: 40,
+                            letterSpacing: -30,
+                          },
+                          lines: [
+                            {
+                              x: 220,
+                              y: 160,
+                              direction,
+                              align: "center",
+                              ...(vertical
+                                ? {
+                                    writing: {
+                                      mode: "vertical-rl" as const,
+                                      orientation: "mixed" as const,
+                                    },
+                                  }
+                                : {}),
+                              ...(curved
+                                ? {
+                                    path: {
+                                      points: [
+                                        {
+                                          x: 24,
+                                          y: 150,
+                                          in: { x: 24, y: 150 },
+                                          out: { x: 100, y: 30 },
+                                        },
+                                        {
+                                          x: 420,
+                                          y: 150,
+                                          in: { x: 340, y: 30 },
+                                          out: { x: 420, y: 150 },
+                                        },
+                                      ],
+                                      startOffset: 210,
+                                      baselineOffset: 7,
+                                    },
+                                  }
+                                : {}),
+                              spans,
+                            },
+                          ],
+                        },
+                        doc.toJSON(),
+                        assets,
+                        { captureLinearPaint: true },
+                      );
+                    try {
+                      const match = await plan.matchStyledGlyphLine(0);
+                      if (match.status !== "matched") {
+                        rows.push({
+                          name,
+                          vertical,
+                          curved,
+                          affine,
+                          direction,
+                          alpha,
+                          status: match.status,
+                          evidence: match.evidence,
+                        });
+                        continue;
+                      }
+                      const expected = new Float32Array(512 * 512 * 4),
+                        owners = new Uint8Array(512 * 512);
+                      let tracked = 0;
+                      for (const glyph of match.glyphs) {
+                        const cluster = glyph.sourceCluster;
+                        if (
+                          cluster === undefined ||
+                          !Number.isInteger(cluster) ||
+                          cluster < 0 ||
+                          cluster >= length
+                        )
+                          throw new Error(
+                            "Original styled cluster provenance is missing",
+                          );
+                        let source = 0;
+                        while (
+                          source + 1 < offsets.length &&
+                          offsets[source + 1] <= cluster
+                        )
+                          source++;
+                        const paint = pieces[source].paint,
+                          color = colors[paint];
+                        const fallback =
+                          name === "mark"
+                            ? cluster === 3
+                            : name === "bidi"
+                              ? cluster === 2 || cluster === 3
+                              : cluster < 4;
+                        if (
+                          glyph.font.sourceFamily !==
+                            (fallback ? file.family : firstFont.family) ||
+                          glyph.color.some((v, i) => v !== color[i])
+                        )
+                          throw new Error(
+                            "Original styled font or source color differs",
+                          );
+                        if (glyph.paintLetterSpacing) tracked++;
+                        const coverage = await mask(glyph);
+                        for (let i = 0; i < coverage.length; i++) {
+                          if (coverage[i]) owners[i] |= 1 << paint;
+                          const p = i * 4,
+                            sa = Math.fround(
+                              color[3] * Math.fround(coverage[i] / 255),
+                            ),
+                            ba = expected[p + 3],
+                            a = sa + ba * (1 - sa);
+                          if (!sa) continue;
+                          for (let c = 0; c < 3; c++)
+                            expected[p + c] =
+                              (sa * (1 - ba) * color[c] +
+                                sa * ba * color[c] +
+                                (1 - sa) * ba * expected[p + c]) /
+                              a;
+                          expected[p + 3] = a;
+                        }
+                      }
+                      const area = { x: 0, y: 0, width: 512, height: 512 },
+                        full = await plan.renderGlyphs(
+                          match.glyphs,
+                          area,
+                          processor,
+                        ),
+                        parts = new Float32Array(full.length);
+                      let alphaError = 0,
+                        rgbError = 0,
+                        overlap = 0;
+                      for (const owner of owners) if (owner === 3) overlap++;
+                      for (let i = 0; i < full.length; i++)
+                        if (i % 4 === 3)
+                          alphaError = Math.max(
+                            alphaError,
+                            Math.abs(full[i] - expected[i]),
+                          );
+                        else
+                          rgbError = Math.max(
+                            rgbError,
+                            Math.abs(full[i] - expected[i]),
+                          );
+                      for (let x = 0; x < 512; x += 137) {
+                        const width = Math.min(137, 512 - x),
+                          part = await plan.renderGlyphs(
+                            match.glyphs,
+                            { ...area, x, width },
+                            processor,
+                          );
+                        for (let y = 0; y < 512; y++)
+                          parts.set(
+                            part.subarray(y * width * 4, (y + 1) * width * 4),
+                            (y * 512 + x) * 4,
+                          );
+                      }
+                      rows.push({
+                        name,
+                        vertical,
+                        curved,
+                        affine,
+                        direction,
+                        alpha,
+                        status: match.status,
+                        evidence: match.evidence,
+                        tracked,
+                        alphaError,
+                        rgbError,
+                        overlap,
+                        unchanged: JSON.stringify(doc.toJSON()) === before,
+                        partitions: new Uint32Array(full.buffer).every(
+                          (value, index) =>
+                            value === new Uint32Array(parts.buffer)[index],
+                        ),
+                      });
+                    } catch (error) {
+                      rows.push({
+                        name,
+                        vertical,
+                        curved,
+                        affine,
+                        direction,
+                        alpha,
+                        status: "error",
+                        error: String(error),
+                      });
+                    } finally {
+                      plan.release();
+                      if (rows.length > published) {
+                        await (
+                          globalThis as unknown as {
+                            __keepFallbackFloat(row: unknown): Promise<void>;
+                          }
+                        ).__keepFallbackFloat(rows.at(-1));
+                        published = rows.length;
+                      }
+                    }
+                  }
+        return rows;
+      } finally {
+        assets.dispose();
+      }
+    },
+    {
+      primary: [...primary],
+      source: [...source],
+      reference: [...reference],
+      manifest,
+    },
+  );
+  await writeFile(
+    info.outputPath("native-fallback-float.json"),
+    JSON.stringify(rows, null, 2),
+  );
+  expect(rows).toHaveLength(12);
+  for (const row of rows) {
+    expect(row).toMatchObject({
+      status: "matched",
+      alphaError: 0,
+      rgbError: 0,
+      unchanged: true,
+      partitions: true,
+    });
+    if (!("overlap" in row))
+      throw new Error("The original styled bidi fixture did not match");
+    expect(row.overlap!).toBeGreaterThan(0);
+  }
 });

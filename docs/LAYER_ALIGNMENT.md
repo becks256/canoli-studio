@@ -29,6 +29,7 @@ Alignment changes only positions. It retains text dimensions and typography inst
 The caller selects the intended layers before running this example in the Scripts panel:
 
 <!-- example: alignment-canvas-script -->
+
 ```js
 document.layerSelection.align("center", "canvas");
 document.layerSelection.align("middle", "canvas");
@@ -50,8 +51,31 @@ The recorder retains relative alignment intent, semantic moving-layer references
 The `layer.align` recipe action owns `targets:SemanticTarget[]`, `alignment` and optional `reference`, defaulting to Selection. A key reference is `{type:"layer",layer:SemanticTarget}`; this action does not accept a separate step `target`. Existing recipe/package/batch preflight and one-transaction acceptance apply. Updated runtimes support this action in recipe versions 1/2; earlier runtimes reject unknown actions.
 
 <!-- example: alignment-key-recipe -->
+
 ```json
-{"schemaVersion":1,"id":"align-to-key","name":"Align artwork to key","description":"Keep the named key stationary","version":1,"parameters":[],"steps":[{"id":"right","name":"Match right edges","action":{"type":"layer.align","targets":[{"by":"name","pattern":"Artwork","literal":true}],"alignment":"right","reference":{"type":"layer","layer":{"by":"name","pattern":"Key","literal":true}}}}]}
+{
+  "schemaVersion": 1,
+  "id": "align-to-key",
+  "name": "Align artwork to key",
+  "description": "Keep the named key stationary",
+  "version": 1,
+  "parameters": [],
+  "steps": [
+    {
+      "id": "right",
+      "name": "Match right edges",
+      "action": {
+        "type": "layer.align",
+        "targets": [{ "by": "name", "pattern": "Artwork", "literal": true }],
+        "alignment": "right",
+        "reference": {
+          "type": "layer",
+          "layer": { "by": "name", "pattern": "Key", "literal": true }
+        }
+      }
+    }
+  ]
+}
 ```
 
 ## Spacing feedback while moving artwork

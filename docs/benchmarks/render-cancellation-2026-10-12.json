@@ -10,12 +10,7 @@
       "aborted": false,
       "completed": true,
       "presented": 1823.4000000059605,
-      "pixel": [
-        32,
-        112,
-        64,
-        255
-      ],
+      "pixel": [32, 112, 64, 255],
       "error": "",
       "latestMs": 1326
     }
@@ -27,12 +22,7 @@
       "aborted": true,
       "completed": false,
       "presented": 544.5999999940395,
-      "pixel": [
-        32,
-        112,
-        64,
-        255
-      ],
+      "pixel": [32, 112, 64, 255],
       "error": "Render superseded.",
       "latestMs": 37.5
     }
@@ -45,12 +35,7 @@
       "aborted": true,
       "completed": false,
       "presented": 519.5,
-      "pixel": [
-        32,
-        112,
-        64,
-        255
-      ],
+      "pixel": [32, 112, 64, 255],
       "error": "Render superseded.",
       "latestMs": 30.700000017881393
     }
@@ -62,12 +47,7 @@
       "aborted": false,
       "completed": true,
       "presented": 2799.0999999940395,
-      "pixel": [
-        32,
-        112,
-        64,
-        255
-      ],
+      "pixel": [32, 112, 64, 255],
       "error": "",
       "latestMs": 1448.4000000059605
     }
@@ -79,12 +59,7 @@
       "aborted": true,
       "completed": false,
       "presented": 1464.5,
-      "pixel": [
-        32,
-        112,
-        64,
-        255
-      ],
+      "pixel": [32, 112, 64, 255],
       "error": "Render superseded.",
       "latestMs": 90.5
     }

@@ -1,50 +1,84 @@
-import {writingModeSchema,textOrientationSchema} from './core/text-writing';
-import {textPathSchema} from './core/text-path';
-import {exportTiffPages as encodeTiffPages} from './engine/tiff';
-import {z} from 'zod';
-import {prepareCharacterTextMetrics} from './engine/styled-text-layout';
-import {characterInputForLayer} from './core/character-layout';
-import {characterRangeSchema} from './core/text-ranges';
-import type {FontInspection,FontInspectOptions,FontPrepareOptions,FontSourceControl,PreparedFontSource} from './fonts/types';
-import {validateTiffVariant,validateTiffPrecision,type TiffPagesExportOptions} from './core/tiff';
-import{isFloatDocument,floatSceneIssue}from'./core/float-document';
-import type{FloatSourceControl}from'./core/float-source/types';
-import {captureRetainedHistory, captureProjectHistory, retainedDocuments} from './core/history';
-import {freeze} from './core/immutable';
-import {historyTimeline} from './core/history-inspection';
-import {renderHistoryComparison, type HistoryComparisonPreview} from './engine/history-comparison';
-import {PaletteLibrary} from './palettes/service';
-import {ArtworkLibrary} from './library/service';
-import type {ArtworkMetadata} from './library/model';
-import {CanvasRenderer} from './engine/renderer';
-import {captureAssetSource,assetBitmapMatches} from "./core/assets";
-import {ChatGptConnections} from './integrations/chatgpt/host';
-import {rawDevelopOptionsSchema} from "./core/interchange/raw/types";
-import {prepareRawImport,developRawComponent} from "./engine/raw-import";
-import {rawSourceMetadata,ownRawSource} from "./core/interchange/raw/source";
-import {RecentFilesService} from './workspace/recent-service';
-import {LensLibraryService} from './core/interchange/lens/library';
-import { separateFrequencies,prepareFrequencySeparation } from "./engine/frequency-separation";
+import { writingModeSchema, textOrientationSchema } from "./core/text-writing";
+import { textPathSchema } from "./core/text-path";
+import { exportTiffPages as encodeTiffPages } from "./engine/tiff";
+import { z } from "zod";
+import { prepareCharacterTextMetrics } from "./engine/styled-text-layout";
+import { characterInputForLayer } from "./core/character-layout";
+import { characterRangeSchema } from "./core/text-ranges";
+import type {
+  FontInspection,
+  FontInspectOptions,
+  FontPrepareOptions,
+  FontSourceControl,
+  PreparedFontSource,
+} from "./fonts/types";
+import {
+  validateTiffVariant,
+  validateTiffPrecision,
+  type TiffPagesExportOptions,
+} from "./core/tiff";
+import { isFloatDocument, floatSceneIssue } from "./core/float-document";
+import type { FloatSourceControl } from "./core/float-source/types";
+import {
+  captureRetainedHistory,
+  captureProjectHistory,
+  retainedDocuments,
+} from "./core/history";
+import { freeze } from "./core/immutable";
+import { historyTimeline } from "./core/history-inspection";
+import {
+  renderHistoryComparison,
+  type HistoryComparisonPreview,
+} from "./engine/history-comparison";
+import { PaletteLibrary } from "./palettes/service";
+import { ArtworkLibrary } from "./library/service";
+import type { ArtworkMetadata } from "./library/model";
+import { CanvasRenderer } from "./engine/renderer";
+import { captureAssetSource, assetBitmapMatches } from "./core/assets";
+import { ChatGptConnections } from "./integrations/chatgpt/host";
+import { rawDevelopOptionsSchema } from "./core/interchange/raw/types";
+import { prepareRawImport, developRawComponent } from "./engine/raw-import";
+import { rawSourceMetadata, ownRawSource } from "./core/interchange/raw/source";
+import { RecentFilesService } from "./workspace/recent-service";
+import { LensLibraryService } from "./core/interchange/lens/library";
+import {
+  separateFrequencies,
+  prepareFrequencySeparation,
+} from "./engine/frequency-separation";
 import type { FrequencySeparationOptions } from "./core/frequency-separation";
-import {captureFrequencyRadius} from './core/frequency-separation';
-import { captureVectorBoolean, vectorBooleanSelectionSchema } from './core/vector-boolean';
-import {remapLayerAssets} from './core/asset-references';
-import {BrushTextureSourceOwner} from './brushes/texture-source';
-import type { VectorBooleanRequest, VectorBooleanControl, VectorBooleanResult } from './core/vector-boolean';
-import { prepareVectorBoolean } from './engine/prepare-vector-boolean';
-import {inspectSvgFile,prepareSvgImport} from './engine/svg-import';
-import type {SvgImportControl,SvgImportOptions,SvgImportReport} from './core/svg-import';
-import {prepareMatting} from './engine/prepare-matting';
-import {preparePreflight} from './engine/preflight';
-import type {PreflightOptions,PreflightControl} from './core/preflight';
-import type {RefineEdgeControl} from './core/matting';
-import { prepareSubject } from './engine/prepare-subject';
-import { selectSubjectOptionsSchema, type SelectSubjectControl } from './core/subject-selection';
+import { captureFrequencyRadius } from "./core/frequency-separation";
+import {
+  captureVectorBoolean,
+  vectorBooleanSelectionSchema,
+} from "./core/vector-boolean";
+import { remapLayerAssets } from "./core/asset-references";
+import { BrushTextureSourceOwner } from "./brushes/texture-source";
+import type {
+  VectorBooleanRequest,
+  VectorBooleanControl,
+  VectorBooleanResult,
+} from "./core/vector-boolean";
+import { prepareVectorBoolean } from "./engine/prepare-vector-boolean";
+import { inspectSvgFile, prepareSvgImport } from "./engine/svg-import";
+import type {
+  SvgImportControl,
+  SvgImportOptions,
+  SvgImportReport,
+} from "./core/svg-import";
+import { prepareMatting } from "./engine/prepare-matting";
+import { preparePreflight } from "./engine/preflight";
+import type { PreflightOptions, PreflightControl } from "./core/preflight";
+import type { RefineEdgeControl } from "./core/matting";
+import { prepareSubject } from "./engine/prepare-subject";
+import {
+  selectSubjectOptionsSchema,
+  type SelectSubjectControl,
+} from "./core/subject-selection";
 import { prepareColorRange } from "./engine/color-range";
-import { prepareQuickSelection } from './engine/prepare-quick-selection';
-import { quickSelectionOptionsSchema } from './core/quick-selection';
-import { prepareChannelSelection } from './engine/prepare-channel';
-import { channelLoadSchema } from './core/alpha-channels';
+import { prepareQuickSelection } from "./engine/prepare-quick-selection";
+import { quickSelectionOptionsSchema } from "./core/quick-selection";
+import { prepareChannelSelection } from "./engine/prepare-channel";
+import { channelLoadSchema } from "./core/alpha-channels";
 import { colorRangeOptionsSchema } from "./core/color-range";
 import { prepareSelectionModification } from "./engine/prepare-selection";
 import { selectionModificationSchema } from "./core/selection-modification";
@@ -57,7 +91,7 @@ import { prepareSmartRaster } from "./engine/smart-raster";
 import { computeSha256 } from "./ai/batch/manifest";
 import { ComponentRegistry } from "./core/smart/manager";
 import { prepareHealingStroke } from "./engine/healing";
-import {encodeRetouchAsset} from './engine/retouch-asset';
+import { encodeRetouchAsset } from "./engine/retouch-asset";
 import { prepareRetouchPatch } from "./engine/patch";
 import { PixelProcessor } from "./engine/processor";
 import type {
@@ -73,12 +107,12 @@ import {
 import { WorkspaceAutosave } from "./workspace/autosave";
 import { DocumentSession } from "./workspace/document-session";
 import { ToolController } from "./tools";
-import { BrushPresetLibrary } from './brushes/library';
-import {BrushPreset,type BrushTool} from './brushes/presets';
-import {verifyPresetSource} from './brushes/sources';
+import { BrushPresetLibrary } from "./brushes/library";
+import { BrushPreset, type BrushTool } from "./brushes/presets";
+import { verifyPresetSource } from "./brushes/sources";
 import { AssetStore } from "./core/assets";
-import {fontFilesForArtwork,documentFontFiles} from './core/font-files';
-import {captureProjectFonts} from './core/font-project';
+import { fontFilesForArtwork, documentFontFiles } from "./core/font-files";
+import { captureProjectFonts } from "./core/font-project";
 import { loadProject, serializeProject } from "./core/project";
 import {
   Document,
@@ -98,27 +132,51 @@ import type {
 import type { SelectionData } from "./core/drawing";
 import { AdaptiveRenderer } from "./engine/adaptive";
 import { ScriptRunner } from "./scripting/runner";
-import { exportDocument, getExportCapabilityReport, getTiffPagesCapabilityReport } from "./engine/export";
-import {prepareTiffImport} from './engine/tiff-import';
-import {prepareAvifImport} from './engine/avif-import';
-import {importParagraphStyles} from './core/paragraph-styles';
-import {inspectTiffFile} from './core/interchange/tiff/client';
-import {inspectAvifFile} from './core/interchange/avif/client';
-import {inspectRawFile,exportRawTiffFile} from './core/interchange/raw/client';
-import{rawComponentSource}from'./core/interchange/raw/commands';
-import{captureColorOutput}from'./core/color/output-source';
-import{colorOutputSchema}from'./core/color/color-settings';
-import{rawTiffSettingsSchema,type RawTiffExportOptions,type RawTiffControl,type RawTiffResult}from'./core/interchange/raw/tiff-types';
-import type {RawDecodeOptions,RawImportControl,RawImportReport} from './core/interchange/raw/types';
-import type {AvifDecodeOptions,AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
-import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
+import {
+  exportDocument,
+  getExportCapabilityReport,
+  getTiffPagesCapabilityReport,
+} from "./engine/export";
+import { prepareTiffImport } from "./engine/tiff-import";
+import { prepareAvifImport } from "./engine/avif-import";
+import { importParagraphStyles } from "./core/paragraph-styles";
+import { inspectTiffFile } from "./core/interchange/tiff/client";
+import { inspectAvifFile } from "./core/interchange/avif/client";
+import {
+  inspectRawFile,
+  exportRawTiffFile,
+} from "./core/interchange/raw/client";
+import { rawComponentSource } from "./core/interchange/raw/commands";
+import { captureColorOutput } from "./core/color/output-source";
+import { colorOutputSchema } from "./core/color/color-settings";
+import {
+  rawTiffSettingsSchema,
+  type RawTiffExportOptions,
+  type RawTiffControl,
+  type RawTiffResult,
+} from "./core/interchange/raw/tiff-types";
+import type {
+  RawDecodeOptions,
+  RawImportControl,
+  RawImportReport,
+} from "./core/interchange/raw/types";
+import type {
+  AvifDecodeOptions,
+  AvifImportControl,
+  AvifImportReport,
+} from "./core/interchange/avif/types";
+import type {
+  TiffDecodeOptions,
+  TiffImportControl,
+  TiffImportReport,
+} from "./core/interchange/tiff/types";
 import type {
   ExportOptions,
   ExportResult,
   ExportCapabilityReport,
 } from "./engine/export";
 import { execute } from "./core/commands";
-import { referencedAssets, allLayers, id,findLayer } from "./core/model";
+import { referencedAssets, allLayers, id, findLayer } from "./core/model";
 import { layerTransform } from "./core/spatial";
 import {
   PluginRegistry,
@@ -141,36 +199,75 @@ import {
   type PsdImportOptions,
   type PsdImportResult,
 } from "./core/interchange/psd";
-import {IccProfile} from './core/color/profile-source';
-import {type IccControl} from './core/color/icc-client';
-import {normalizeColorSettings,normalizeColorOutput,serializeColorSettings,restoreColorSettings,preflightColorSettings,type ColorSettings} from './core/color/color-settings';
+import { IccProfile } from "./core/color/profile-source";
+import { type IccControl } from "./core/color/icc-client";
+import {
+  normalizeColorSettings,
+  normalizeColorOutput,
+  serializeColorSettings,
+  restoreColorSettings,
+  preflightColorSettings,
+  type ColorSettings,
+} from "./core/color/color-settings";
 import type { StandardRgbSpaceId, SoftProofOptions } from "./core/color/types";
-import {inspectPhotoshop,decodePhotoshop} from './engine/photoshop-import';
-import { validatePreparedPaintAssets } from './core/prepared-paint-assets';
-import { wetBrowserAssets } from './engine/wet-composite';
-import { applyPreparedWetPaint, createPreparedWetPaintJob, type ApplyWetPaintOptions, type WetBrushBuilder } from './engine/wet-authoring';
-export type { ApplyWetPaintOptions } from './engine/wet-authoring';
-import type {PhotoshopInput,PhotoshopInspection,PhotoshopImportControl} from './core/photoshop-import';
+import { inspectPhotoshop, decodePhotoshop } from "./engine/photoshop-import";
+import { validatePreparedPaintAssets } from "./core/prepared-paint-assets";
+import { wetBrowserAssets } from "./engine/wet-composite";
+import {
+  applyPreparedWetPaint,
+  createPreparedWetPaintJob,
+  type ApplyWetPaintOptions,
+  type WetBrushBuilder,
+} from "./engine/wet-authoring";
+export type { ApplyWetPaintOptions } from "./engine/wet-authoring";
+import type {
+  PhotoshopInput,
+  PhotoshopInspection,
+  PhotoshopImportControl,
+} from "./core/photoshop-import";
 
 /** Application services own assets and I/O; the DOM itself is browser-independent. */
 export class EditorApplication {
-  separateFrequencies(layerId: string, options: FrequencySeparationOptions = {}, control: {signal?: AbortSignal} = {}) {
-    const generation=this.ioGeneration;
-    return separateFrequencies(this,layerId,options,control,()=>{if(generation!==this.ioGeneration||this.retouchDisposed)throw new Error('The editor session changed during frequency separation.');});
+  separateFrequencies(
+    layerId: string,
+    options: FrequencySeparationOptions = {},
+    control: { signal?: AbortSignal } = {},
+  ) {
+    const generation = this.ioGeneration;
+    return separateFrequencies(this, layerId, options, control, () => {
+      if (generation !== this.ioGeneration || this.retouchDisposed)
+        throw new Error(
+          "The editor session changed during frequency separation.",
+        );
+    });
   }
-  prepareFrequencySeparation(layerId:string,control:{signal?:AbortSignal}={}) {
-    const generation=this.ioGeneration;
-    return prepareFrequencySeparation(this,layerId,control,()=>{if(generation!==this.ioGeneration||this.retouchDisposed)throw new Error('The editor session changed during frequency separation.');});
+  prepareFrequencySeparation(
+    layerId: string,
+    control: { signal?: AbortSignal } = {},
+  ) {
+    const generation = this.ioGeneration;
+    return prepareFrequencySeparation(this, layerId, control, () => {
+      if (generation !== this.ioGeneration || this.retouchDisposed)
+        throw new Error(
+          "The editor session changed during frequency separation.",
+        );
+    });
   }
   /** Trusted host editing; isolated scripts use prepared values/shared commands. */
   applyWetPaint(brush: BrushStroke, options: ApplyWetPaintOptions = {}) {
     const generation = this.ioGeneration;
-    return applyPreparedWetPaint(this, brush, options, () => { if (generation !== this.ioGeneration || this.retouchDisposed) throw new Error('The wet-paint application session changed.'); });
+    return applyPreparedWetPaint(this, brush, options, () => {
+      if (generation !== this.ioGeneration || this.retouchDisposed)
+        throw new Error("The wet-paint application session changed.");
+    });
   }
   /** @internal Pointer tools share private preparation and the public commit path. */
   _beginWetPaint(brush: WetBrushBuilder, options: ApplyWetPaintOptions = {}) {
     const generation = this.ioGeneration;
-    return createPreparedWetPaintJob(this, brush, options, () => { if (generation !== this.ioGeneration || this.retouchDisposed) throw new Error('The wet-paint application session changed.'); });
+    return createPreparedWetPaintJob(this, brush, options, () => {
+      if (generation !== this.ioGeneration || this.retouchDisposed)
+        throw new Error("The wet-paint application session changed.");
+    });
   }
   readonly pixels = new RasterEditing(this);
   get recovery() {
@@ -199,12 +296,12 @@ export class EditorApplication {
     }
   >();
   private ioGeneration = 0;
-  private photoshopJobs=new Set<AbortController>();
-  private rawJobs=new Set<AbortController>();
-  private tiffJobs=new Set<AbortController>();
-  private avifJobs=new Set<AbortController>();
-  private fontJobs=new Set<AbortController>();
-  private photoshopCommits=new Set<AbortController>();
+  private photoshopJobs = new Set<AbortController>();
+  private rawJobs = new Set<AbortController>();
+  private tiffJobs = new Set<AbortController>();
+  private avifJobs = new Set<AbortController>();
+  private fontJobs = new Set<AbortController>();
+  private photoshopCommits = new Set<AbortController>();
   private idleRetouchProcessor: PixelProcessor | null = null;
   private retouchProcessors = new Set<PixelProcessor>();
   private retouchDisposed = false;
@@ -220,7 +317,7 @@ export class EditorApplication {
   readonly chatGpt = new ChatGptConnections(this);
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
-  private presetApplyAbort:AbortController|null=null;
+  private presetApplyAbort: AbortController | null = null;
   readonly plugins = new PluginRegistry(browserPluginStorage());
   readonly ai: GenerationJobService;
   readonly recipes: RecipeService;
@@ -291,7 +388,7 @@ export class EditorApplication {
       })(),
       selectedIds: [...session.document.getSnapshot().selectedIds],
       view: structuredClone(session.view),
-      colorSettings:serializeColorSettings(session.colorSettings),
+      colorSettings: serializeColorSettings(session.colorSettings),
       colorProfile: session.colorProfile,
       softProof: structuredClone(session.softProof),
       project: this.captureWorkspaceProject(session),
@@ -312,12 +409,19 @@ export class EditorApplication {
       cached?.state.document === state.document &&
       cached.state.past === state.past &&
       cached.state.future === state.future &&
-      cached.state.branches === state.branches && cached.state.activeBranchId === state.activeBranchId && cached.state.comparisons === state.comparisons && cached.state.provenance === state.provenance
+      cached.state.branches === state.branches &&
+      cached.state.activeBranchId === state.activeBranchId &&
+      cached.state.comparisons === state.comparisons &&
+      cached.state.provenance === state.provenance
     )
       return cached.project;
     const entry = {
       state,
-      project: this.projectEncoder.encode(state.document, session.assets, freeze(captureRetainedHistory(state))),
+      project: this.projectEncoder.encode(
+        state.document,
+        session.assets,
+        freeze(captureRetainedHistory(state)),
+      ),
     };
     this.workspaceProjects.set(session, entry);
     void entry.project.catch(() => {
@@ -394,16 +498,37 @@ export class EditorApplication {
   ): Promise<Document[]> {
     workspace = workspaceSchema.parse(workspace);
     const decoded: { document: Document; assets: AssetStore }[] = [];
-    const colorSettings:ColorSettings[]=[],colorWarnings:string[][]=[];
+    const colorSettings: ColorSettings[] = [],
+      colorWarnings: string[][] = [];
     try {
       for (const entry of workspace.documents) {
-        const warnings:string[]=[];
-        colorSettings.push(entry.colorSettings?await restoreColorSettings(entry.colorSettings):this.legacyColorSettings(entry.colorProfile,entry.softProof,warnings));
-        const settings=colorSettings[colorSettings.length-1];
+        const warnings: string[] = [];
+        colorSettings.push(
+          entry.colorSettings
+            ? await restoreColorSettings(entry.colorSettings)
+            : this.legacyColorSettings(
+                entry.colorProfile,
+                entry.softProof,
+                warnings,
+              ),
+        );
+        const settings = colorSettings[colorSettings.length - 1];
         colorWarnings.push(warnings);
         const loaded = await loadProject(entry.project);
         try {
-          if(typeof settings.output.profile!=='string'||settings.proof||isFloatDocument(loaded.document))warnings.push(...await preflightColorSettings(settings,{},()=>{},isFloatDocument(loaded.document)));
+          if (
+            typeof settings.output.profile !== "string" ||
+            settings.proof ||
+            isFloatDocument(loaded.document)
+          )
+            warnings.push(
+              ...(await preflightColorSettings(
+                settings,
+                {},
+                () => {},
+                isFloatDocument(loaded.document),
+              )),
+            );
           decoded.push({
             document: Document._fromWorkspace(loaded.document, loaded.history),
             assets: loaded.assets,
@@ -438,10 +563,13 @@ export class EditorApplication {
     const restored = decoded.map((entry, index) => {
       const session = this.createSession(entry.document, entry.assets);
       session.view = structuredClone(workspace.documents[index].view);
-      session.colorSettings=colorSettings[index];
-      session.colorWarnings=colorWarnings[index];
-      session.colorProfile=typeof session.colorSettings.output.profile==='string'?session.colorSettings.output.profile:'srgb';
-      session.softProof=this.legacyProofMirror(session.colorSettings.proof);
+      session.colorSettings = colorSettings[index];
+      session.colorWarnings = colorWarnings[index];
+      session.colorProfile =
+        typeof session.colorSettings.output.profile === "string"
+          ? session.colorSettings.output.profile
+          : "srgb";
+      session.softProof = this.legacyProofMirror(session.colorSettings.proof);
       entry.document.selectLayers(
         workspace.documents[index].selectedIds.flatMap((id) => {
           const layer = entry.document.getLayer(id);
@@ -511,8 +639,25 @@ export class EditorApplication {
   }
 
   /** @internal Trusted tool coverage view; never an isolated script capability. */
-  _healStrokeWithAssets(brush:BrushStroke,sampling:RetouchSamplingOptions,options:PoissonBlendOptions,radius:number,signal:AbortSignal,sourceAssets:AssetStore):Promise<AdjustmentLayer>{
-    if(!(brush instanceof BrushStroke))throw new Error('Healing requires a BrushStroke.');return this.commitRetouch(null,sampling,options,signal,brush.toJSON() as import('./core/drawing').BrushStrokeData,radius,sourceAssets);
+  _healStrokeWithAssets(
+    brush: BrushStroke,
+    sampling: RetouchSamplingOptions,
+    options: PoissonBlendOptions,
+    radius: number,
+    signal: AbortSignal,
+    sourceAssets: AssetStore,
+  ): Promise<AdjustmentLayer> {
+    if (!(brush instanceof BrushStroke))
+      throw new Error("Healing requires a BrushStroke.");
+    return this.commitRetouch(
+      null,
+      sampling,
+      options,
+      signal,
+      brush.toJSON() as import("./core/drawing").BrushStrokeData,
+      radius,
+      sourceAssets,
+    );
   }
 
   private async commitRetouch(
@@ -522,30 +667,50 @@ export class EditorApplication {
     signal?: AbortSignal,
     brush?: import("./core/drawing").BrushStrokeData,
     radius = 64,
-    sourceAssets?:AssetStore,
+    sourceAssets?: AssetStore,
   ): Promise<AdjustmentLayer> {
     const document = this.document,
       assets = this.assetStore;
     const revision = document.getSnapshot().revision,
       generation = this.ioGeneration;
     const selectedId = document.selectedLayer?.id ?? null;
-    const selectedIds=[...document.getSnapshot().selectedIds],sampleAssets=sourceAssets??assets,alive=assets.captureLifetime(),sampleAlive=sampleAssets.captureLifetime(),sourceIds=new Set(referencedAssets(document._read()));if(brush?.texture)sourceIds.add(brush.texture.assetId);
-    let selectionRetired=false;
-    const sourcePins=isFloatDocument(document._read())?[...referencedAssets(document._read())].map(key=>captureAssetSource(assets,key)):[],samplePins=isFloatDocument(document._read())?[...sourceIds].map(key=>captureAssetSource(sampleAssets,key)):[];
+    const selectedIds = [...document.getSnapshot().selectedIds],
+      sampleAssets = sourceAssets ?? assets,
+      alive = assets.captureLifetime(),
+      sampleAlive = sampleAssets.captureLifetime(),
+      sourceIds = new Set(referencedAssets(document._read()));
+    if (brush?.texture) sourceIds.add(brush.texture.assetId);
+    let selectionRetired = false;
+    const sourcePins = isFloatDocument(document._read())
+        ? [...referencedAssets(document._read())].map((key) =>
+            captureAssetSource(assets, key),
+          )
+        : [],
+      samplePins = isFloatDocument(document._read())
+        ? [...sourceIds].map((key) => captureAssetSource(sampleAssets, key))
+        : [];
     const selection = document.selection;
     if (!selection && !brush)
       throw new Error("Select a region to patch first.");
     const check = () => {
       signal?.throwIfAborted();
-      if(selectionRetired)throw new Error('The selection changed while preparing the patch.');
-      alive();sampleAlive();for(const pin of sourcePins)pin.check();for(const pin of samplePins)pin.check();
+      if (selectionRetired)
+        throw new Error("The selection changed while preparing the patch.");
+      alive();
+      sampleAlive();
+      for (const pin of sourcePins) pin.check();
+      for (const pin of samplePins) pin.check();
       if (
         this.ioGeneration !== generation ||
         this.document !== document ||
         this.assetStore !== assets ||
         !this.sessions.some((session) => session.document === document) ||
         document.getSnapshot().revision !== revision ||
-        (document.selectedLayer?.id ?? null) !== selectedId||document.getSnapshot().selectedIds.length!==selectedIds.length||document.getSnapshot().selectedIds.some((key,i)=>key!==selectedIds[i])
+        (document.selectedLayer?.id ?? null) !== selectedId ||
+        document.getSnapshot().selectedIds.length !== selectedIds.length ||
+        document
+          .getSnapshot()
+          .selectedIds.some((key, i) => key !== selectedIds[i])
       )
         throw new Error(
           "Document changed while preparing the patch. Retry after reviewing the target.",
@@ -558,12 +723,22 @@ export class EditorApplication {
     this.retouchProcessors.add(processor);
     let reusable = false;
     let cancelled = false;
-    const cancelWorker = () => { cancelled = true; processor.dispose(); };
+    const cancelWorker = () => {
+      cancelled = true;
+      processor.dispose();
+    };
     signal?.addEventListener("abort", cancelWorker, { once: true });
     const staging = new AssetStore();
     let installed: string | undefined;
-    let installedRecord:ReturnType<AssetStore['get']>|undefined;
-    const unsubscribeSelection=document.subscribe(()=>{const ids=document.getSnapshot().selectedIds;if(ids.length!==selectedIds.length||ids.some((key,i)=>key!==selectedIds[i]))selectionRetired=true;});
+    let installedRecord: ReturnType<AssetStore["get"]> | undefined;
+    const unsubscribeSelection = document.subscribe(() => {
+      const ids = document.getSnapshot().selectedIds;
+      if (
+        ids.length !== selectedIds.length ||
+        ids.some((key, i) => key !== selectedIds[i])
+      )
+        selectionRetired = true;
+    });
     try {
       check();
       const capturedSampling = {
@@ -598,9 +773,17 @@ export class EditorApplication {
       check();
       // Encode the detached correction directly. HTMLCanvasElement.toBlob can
       // defer its idle task for a full second while editor renders are pending.
-      const blob=await encodeRetouchAsset(patch,{signal,check});
+      const blob = await encodeRetouchAsset(patch, { signal, check });
       check();
-      const asset = await staging.add(blob, "Retouch patch", id(), false,patch.precision==='float32'?{tiff:{editingPrecision:'float32'},signal,onProgress:check}:undefined);
+      const asset = await staging.add(
+        blob,
+        "Retouch patch",
+        id(),
+        false,
+        patch.precision === "float32"
+          ? { tiff: { editingPrecision: "float32" }, signal, onProgress: check }
+          : undefined,
+      );
       check();
       const layer = new AdjustmentLayer({
         name: brush ? "Healing stroke" : "Retouch patch",
@@ -610,12 +793,31 @@ export class EditorApplication {
           assetId: asset.id,
           width: patch.bounds.width,
           height: patch.bounds.height,
-          ...(patch.precision==='float32'?{precision:'float32' as const}:{}),
+          ...(patch.precision === "float32"
+            ? { precision: "float32" as const }
+            : {}),
         }),
       });
-      const candidate=execute(document._read(),{type:'layer.add',layer:layer.toJSON()});
-      await validatePreparedPaintAssets(candidate,wetBrowserAssets({get:key=>staging.has(key)?staging.get(key):assets.get(key),captureLifetime:()=>()=>{check();staging.captureLifetime()();}},check));check();
-      installedRecord=staging.shareTo(assets,asset.id,asset.id);
+      const candidate = execute(document._read(), {
+        type: "layer.add",
+        layer: layer.toJSON(),
+      });
+      await validatePreparedPaintAssets(
+        candidate,
+        wetBrowserAssets(
+          {
+            get: (key) =>
+              staging.has(key) ? staging.get(key) : assets.get(key),
+            captureLifetime: () => () => {
+              check();
+              staging.captureLifetime()();
+            },
+          },
+          check,
+        ),
+      );
+      check();
+      installedRecord = staging.shareTo(assets, asset.id, asset.id);
       installed = asset.id;
       check();
       document.transaction(brush ? "Healing stroke" : "Patch selection", () =>
@@ -625,8 +827,38 @@ export class EditorApplication {
       reusable = true;
       return layer;
     } finally {
-      try{if(installed&&assets.has(installed)&&assets.get(installed)===installedRecord){const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));if(!retained.has(installed))assets.remove(installed);}}
-      finally{unsubscribeSelection();signal?.removeEventListener("abort",cancelWorker);try{staging.dispose();}finally{this.retouchProcessors.delete(processor);if(reusable&&!cancelled&&!this.retouchDisposed&&!this.idleRetouchProcessor)this.idleRetouchProcessor=processor;else processor.dispose();}}
+      try {
+        if (
+          installed &&
+          assets.has(installed) &&
+          assets.get(installed) === installedRecord
+        ) {
+          const state = document.getSnapshot(),
+            retained = new Set(
+              retainedDocuments(
+                state.document,
+                captureRetainedHistory(state),
+              ).flatMap((value) => [...referencedAssets(value)]),
+            );
+          if (!retained.has(installed)) assets.remove(installed);
+        }
+      } finally {
+        unsubscribeSelection();
+        signal?.removeEventListener("abort", cancelWorker);
+        try {
+          staging.dispose();
+        } finally {
+          this.retouchProcessors.delete(processor);
+          if (
+            reusable &&
+            !cancelled &&
+            !this.retouchDisposed &&
+            !this.idleRetouchProcessor
+          )
+            this.idleRetouchProcessor = processor;
+          else processor.dispose();
+        }
+      }
     }
   }
 
@@ -890,14 +1122,22 @@ export class EditorApplication {
             previous.height !== asset.height ||
             JSON.stringify(previous.tiff) !== JSON.stringify(asset.tiff) ||
             JSON.stringify(previous.avif) !== JSON.stringify(asset.avif) ||
-            JSON.stringify(previous.raw?rawSourceMetadata(previous.raw):null)!==JSON.stringify(asset.raw?rawSourceMetadata(asset.raw):null) ||
+            JSON.stringify(
+              previous.raw ? rawSourceMetadata(previous.raw) : null,
+            ) !==
+              JSON.stringify(asset.raw ? rawSourceMetadata(asset.raw) : null) ||
             (await computeSha256(await previous.blob.arrayBuffer())) !==
               (await computeSha256(await asset.blob.arrayBuffer()))
           )
             throw new Error(
               "An image asset ID conflicts with the source document. Import it with a new identity before applying.",
             );
-        } else await staged.add(asset.blob, asset.name, asset.id, false,{tiff:asset.tiff,avif:asset.avif,raw:asset.raw});
+        } else
+          await staged.add(asset.blob, asset.name, asset.id, false, {
+            tiff: asset.tiff,
+            avif: asset.avif,
+            raw: asset.raw,
+          });
         assertCurrent();
       }
       assertCurrent();
@@ -920,99 +1160,404 @@ export class EditorApplication {
   }
 
   private captureSelectedArtwork() {
-    const source=this.activeDocument,roots=source.layerSelection.rootLayers;
-    if(!roots.length)throw new Error('Select artwork to save or copy first.');
-    const snapshot=source.toJSON(),copies=roots.map(layer=>{
-      const copy=structuredClone(captureFrequencyRadius(snapshot,layer.toJSON())),world=layerTransform(snapshot,layer.id)!.toJSON();
-      copy.x=world.e;copy.y=world.f;copy.transform={...world,e:0,f:0};return copy;
-    });
-    return{snapshot,copies};
+    const source = this.activeDocument,
+      roots = source.layerSelection.rootLayers;
+    if (!roots.length) throw new Error("Select artwork to save or copy first.");
+    const snapshot = source.toJSON(),
+      copies = roots.map((layer) => {
+        const copy = structuredClone(
+            captureFrequencyRadius(snapshot, layer.toJSON()),
+          ),
+          world = layerTransform(snapshot, layer.id)!.toJSON();
+        copy.x = world.e;
+        copy.y = world.f;
+        copy.transform = { ...world, e: 0, f: 0 };
+        return copy;
+      });
+    return { snapshot, copies };
   }
 
-  async saveArtworkToLibrary(metadata:ArtworkMetadata,control:{signal?:AbortSignal}={}) {
-    control.signal?.throwIfAborted();if(!this.artworkLibrary.getSnapshot().available)throw new Error('The local artwork library is unavailable.');
-    const {snapshot,copies}=this.captureSelectedArtwork(),base=new Document({name:'Saved artwork',width:snapshot.width,height:snapshot.height}).toJSON();
-    base.id=snapshot.id;base.children=copies;const registry=new ComponentRegistry(snapshot.components),roots=allLayers(copies).flatMap(node=>node.kind==='smart-object'?[node.componentId]:[]),reachable=new Set(roots.flatMap(key=>[...registry.reachableFrom(key)]));
-    base.components=[...reachable].map(key=>structuredClone(registry.get(key)));base.paragraphStyles=importParagraphStyles(snapshot,base,copies,id);
-    const fontFiles=fontFilesForArtwork(snapshot,base);if(fontFiles.length)base.fontFiles=fontFiles;
-    const capturedFonts=new Map(captureProjectFonts([base],this.assets.fonts).map(value=>[value.descriptor.report.faces[0].id,value]));
-    const captured=new Map([...referencedAssets(base)].map(key=>{const asset=this.assets.get(key);return[key,{id:asset.id,name:asset.name,width:asset.width,height:asset.height,blob:asset.blob,...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{})}] as const;}));
-    return this.artworkLibrary.save(()=>this.projectEncoder.encode(base,{fonts:{get(key){const font=capturedFonts.get(key);if(!font)throw new Error('Missing captured artwork font.');return font;}},get(key){const asset=captured.get(key);if(!asset)throw new Error('Missing captured artwork source.');return asset;}},{version:1,past:[],future:[]}),metadata,control.signal);
+  async saveArtworkToLibrary(
+    metadata: ArtworkMetadata,
+    control: { signal?: AbortSignal } = {},
+  ) {
+    control.signal?.throwIfAborted();
+    if (!this.artworkLibrary.getSnapshot().available)
+      throw new Error("The local artwork library is unavailable.");
+    const { snapshot, copies } = this.captureSelectedArtwork(),
+      base = new Document({
+        name: "Saved artwork",
+        width: snapshot.width,
+        height: snapshot.height,
+      }).toJSON();
+    base.id = snapshot.id;
+    base.children = copies;
+    const registry = new ComponentRegistry(snapshot.components),
+      roots = allLayers(copies).flatMap((node) =>
+        node.kind === "smart-object" ? [node.componentId] : [],
+      ),
+      reachable = new Set(
+        roots.flatMap((key) => [...registry.reachableFrom(key)]),
+      );
+    base.components = [...reachable].map((key) =>
+      structuredClone(registry.get(key)),
+    );
+    base.paragraphStyles = importParagraphStyles(snapshot, base, copies, id);
+    const fontFiles = fontFilesForArtwork(snapshot, base);
+    if (fontFiles.length) base.fontFiles = fontFiles;
+    const capturedFonts = new Map(
+      captureProjectFonts([base], this.assets.fonts).map((value) => [
+        value.descriptor.report.faces[0].id,
+        value,
+      ]),
+    );
+    const captured = new Map(
+      [...referencedAssets(base)].map((key) => {
+        const asset = this.assets.get(key);
+        return [
+          key,
+          {
+            id: asset.id,
+            name: asset.name,
+            width: asset.width,
+            height: asset.height,
+            blob: asset.blob,
+            ...(asset.tiff ? { tiff: { ...asset.tiff } } : {}),
+            ...(asset.avif ? { avif: { ...asset.avif } } : {}),
+            ...(asset.raw ? { raw: ownRawSource(asset.raw) } : {}),
+          },
+        ] as const;
+      }),
+    );
+    return this.artworkLibrary.save(
+      () =>
+        this.projectEncoder.encode(
+          base,
+          {
+            fonts: {
+              get(key) {
+                const font = capturedFonts.get(key);
+                if (!font) throw new Error("Missing captured artwork font.");
+                return font;
+              },
+            },
+            get(key) {
+              const asset = captured.get(key);
+              if (!asset) throw new Error("Missing captured artwork source.");
+              return asset;
+            },
+          },
+          { version: 1, past: [], future: [] },
+        ),
+      metadata,
+      control.signal,
+    );
   }
 
-  async placeLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}) {
-    const destination=this.activeSession,target=this.activeDocument,revision=target.getSnapshot().revision,lifetime=destination.assets.captureLifetime();
-    const check=()=>{control.signal?.throwIfAborted();lifetime();if(this.activeSession!==destination||!this.sessions.includes(destination)||target.getSnapshot().revision!==revision)throw new Error('The destination changed while artwork was preparing. Choose it again.');};
-    check();const value=await this.artworkLibrary.read(entryId,control.signal);check();const loaded=await loadProject(value.blob,{prepareImmutable:true});
-    try{check();return await this.copyArtworkTo(loaded.document,structuredClone(loaded.document.children),loaded.assets,target,{check,signal:control.signal,label:'Place library artwork',shareSources:true,commit:run=>this.artworkLibrary.commitPlacement(value,run,control.signal)});}finally{loaded.assets.dispose();}
+  async placeLibraryArtwork(
+    entryId: string,
+    control: { signal?: AbortSignal } = {},
+  ) {
+    const destination = this.activeSession,
+      target = this.activeDocument,
+      revision = target.getSnapshot().revision,
+      lifetime = destination.assets.captureLifetime();
+    const check = () => {
+      control.signal?.throwIfAborted();
+      lifetime();
+      if (
+        this.activeSession !== destination ||
+        !this.sessions.includes(destination) ||
+        target.getSnapshot().revision !== revision
+      )
+        throw new Error(
+          "The destination changed while artwork was preparing. Choose it again.",
+        );
+    };
+    check();
+    const value = await this.artworkLibrary.read(entryId, control.signal);
+    check();
+    const loaded = await loadProject(value.blob, { prepareImmutable: true });
+    try {
+      check();
+      return await this.copyArtworkTo(
+        loaded.document,
+        structuredClone(loaded.document.children),
+        loaded.assets,
+        target,
+        {
+          check,
+          signal: control.signal,
+          label: "Place library artwork",
+          shareSources: true,
+          commit: (run) =>
+            this.artworkLibrary.commitPlacement(value, run, control.signal),
+        },
+      );
+    } finally {
+      loaded.assets.dispose();
+    }
   }
 
   /** Private reference previews of retained states; never executes recorded commands. */
-  async previewHistory(position:number,control:{signal?:AbortSignal}={}):Promise<{before:Blob|null;after:Blob}> {
-    if(this.historyPreviewClosed)throw new Error('Editor is closed.');
+  async previewHistory(
+    position: number,
+    control: { signal?: AbortSignal } = {},
+  ): Promise<{ before: Blob | null; after: Blob }> {
+    if (this.historyPreviewClosed) throw new Error("Editor is closed.");
     control.signal?.throwIfAborted();
-    const target=this.document,snapshot=target.getSnapshot(),timeline=historyTimeline(snapshot);
-    if(!Number.isSafeInteger(position)||position<0||position>=timeline.length)throw new Error('History position is outside the retained timeline.');
-    const abort=new AbortController(),assets=new AssetStore(),renderer=new CanvasRenderer();
-    const cancel=()=>abort.abort(control.signal?.reason),check=()=>{
-      abort.signal.throwIfAborted();
-      if(this.historyPreviewClosed||this.document!==target||target.getSnapshot().revision!==snapshot.revision)
-        throw new Error('History changed during preview. Reload the timeline.');
-    },changed=()=>{try{check();}catch(cause){abort.abort(cause);}};
-    const stopDocument=target.subscribe(changed),stopEditor=this.subscribe(changed),disposeRenderer=()=>renderer.dispose();
-    control.signal?.addEventListener('abort',cancel,{once:true});abort.signal.addEventListener('abort',disposeRenderer,{once:true});this.historyPreviews.add(abort);
-    try {
-      check();const sourceIds=new Set([...referencedAssets(timeline[position].document),...(position?referencedAssets(timeline[position-1].document):[])]);for(const assetId of sourceIds)this.assetStore.shareTo(assets,assetId,assetId);
-      for(const state of [timeline[position].document,...(position?[timeline[position-1].document]:[])])for(const font of documentFontFiles(state)){this.assetStore.fonts.shareTo(assets.fonts,font.id);assets.fonts.activate(font.id);}
-      const render=async(document:import('./core/model').DocumentData)=>{
-        let canvas:HTMLCanvasElement|undefined;
+    const target = this.document,
+      snapshot = target.getSnapshot(),
+      timeline = historyTimeline(snapshot);
+    if (
+      !Number.isSafeInteger(position) ||
+      position < 0 ||
+      position >= timeline.length
+    )
+      throw new Error("History position is outside the retained timeline.");
+    const abort = new AbortController(),
+      assets = new AssetStore(),
+      renderer = new CanvasRenderer();
+    const cancel = () => abort.abort(control.signal?.reason),
+      check = () => {
+        abort.signal.throwIfAborted();
+        if (
+          this.historyPreviewClosed ||
+          this.document !== target ||
+          target.getSnapshot().revision !== snapshot.revision
+        )
+          throw new Error(
+            "History changed during preview. Reload the timeline.",
+          );
+      },
+      changed = () => {
         try {
-          check();canvas=await renderer.render(document,assets,{cache:false,scale:Math.min(1,512/document.width,512/document.height),maxPixels:512*512,maxDimension:512,isCancelled:()=>abort.signal.aborted});
-          check();const blob=await new Promise<Blob>((resolve,reject)=>canvas!.toBlob(value=>{if(abort.signal.aborted)reject(abort.signal.reason);else if(value)resolve(value);else reject(new Error('History preview could not be encoded.'));},'image/png'));
-          check();return blob;
-        }finally{if(canvas){canvas.width=0;canvas.height=0;}}
+          check();
+        } catch (cause) {
+          abort.abort(cause);
+        }
       };
-      const before=position?await render(timeline[position-1].document):null,after=await render(timeline[position].document);check();return{before,after};
-    }catch(cause){if(abort.signal.aborted)throw abort.signal.reason;throw cause;}finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);abort.signal.removeEventListener('abort',disposeRenderer);this.historyPreviews.delete(abort);renderer.dispose();assets.dispose();}
-  }
-
-  async previewHistoryComparison(id: string, control: {signal?: AbortSignal} = {}): Promise<HistoryComparisonPreview> {
-    if (this.historyPreviewClosed) throw new Error('Editor is closed.');
-    control.signal?.throwIfAborted();
-    const target = this.document, snapshot = target.getSnapshot(), comparison = snapshot.comparisons.find(value => value.id === id);
-    if (!comparison) throw new Error('History comparison not found.');
-    const abort = new AbortController(), assets = new AssetStore(), renderer = new CanvasRenderer();
-    const cancel = () => abort.abort(control.signal?.reason), check = () => {
-      abort.signal.throwIfAborted();
-      if (this.historyPreviewClosed || this.document !== target || target.getSnapshot().revision !== snapshot.revision)
-        throw new Error('History changed during comparison preview. Reload the timeline.');
-    }, changed = () => {try {check();} catch (cause) {abort.abort(cause);}};
-    const stopDocument = target.subscribe(changed), stopEditor = this.subscribe(changed), disposeRenderer = () => renderer.dispose();
-    control.signal?.addEventListener('abort', cancel, {once: true}); abort.signal.addEventListener('abort', disposeRenderer, {once: true}); this.historyPreviews.add(abort);
+    const stopDocument = target.subscribe(changed),
+      stopEditor = this.subscribe(changed),
+      disposeRenderer = () => renderer.dispose();
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    abort.signal.addEventListener("abort", disposeRenderer, { once: true });
+    this.historyPreviews.add(abort);
     try {
-      check(); const ids = new Set([...referencedAssets(comparison.before), ...referencedAssets(comparison.after)]);
-      for (const assetId of ids) this.assetStore.shareTo(assets, assetId, assetId);
-      for(const state of [comparison.before,comparison.after])for(const font of documentFontFiles(state)){this.assetStore.fonts.shareTo(assets.fonts,font.id);assets.fonts.activate(font.id);}
-      const value = await renderHistoryComparison(comparison, assets, renderer, check, () => abort.signal.aborted); check(); return value;
-    } catch (cause) {if (abort.signal.aborted) throw abort.signal.reason; throw cause;}
-    finally {stopDocument(); stopEditor(); control.signal?.removeEventListener('abort', cancel); abort.signal.removeEventListener('abort', disposeRenderer); this.historyPreviews.delete(abort); renderer.dispose(); assets.dispose();}
+      check();
+      const sourceIds = new Set([
+        ...referencedAssets(timeline[position].document),
+        ...(position ? referencedAssets(timeline[position - 1].document) : []),
+      ]);
+      for (const assetId of sourceIds)
+        this.assetStore.shareTo(assets, assetId, assetId);
+      for (const state of [
+        timeline[position].document,
+        ...(position ? [timeline[position - 1].document] : []),
+      ])
+        for (const font of documentFontFiles(state)) {
+          this.assetStore.fonts.shareTo(assets.fonts, font.id);
+          assets.fonts.activate(font.id);
+        }
+      const render = async (document: import("./core/model").DocumentData) => {
+        let canvas: HTMLCanvasElement | undefined;
+        try {
+          check();
+          canvas = await renderer.render(document, assets, {
+            cache: false,
+            scale: Math.min(1, 512 / document.width, 512 / document.height),
+            maxPixels: 512 * 512,
+            maxDimension: 512,
+            isCancelled: () => abort.signal.aborted,
+          });
+          check();
+          const blob = await new Promise<Blob>((resolve, reject) =>
+            canvas!.toBlob((value) => {
+              if (abort.signal.aborted) reject(abort.signal.reason);
+              else if (value) resolve(value);
+              else reject(new Error("History preview could not be encoded."));
+            }, "image/png"),
+          );
+          check();
+          return blob;
+        } finally {
+          if (canvas) {
+            canvas.width = 0;
+            canvas.height = 0;
+          }
+        }
+      };
+      const before = position
+          ? await render(timeline[position - 1].document)
+          : null,
+        after = await render(timeline[position].document);
+      check();
+      return { before, after };
+    } catch (cause) {
+      if (abort.signal.aborted) throw abort.signal.reason;
+      throw cause;
+    } finally {
+      stopDocument();
+      stopEditor();
+      control.signal?.removeEventListener("abort", cancel);
+      abort.signal.removeEventListener("abort", disposeRenderer);
+      this.historyPreviews.delete(abort);
+      renderer.dispose();
+      assets.dispose();
+    }
   }
 
-  async previewLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}):Promise<Blob> {
-    const value=await this.artworkLibrary.read(entryId,control.signal),loaded=await loadProject(value.blob,{prepareImmutable:true}),renderer=new CanvasRenderer();let canvas:HTMLCanvasElement|undefined;
-    try{control.signal?.throwIfAborted();canvas=await renderer.render(loaded.document,loaded.assets,{cache:false,scale:Math.min(1,256/loaded.document.width,256/loaded.document.height),maxPixels:65536,maxDimension:256,isCancelled:()=>!!control.signal?.aborted});control.signal?.throwIfAborted();const blob=await new Promise<Blob>((resolve,reject)=>canvas!.toBlob(blob=>{if(control.signal?.aborted)reject(control.signal.reason);else if(blob)resolve(blob);else reject(new Error('Artwork preview could not be encoded.'));},'image/png'));await this.artworkLibrary.commitPlacement(value,()=>{},control.signal);return blob;}
-    finally{if(canvas){canvas.width=0;canvas.height=0;}renderer.dispose();loaded.assets.dispose();}
+  async previewHistoryComparison(
+    id: string,
+    control: { signal?: AbortSignal } = {},
+  ): Promise<HistoryComparisonPreview> {
+    if (this.historyPreviewClosed) throw new Error("Editor is closed.");
+    control.signal?.throwIfAborted();
+    const target = this.document,
+      snapshot = target.getSnapshot(),
+      comparison = snapshot.comparisons.find((value) => value.id === id);
+    if (!comparison) throw new Error("History comparison not found.");
+    const abort = new AbortController(),
+      assets = new AssetStore(),
+      renderer = new CanvasRenderer();
+    const cancel = () => abort.abort(control.signal?.reason),
+      check = () => {
+        abort.signal.throwIfAborted();
+        if (
+          this.historyPreviewClosed ||
+          this.document !== target ||
+          target.getSnapshot().revision !== snapshot.revision
+        )
+          throw new Error(
+            "History changed during comparison preview. Reload the timeline.",
+          );
+      },
+      changed = () => {
+        try {
+          check();
+        } catch (cause) {
+          abort.abort(cause);
+        }
+      };
+    const stopDocument = target.subscribe(changed),
+      stopEditor = this.subscribe(changed),
+      disposeRenderer = () => renderer.dispose();
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    abort.signal.addEventListener("abort", disposeRenderer, { once: true });
+    this.historyPreviews.add(abort);
+    try {
+      check();
+      const ids = new Set([
+        ...referencedAssets(comparison.before),
+        ...referencedAssets(comparison.after),
+      ]);
+      for (const assetId of ids)
+        this.assetStore.shareTo(assets, assetId, assetId);
+      for (const state of [comparison.before, comparison.after])
+        for (const font of documentFontFiles(state)) {
+          this.assetStore.fonts.shareTo(assets.fonts, font.id);
+          assets.fonts.activate(font.id);
+        }
+      const value = await renderHistoryComparison(
+        comparison,
+        assets,
+        renderer,
+        check,
+        () => abort.signal.aborted,
+      );
+      check();
+      return value;
+    } catch (cause) {
+      if (abort.signal.aborted) throw abort.signal.reason;
+      throw cause;
+    } finally {
+      stopDocument();
+      stopEditor();
+      control.signal?.removeEventListener("abort", cancel);
+      abort.signal.removeEventListener("abort", disposeRenderer);
+      this.historyPreviews.delete(abort);
+      renderer.dispose();
+      assets.dispose();
+    }
+  }
+
+  async previewLibraryArtwork(
+    entryId: string,
+    control: { signal?: AbortSignal } = {},
+  ): Promise<Blob> {
+    const value = await this.artworkLibrary.read(entryId, control.signal),
+      loaded = await loadProject(value.blob, { prepareImmutable: true }),
+      renderer = new CanvasRenderer();
+    let canvas: HTMLCanvasElement | undefined;
+    try {
+      control.signal?.throwIfAborted();
+      canvas = await renderer.render(loaded.document, loaded.assets, {
+        cache: false,
+        scale: Math.min(
+          1,
+          256 / loaded.document.width,
+          256 / loaded.document.height,
+        ),
+        maxPixels: 65536,
+        maxDimension: 256,
+        isCancelled: () => !!control.signal?.aborted,
+      });
+      control.signal?.throwIfAborted();
+      const blob = await new Promise<Blob>((resolve, reject) =>
+        canvas!.toBlob((blob) => {
+          if (control.signal?.aborted) reject(control.signal.reason);
+          else if (blob) resolve(blob);
+          else reject(new Error("Artwork preview could not be encoded."));
+        }, "image/png"),
+      );
+      await this.artworkLibrary.commitPlacement(
+        value,
+        () => {},
+        control.signal,
+      );
+      return blob;
+    } finally {
+      if (canvas) {
+        canvas.width = 0;
+        canvas.height = 0;
+      }
+      renderer.dispose();
+      loaded.assets.dispose();
+    }
   }
 
   async copySelectedLayersTo(target: Document) {
-    if(this.activeDocument===target)throw new Error('Choose another open document as the copy destination.');
-    const {snapshot,copies}=this.captureSelectedArtwork();return this.copyArtworkTo(snapshot,copies,this.assets,target);
+    if (this.activeDocument === target)
+      throw new Error("Choose another open document as the copy destination.");
+    const { snapshot, copies } = this.captureSelectedArtwork();
+    return this.copyArtworkTo(snapshot, copies, this.assets, target);
   }
 
-  private async copyArtworkTo(snapshot:import('./core/model').DocumentData,copies:import('./core/model').LayerData[],sourceAssets:AssetStore,target:Document,control:{check?():void;signal?:AbortSignal;label?:string;shareSources?:boolean;commit?(run:()=>void):Promise<void>}={}) {
-    const destination=this.sessions.find(session=>session.document===target);if(!destination)throw new Error('Choose an open document as the copy destination.');
+  private async copyArtworkTo(
+    snapshot: import("./core/model").DocumentData,
+    copies: import("./core/model").LayerData[],
+    sourceAssets: AssetStore,
+    target: Document,
+    control: {
+      check?(): void;
+      signal?: AbortSignal;
+      label?: string;
+      shareSources?: boolean;
+      commit?(run: () => void): Promise<void>;
+    } = {},
+  ) {
+    const destination = this.sessions.find(
+      (session) => session.document === target,
+    );
+    if (!destination)
+      throw new Error("Choose an open document as the copy destination.");
     const registry = new ComponentRegistry(snapshot.components);
-    const paragraphStyles=importParagraphStyles(snapshot,target._read(),copies,id);
+    const paragraphStyles = importParagraphStyles(
+      snapshot,
+      target._read(),
+      copies,
+      id,
+    );
     const componentRoots = allLayers(copies).flatMap((node) =>
       node.kind === "smart-object" ? [node.componentId] : [],
     );
@@ -1023,7 +1568,13 @@ export class EditorApplication {
       [...reachable].map((key) => [key, id()]),
     );
     const definitions = registry.copyDefinitions(componentRoots, componentIds);
-    const fontFiles=fontFilesForArtwork(snapshot,{...snapshot,fontFiles:undefined,children:copies,components:definitions,paragraphStyles});
+    const fontFiles = fontFilesForArtwork(snapshot, {
+      ...snapshot,
+      fontFiles: undefined,
+      children: copies,
+      components: definitions,
+      paragraphStyles,
+    });
     const assetIds = referencedAssets({
       ...snapshot,
       children: copies,
@@ -1035,7 +1586,9 @@ export class EditorApplication {
     const revision = target.getSnapshot().revision;
     const assertLifetime = destination.assets.captureLifetime();
     const assertTarget = () => {
-      control.signal?.throwIfAborted();control.check?.();assertLifetime();
+      control.signal?.throwIfAborted();
+      control.check?.();
+      assertLifetime();
       if (
         !this.sessions.includes(destination) ||
         target.getSnapshot().revision !== revision
@@ -1050,7 +1603,7 @@ export class EditorApplication {
     ) => {
       const layerIds = new Map<string, string>();
       for (const node of allLayers(layers)) {
-        remapLayerAssets(node,replacements);
+        remapLayerAssets(node, replacements);
         const previousId = node.id;
         node.id = id();
         layerIds.set(previousId, node.id);
@@ -1091,8 +1644,11 @@ export class EditorApplication {
       } // Master references were already remapped by the registry.
     }
     const commands: import("./core/commands").EditorCommand[] = [
-      ...fontFiles.map(file=>({type:'font.file.add' as const,file})),
-      ...paragraphStyles.map(style=>({type:'paragraphStyle.set' as const,style})),
+      ...fontFiles.map((file) => ({ type: "font.file.add" as const, file })),
+      ...paragraphStyles.map((style) => ({
+        type: "paragraphStyle.set" as const,
+        style,
+      })),
       ...(definitions.length
         ? [
             {
@@ -1108,26 +1664,31 @@ export class EditorApplication {
     ];
     const command = {
       type: "transaction" as const,
-      label: control.label??"Copy artwork from document",
+      label: control.label ?? "Copy artwork from document",
       commands,
     };
     execute(target.toJSON(), command); // Validate the entire target before decoding or publishing images.
     const staging = new AssetStore(),
       installed = new Set<string>();
     let committed = false;
-    const fontLeases:import('./fonts/store').FontSourceLease[]=[];
+    const fontLeases: import("./fonts/store").FontSourceLease[] = [];
     try {
       // Independent leases are acquired before image decoding yields, so closing
       // the source cannot change the captured artwork's native font identity.
-      for(const file of fontFiles)fontLeases.push(sourceAssets.fonts.stageTo(destination.assets.fonts,file.id));
-      for (const asset of originals) {
-        const copy = control.shareSources?sourceAssets.shareTo(staging,asset.id,replacements.get(asset.id)!):await staging.add(
-          asset.blob,
-          asset.name,
-          replacements.get(asset.id)!,
-          false,
-          {tiff:asset.tiff,avif:asset.avif,raw:asset.raw},
+      for (const file of fontFiles)
+        fontLeases.push(
+          sourceAssets.fonts.stageTo(destination.assets.fonts, file.id),
         );
+      for (const asset of originals) {
+        const copy = control.shareSources
+          ? sourceAssets.shareTo(staging, asset.id, replacements.get(asset.id)!)
+          : await staging.add(
+              asset.blob,
+              asset.name,
+              replacements.get(asset.id)!,
+              false,
+              { tiff: asset.tiff, avif: asset.avif, raw: asset.raw },
+            );
         if (copy.width !== asset.width || copy.height !== asset.height)
           throw new Error(
             "Copied image dimensions do not match the captured source.",
@@ -1136,24 +1697,41 @@ export class EditorApplication {
       }
       assertTarget();
       for (const asset of staging.values()) {
-        if(control.shareSources)staging.shareTo(destination.assets,asset.id,asset.id);
+        if (control.shareSources)
+          staging.shareTo(destination.assets, asset.id, asset.id);
         else destination.assets.install(asset, false);
         installed.add(asset.id);
       }
-      const publish=()=>{assertTarget();try{target._dispatch(command);}finally{committed=target.getSnapshot().revision!==revision;}};
-      try{
-        if(control.commit)await control.commit(publish);else publish();
+      const publish = () => {
+        assertTarget();
+        try {
+          target._dispatch(command);
+        } finally {
+          committed = target.getSnapshot().revision !== revision;
+        }
+      };
+      try {
+        if (control.commit) await control.commit(publish);
+        else publish();
         const layers = copies.map((copy) => target.getLayer(copy.id)!);
         target.selectLayers(layers);
         return layers;
-      }catch(error){if(committed)throw new Error('Artwork was placed, but a listener or acknowledgement failed. Inspect the document before retrying.',{cause:error});throw error;}
+      } catch (error) {
+        if (committed)
+          throw new Error(
+            "Artwork was placed, but a listener or acknowledgement failed. Inspect the document before retrying.",
+            { cause: error },
+          );
+        throw error;
+      }
     } finally {
-      for(const lease of fontLeases)lease.release();
+      for (const lease of fontLeases) lease.release();
       if (!committed)
         for (const key of installed) destination.assets.remove(key);
-      if(control.shareSources)staging.dispose();
-      else{
-        for (const asset of staging.values())if (!installed.has(asset.id)) asset.bitmap.close();
+      if (control.shareSources) staging.dispose();
+      else {
+        for (const asset of staging.values())
+          if (!installed.has(asset.id)) asset.bitmap.close();
         staging.metadata.dispose();
       }
     }
@@ -1193,8 +1771,8 @@ export class EditorApplication {
   get analysis() {
     return this.assets.analysis;
   }
-  preflight(options:PreflightOptions={},control:PreflightControl={}){
-    return this.document.preflight(options,control);
+  preflight(options: PreflightOptions = {}, control: PreflightControl = {}) {
+    return this.document.preflight(options, control);
   }
   get colorProfile(): StandardRgbSpaceId {
     return this.currentProfileId;
@@ -1203,96 +1781,330 @@ export class EditorApplication {
     return this.activeSession.softProof;
   }
 
-  get colorSettings():ColorSettings { return this.activeSession.colorSettings; }
-  private precisionJob:AbortController|null=null;
-  get floatConversionIssue():string|null{
-    const document=this.document._read();if(isFloatDocument(document))return'This document already uses 32-bit linear editing.';const issue=floatSceneIssue(document);if(issue)return issue;
-    const rasters=allLayers(document.children).filter(layer=>layer.kind==='raster');
-    for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff)return'Float editing requires retained original unsigned 16-bit or float32 TIFF raster sources.';}return null;
+  get colorSettings(): ColorSettings {
+    return this.activeSession.colorSettings;
   }
-  async convertDocumentToFloat(control:FloatSourceControl={},value?:ColorSettings):Promise<void>{
-    const beforeSettings=this.colorSettings,settings=normalizeColorSettings(value??beforeSettings);
-    const issue=this.floatConversionIssue;if(issue)throw new Error(issue);control.signal?.throwIfAborted();this.precisionJob?.abort(new Error('Precision preparation was replaced.'));
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason),document=this.document,assets=this.assets,revision=document.getSnapshot().revision,generation=this.ioGeneration,alive=assets.captureLifetime();this.precisionJob=abort;control.signal?.addEventListener('abort',cancel,{once:true});
-    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||this.precisionJob!==abort||this.document!==document||this.assets!==assets||this.ioGeneration!==generation||document.getSnapshot().revision!==revision||this.colorSettings!==beforeSettings)throw new Error('The document or color settings changed during float preparation. Try again.');};
-    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
-    const installed=new Map<string,import('./core/assets').ImageAsset>();
-    try{
-      check();const originals=allLayers(document._read().children).filter(layer=>layer.kind==='raster').map(layer=>({layer,source:captureAssetSource(assets,layer.assetId)})),replacements=new Map<string,string>(),stagedChecks:(()=>void)[]=[];
-      for(const {layer,source} of originals){
-        source.check();if(source.asset.tiffColor||replacements.has(layer.assetId))continue;
-        const asset=await assets.add(source.asset.blob,source.asset.name,undefined,false,{tiff:{...source.asset.tiff!,editingPrecision:'float32'},signal:abort.signal,onProgress:check});installed.set(asset.id,asset);stagedChecks.push(captureAssetSource(assets,asset.id).check);check();source.check();
-        if(asset.width!==source.asset.width||asset.height!==source.asset.height)throw new Error('Original TIFF geometry differs from the byte editing source.');
-        replacements.set(layer.assetId,asset.id);
+  private precisionJob: AbortController | null = null;
+  get floatConversionIssue(): string | null {
+    const document = this.document._read();
+    if (isFloatDocument(document))
+      return "This document already uses 32-bit linear editing.";
+    const issue = floatSceneIssue(document);
+    if (issue) return issue;
+    const rasters = allLayers(document.children).filter(
+      (layer) => layer.kind === "raster",
+    );
+    for (const raster of rasters) {
+      const asset = this.assets.get(raster.assetId);
+      if (!asset.tiff)
+        return "Float editing requires retained original unsigned 16-bit or float32 TIFF raster sources.";
+    }
+    return null;
+  }
+  async convertDocumentToFloat(
+    control: FloatSourceControl = {},
+    value?: ColorSettings,
+  ): Promise<void> {
+    const beforeSettings = this.colorSettings,
+      settings = normalizeColorSettings(value ?? beforeSettings);
+    const issue = this.floatConversionIssue;
+    if (issue) throw new Error(issue);
+    control.signal?.throwIfAborted();
+    this.precisionJob?.abort(new Error("Precision preparation was replaced."));
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason),
+      document = this.document,
+      assets = this.assets,
+      revision = document.getSnapshot().revision,
+      generation = this.ioGeneration,
+      alive = assets.captureLifetime();
+    this.precisionJob = abort;
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    const check = () => {
+      abort.signal.throwIfAborted();
+      alive();
+      if (
+        this.retouchDisposed ||
+        this.precisionJob !== abort ||
+        this.document !== document ||
+        this.assets !== assets ||
+        this.ioGeneration !== generation ||
+        document.getSnapshot().revision !== revision ||
+        this.colorSettings !== beforeSettings
+      )
+        throw new Error(
+          "The document or color settings changed during float preparation. Try again.",
+        );
+    };
+    const changed = () => {
+        try {
+          check();
+        } catch (error) {
+          abort.abort(error);
+        }
+      },
+      stopDocument = document.subscribe(changed),
+      stopEditor = this.subscribe(changed);
+    const installed = new Map<string, import("./core/assets").ImageAsset>();
+    try {
+      check();
+      const originals = allLayers(document._read().children)
+          .filter((layer) => layer.kind === "raster")
+          .map((layer) => ({
+            layer,
+            source: captureAssetSource(assets, layer.assetId),
+          })),
+        replacements = new Map<string, string>(),
+        stagedChecks: (() => void)[] = [];
+      for (const { layer, source } of originals) {
+        source.check();
+        if (source.asset.tiffColor || replacements.has(layer.assetId)) continue;
+        const asset = await assets.add(
+          source.asset.blob,
+          source.asset.name,
+          undefined,
+          false,
+          {
+            tiff: { ...source.asset.tiff!, editingPrecision: "float32" },
+            signal: abort.signal,
+            onProgress: check,
+          },
+        );
+        installed.set(asset.id, asset);
+        stagedChecks.push(captureAssetSource(assets, asset.id).check);
+        check();
+        source.check();
+        if (
+          asset.width !== source.asset.width ||
+          asset.height !== source.asset.height
+        )
+          throw new Error(
+            "Original TIFF geometry differs from the byte editing source.",
+          );
+        replacements.set(layer.assetId, asset.id);
       }
-      const command:import('./core/commands').EditorCommand={type:'document.precision.float',...(replacements.size?{sources:originals.filter(({layer})=>replacements.has(layer.assetId)).map(({layer})=>({layerId:layer.id,assetId:replacements.get(layer.assetId)!}))}:{})};
-      const candidate=execute(document._read(),command),scene=await this.renderer.captureFloatScene(candidate,assets,{signal:abort.signal,onProgress:progress=>{check();control.onProgress?.(progress);check();}});scene.dispose();check();for(const {source} of originals)source.check();
-      const warnings=await preflightColorSettings(settings,{signal:abort.signal,onProgress:check},check,true);check();for(const {source} of originals)source.check();for(const stagedCheck of stagedChecks)stagedCheck();
-      stopDocument();stopEditor();this.precisionJob=null;document._dispatch(command);this.commitColorSettings(settings,warnings);
-    }finally{
-      stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);if(this.precisionJob===abort)this.precisionJob=null;
-      const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));
-      for(const [key,asset] of installed)if(!retained.has(key)&&assets.has(key)&&assets.get(key)===asset)assets.remove(key);
+      const command: import("./core/commands").EditorCommand = {
+        type: "document.precision.float",
+        ...(replacements.size
+          ? {
+              sources: originals
+                .filter(({ layer }) => replacements.has(layer.assetId))
+                .map(({ layer }) => ({
+                  layerId: layer.id,
+                  assetId: replacements.get(layer.assetId)!,
+                })),
+            }
+          : {}),
+      };
+      const candidate = execute(document._read(), command),
+        scene = await this.renderer.captureFloatScene(candidate, assets, {
+          signal: abort.signal,
+          onProgress: (progress) => {
+            check();
+            control.onProgress?.(progress);
+            check();
+          },
+        });
+      scene.dispose();
+      check();
+      for (const { source } of originals) source.check();
+      const warnings = await preflightColorSettings(
+        settings,
+        { signal: abort.signal, onProgress: check },
+        check,
+        true,
+      );
+      check();
+      for (const { source } of originals) source.check();
+      for (const stagedCheck of stagedChecks) stagedCheck();
+      stopDocument();
+      stopEditor();
+      this.precisionJob = null;
+      document._dispatch(command);
+      this.commitColorSettings(settings, warnings);
+    } finally {
+      stopDocument();
+      stopEditor();
+      control.signal?.removeEventListener("abort", cancel);
+      if (this.precisionJob === abort) this.precisionJob = null;
+      const state = document.getSnapshot(),
+        retained = new Set(
+          retainedDocuments(
+            state.document,
+            captureRetainedHistory(state),
+          ).flatMap((value) => [...referencedAssets(value)]),
+        );
+      for (const [key, asset] of installed)
+        if (!retained.has(key) && assets.has(key) && assets.get(key) === asset)
+          assets.remove(key);
     }
   }
-  get colorWarnings():readonly string[] { return this.activeSession.colorWarnings; }
-  inspectColorProfile(source:Blob,name?:string,control:IccControl={}) { return IccProfile.inspect(source,name,control); }
-  private colorRequest=0;
+  get colorWarnings(): readonly string[] {
+    return this.activeSession.colorWarnings;
+  }
+  inspectColorProfile(source: Blob, name?: string, control: IccControl = {}) {
+    return IccProfile.inspect(source, name, control);
+  }
+  private colorRequest = 0;
   /** Trusted host preferences; preflight both transforms before publishing anything. */
-  async setColorSettings(value:ColorSettings,control:IccControl={}):Promise<readonly string[]> {
-    const settings=normalizeColorSettings(value),session=this.activeSession,before=session.colorSettings,request=++this.colorRequest,generation=this.ioGeneration;
-    const warnings:string[]=[];
-    const current=()=>{control.signal?.throwIfAborted();if(this.retouchDisposed||this.activeSession!==session||session.colorSettings!==before||this.ioGeneration!==generation||request!==this.colorRequest)throw new Error('The active document or color settings changed. Apply again from the current tab.');};
+  async setColorSettings(
+    value: ColorSettings,
+    control: IccControl = {},
+  ): Promise<readonly string[]> {
+    const settings = normalizeColorSettings(value),
+      session = this.activeSession,
+      before = session.colorSettings,
+      request = ++this.colorRequest,
+      generation = this.ioGeneration;
+    const warnings: string[] = [];
+    const current = () => {
+      control.signal?.throwIfAborted();
+      if (
+        this.retouchDisposed ||
+        this.activeSession !== session ||
+        session.colorSettings !== before ||
+        this.ioGeneration !== generation ||
+        request !== this.colorRequest
+      )
+        throw new Error(
+          "The active document or color settings changed. Apply again from the current tab.",
+        );
+    };
     current();
-    warnings.push(...await preflightColorSettings(settings,control,current,this.document.precision==='float32'));
-    current();this.commitColorSettings(settings,[...new Set(warnings)]);return this.colorWarnings;
+    warnings.push(
+      ...(await preflightColorSettings(
+        settings,
+        control,
+        current,
+        this.document.precision === "float32",
+      )),
+    );
+    current();
+    this.commitColorSettings(settings, [...new Set(warnings)]);
+    return this.colorWarnings;
   }
-  private commitColorSettings(settings:ColorSettings,warnings:readonly string[]=[]){
-    this.activeSession.colorSettings=settings;this.activeSession.colorWarnings=Object.freeze([...warnings]);
-    this.currentProfileId=typeof settings.output.profile==='string'?settings.output.profile:'srgb';this.activeSession.colorProfile=this.currentProfileId;
-    const proof=settings.proof;
-    this.currentSoftProof=this.legacyProofMirror(proof);
-    this.activeSession.softProof=this.currentSoftProof;
-    this.renderer.resetView();this.publish();
+  private commitColorSettings(
+    settings: ColorSettings,
+    warnings: readonly string[] = [],
+  ) {
+    this.activeSession.colorSettings = settings;
+    this.activeSession.colorWarnings = Object.freeze([...warnings]);
+    this.currentProfileId =
+      typeof settings.output.profile === "string"
+        ? settings.output.profile
+        : "srgb";
+    this.activeSession.colorProfile = this.currentProfileId;
+    const proof = settings.proof;
+    this.currentSoftProof = this.legacyProofMirror(proof);
+    this.activeSession.softProof = this.currentSoftProof;
+    this.renderer.resetView();
+    this.publish();
   }
-  private legacyProofMirror(proof:ColorSettings['proof']):SoftProofOptions|null{
-    if(!proof||typeof proof.profile!=='string')return null;
-    const warningColor=proof.warningColor.slice(1).match(/../g)!.map(value=>parseInt(value,16));
-    return {proofSpace:proof.profile,intent:proof.proofIntent,gamutWarning:proof.gamutWarning,...(proof.warningColor!=='#00ffff'?{warningColor:[...warningColor,255] as [number,number,number,number]}:{})};
+  private legacyProofMirror(
+    proof: ColorSettings["proof"],
+  ): SoftProofOptions | null {
+    if (!proof || typeof proof.profile !== "string") return null;
+    const warningColor = proof.warningColor
+      .slice(1)
+      .match(/../g)!
+      .map((value) => parseInt(value, 16));
+    return {
+      proofSpace: proof.profile,
+      intent: proof.proofIntent,
+      gamutWarning: proof.gamutWarning,
+      ...(proof.warningColor !== "#00ffff"
+        ? {
+            warningColor: [...warningColor, 255] as [
+              number,
+              number,
+              number,
+              number,
+            ],
+          }
+        : {}),
+    };
   }
-  private legacyColorSettings(profile:StandardRgbSpaceId,proof:SoftProofOptions|null,warnings:string[]=[]):ColorSettings{
-    if(proof?.intent==='unclipped'){warnings.push('Legacy soft proof was disabled: “unclipped” is not an ICC rendering intent. Choose a proof intent in Color Settings.');proof=null;}
-    const warningColor=proof?.warningColor?'#'+proof.warningColor.slice(0,3).map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''):'#00ffff';
-    return normalizeColorSettings({output:{profile,intent:'relative-colorimetric',blackPointCompensation:false},proof:proof?{profile:proof.proofSpace,intent:'relative-colorimetric',proofIntent:proof.intent as import('./core/color/icc-types').IccIntent,blackPointCompensation:false,gamutWarning:proof.gamutWarning,warningColor}:null});
+  private legacyColorSettings(
+    profile: StandardRgbSpaceId,
+    proof: SoftProofOptions | null,
+    warnings: string[] = [],
+  ): ColorSettings {
+    if (proof?.intent === "unclipped") {
+      warnings.push(
+        "Legacy soft proof was disabled: “unclipped” is not an ICC rendering intent. Choose a proof intent in Color Settings.",
+      );
+      proof = null;
+    }
+    const warningColor = proof?.warningColor
+      ? "#" +
+        proof.warningColor
+          .slice(0, 3)
+          .map((v) => Math.round(v).toString(16).padStart(2, "0"))
+          .join("")
+      : "#00ffff";
+    return normalizeColorSettings({
+      output: {
+        profile,
+        intent: "relative-colorimetric",
+        blackPointCompensation: false,
+      },
+      proof: proof
+        ? {
+            profile: proof.proofSpace,
+            intent: "relative-colorimetric",
+            proofIntent:
+              proof.intent as import("./core/color/icc-types").IccIntent,
+            blackPointCompensation: false,
+            gamutWarning: proof.gamutWarning,
+            warningColor,
+          }
+        : null,
+    });
   }
   /** Compatibility alias: chooses an output preset; does not assign a working space. */
-  setColorProfile(profileId:StandardRgbSpaceId):void{
-    this.commitColorSettings(normalizeColorSettings({...this.colorSettings,output:{...this.colorSettings.output,profile:profileId}}));
+  setColorProfile(profileId: StandardRgbSpaceId): void {
+    this.commitColorSettings(
+      normalizeColorSettings({
+        ...this.colorSettings,
+        output: { ...this.colorSettings.output, profile: profileId },
+      }),
+    );
   }
-  setSoftProof(options:SoftProofOptions|null):void{
-    if(options?.intent==='unclipped')throw new Error('“unclipped” is not an ICC rendering intent. Choose a supported proof intent.');
-    const legacy=this.legacyColorSettings(this.currentProfileId,options);
-    this.commitColorSettings(normalizeColorSettings({...this.colorSettings,proof:legacy.proof}));
+  setSoftProof(options: SoftProofOptions | null): void {
+    if (options?.intent === "unclipped")
+      throw new Error(
+        "“unclipped” is not an ICC rendering intent. Choose a supported proof intent.",
+      );
+    const legacy = this.legacyColorSettings(this.currentProfileId, options);
+    this.commitColorSettings(
+      normalizeColorSettings({ ...this.colorSettings, proof: legacy.proof }),
+    );
   }
 
-  async selectSubject(options?: SelectSubjectOptions,control?:SelectSubjectControl): Promise<SelectionData> {
-    return this.activeDocument.selectSubject(options,control);
+  async selectSubject(
+    options?: SelectSubjectOptions,
+    control?: SelectSubjectControl,
+  ): Promise<SelectionData> {
+    return this.activeDocument.selectSubject(options, control);
   }
 
   async removeBackground(
     targetLayer?: RasterLayer,
     options?: RefineEdgeOptions,
-    control?:RefineEdgeControl,
+    control?: RefineEdgeControl,
   ): Promise<RasterLayer> {
-    return this.activeDocument.removeBackground(targetLayer, options,control);
+    return this.activeDocument.removeBackground(targetLayer, options, control);
   }
 
-  async refineEdge(options: RefineEdgeOptions = {},control?:RefineEdgeControl): Promise<LayerMask> {
+  async refineEdge(
+    options: RefineEdgeOptions = {},
+    control?: RefineEdgeControl,
+  ): Promise<LayerMask> {
     const layer = this.activeDocument.selectedLayer;
     if (!(layer instanceof RasterLayer)) {
       throw new Error("Select a raster layer to refine its edge.");
     }
-    return layer.refineEdge(options,control);
+    return layer.refineEdge(options, control);
   }
 
   getSnapshot = () => this.snapshot;
@@ -1307,10 +2119,12 @@ export class EditorApplication {
       document: this.activeDocument,
       assets: this.assets,
       state: this.activeDocument.getSnapshot(),
-      colorSettings:this.activeSession?.colorSettings,
-      colorWarnings:this.activeSession?.colorWarnings,
+      colorSettings: this.activeSession?.colorSettings,
+      colorWarnings: this.activeSession?.colorWarnings,
       colorProfile: this.currentProfileId,
-      softProof: this.activeSession?this.activeSession.softProof:this.currentSoftProof,
+      softProof: this.activeSession
+        ? this.activeSession.softProof
+        : this.currentSoftProof,
       sessions: this.sessions?.map((session) => ({
         id: session.id,
         document: session.document,
@@ -1358,17 +2172,46 @@ export class EditorApplication {
     this.publish();
   }
 
-  private async prepareBoolean(document:Document,request:VectorBooleanRequest,control:VectorBooleanControl,check:()=>void):Promise<VectorBooleanResult>{
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-    control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+  private async prepareBoolean(
+    document: Document,
+    request: VectorBooleanRequest,
+    control: VectorBooleanControl,
+    check: () => void,
+  ): Promise<VectorBooleanResult> {
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.throwIfAborted();
+    control.signal?.addEventListener("abort", cancel, { once: true });
     this.booleanControllers.add(abort);
-    const verify=()=>{try{check();}catch(error){abort.abort(error);}};
-    const stopDocument=document.subscribe(verify),stopSession=this.subscribe(verify),stopPermissions=this.plugins.subscribe(verify);
-    try{return await prepareVectorBoolean(request,{...control,signal:abort.signal},()=>{verify();abort.signal.throwIfAborted();});}
-    finally{stopDocument();stopSession();stopPermissions();this.booleanControllers.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+    const verify = () => {
+      try {
+        check();
+      } catch (error) {
+        abort.abort(error);
+      }
+    };
+    const stopDocument = document.subscribe(verify),
+      stopSession = this.subscribe(verify),
+      stopPermissions = this.plugins.subscribe(verify);
+    try {
+      return await prepareVectorBoolean(
+        request,
+        { ...control, signal: abort.signal },
+        () => {
+          verify();
+          abort.signal.throwIfAborted();
+        },
+      );
+    } finally {
+      stopDocument();
+      stopSession();
+      stopPermissions();
+      this.booleanControllers.delete(abort);
+      control.signal?.removeEventListener("abort", cancel);
+    }
   }
   private createSession(document: Document, assets: AssetStore) {
-    document._setDefaultHistoryOrigin({surface:'editor'});
+    document._setDefaultHistoryOrigin({ surface: "editor" });
     if (
       this.sessions.some(
         (session) => session.document === document || session.assets === assets,
@@ -1377,68 +2220,224 @@ export class EditorApplication {
       throw new Error(
         "Each document session must own an independent document and asset store.",
       );
-    document._prepareRawDevelopment=async(layerId,settings,control)=>{
+    document._prepareRawDevelopment = async (layerId, settings, control) => {
       control.signal?.throwIfAborted();
-      for(const job of this.rawJobs)job.abort(new Error('RAW preparation was replaced.'));
-      const generation=this.ioGeneration,revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-      control.signal?.addEventListener('abort',cancel,{once:true});this.rawJobs.add(abort);
-      const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during RAW development. Try again.');};
-      const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
-      try{return await developRawComponent(document,assets,layerId,{allowPrecisionLoss:control.allowPrecisionLoss??false,development:settings},{signal:abort.signal,onProgress:control.onProgress},check,()=>{stopDocument();stopEditor();});}
-      finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);this.rawJobs.delete(abort);}
+      for (const job of this.rawJobs)
+        job.abort(new Error("RAW preparation was replaced."));
+      const generation = this.ioGeneration,
+        revision = document.getSnapshot().revision,
+        alive = assets.captureLifetime(),
+        abort = new AbortController(),
+        cancel = () => abort.abort(control.signal?.reason);
+      control.signal?.addEventListener("abort", cancel, { once: true });
+      this.rawJobs.add(abort);
+      const check = () => {
+        abort.signal.throwIfAborted();
+        alive();
+        if (
+          this.retouchDisposed ||
+          this.ioGeneration !== generation ||
+          this.document !== document ||
+          this.assets !== assets ||
+          document.getSnapshot().revision !== revision ||
+          !this.sessions.some((session) => session.document === document)
+        )
+          throw new Error(
+            "Document session changed during RAW development. Try again.",
+          );
+      };
+      const changed = () => {
+          try {
+            check();
+          } catch (error) {
+            abort.abort(error);
+          }
+        },
+        stopDocument = document.subscribe(changed),
+        stopEditor = this.subscribe(changed);
+      try {
+        return await developRawComponent(
+          document,
+          assets,
+          layerId,
+          {
+            allowPrecisionLoss: control.allowPrecisionLoss ?? false,
+            development: settings,
+          },
+          { signal: abort.signal, onProgress: control.onProgress },
+          check,
+          () => {
+            stopDocument();
+            stopEditor();
+          },
+        );
+      } finally {
+        stopDocument();
+        stopEditor();
+        control.signal?.removeEventListener("abort", cancel);
+        this.rawJobs.delete(abort);
+      }
     };
-    document._preflight=(settings,control)=>{
-      const snapshot=document.getSnapshot(),generation=this.ioGeneration;
-      return preparePreflight(snapshot.document,snapshot.revision,assets,settings,control,()=>{
-        if(this.ioGeneration!==generation||this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during design checks.');
-      });
+    document._preflight = (settings, control) => {
+      const snapshot = document.getSnapshot(),
+        generation = this.ioGeneration;
+      return preparePreflight(
+        snapshot.document,
+        snapshot.revision,
+        assets,
+        settings,
+        control,
+        () => {
+          if (
+            this.ioGeneration !== generation ||
+            this.document !== document ||
+            document.getSnapshot().revision !== snapshot.revision ||
+            !this.sessions.some((session) => session.document === document)
+          )
+            throw new Error("Document session changed during design checks.");
+        },
+      );
     };
-    document._prepareChannelLoad=(settings,control)=>{
-      const snapshot=document.getSnapshot(),channel=snapshot.document.alphaChannels?.find(entry=>entry.id===settings.id),alive=assets.captureLifetime();
-      if(!channel)throw new Error('Alpha channel not found.');
-      return prepareChannelSelection({operation:settings.operation,invert:settings.invert,selection:channel.selection,base:snapshot.document.selection??null,width:document.width,height:document.height},control,()=>{
-        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed while loading its alpha channel.');
-      });
+    document._prepareChannelLoad = (settings, control) => {
+      const snapshot = document.getSnapshot(),
+        channel = snapshot.document.alphaChannels?.find(
+          (entry) => entry.id === settings.id,
+        ),
+        alive = assets.captureLifetime();
+      if (!channel) throw new Error("Alpha channel not found.");
+      return prepareChannelSelection(
+        {
+          operation: settings.operation,
+          invert: settings.invert,
+          selection: channel.selection,
+          base: snapshot.document.selection ?? null,
+          width: document.width,
+          height: document.height,
+        },
+        control,
+        () => {
+          alive();
+          if (
+            this.document !== document ||
+            document.getSnapshot().revision !== snapshot.revision ||
+            !this.sessions.some((session) => session.document === document)
+          )
+            throw new Error(
+              "The document changed while loading its alpha channel.",
+            );
+        },
+      );
     };
     document._prepareSelectionModification = (options, control) => {
-      const snapshot = document.getSnapshot(), alive = assets.captureLifetime();
-      return prepareSelectionModification({ ...options, selection: snapshot.document.selection!, width:document.width, height:document.height }, control, () => {
+      const snapshot = document.getSnapshot(),
+        alive = assets.captureLifetime();
+      return prepareSelectionModification(
+        {
+          ...options,
+          selection: snapshot.document.selection!,
+          width: document.width,
+          height: document.height,
+        },
+        control,
+        () => {
+          alive();
+          if (
+            this.document !== document ||
+            document.getSnapshot().revision !== snapshot.revision ||
+            !this.sessions.some((session) => session.document === document)
+          )
+            throw new Error(
+              "The document changed while modifying its selection. Try again.",
+            );
+        },
+      );
+    };
+    document._prepareVectorBoolean = (selection, control) => {
+      const snapshot = document.getSnapshot(),
+        request = captureVectorBoolean(snapshot.document, selection).request;
+      return this.prepareBoolean(document, request, control, () => {
+        if (
+          this.document !== document ||
+          document.getSnapshot().revision !== snapshot.revision ||
+          !this.sessions.some((session) => session.document === document)
+        )
+          throw new Error(
+            "Document session changed during the Boolean operation.",
+          );
+      });
+    };
+    document._prepareQuickSelection = (options, control) => {
+      const snapshot = document.getSnapshot(),
+        alive = assets.captureLifetime();
+      return prepareQuickSelection(
+        snapshot.document,
+        assets,
+        options,
+        control,
+        () => {
+          alive();
+          if (
+            this.document !== document ||
+            document.getSnapshot().revision !== snapshot.revision ||
+            !this.sessions.some((session) => session.document === document)
+          )
+            throw new Error("The document changed during Quick Selection.");
+        },
+      );
+    };
+    document._prepareSubject = (options, control) => {
+      const snapshot = document.getSnapshot(),
+        alive = assets.captureLifetime();
+      return prepareSubject(snapshot.document, assets, options, control, () => {
         alive();
-        if (this.document !== document || document.getSnapshot().revision !== snapshot.revision || !this.sessions.some(session => session.document === document))
-          throw new Error("The document changed while modifying its selection. Try again.");
+        if (
+          this.document !== document ||
+          document.getSnapshot().revision !== snapshot.revision ||
+          !this.sessions.some((session) => session.document === document)
+        )
+          throw new Error("The document changed during Select Subject.");
       });
     };
-    document._prepareVectorBoolean=(selection,control)=>{
-      const snapshot=document.getSnapshot(),request=captureVectorBoolean(snapshot.document,selection).request;
-      return this.prepareBoolean(document,request,control,()=>{
-        if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during the Boolean operation.');
-      });
+    document._prepareMatting = (request, control) => {
+      const snapshot = document.getSnapshot(),
+        alive = assets.captureLifetime();
+      return prepareMatting(
+        snapshot.document,
+        assets,
+        request,
+        control,
+        () => {
+          alive();
+          if (
+            this.document !== document ||
+            document.getSnapshot().revision !== snapshot.revision ||
+            !this.sessions.some((session) => session.document === document)
+          )
+            throw new Error("The document changed during matting.");
+        },
+        () => document.getSnapshot().revision !== snapshot.revision,
+      );
     };
-    document._prepareQuickSelection=(options,control)=>{
-      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
-      return prepareQuickSelection(snapshot.document,assets,options,control,()=>{
-        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed during Quick Selection.');
-      });
-    };
-    document._prepareSubject=(options,control)=>{
-      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
-      return prepareSubject(snapshot.document,assets,options,control,()=>{
-        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed during Select Subject.');
-      });
-    };
-    document._prepareMatting=(request,control)=>{
-      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
-      return prepareMatting(snapshot.document,assets,request,control,()=>{
-        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed during matting.');
-      },()=>document.getSnapshot().revision!==snapshot.revision);
-    };
-    document._prepareColorRange=(options,control)=>{
-      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
-      return prepareColorRange(snapshot.document,assets,options,control,()=>{
-        alive();
-        if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))
-          throw new Error('The document changed while selecting a color range. Try again.');
-      });
+    document._prepareColorRange = (options, control) => {
+      const snapshot = document.getSnapshot(),
+        alive = assets.captureLifetime();
+      return prepareColorRange(
+        snapshot.document,
+        assets,
+        options,
+        control,
+        () => {
+          alive();
+          if (
+            this.document !== document ||
+            document.getSnapshot().revision !== snapshot.revision ||
+            !this.sessions.some((session) => session.document === document)
+          )
+            throw new Error(
+              "The document changed while selecting a color range. Try again.",
+            );
+        },
+      );
     };
     document._rasterizeSmartObject = (layerId) => {
       const layer = document.getLayer(layerId);
@@ -1455,7 +2454,12 @@ export class EditorApplication {
     const session = this.sessions.find((item) => item.document === document);
     if (!session) throw new Error("Document is not open in this workspace.");
     if (session === this.activeSession) return;
-    for(const job of this.photoshopCommits)job.abort(new Error('Document session changed during Photoshop import. Try again.'));
+    for (const job of this.photoshopCommits)
+      job.abort(
+        new Error(
+          "Document session changed during Photoshop import. Try again.",
+        ),
+      );
     void this.recovery.flush();
     this.ioGeneration++;
     this.tools.reset();
@@ -1485,7 +2489,11 @@ export class EditorApplication {
       old.dispose();
     }
     if (document.layers.length)
-      this.recovery.schedule(this.recoverySessionId, document.getSnapshot().document, assets);
+      this.recovery.schedule(
+        this.recoverySessionId,
+        document.getSnapshot().document,
+        assets,
+      );
     this.publish();
   }
 
@@ -1520,142 +2528,568 @@ export class EditorApplication {
   }
 
   /** Trusted local file preflight. Scripts/plugins do not receive file access. */
-  async inspectSvg(file:File,control:SvgImportControl={}):Promise<SvgImportReport>{
-    return (await inspectSvgFile(file,control)).report;
+  async inspectSvg(
+    file: File,
+    control: SvgImportControl = {},
+  ): Promise<SvgImportReport> {
+    return (await inspectSvgFile(file, control)).report;
   }
 
   /** Read-only font source preparation; no font is installed or embedded. */
-  inspectFont(file:Blob,options:FontInspectOptions={},control:FontSourceControl={}):Promise<FontInspection>{
-    return this.withFontSource(control,async checked=>(await import('./fonts/client')).inspectFontFile(file,options,checked));
+  inspectFont(
+    file: Blob,
+    options: FontInspectOptions = {},
+    control: FontSourceControl = {},
+  ): Promise<FontInspection> {
+    return this.withFontSource(control, async (checked) =>
+      (await import("./fonts/client")).inspectFontFile(file, options, checked),
+    );
   }
-  prepareFontSource(file:Blob,options:FontPrepareOptions={},control:FontSourceControl={}):Promise<PreparedFontSource>{
-    return this.withFontSource(control,async checked=>(await import('./fonts/client')).prepareFontFile(file,options,checked));
+  prepareFontSource(
+    file: Blob,
+    options: FontPrepareOptions = {},
+    control: FontSourceControl = {},
+  ): Promise<PreparedFontSource> {
+    return this.withFontSource(control, async (checked) =>
+      (await import("./fonts/client")).prepareFontFile(file, options, checked),
+    );
   }
-  private async withFontSource<T>(control:FontSourceControl,action:(checked:FontSourceControl)=>Promise<T>):Promise<T>{
-    if(this.retouchDisposed)throw new Error('The editor is disposed.');
-    control.signal?.throwIfAborted();const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
-    this.fontJobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
-    try{const result=await action({...control,signal:abort.signal});abort.signal.throwIfAborted();return result;}
-    finally{this.fontJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  private async withFontSource<T>(
+    control: FontSourceControl,
+    action: (checked: FontSourceControl) => Promise<T>,
+  ): Promise<T> {
+    if (this.retouchDisposed) throw new Error("The editor is disposed.");
+    control.signal?.throwIfAborted();
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    this.fontJobs.add(abort);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    try {
+      const result = await action({ ...control, signal: abort.signal });
+      abort.signal.throwIfAborted();
+      return result;
+    } finally {
+      this.fontJobs.delete(abort);
+      control.signal?.removeEventListener("abort", cancel);
+    }
   }
 
-  async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{
-    if(this.retouchDisposed)throw new Error('The editor is disposed.');control.signal?.throwIfAborted();const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);this.tiffJobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
-    try{return await inspectTiffFile(file,{...control,signal:abort.signal});}finally{this.tiffJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  async inspectTiff(
+    file: File,
+    control: TiffImportControl = {},
+  ): Promise<TiffImportReport> {
+    if (this.retouchDisposed) throw new Error("The editor is disposed.");
+    control.signal?.throwIfAborted();
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    this.tiffJobs.add(abort);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    try {
+      return await inspectTiffFile(file, { ...control, signal: abort.signal });
+    } finally {
+      this.tiffJobs.delete(abort);
+      control.signal?.removeEventListener("abort", cancel);
+    }
   }
 
   /** Trusted local preflight; opening uses the separate guarded import transaction below. */
-  async inspectAvif(file:File,control:AvifImportControl={}):Promise<AvifImportReport>{return inspectAvifFile(file,control);}
+  async inspectAvif(
+    file: File,
+    control: AvifImportControl = {},
+  ): Promise<AvifImportReport> {
+    return inspectAvifFile(file, control);
+  }
 
   /** Trusted, read-only sensor preflight. Application RAW installation is separate. */
-  async inspectRaw(file:File,image=0,control:RawImportControl={}):Promise<RawImportReport>{return inspectRawFile(file,image,control);}
+  async inspectRaw(
+    file: File,
+    image = 0,
+    control: RawImportControl = {},
+  ): Promise<RawImportReport> {
+    return inspectRawFile(file, image, control);
+  }
 
   /** Export a developed sensor master; document placement/effects are excluded. */
-  async exportRawTiff(source:File|SmartObjectLayer,options:RawTiffExportOptions={},control:RawTiffControl={}):Promise<RawTiffResult>{
-    const draft=z.object({development:rawDevelopOptionsSchema.optional(),sampleFormat:z.enum(['rgba16','rgba-float32']).default('rgba16'),variant:z.enum(['auto','classic','big']).default('auto'),color:colorOutputSchema.optional()}).strict().parse(options);
-    if(this.retouchDisposed)throw new Error('The editor is disposed.');control.signal?.throwIfAborted();
-    const document=this.document,assets=this.assets,revision=document.getSnapshot().revision,generation=this.ioGeneration;
-    const layer=source instanceof SmartObjectLayer?source:null;
-    if(layer&&(!layer.isAttached||layer.document!==document||document.getLayer(layer.id)!==layer))throw new Error('Choose an attached RAW smart object in the current document.');
-    const captured=layer?rawComponentSource(document._read(),layer.id,assets):null,lease=captured?captureAssetSource(assets,captured.asset.id):null;
-    const blob=captured?.raw.originalBlob??(source instanceof File?source:null);if(!blob)throw new Error('Choose a RAW file or attached RAW smart object.');
-    const development=draft.development??captured?.raw.settings.development??rawDevelopOptionsSchema.parse({}),color=draft.color??normalizeColorOutput(this.colorSettings.output);
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.rawJobs.add(abort);
-    const check=()=>{abort.signal.throwIfAborted();if(this.retouchDisposed)throw new Error('The editor is disposed.');if(layer){lease!.check();if(this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during RAW TIFF delivery. Try again.');}};
-    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=layer?document.subscribe(changed):()=>{},stopEditor=layer?this.subscribe(changed):()=>{};
-    try{
-      check();const output=await captureColorOutput(color,{signal:abort.signal});check();
-      const settings=rawTiffSettingsSchema.parse({development,sampleFormat:draft.sampleFormat,variant:draft.variant,color:output});
-      const result=await exportRawTiffFile(blob,settings,{signal:abort.signal,onProgress:value=>{check();control.onProgress?.(value);check();}});check();
-      if(captured&&result.receipt.sourceSha256!==captured.raw.original.sha256)throw new Error('Retained RAW source differs from its original fingerprint.');return result;
-    }finally{stopDocument();stopEditor();this.rawJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
-  }
-
-  async openRaw(file:File,options:RawDecodeOptions={},control:RawImportControl={}):Promise<Readonly<RawImportReport>>{
+  async exportRawTiff(
+    source: File | SmartObjectLayer,
+    options: RawTiffExportOptions = {},
+    control: RawTiffControl = {},
+  ): Promise<RawTiffResult> {
+    const draft = z
+      .object({
+        development: rawDevelopOptionsSchema.optional(),
+        sampleFormat: z.enum(["rgba16", "rgba-float32"]).default("rgba16"),
+        variant: z.enum(["auto", "classic", "big"]).default("auto"),
+        color: colorOutputSchema.optional(),
+      })
+      .strict()
+      .parse(options);
+    if (this.retouchDisposed) throw new Error("The editor is disposed.");
     control.signal?.throwIfAborted();
-    for(const job of this.rawJobs)job.abort(new Error('RAW preparation was replaced.'));
-    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.rawJobs.add(abort);
-    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during RAW import. Try again.');};
-    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
-    let prepared:Awaited<ReturnType<typeof prepareRawImport>>|undefined;
-    try{
-      check();prepared=await prepareRawImport(file,options,{signal:abort.signal,onProgress:control.onProgress},check);check();
-      stopDocument();stopEditor();this.rawJobs.delete(abort);
-      this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'raw');return prepared.report;
-    }catch(error){prepared?.assets.dispose();throw error;}
-    finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);this.rawJobs.delete(abort);}
+    const document = this.document,
+      assets = this.assets,
+      revision = document.getSnapshot().revision,
+      generation = this.ioGeneration;
+    const layer = source instanceof SmartObjectLayer ? source : null;
+    if (
+      layer &&
+      (!layer.isAttached ||
+        layer.document !== document ||
+        document.getLayer(layer.id) !== layer)
+    )
+      throw new Error(
+        "Choose an attached RAW smart object in the current document.",
+      );
+    const captured = layer
+        ? rawComponentSource(document._read(), layer.id, assets)
+        : null,
+      lease = captured ? captureAssetSource(assets, captured.asset.id) : null;
+    const blob =
+      captured?.raw.originalBlob ?? (source instanceof File ? source : null);
+    if (!blob)
+      throw new Error("Choose a RAW file or attached RAW smart object.");
+    const development =
+        draft.development ??
+        captured?.raw.settings.development ??
+        rawDevelopOptionsSchema.parse({}),
+      color = draft.color ?? normalizeColorOutput(this.colorSettings.output);
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    this.rawJobs.add(abort);
+    const check = () => {
+      abort.signal.throwIfAborted();
+      if (this.retouchDisposed) throw new Error("The editor is disposed.");
+      if (layer) {
+        lease!.check();
+        if (
+          this.ioGeneration !== generation ||
+          this.document !== document ||
+          this.assets !== assets ||
+          document.getSnapshot().revision !== revision ||
+          !this.sessions.some((session) => session.document === document)
+        )
+          throw new Error(
+            "Document session changed during RAW TIFF delivery. Try again.",
+          );
+      }
+    };
+    const changed = () => {
+        try {
+          check();
+        } catch (error) {
+          abort.abort(error);
+        }
+      },
+      stopDocument = layer ? document.subscribe(changed) : () => {},
+      stopEditor = layer ? this.subscribe(changed) : () => {};
+    try {
+      check();
+      const output = await captureColorOutput(color, { signal: abort.signal });
+      check();
+      const settings = rawTiffSettingsSchema.parse({
+        development,
+        sampleFormat: draft.sampleFormat,
+        variant: draft.variant,
+        color: output,
+      });
+      const result = await exportRawTiffFile(blob, settings, {
+        signal: abort.signal,
+        onProgress: (value) => {
+          check();
+          control.onProgress?.(value);
+          check();
+        },
+      });
+      check();
+      if (
+        captured &&
+        result.receipt.sourceSha256 !== captured.raw.original.sha256
+      )
+        throw new Error(
+          "Retained RAW source differs from its original fingerprint.",
+        );
+      return result;
+    } finally {
+      stopDocument();
+      stopEditor();
+      this.rawJobs.delete(abort);
+      control.signal?.removeEventListener("abort", cancel);
+    }
   }
 
-  async openAvif(file:File,options:AvifDecodeOptions={},control:AvifImportControl={}):Promise<Readonly<AvifImportReport>>{
+  async openRaw(
+    file: File,
+    options: RawDecodeOptions = {},
+    control: RawImportControl = {},
+  ): Promise<Readonly<RawImportReport>> {
     control.signal?.throwIfAborted();
-    for(const job of this.avifJobs)job.abort(new Error('Document session changed during AVIF import. Try again.'));
-    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.avifJobs.add(abort);
-    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during AVIF import. Try again.');};
-    const changed=()=>{try{check();}catch(error){abort.abort(error);}},unsubscribeDocument=document.subscribe(changed),unsubscribeEditor=this.subscribe(changed);
-    let prepared:Awaited<ReturnType<typeof prepareAvifImport>>|undefined;
-    try{
-      check();prepared=await prepareAvifImport(file,options,{signal:abort.signal,onProgress:control.onProgress},check);check();
-      unsubscribeDocument();unsubscribeEditor();this.avifJobs.delete(abort);
-      this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'avif');return prepared.report;
-    }catch(error){prepared?.assets.dispose();throw error;}
-    finally{unsubscribeDocument();unsubscribeEditor();control.signal?.removeEventListener('abort',cancel);this.avifJobs.delete(abort);}
+    for (const job of this.rawJobs)
+      job.abort(new Error("RAW preparation was replaced."));
+    const generation = ++this.ioGeneration,
+      document = this.document,
+      assets = this.assets,
+      revision = document.getSnapshot().revision,
+      alive = assets.captureLifetime();
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    this.rawJobs.add(abort);
+    const check = () => {
+      abort.signal.throwIfAborted();
+      alive();
+      if (
+        this.retouchDisposed ||
+        generation !== this.ioGeneration ||
+        this.document !== document ||
+        this.assets !== assets ||
+        document.getSnapshot().revision !== revision ||
+        !this.sessions.some((s) => s.document === document)
+      )
+        throw new Error(
+          "Document session changed during RAW import. Try again.",
+        );
+    };
+    const changed = () => {
+        try {
+          check();
+        } catch (error) {
+          abort.abort(error);
+        }
+      },
+      stopDocument = document.subscribe(changed),
+      stopEditor = this.subscribe(changed);
+    let prepared: Awaited<ReturnType<typeof prepareRawImport>> | undefined;
+    try {
+      check();
+      prepared = await prepareRawImport(
+        file,
+        options,
+        { signal: abort.signal, onProgress: control.onProgress },
+        check,
+      );
+      check();
+      stopDocument();
+      stopEditor();
+      this.rawJobs.delete(abort);
+      this.replace(prepared.document, prepared.assets);
+      this.recentFiles?.remember(file, "raw");
+      return prepared.report;
+    } catch (error) {
+      prepared?.assets.dispose();
+      throw error;
+    } finally {
+      stopDocument();
+      stopEditor();
+      control.signal?.removeEventListener("abort", cancel);
+      this.rawJobs.delete(abort);
+    }
   }
 
-  async openTiff(file:File,options:TiffDecodeOptions={},control:TiffImportControl={}):Promise<TiffImportReport>{
-    if(this.retouchDisposed)throw new Error('The editor is disposed.');control.signal?.throwIfAborted();for(const job of this.tiffJobs)job.abort(new Error('TIFF preparation was replaced.'));
-    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);this.tiffJobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
-    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during TIFF import. Try again.');};
-    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);let prepared:Awaited<ReturnType<typeof prepareTiffImport>>|undefined;
-    try{check();prepared=await prepareTiffImport(file,options,{signal:abort.signal,onProgress:control.onProgress},check);check();stopDocument();stopEditor();this.tiffJobs.delete(abort);this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'tiff');return prepared.report;}
-    catch(error){prepared?.assets.dispose();throw error;}
-    finally{stopDocument();stopEditor();this.tiffJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  async openAvif(
+    file: File,
+    options: AvifDecodeOptions = {},
+    control: AvifImportControl = {},
+  ): Promise<Readonly<AvifImportReport>> {
+    control.signal?.throwIfAborted();
+    for (const job of this.avifJobs)
+      job.abort(
+        new Error("Document session changed during AVIF import. Try again."),
+      );
+    const generation = ++this.ioGeneration,
+      document = this.document,
+      assets = this.assets,
+      revision = document.getSnapshot().revision,
+      alive = assets.captureLifetime();
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    this.avifJobs.add(abort);
+    const check = () => {
+      abort.signal.throwIfAborted();
+      alive();
+      if (
+        this.retouchDisposed ||
+        generation !== this.ioGeneration ||
+        this.document !== document ||
+        this.assets !== assets ||
+        document.getSnapshot().revision !== revision ||
+        !this.sessions.some((s) => s.document === document)
+      )
+        throw new Error(
+          "Document session changed during AVIF import. Try again.",
+        );
+    };
+    const changed = () => {
+        try {
+          check();
+        } catch (error) {
+          abort.abort(error);
+        }
+      },
+      unsubscribeDocument = document.subscribe(changed),
+      unsubscribeEditor = this.subscribe(changed);
+    let prepared: Awaited<ReturnType<typeof prepareAvifImport>> | undefined;
+    try {
+      check();
+      prepared = await prepareAvifImport(
+        file,
+        options,
+        { signal: abort.signal, onProgress: control.onProgress },
+        check,
+      );
+      check();
+      unsubscribeDocument();
+      unsubscribeEditor();
+      this.avifJobs.delete(abort);
+      this.replace(prepared.document, prepared.assets);
+      this.recentFiles?.remember(file, "avif");
+      return prepared.report;
+    } catch (error) {
+      prepared?.assets.dispose();
+      throw error;
+    } finally {
+      unsubscribeDocument();
+      unsubscribeEditor();
+      control.signal?.removeEventListener("abort", cancel);
+      this.avifJobs.delete(abort);
+    }
+  }
+
+  async openTiff(
+    file: File,
+    options: TiffDecodeOptions = {},
+    control: TiffImportControl = {},
+  ): Promise<TiffImportReport> {
+    if (this.retouchDisposed) throw new Error("The editor is disposed.");
+    control.signal?.throwIfAborted();
+    for (const job of this.tiffJobs)
+      job.abort(new Error("TIFF preparation was replaced."));
+    const generation = ++this.ioGeneration,
+      document = this.document,
+      assets = this.assets,
+      revision = document.getSnapshot().revision,
+      alive = assets.captureLifetime(),
+      abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    this.tiffJobs.add(abort);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    const check = () => {
+      abort.signal.throwIfAborted();
+      alive();
+      if (
+        this.retouchDisposed ||
+        generation !== this.ioGeneration ||
+        this.document !== document ||
+        this.assets !== assets ||
+        document.getSnapshot().revision !== revision ||
+        !this.sessions.some((s) => s.document === document)
+      )
+        throw new Error(
+          "Document session changed during TIFF import. Try again.",
+        );
+    };
+    const changed = () => {
+        try {
+          check();
+        } catch (error) {
+          abort.abort(error);
+        }
+      },
+      stopDocument = document.subscribe(changed),
+      stopEditor = this.subscribe(changed);
+    let prepared: Awaited<ReturnType<typeof prepareTiffImport>> | undefined;
+    try {
+      check();
+      prepared = await prepareTiffImport(
+        file,
+        options,
+        { signal: abort.signal, onProgress: control.onProgress },
+        check,
+      );
+      check();
+      stopDocument();
+      stopEditor();
+      this.tiffJobs.delete(abort);
+      this.replace(prepared.document, prepared.assets);
+      this.recentFiles?.remember(file, "tiff");
+      return prepared.report;
+    } catch (error) {
+      prepared?.assets.dispose();
+      throw error;
+    } finally {
+      stopDocument();
+      stopEditor();
+      this.tiffJobs.delete(abort);
+      control.signal?.removeEventListener("abort", cancel);
+    }
   }
 
   /** Open a complete imported document; preserve existing edited tabs. */
-  async openSvg(file:File,options:SvgImportOptions={},control:SvgImportControl={}):Promise<SvgImportReport>{
-    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
-    const check=()=>{control.signal?.throwIfAborted();alive();if(generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during SVG import. Try again.');};
-    const prepared=await prepareSvgImport(file,options,control,check);
-    try{check();this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'svg');return prepared.report;}
-    catch(error){prepared.assets.dispose();throw error;}
+  async openSvg(
+    file: File,
+    options: SvgImportOptions = {},
+    control: SvgImportControl = {},
+  ): Promise<SvgImportReport> {
+    const generation = ++this.ioGeneration,
+      document = this.document,
+      assets = this.assets,
+      revision = document.getSnapshot().revision,
+      alive = assets.captureLifetime();
+    const check = () => {
+      control.signal?.throwIfAborted();
+      alive();
+      if (
+        generation !== this.ioGeneration ||
+        this.document !== document ||
+        this.assets !== assets ||
+        document.getSnapshot().revision !== revision ||
+        !this.sessions.some((s) => s.document === document)
+      )
+        throw new Error(
+          "Document session changed during SVG import. Try again.",
+        );
+    };
+    const prepared = await prepareSvgImport(file, options, control, check);
+    try {
+      check();
+      this.replace(prepared.document, prepared.assets);
+      this.recentFiles?.remember(file, "svg");
+      return prepared.report;
+    } catch (error) {
+      prepared.assets.dispose();
+      throw error;
+    }
   }
 
-  async inspectPsd(source:PhotoshopInput,control:PhotoshopImportControl={}):Promise<PhotoshopInspection>{
-    if(this.retouchDisposed)throw new Error('Editor disposed during Photoshop import.');
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});this.photoshopJobs.add(abort);
-    try{return await inspectPhotoshop(source,{signal:abort.signal,onProgress:control.onProgress});}
-    finally{control.signal?.removeEventListener('abort',cancel);this.photoshopJobs.delete(abort);}
+  async inspectPsd(
+    source: PhotoshopInput,
+    control: PhotoshopImportControl = {},
+  ): Promise<PhotoshopInspection> {
+    if (this.retouchDisposed)
+      throw new Error("Editor disposed during Photoshop import.");
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.throwIfAborted();
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    this.photoshopJobs.add(abort);
+    try {
+      return await inspectPhotoshop(source, {
+        signal: abort.signal,
+        onProgress: control.onProgress,
+      });
+    } finally {
+      control.signal?.removeEventListener("abort", cancel);
+      this.photoshopJobs.delete(abort);
+    }
   }
 
   async openPsd(
     buffer: PhotoshopInput,
     options: PsdImportOptions = {},
-    control:PhotoshopImportControl={},
+    control: PhotoshopImportControl = {},
   ): Promise<PsdImportResult> {
     control.signal?.throwIfAborted();
-    for(const job of this.photoshopCommits)job.abort(new Error('Document session changed during Photoshop import. Try again.'));
-    const generation=++this.ioGeneration,owner=this.document,assets=this.assets,revision=owner.getSnapshot().revision,alive=assets.captureLifetime();
-    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.photoshopJobs.add(abort);this.photoshopCommits.add(abort);
-    const current=()=>{abort.signal.throwIfAborted();alive();if(this.ioGeneration!==generation||this.document!==owner||this.assets!==assets||owner.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===owner))throw new Error('Document session changed during Photoshop import. Try again.');};
-    const unsubscribe=owner.subscribe(()=>{if(owner.getSnapshot().revision!==revision)abort.abort(new Error('Document session changed during Photoshop import. Try again.'));});
-    let newAssets:AssetStore|null=null;
-    try{
-      current();const decoded=await decodePhotoshop(buffer,options,{signal:abort.signal,onProgress:value=>{current();control.onProgress?.(value);current();}});current();
-      newAssets=new AssetStore();const images=new Map<string,ImageData>();let index=0;
-      for(const entry of decoded.entries){
-        current();control.onProgress?.({phase:'installing',fraction:index/decoded.entries.length});current();
-        const asset=await newAssets.add(entry.png,'Photoshop layer',entry.id,false,{signal:abort.signal});current();
-        if(asset.width!==entry.width||asset.height!==entry.height)throw new Error('Decoded Photoshop layer dimensions changed during import.');
-        images.set(entry.id,new ImageData(entry.pixels,entry.width,entry.height));index++;
+    for (const job of this.photoshopCommits)
+      job.abort(
+        new Error(
+          "Document session changed during Photoshop import. Try again.",
+        ),
+      );
+    const generation = ++this.ioGeneration,
+      owner = this.document,
+      assets = this.assets,
+      revision = owner.getSnapshot().revision,
+      alive = assets.captureLifetime();
+    const abort = new AbortController(),
+      cancel = () => abort.abort(control.signal?.reason);
+    control.signal?.addEventListener("abort", cancel, { once: true });
+    this.photoshopJobs.add(abort);
+    this.photoshopCommits.add(abort);
+    const current = () => {
+      abort.signal.throwIfAborted();
+      alive();
+      if (
+        this.ioGeneration !== generation ||
+        this.document !== owner ||
+        this.assets !== assets ||
+        owner.getSnapshot().revision !== revision ||
+        !this.sessions.some((s) => s.document === owner)
+      )
+        throw new Error(
+          "Document session changed during Photoshop import. Try again.",
+        );
+    };
+    const unsubscribe = owner.subscribe(() => {
+      if (owner.getSnapshot().revision !== revision)
+        abort.abort(
+          new Error(
+            "Document session changed during Photoshop import. Try again.",
+          ),
+        );
+    });
+    let newAssets: AssetStore | null = null;
+    try {
+      current();
+      const decoded = await decodePhotoshop(buffer, options, {
+        signal: abort.signal,
+        onProgress: (value) => {
+          current();
+          control.onProgress?.(value);
+          current();
+        },
+      });
+      current();
+      newAssets = new AssetStore();
+      const images = new Map<string, ImageData>();
+      let index = 0;
+      for (const entry of decoded.entries) {
+        current();
+        control.onProgress?.({
+          phase: "installing",
+          fraction: index / decoded.entries.length,
+        });
+        current();
+        const asset = await newAssets.add(
+          entry.png,
+          "Photoshop layer",
+          entry.id,
+          false,
+          { signal: abort.signal },
+        );
+        current();
+        if (asset.width !== entry.width || asset.height !== entry.height)
+          throw new Error(
+            "Decoded Photoshop layer dimensions changed during import.",
+          );
+        images.set(
+          entry.id,
+          new ImageData(entry.pixels, entry.width, entry.height),
+        );
+        index++;
       }
-      current();control.onProgress?.({phase:'installing',fraction:1});current();
-      const document=Document.fromJSON(decoded.document);this.photoshopCommits.delete(abort);this.replace(document,newAssets);
-      if(typeof File!=='undefined'&&buffer instanceof File)this.recentFiles?.remember(buffer,'photoshop');
-      return{document:decoded.document,report:decoded.report,assets:images};
-    }catch(error){newAssets?.dispose();throw error;}
-    finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);this.photoshopJobs.delete(abort);this.photoshopCommits.delete(abort);}
+      current();
+      control.onProgress?.({ phase: "installing", fraction: 1 });
+      current();
+      const document = Document.fromJSON(decoded.document);
+      this.photoshopCommits.delete(abort);
+      this.replace(document, newAssets);
+      if (typeof File !== "undefined" && buffer instanceof File)
+        this.recentFiles?.remember(buffer, "photoshop");
+      return {
+        document: decoded.document,
+        report: decoded.report,
+        assets: images,
+      };
+    } catch (error) {
+      newAssets?.dispose();
+      throw error;
+    } finally {
+      unsubscribe();
+      control.signal?.removeEventListener("abort", cancel);
+      this.photoshopJobs.delete(abort);
+      this.photoshopCommits.delete(abort);
+    }
   }
 
   newDocument(
@@ -1673,14 +3107,59 @@ export class EditorApplication {
   }
 
   /** Open an image independently; keep existing edited tabs and original pixels. */
-  async openImage(file:File,control:{signal?:AbortSignal}={}):Promise<RasterLayer>{
-    const generation=++this.ioGeneration,owner=this.document,assets=this.assets,revision=owner.getSnapshot().revision,alive=assets.captureLifetime(),staged=new AssetStore();
-    const check=()=>{control.signal?.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==owner||this.assets!==assets||owner.getSnapshot().revision!==revision||!this.sessions.some(session=>session.document===owner))throw new Error('Document session changed during image opening. Try again.');};
-    try{
-      check();const asset=await staged.add(file,file.name,undefined,false,{signal:control.signal});check();
-      const name=file.name.replace(/\.[^.]+$/,'').slice(0,240)||'Untitled',root=new Document({name,width:asset.width,height:asset.height}),raster=new RasterLayer({name:file.name.slice(0,240),assetId:asset.id,width:asset.width,height:asset.height});
-      const document=Document.fromJSON({...root.toJSON(),children:[raster.toJSON()]});document.selectedLayer=document.getLayer(raster.id);check();this.replace(document,staged);this.recentFiles?.remember(file,'image');return document.getLayer(raster.id) as RasterLayer;
-    }catch(error){staged.dispose();throw error;}
+  async openImage(
+    file: File,
+    control: { signal?: AbortSignal } = {},
+  ): Promise<RasterLayer> {
+    const generation = ++this.ioGeneration,
+      owner = this.document,
+      assets = this.assets,
+      revision = owner.getSnapshot().revision,
+      alive = assets.captureLifetime(),
+      staged = new AssetStore();
+    const check = () => {
+      control.signal?.throwIfAborted();
+      alive();
+      if (
+        this.retouchDisposed ||
+        generation !== this.ioGeneration ||
+        this.document !== owner ||
+        this.assets !== assets ||
+        owner.getSnapshot().revision !== revision ||
+        !this.sessions.some((session) => session.document === owner)
+      )
+        throw new Error(
+          "Document session changed during image opening. Try again.",
+        );
+    };
+    try {
+      check();
+      const asset = await staged.add(file, file.name, undefined, false, {
+        signal: control.signal,
+      });
+      check();
+      const name =
+          file.name.replace(/\.[^.]+$/, "").slice(0, 240) || "Untitled",
+        root = new Document({ name, width: asset.width, height: asset.height }),
+        raster = new RasterLayer({
+          name: file.name.slice(0, 240),
+          assetId: asset.id,
+          width: asset.width,
+          height: asset.height,
+        });
+      const document = Document.fromJSON({
+        ...root.toJSON(),
+        children: [raster.toJSON()],
+      });
+      document.selectedLayer = document.getLayer(raster.id);
+      check();
+      this.replace(document, staged);
+      this.recentFiles?.remember(file, "image");
+      return document.getLayer(raster.id) as RasterLayer;
+    } catch (error) {
+      staged.dispose();
+      throw error;
+    }
   }
 
   async importImage(file: File): Promise<RasterLayer> {
@@ -1722,7 +3201,7 @@ export class EditorApplication {
     }
 
     this.document.selectedLayer = layer;
-    this.recentFiles?.remember(file,'image');
+    this.recentFiles?.remember(file, "image");
     return layer;
   }
 
@@ -1754,7 +3233,8 @@ export class EditorApplication {
 
   async saveProject(): Promise<Blob> {
     const session = this.activeSession;
-    const state = session.document.getSnapshot(), revision = state.revision;
+    const state = session.document.getSnapshot(),
+      revision = state.revision;
     const blob = await serializeProject(
       state.document,
       session.assets,
@@ -1780,85 +3260,229 @@ export class EditorApplication {
         "The document changed while the project was opening. Try again.",
       );
     }
-    let document:Document;
-    try{document=Document._fromWorkspace(loaded.document,loaded.history);}
-    catch(error){loaded.assets.dispose();throw error;}
+    let document: Document;
+    try {
+      document = Document._fromWorkspace(loaded.document, loaded.history);
+    } catch (error) {
+      loaded.assets.dispose();
+      throw error;
+    }
     this.replace(document, loaded.assets);
-    this.recentFiles?.remember(file,'project');
+    this.recentFiles?.remember(file, "project");
   }
 
   async exportPng(control?: ExportControl): Promise<Blob> {
     return (await this.export({ format: "png" }, control)).blob;
   }
 
-  async export(options: ExportOptions, control?: ExportControl): Promise<ExportResult> {
+  async export(
+    options: ExportOptions,
+    control?: ExportControl,
+  ): Promise<ExportResult> {
     checkExport(control);
     const result = await exportDocument(
       // Native read-only exporters pin the immutable model before yielding instead
       // of cloning all paths and unrelated raster/effect data on the UI thread.
-      ['png','svg','tiff','pdf','psd','psb','avif'].includes(options.format) ? this.document._read() : this.document.toJSON(),
+      ["png", "svg", "tiff", "pdf", "psd", "psb", "avif"].includes(
+        options.format,
+      )
+        ? this.document._read()
+        : this.document.toJSON(),
       this.assets,
       this.renderer,
       options,
       control,
     );
-    if (control?.signal) await new Promise<void>(resolve=>setTimeout(resolve,0));
+    if (control?.signal)
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
     checkExport(control);
     return result;
   }
 
-  private captureTiffPages(documents:readonly Document[],options:TiffPagesExportOptions) {
-    if(!Array.isArray(documents)||!documents.length)throw new Error('Choose at least one open document as a TIFF page.');
-    if(new Set(documents).size!==documents.length)throw new Error('Choose each open document once.');
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='variant'&&key!=='color'&&key!=='precision'))throw new Error('TIFF page export options accept only variant, precision and color.');
-    const variant=validateTiffVariant(options.variant),precision=validateTiffPrecision(options.precision),color=options.color?normalizeColorOutput(options.color):undefined;
-    const pages=documents.map(document=>{
-      const session=this.sessions.find(session=>session.document===document);
-      if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');
-      return{session,document:document._read(),assets:session.assets,renderer:this.renderer};
+  private captureTiffPages(
+    documents: readonly Document[],
+    options: TiffPagesExportOptions,
+  ) {
+    if (!Array.isArray(documents) || !documents.length)
+      throw new Error("Choose at least one open document as a TIFF page.");
+    if (new Set(documents).size !== documents.length)
+      throw new Error("Choose each open document once.");
+    if (
+      !options ||
+      typeof options !== "object" ||
+      Array.isArray(options) ||
+      Object.keys(options).some(
+        (key) => key !== "variant" && key !== "color" && key !== "precision",
+      )
+    )
+      throw new Error(
+        "TIFF page export options accept only variant, precision and color.",
+      );
+    const variant = validateTiffVariant(options.variant),
+      precision = validateTiffPrecision(options.precision),
+      color = options.color ? normalizeColorOutput(options.color) : undefined;
+    const pages = documents.map((document) => {
+      const session = this.sessions.find(
+        (session) => session.document === document,
+      );
+      if (!session)
+        throw new Error(
+          "A TIFF page document is no longer open. Choose its pages again.",
+        );
+      return {
+        session,
+        document: document._read(),
+        assets: session.assets,
+        renderer: this.renderer,
+      };
     });
-    const check=()=>{for(const page of pages)if(this.retouchDisposed||!this.sessions.includes(page.session)||page.session.assets!==page.assets)throw new Error('A TIFF page document closed during export. Choose its pages again.');};
-    check();return{pages,variant,precision,color,check};
+    const check = () => {
+      for (const page of pages)
+        if (
+          this.retouchDisposed ||
+          !this.sessions.includes(page.session) ||
+          page.session.assets !== page.assets
+        )
+          throw new Error(
+            "A TIFF page document closed during export. Choose its pages again.",
+          );
+    };
+    check();
+    return { pages, variant, precision, color, check };
   }
 
   /** Trusted browser host; each open Document becomes one flattened native-size page. */
-  async exportTiffPages(documents:readonly Document[],options:TiffPagesExportOptions={},control?:ExportControl):Promise<ExportResult> {
-    checkExport(control);const{pages,variant,precision,color,check}=this.captureTiffPages(documents,options);
-    const report=getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color,precision);if(report.unavailableReason)throw new Error(report.unavailableReason);
-    const current=()=>{checkExport(control);check();};
-    const blob=await encodeTiffPages(pages,variant,{signal:control?.signal,onProgress:progress=>{current();control?.onProgress?.(progress);current();}},color,precision);
-    if(control?.signal)await new Promise<void>(resolve=>setTimeout(resolve,0));current();
-    return{blob,mimeType:'image/tiff',extension:'tif',report};
+  async exportTiffPages(
+    documents: readonly Document[],
+    options: TiffPagesExportOptions = {},
+    control?: ExportControl,
+  ): Promise<ExportResult> {
+    checkExport(control);
+    const { pages, variant, precision, color, check } = this.captureTiffPages(
+      documents,
+      options,
+    );
+    const report = getTiffPagesCapabilityReport(
+      pages.map((page) => page.document),
+      variant,
+      color,
+      precision,
+    );
+    if (report.unavailableReason) throw new Error(report.unavailableReason);
+    const current = () => {
+      checkExport(control);
+      check();
+    };
+    const blob = await encodeTiffPages(
+      pages,
+      variant,
+      {
+        signal: control?.signal,
+        onProgress: (progress) => {
+          current();
+          control?.onProgress?.(progress);
+          current();
+        },
+      },
+      color,
+      precision,
+    );
+    if (control?.signal)
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    current();
+    return { blob, mimeType: "image/tiff", extension: "tif", report };
   }
 
-  getTiffPagesCapabilityReport(documents:readonly Document[],options:TiffPagesExportOptions={}):ExportCapabilityReport {
-    const{pages,variant,precision,color}=this.captureTiffPages(documents,options);
-    return getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color,precision);
+  getTiffPagesCapabilityReport(
+    documents: readonly Document[],
+    options: TiffPagesExportOptions = {},
+  ): ExportCapabilityReport {
+    const { pages, variant, precision, color } = this.captureTiffPages(
+      documents,
+      options,
+    );
+    return getTiffPagesCapabilityReport(
+      pages.map((page) => page.document),
+      variant,
+      color,
+      precision,
+    );
   }
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {
     return getExportCapabilityReport(
-      ['png','svg','tiff','pdf','psd','psb','avif'].includes(options.format) ? this.document._read() : this.document.toJSON(), options,
+      ["png", "svg", "tiff", "pdf", "psd", "psb", "avif"].includes(
+        options.format,
+      )
+        ? this.document._read()
+        : this.document.toJSON(),
+      options,
     );
   }
 
   /** Trusted preference operation. Preparation never inserts an asset into a document. */
-  async applyBrushPreset(preset:BrushPreset,options:{signal?:AbortSignal;selectTool?(tool:BrushTool):void}={}):Promise<BrushTool>{
-    const owned=new BrushPreset(preset.toJSON(),preset.source),signal=options.signal,selectTool=options.selectTool;signal?.throwIfAborted();
-    this.presetApplyAbort?.abort(new DOMException('Brush preset application was replaced.','AbortError'));
-    const abort=new AbortController();this.presetApplyAbort=abort;
-    const cancel=()=>abort.abort(signal?.reason);signal?.addEventListener('abort',cancel,{once:true});
-    const document=this.document,revision=document.getSnapshot().revision,state=this.tools.getSnapshot(),source=this.brushTextureSource.source,generation=this.ioGeneration;
-    const draft=new BrushTextureSourceOwner();
-    const check=()=>{abort.signal.throwIfAborted();if(this.presetApplyAbort!==abort||this.ioGeneration!==generation||this.document!==document||document.getSnapshot().revision!==revision||this.tools.getSnapshot()!==state||this.brushTextureSource.source!==source)throw new Error('The document or brush changed while preparing this preset. Retry from the current tool.');};
-    try{
-      if(owned.source){
-        const original=await verifyPresetSource(owned.source,abort.signal);check();
-        const asset=await draft.import(original.blob,original.name,{signal:abort.signal,tiff:original.tiff,avif:original.avif,raw:original.raw});check();
-        if(asset.width!==original.width||asset.height!==original.height)throw new Error('Brush source dimensions do not match its original pixels.');
+  async applyBrushPreset(
+    preset: BrushPreset,
+    options: { signal?: AbortSignal; selectTool?(tool: BrushTool): void } = {},
+  ): Promise<BrushTool> {
+    const owned = new BrushPreset(preset.toJSON(), preset.source),
+      signal = options.signal,
+      selectTool = options.selectTool;
+    signal?.throwIfAborted();
+    this.presetApplyAbort?.abort(
+      new DOMException("Brush preset application was replaced.", "AbortError"),
+    );
+    const abort = new AbortController();
+    this.presetApplyAbort = abort;
+    const cancel = () => abort.abort(signal?.reason);
+    signal?.addEventListener("abort", cancel, { once: true });
+    const document = this.document,
+      revision = document.getSnapshot().revision,
+      state = this.tools.getSnapshot(),
+      source = this.brushTextureSource.source,
+      generation = this.ioGeneration;
+    const draft = new BrushTextureSourceOwner();
+    const check = () => {
+      abort.signal.throwIfAborted();
+      if (
+        this.presetApplyAbort !== abort ||
+        this.ioGeneration !== generation ||
+        this.document !== document ||
+        document.getSnapshot().revision !== revision ||
+        this.tools.getSnapshot() !== state ||
+        this.brushTextureSource.source !== source
+      )
+        throw new Error(
+          "The document or brush changed while preparing this preset. Retry from the current tool.",
+        );
+    };
+    try {
+      if (owned.source) {
+        const original = await verifyPresetSource(owned.source, abort.signal);
+        check();
+        const asset = await draft.import(original.blob, original.name, {
+          signal: abort.signal,
+          tiff: original.tiff,
+          avif: original.avif,
+          raw: original.raw,
+        });
+        check();
+        if (asset.width !== original.width || asset.height !== original.height)
+          throw new Error(
+            "Brush source dimensions do not match its original pixels.",
+          );
       }
-      check();selectTool?.(owned.tool);return this.tools.applyBrushPreset(owned,owned.source?draft:undefined);
-    }finally{signal?.removeEventListener('abort',cancel);if(this.presetApplyAbort===abort)this.presetApplyAbort=null;draft.dispose();}
+      check();
+      selectTool?.(owned.tool);
+      return this.tools.applyBrushPreset(
+        owned,
+        owned.source ? draft : undefined,
+      );
+    } finally {
+      signal?.removeEventListener("abort", cancel);
+      if (this.presetApplyAbort === abort) this.presetApplyAbort = null;
+      draft.dispose();
+    }
   }
 
   async runScript(code: string) {
@@ -1881,7 +3505,7 @@ export class EditorApplication {
       command.source,
       `${plugin.name}: ${command.title}`.slice(0, 240),
       !hasWritePermission,
-      { permissions: granted, pluginId, commandId, version:plugin.version },
+      { permissions: granted, pluginId, commandId, version: plugin.version },
     );
   }
 
@@ -1892,43 +3516,97 @@ export class EditorApplication {
     pluginContext?: {
       permissions: readonly PluginPermission[];
       pluginId: string;
-      commandId:string;version:string;
+      commandId: string;
+      version: string;
     },
   ) {
     const document = this.document;
     const revision = document.getSnapshot().revision;
-    const historyOrigin:import('./core/history-provenance').HistoryOrigin=pluginContext?{surface:'plugin',executionId:crypto.randomUUID(),plugin:{id:pluginContext.pluginId,commandId:pluginContext.commandId,version:pluginContext.version}}:{surface:'script',executionId:crypto.randomUUID()};
+    const historyOrigin: import("./core/history-provenance").HistoryOrigin =
+      pluginContext
+        ? {
+            surface: "plugin",
+            executionId: crypto.randomUUID(),
+            plugin: {
+              id: pluginContext.pluginId,
+              commandId: pluginContext.commandId,
+              version: pluginContext.version,
+            },
+          }
+        : { surface: "script", executionId: crypto.randomUUID() };
     const selectedId = document.selectedLayer?.id ?? null;
     const selectedIds = document.selectedLayers.map((layer) => layer.id);
     const assets = this.assets,
       generation = this.ioGeneration,
       snapshot = document.toJSON();
-    const rawOriginPins=new Map(assets.values().filter(asset=>asset.raw).map(asset=>[asset.id,captureAssetSource(assets,asset.id)]));
-    const usedRawOrigins=new Set<string>();let rawReadUsed=false;
-    const checkRawOrigin=(assetId:string)=>{
-      usedRawOrigins.add(assetId);const pin=rawOriginPins.get(assetId);if(!pin)throw new Error('RAW source was not present in the script snapshot.');
+    const rawOriginPins = new Map(
+      assets
+        .values()
+        .filter((asset) => asset.raw)
+        .map((asset) => [asset.id, captureAssetSource(assets, asset.id)]),
+    );
+    const usedRawOrigins = new Set<string>();
+    let rawReadUsed = false;
+    const checkRawOrigin = (assetId: string) => {
+      usedRawOrigins.add(assetId);
+      const pin = rawOriginPins.get(assetId);
+      if (!pin)
+        throw new Error("RAW source was not present in the script snapshot.");
       pin.check();
     };
-    const checkRawOrigins=()=>{for(const key of usedRawOrigins){const pin=rawOriginPins.get(key);if(!pin)throw new Error('RAW source was not present in the script snapshot.');pin.check();}};
+    const checkRawOrigins = () => {
+      for (const key of usedRawOrigins) {
+        const pin = rawOriginPins.get(key);
+        if (!pin)
+          throw new Error("RAW source was not present in the script snapshot.");
+        pin.check();
+      }
+    };
     let retouch: ScriptRetouch | undefined;
-    let retouchSelectionRetired=false;
-    let unsubscribeRetouchSelection=()=>{};
+    let retouchSelectionRetired = false;
+    let unsubscribeRetouchSelection = () => {};
     const selectionAbort = new AbortController();
-    const scriptCommitAbort = new AbortController(), scriptCommitDeadline = performance.now() + 5000;
+    const scriptCommitAbort = new AbortController(),
+      scriptCommitDeadline = performance.now() + 5000;
     let unsubscribeScriptCancellation = () => {};
     let selectionBusy = false;
     let selectionCount = 0;
-    let imageSelectionPrepared=false;
+    let imageSelectionPrepared = false;
     const checkSelection = () => {
       selectionAbort.signal.throwIfAborted();
-      if (this.ioGeneration !== generation || this.document !== document || this.assets !== assets || document.getSnapshot().revision !== revision)
-        throw new Error("Document session changed during selection preparation.");
-      if (pluginContext && !this.plugins.getGrantedPermissions(pluginContext.pluginId).includes("document:write"))
-        throw new Error("Permission denied: document:write is required to modify the document.");
+      if (
+        this.ioGeneration !== generation ||
+        this.document !== document ||
+        this.assets !== assets ||
+        document.getSnapshot().revision !== revision
+      )
+        throw new Error(
+          "Document session changed during selection preparation.",
+        );
+      if (
+        pluginContext &&
+        !this.plugins
+          .getGrantedPermissions(pluginContext.pluginId)
+          .includes("document:write")
+      )
+        throw new Error(
+          "Permission denied: document:write is required to modify the document.",
+        );
     };
     const checkRetouch = () => {
-      if(retouchSelectionRetired)throw new Error('The selection changed during script repair preparation.');
-      if (document.getSnapshot().selectedIds.length!==selectedIds.length||document.getSnapshot().selectedIds.some((key,i)=>key!==selectedIds[i]))throw new Error('The selection changed during script repair preparation.');
+      if (retouchSelectionRetired)
+        throw new Error(
+          "The selection changed during script repair preparation.",
+        );
+      if (
+        document.getSnapshot().selectedIds.length !== selectedIds.length ||
+        document
+          .getSnapshot()
+          .selectedIds.some((key, i) => key !== selectedIds[i])
+      )
+        throw new Error(
+          "The selection changed during script repair preparation.",
+        );
       if (
         this.ioGeneration !== generation ||
         this.document !== document ||
@@ -1965,101 +3643,422 @@ export class EditorApplication {
       pluginId: pluginContext?.pluginId,
       isTrustedScript: !pluginContext,
       historyOrigin,
-      assertCanCommit:()=>{
+      assertCanCommit: () => {
         scriptCommitAbort.signal.throwIfAborted();
-        if(performance.now()>scriptCommitDeadline)throw new Error('Script exceeded its 5-second time limit.');
-        if(this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision+hostBridge.inBandRevisions)throw new Error('Document changed before the script host commit.');
-        if(pluginContext){const grants=this.plugins.getGrantedPermissions(pluginContext.pluginId);if(!grants.includes('document:read')||!grants.includes('document:write'))throw new Error('Plugin permissions changed before host commit.');}
+        if (performance.now() > scriptCommitDeadline)
+          throw new Error("Script exceeded its 5-second time limit.");
+        if (
+          this.ioGeneration !== generation ||
+          this.document !== document ||
+          this.assets !== assets ||
+          document.getSnapshot().revision !==
+            revision + hostBridge.inBandRevisions
+        )
+          throw new Error("Document changed before the script host commit.");
+        if (pluginContext) {
+          const grants = this.plugins.getGrantedPermissions(
+            pluginContext.pluginId,
+          );
+          if (
+            !grants.includes("document:read") ||
+            !grants.includes("document:write")
+          )
+            throw new Error("Plugin permissions changed before host commit.");
+        }
       },
     });
     try {
       const pendingScript = this.scripts.run(document, code, {
         hostBridge: {
           dispatch: async (service, method, args) => {
-            if(service==='raw'&&method==='settings'){
+            if (service === "raw" && method === "settings") {
               selectionAbort.signal.throwIfAborted();
-              if(this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision)throw new Error('Document changed while reading RAW settings.');
-              if(pluginContext){const grants=this.plugins.getGrantedPermissions(pluginContext.pluginId);if(!grants.includes('document:read')||!grants.includes('assets:read'))throw new Error('Permission denied: document:read and assets:read are required for RAW settings.');}
-              rawReadUsed=true;
-              const request=args[1] as {layerId?:unknown};if(!request||typeof request.layerId!=='string'||Object.keys(request).some(key=>key!=='layerId'))throw new Error('Invalid RAW settings request.');
-              const data=execute(snapshot,{type:'transaction',label:'Read RAW settings',commands:parseCommands(args[0])});
-              if(retouch)return retouch.rawSettings(data,request.layerId);
-              const layer=findLayer(data,request.layerId);if(layer?.kind!=='smart-object')throw new Error('Choose an attached smart object.');
-              const source=new ComponentRegistry(data.components).get(layer.componentId).source;if(source.kind!=='asset')return null;
-              const asset=assets.get(source.assetId);if(rawOriginPins.has(source.assetId)||asset.raw)checkRawOrigin(source.assetId);
-              return asset.raw?rawDevelopOptionsSchema.parse(asset.raw.settings.development):null;
+              if (
+                this.ioGeneration !== generation ||
+                this.document !== document ||
+                this.assets !== assets ||
+                document.getSnapshot().revision !== revision
+              )
+                throw new Error("Document changed while reading RAW settings.");
+              if (pluginContext) {
+                const grants = this.plugins.getGrantedPermissions(
+                  pluginContext.pluginId,
+                );
+                if (
+                  !grants.includes("document:read") ||
+                  !grants.includes("assets:read")
+                )
+                  throw new Error(
+                    "Permission denied: document:read and assets:read are required for RAW settings.",
+                  );
+              }
+              rawReadUsed = true;
+              const request = args[1] as { layerId?: unknown };
+              if (
+                !request ||
+                typeof request.layerId !== "string" ||
+                Object.keys(request).some((key) => key !== "layerId")
+              )
+                throw new Error("Invalid RAW settings request.");
+              const data = execute(snapshot, {
+                type: "transaction",
+                label: "Read RAW settings",
+                commands: parseCommands(args[0]),
+              });
+              if (retouch) return retouch.rawSettings(data, request.layerId);
+              const layer = findLayer(data, request.layerId);
+              if (layer?.kind !== "smart-object")
+                throw new Error("Choose an attached smart object.");
+              const source = new ComponentRegistry(data.components).get(
+                layer.componentId,
+              ).source;
+              if (source.kind !== "asset") return null;
+              const asset = assets.get(source.assetId);
+              if (rawOriginPins.has(source.assetId) || asset.raw)
+                checkRawOrigin(source.assetId);
+              return asset.raw
+                ? rawDevelopOptionsSchema.parse(asset.raw.settings.development)
+                : null;
             }
-            if(service==='assets'&&pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required to inspect asset metadata.');
-            if(service==='selection'&&method==='subject'){
-              checkSelection();if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
-              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
-              const settings=selectSubjectOptionsSchema.parse(args[1]);
-              const checkSubject=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required for Select Subject.');};
-              checkSubject();imageSelectionPrepared=true;
-              const source=execute(snapshot,{type:'transaction',label:'Prepare Select Subject',commands:parseCommands(args[0])});
-              selectionBusy=true;return prepareSubject(source,assets,settings,{signal:selectionAbort.signal},checkSubject).finally(()=>{selectionBusy=false;});
-            }
-            if(service==='selection'&&method==='quick'){
-              checkSelection();if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
-              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
-              const settings=quickSelectionOptionsSchema.parse(args[1]);
-              const checkQuick=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required for Quick Selection.');};
-              checkQuick();imageSelectionPrepared=true;
-              const source=execute(snapshot,{type:'transaction',label:'Prepare Quick Selection',commands:parseCommands(args[0])});
-              selectionBusy=true;return prepareQuickSelection(source,assets,settings,{signal:selectionAbort.signal},checkQuick).finally(()=>{selectionBusy=false;});
-            }
-            if(service==='selection'&&method==='channel'){
+            if (
+              service === "assets" &&
+              pluginContext &&
+              !this.plugins
+                .getGrantedPermissions(pluginContext.pluginId)
+                .includes("assets:read")
+            )
+              throw new Error(
+                "Permission denied: assets:read is required to inspect asset metadata.",
+              );
+            if (service === "selection" && method === "subject") {
               checkSelection();
-              if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
-              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
-              const settings=channelLoadSchema.parse(args[1]);
-              const source=execute(snapshot,{type:'transaction',label:'Prepare alpha channel',commands:parseCommands(args[0])});
-              const channel=source.alphaChannels?.find(entry=>entry.id===settings.id);
-              if(!channel)throw new Error('Alpha channel not found.');
-              selectionBusy=true;
-              return prepareChannelSelection({operation:settings.operation,invert:settings.invert,selection:channel.selection,base:source.selection??null,width:source.width,height:source.height},{signal:selectionAbort.signal},checkSelection).finally(()=>{selectionBusy=false;});
+              if (selectionBusy)
+                throw new Error(
+                  "Await each selection preparation before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error("A script can prepare at most 32 selections.");
+              const settings = selectSubjectOptionsSchema.parse(args[1]);
+              const checkSubject = () => {
+                checkSelection();
+                if (
+                  pluginContext &&
+                  !this.plugins
+                    .getGrantedPermissions(pluginContext.pluginId)
+                    .includes("assets:read")
+                )
+                  throw new Error(
+                    "Permission denied: assets:read is required for Select Subject.",
+                  );
+              };
+              checkSubject();
+              imageSelectionPrepared = true;
+              const source = execute(snapshot, {
+                type: "transaction",
+                label: "Prepare Select Subject",
+                commands: parseCommands(args[0]),
+              });
+              selectionBusy = true;
+              return prepareSubject(
+                source,
+                assets,
+                settings,
+                { signal: selectionAbort.signal },
+                checkSubject,
+              ).finally(() => {
+                selectionBusy = false;
+              });
             }
-            if(service==='selection'&&method==='color-range'){
+            if (service === "selection" && method === "quick") {
               checkSelection();
-              if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
-              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
-              const settings=colorRangeOptionsSchema.parse(args[1]);
-              const checkColor=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required for Color Range sampling.');};
-              checkColor();imageSelectionPrepared=true;
-              const source=execute(snapshot,{type:'transaction',label:'Prepare color range',commands:parseCommands(args[0])});
-              selectionBusy=true;
-              return prepareColorRange(source,assets,settings,{signal:selectionAbort.signal},checkColor).finally(()=>{selectionBusy=false;});
+              if (selectionBusy)
+                throw new Error(
+                  "Await each selection preparation before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error("A script can prepare at most 32 selections.");
+              const settings = quickSelectionOptionsSchema.parse(args[1]);
+              const checkQuick = () => {
+                checkSelection();
+                if (
+                  pluginContext &&
+                  !this.plugins
+                    .getGrantedPermissions(pluginContext.pluginId)
+                    .includes("assets:read")
+                )
+                  throw new Error(
+                    "Permission denied: assets:read is required for Quick Selection.",
+                  );
+              };
+              checkQuick();
+              imageSelectionPrepared = true;
+              const source = execute(snapshot, {
+                type: "transaction",
+                label: "Prepare Quick Selection",
+                commands: parseCommands(args[0]),
+              });
+              selectionBusy = true;
+              return prepareQuickSelection(
+                source,
+                assets,
+                settings,
+                { signal: selectionAbort.signal },
+                checkQuick,
+              ).finally(() => {
+                selectionBusy = false;
+              });
+            }
+            if (service === "selection" && method === "channel") {
+              checkSelection();
+              if (selectionBusy)
+                throw new Error(
+                  "Await each selection preparation before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error("A script can prepare at most 32 selections.");
+              const settings = channelLoadSchema.parse(args[1]);
+              const source = execute(snapshot, {
+                type: "transaction",
+                label: "Prepare alpha channel",
+                commands: parseCommands(args[0]),
+              });
+              const channel = source.alphaChannels?.find(
+                (entry) => entry.id === settings.id,
+              );
+              if (!channel) throw new Error("Alpha channel not found.");
+              selectionBusy = true;
+              return prepareChannelSelection(
+                {
+                  operation: settings.operation,
+                  invert: settings.invert,
+                  selection: channel.selection,
+                  base: source.selection ?? null,
+                  width: source.width,
+                  height: source.height,
+                },
+                { signal: selectionAbort.signal },
+                checkSelection,
+              ).finally(() => {
+                selectionBusy = false;
+              });
+            }
+            if (service === "selection" && method === "color-range") {
+              checkSelection();
+              if (selectionBusy)
+                throw new Error(
+                  "Await each selection preparation before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error("A script can prepare at most 32 selections.");
+              const settings = colorRangeOptionsSchema.parse(args[1]);
+              const checkColor = () => {
+                checkSelection();
+                if (
+                  pluginContext &&
+                  !this.plugins
+                    .getGrantedPermissions(pluginContext.pluginId)
+                    .includes("assets:read")
+                )
+                  throw new Error(
+                    "Permission denied: assets:read is required for Color Range sampling.",
+                  );
+              };
+              checkColor();
+              imageSelectionPrepared = true;
+              const source = execute(snapshot, {
+                type: "transaction",
+                label: "Prepare color range",
+                commands: parseCommands(args[0]),
+              });
+              selectionBusy = true;
+              return prepareColorRange(
+                source,
+                assets,
+                settings,
+                { signal: selectionAbort.signal },
+                checkColor,
+              ).finally(() => {
+                selectionBusy = false;
+              });
             }
             if (service === "selection" && method === "modify") {
               checkSelection();
-              if (selectionBusy) throw new Error("Await each selection modification before starting another.");
-              if (++selectionCount > 32) throw new Error("A script can prepare at most 32 selections.");
+              if (selectionBusy)
+                throw new Error(
+                  "Await each selection modification before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error("A script can prepare at most 32 selections.");
               const settings = selectionModificationSchema.parse(args[1]);
-              const source = execute(snapshot, {type:"transaction",label:"Prepare selection",commands:parseCommands(args[0])});
-              if (!source.selection) throw new Error("Create a pixel selection first.");
+              const source = execute(snapshot, {
+                type: "transaction",
+                label: "Prepare selection",
+                commands: parseCommands(args[0]),
+              });
+              if (!source.selection)
+                throw new Error("Create a pixel selection first.");
               selectionBusy = true;
-              return prepareSelectionModification({...settings,selection:source.selection,width:source.width,height:source.height}, {signal:selectionAbort.signal}, checkSelection)
-                .finally(() => { selectionBusy = false; });
+              return prepareSelectionModification(
+                {
+                  ...settings,
+                  selection: source.selection,
+                  width: source.width,
+                  height: source.height,
+                },
+                { signal: selectionAbort.signal },
+                checkSelection,
+              ).finally(() => {
+                selectionBusy = false;
+              });
             }
-            if(service==='typography'&&method==='measure'){
-              const check=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('document:read'))throw new Error('Permission denied: document:read is required for typography preparation.');};
-              check();if(selectionBusy)throw new Error('Await each native preparation before starting another.');
-              if(++selectionCount>32)throw new Error('A script can prepare at most 32 native operations.');
-              const request=z.object({layerId:z.string(),patch:z.object({writingMode:writingModeSchema.optional(),textOrientation:textOrientationSchema.optional(),text:z.string().max(10000).optional(),characterRanges:z.array(characterRangeSchema).max(10000).optional(),textPath:textPathSchema.nullable().optional(),wrapWidth:z.number().finite().positive().nullable().optional(),paragraphSpacing:z.number().finite().min(0).max(10000).optional(),firstLineIndent:z.number().finite().min(-10000).max(10000).optional(),paragraphJustify:z.enum(['none','inter-word']).optional()}).strict()}).strict().parse(args[1]);
-              const source=execute(snapshot,{type:'transaction',label:'Prepare typography',commands:parseCommands(args[0])});
-              const candidate=execute(source,{type:'layer.update',id:request.layerId,patch:request.patch}),layer=findLayer(candidate,request.layerId);
-              if(layer?.kind!=='text')throw new Error('Typography preparation requires an attached text layer.');
-              selectionBusy=true;
-              try{const prepared=await prepareCharacterTextMetrics(characterInputForLayer(layer),candidate,assets,{signal:selectionAbort.signal,isCancelled:()=>{check();return false;}});try{check();prepared.check();return prepared.bounds;}finally{prepared.release();}}finally{selectionBusy=false;}
+            if (service === "typography" && method === "measure") {
+              const check = () => {
+                checkSelection();
+                if (
+                  pluginContext &&
+                  !this.plugins
+                    .getGrantedPermissions(pluginContext.pluginId)
+                    .includes("document:read")
+                )
+                  throw new Error(
+                    "Permission denied: document:read is required for typography preparation.",
+                  );
+              };
+              check();
+              if (selectionBusy)
+                throw new Error(
+                  "Await each native preparation before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error(
+                  "A script can prepare at most 32 native operations.",
+                );
+              const request = z
+                .object({
+                  layerId: z.string(),
+                  patch: z
+                    .object({
+                      writingMode: writingModeSchema.optional(),
+                      textOrientation: textOrientationSchema.optional(),
+                      text: z.string().max(10000).optional(),
+                      characterRanges: z
+                        .array(characterRangeSchema)
+                        .max(10000)
+                        .optional(),
+                      textPath: textPathSchema.nullable().optional(),
+                      wrapWidth: z
+                        .number()
+                        .finite()
+                        .positive()
+                        .nullable()
+                        .optional(),
+                      paragraphSpacing: z
+                        .number()
+                        .finite()
+                        .min(0)
+                        .max(10000)
+                        .optional(),
+                      firstLineIndent: z
+                        .number()
+                        .finite()
+                        .min(-10000)
+                        .max(10000)
+                        .optional(),
+                      paragraphJustify: z
+                        .enum(["none", "inter-word"])
+                        .optional(),
+                    })
+                    .strict(),
+                })
+                .strict()
+                .parse(args[1]);
+              const source = execute(snapshot, {
+                type: "transaction",
+                label: "Prepare typography",
+                commands: parseCommands(args[0]),
+              });
+              const candidate = execute(source, {
+                  type: "layer.update",
+                  id: request.layerId,
+                  patch: request.patch,
+                }),
+                layer = findLayer(candidate, request.layerId);
+              if (layer?.kind !== "text")
+                throw new Error(
+                  "Typography preparation requires an attached text layer.",
+                );
+              selectionBusy = true;
+              try {
+                const prepared = await prepareCharacterTextMetrics(
+                  characterInputForLayer(layer),
+                  candidate,
+                  assets,
+                  {
+                    signal: selectionAbort.signal,
+                    isCancelled: () => {
+                      check();
+                      return false;
+                    },
+                  },
+                );
+                try {
+                  check();
+                  prepared.check();
+                  return prepared.bounds;
+                } finally {
+                  prepared.release();
+                }
+              } finally {
+                selectionBusy = false;
+              }
             }
-            if(service==='vector'&&method==='boolean'){
+            if (service === "vector" && method === "boolean") {
               checkSelection();
-              if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('document:read'))throw new Error('Permission denied: document:read is required for Boolean operations.');
-              if(selectionBusy)throw new Error('Await each native preparation before starting another.');
-              if(++selectionCount>32)throw new Error('A script can prepare at most 32 native operations.');
-              const selection=vectorBooleanSelectionSchema.parse(args[1]),source=execute(snapshot,{type:'transaction',label:'Prepare Boolean operation',commands:parseCommands(args[0])}),request=captureVectorBoolean(source,selection).request;
-              const check=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('document:read'))throw new Error('Permission denied: document:read is required for Boolean operations.');};
-              selectionBusy=true;return this.prepareBoolean(document,request,{signal:selectionAbort.signal},check).finally(()=>{selectionBusy=false;});
+              if (
+                pluginContext &&
+                !this.plugins
+                  .getGrantedPermissions(pluginContext.pluginId)
+                  .includes("document:read")
+              )
+                throw new Error(
+                  "Permission denied: document:read is required for Boolean operations.",
+                );
+              if (selectionBusy)
+                throw new Error(
+                  "Await each native preparation before starting another.",
+                );
+              if (++selectionCount > 32)
+                throw new Error(
+                  "A script can prepare at most 32 native operations.",
+                );
+              const selection = vectorBooleanSelectionSchema.parse(args[1]),
+                source = execute(snapshot, {
+                  type: "transaction",
+                  label: "Prepare Boolean operation",
+                  commands: parseCommands(args[0]),
+                }),
+                request = captureVectorBoolean(source, selection).request;
+              const check = () => {
+                checkSelection();
+                if (
+                  pluginContext &&
+                  !this.plugins
+                    .getGrantedPermissions(pluginContext.pluginId)
+                    .includes("document:read")
+                )
+                  throw new Error(
+                    "Permission denied: document:read is required for Boolean operations.",
+                  );
+              };
+              selectionBusy = true;
+              return this.prepareBoolean(
+                document,
+                request,
+                { signal: selectionAbort.signal },
+                check,
+              ).finally(() => {
+                selectionBusy = false;
+              });
             }
             if (service !== "retouch")
               return hostBridge.dispatch(service, method, args);
@@ -2067,10 +4066,20 @@ export class EditorApplication {
             if (
               method !== "patch" &&
               method !== "heal" &&
-              method !== "rasterize" && method!=='matting' && method!=='raw-develop'
+              method !== "rasterize" &&
+              method !== "matting" &&
+              method !== "raw-develop"
             )
               return Promise.reject(new Error("Unknown retouch method."));
-            if(!retouch)unsubscribeRetouchSelection=document.subscribe(()=>{const ids=document.getSnapshot().selectedIds;if(ids.length!==selectedIds.length||ids.some((key,i)=>key!==selectedIds[i]))retouchSelectionRetired=true;});
+            if (!retouch)
+              unsubscribeRetouchSelection = document.subscribe(() => {
+                const ids = document.getSnapshot().selectedIds;
+                if (
+                  ids.length !== selectedIds.length ||
+                  ids.some((key, i) => key !== selectedIds[i])
+                )
+                  retouchSelectionRetired = true;
+              });
             retouch ??= new ScriptRetouch(
               snapshot,
               this.renderer,
@@ -2082,7 +4091,11 @@ export class EditorApplication {
           },
         },
       });
-      unsubscribeScriptCancellation = this.scripts.subscribeCancellation(() => scriptCommitAbort.abort(new Error('Script stopped. No script edits were applied.')));
+      unsubscribeScriptCancellation = this.scripts.subscribeCancellation(() =>
+        scriptCommitAbort.abort(
+          new Error("Script stopped. No script edits were applied."),
+        ),
+      );
       const result = await pendingScript;
       scriptCommitAbort.signal.throwIfAborted();
       if (
@@ -2106,15 +4119,30 @@ export class EditorApplication {
       // Permissions can change while the isolated worker is running. Recheck
       // before installing assets, dispatching staged commands or selecting layers.
       if (pluginContext) {
-        const granted = this.plugins.getGrantedPermissions(pluginContext.pluginId);
-        if(rawReadUsed&&!granted.includes('assets:read'))throw new Error('Plugin no longer has assets:read permission. No script edits were applied.');
-        if(imageSelectionPrepared&&!granted.includes('assets:read'))throw new Error('Plugin no longer has assets:read permission. No script edits were applied.');
+        const granted = this.plugins.getGrantedPermissions(
+          pluginContext.pluginId,
+        );
+        if (rawReadUsed && !granted.includes("assets:read"))
+          throw new Error(
+            "Plugin no longer has assets:read permission. No script edits were applied.",
+          );
+        if (imageSelectionPrepared && !granted.includes("assets:read"))
+          throw new Error(
+            "Plugin no longer has assets:read permission. No script edits were applied.",
+          );
         if (!granted.includes("document:read"))
-          throw new Error("Plugin is no longer installed. No script edits were applied.");
-        if (!granted.includes("document:write") && (
-          result.commands.length > 0 || result.selectedId !== selectedId ||
-          JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds)
-        )) throw new Error("Plugin no longer has document:write permission. No script edits were applied.");
+          throw new Error(
+            "Plugin is no longer installed. No script edits were applied.",
+          );
+        if (
+          !granted.includes("document:write") &&
+          (result.commands.length > 0 ||
+            result.selectedId !== selectedId ||
+            JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds))
+        )
+          throw new Error(
+            "Plugin no longer has document:write permission. No script edits were applied.",
+          );
       }
       const command = {
         type: "transaction" as const,
@@ -2123,29 +4151,96 @@ export class EditorApplication {
       };
       const next = execute(document.toJSON(), command);
       let installed: string[] = [];
-      const installedRecords = new Map<string, ReturnType<AssetStore['get']>>();
+      const installedRecords = new Map<string, ReturnType<AssetStore["get"]>>();
       try {
         const sources = retouch ? retouch.validationSources(assets) : assets;
-        const pinned = [...referencedAssets(next)].map(id => { const source = sources.get(id); return { id, source, bitmap: source.bitmap, blob: source.blob, width: source.width, height: source.height }; });
-        const needsWrite = result.commands.length > 0 || result.selectedId !== selectedId || JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds) || hostBridge.inBandRevisions > 0;
+        const pinned = [...referencedAssets(next)].map((id) => {
+          const source = sources.get(id);
+          return {
+            id,
+            source,
+            bitmap: source.bitmap,
+            blob: source.blob,
+            width: source.width,
+            height: source.height,
+          };
+        });
+        const needsWrite =
+          result.commands.length > 0 ||
+          result.selectedId !== selectedId ||
+          JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds) ||
+          hostBridge.inBandRevisions > 0;
         const checkWetCommit = () => {
-          scriptCommitAbort.signal.throwIfAborted();checkRawOrigins();
-          if (performance.now() > scriptCommitDeadline) throw new Error('Script exceeded its 5-second time limit. No script edits were applied.');
-          if (this.ioGeneration !== generation || this.document !== document || this.assets !== assets || document.getSnapshot().revision !== revision + hostBridge.inBandRevisions) throw new Error('The document changed while the script ran. No script edits were applied.');
+          scriptCommitAbort.signal.throwIfAborted();
+          checkRawOrigins();
+          if (performance.now() > scriptCommitDeadline)
+            throw new Error(
+              "Script exceeded its 5-second time limit. No script edits were applied.",
+            );
+          if (
+            this.ioGeneration !== generation ||
+            this.document !== document ||
+            this.assets !== assets ||
+            document.getSnapshot().revision !==
+              revision + hostBridge.inBandRevisions
+          )
+            throw new Error(
+              "The document changed while the script ran. No script edits were applied.",
+            );
           if (pluginContext) {
-            const grants = this.plugins.getGrantedPermissions(pluginContext.pluginId);
-            if (!grants.includes('document:read') || (needsWrite && !grants.includes('document:write')) || ((imageSelectionPrepared||rawReadUsed) && !grants.includes('assets:read'))) throw new Error('Plugin permissions changed. No script edits were applied.');
+            const grants = this.plugins.getGrantedPermissions(
+              pluginContext.pluginId,
+            );
+            if (
+              !grants.includes("document:read") ||
+              (needsWrite && !grants.includes("document:write")) ||
+              ((imageSelectionPrepared || rawReadUsed) &&
+                !grants.includes("assets:read"))
+            )
+              throw new Error(
+                "Plugin permissions changed. No script edits were applied.",
+              );
           }
-          for (const entry of pinned) { const source = sources.get(entry.id); if (source !== entry.source || source.bitmap !== entry.bitmap || source.blob !== entry.blob || source.width !== entry.width || source.height !== entry.height || !assetBitmapMatches(source)) throw new Error('Script source assets changed. No script edits were applied.'); }
+          for (const entry of pinned) {
+            const source = sources.get(entry.id);
+            if (
+              source !== entry.source ||
+              source.bitmap !== entry.bitmap ||
+              source.blob !== entry.blob ||
+              source.width !== entry.width ||
+              source.height !== entry.height ||
+              !assetBitmapMatches(source)
+            )
+              throw new Error(
+                "Script source assets changed. No script edits were applied.",
+              );
+          }
         };
-        await validatePreparedPaintAssets(next, wetBrowserAssets(sources, checkWetCommit));
+        await validatePreparedPaintAssets(
+          next,
+          wetBrowserAssets(sources, checkWetCommit),
+        );
         checkWetCommit();
         installed = retouch ? retouch.installReferenced(next, assets) : [];
         for (const id of installed) installedRecords.set(id, assets.get(id));
-        document._withHistoryOrigin(historyOrigin,()=>document._dispatch(command));
+        document._withHistoryOrigin(historyOrigin, () =>
+          document._dispatch(command),
+        );
       } catch (error) {
-        const current = document.getSnapshot(), retained = new Set(retainedDocuments(current.document, captureRetainedHistory(current)).flatMap(state => [...referencedAssets(state)]));
-        for (const assetId of installed) if (!retained.has(assetId) && assets.has(assetId) && assets.get(assetId) === installedRecords.get(assetId)) assets.remove(assetId);
+        const current = document.getSnapshot(),
+          retained = new Set(
+            retainedDocuments(
+              current.document,
+              captureRetainedHistory(current),
+            ).flatMap((state) => [...referencedAssets(state)]),
+          );
+        for (const assetId of installed)
+          if (
+            !retained.has(assetId) &&
+            assets.has(assetId) &&
+            assets.get(assetId) === installedRecords.get(assetId)
+          )
+            assets.remove(assetId);
         throw error;
       }
       document.selectLayers(
@@ -2153,7 +4248,11 @@ export class EditorApplication {
       );
       return result.logs;
     } finally {
-      scriptCommitAbort.abort(new Error('Script execution finished. Pending host edits cannot commit.'));
+      scriptCommitAbort.abort(
+        new Error(
+          "Script execution finished. Pending host edits cannot commit.",
+        ),
+      );
       unsubscribeRetouchSelection();
       unsubscribeScriptCancellation();
       selectionAbort.abort();
@@ -2164,13 +4263,30 @@ export class EditorApplication {
   dispose() {
     this.ioGeneration++;
     this.retouchDisposed = true;
-    this.precisionJob?.abort(new Error('Editor disposed during precision preparation.'));this.precisionJob=null;
-    for(const job of this.fontJobs)job.abort(new Error('Editor disposed during font source preparation.'));this.fontJobs.clear();
-    for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
-    for(const job of this.rawJobs)job.abort(new Error('Editor disposed during RAW preparation.'));this.rawJobs.clear();
-    for(const job of this.tiffJobs)job.abort(new Error('Editor disposed during TIFF preparation.'));this.tiffJobs.clear();
-    for(const job of this.avifJobs)job.abort(new Error('Editor disposed during AVIF import.'));this.avifJobs.clear();
-    for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
+    this.precisionJob?.abort(
+      new Error("Editor disposed during precision preparation."),
+    );
+    this.precisionJob = null;
+    for (const job of this.fontJobs)
+      job.abort(new Error("Editor disposed during font source preparation."));
+    this.fontJobs.clear();
+    for (const job of this.photoshopJobs)
+      job.abort(new Error("Editor disposed during Photoshop import."));
+    this.photoshopJobs.clear();
+    this.photoshopCommits.clear();
+    for (const job of this.rawJobs)
+      job.abort(new Error("Editor disposed during RAW preparation."));
+    this.rawJobs.clear();
+    for (const job of this.tiffJobs)
+      job.abort(new Error("Editor disposed during TIFF preparation."));
+    this.tiffJobs.clear();
+    for (const job of this.avifJobs)
+      job.abort(new Error("Editor disposed during AVIF import."));
+    this.avifJobs.clear();
+    for (const controller of this.booleanControllers)
+      controller.abort(
+        new Error("Editor disposed during the Boolean operation."),
+      );
     this.booleanControllers.clear();
     this.retouchDisposed = true;
     this.idleRetouchProcessor?.dispose();
@@ -2180,11 +4296,20 @@ export class EditorApplication {
     this.workspaceAutosave.dispose();
     this.projectEncoder.dispose();
     this.tools.cancel();
-    this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
+    this.presetApplyAbort?.abort(
+      new DOMException(
+        "Editor disposed during preset preparation.",
+        "AbortError",
+      ),
+    );
+    this.presetApplyAbort = null;
     this.recentFiles.dispose();
     this.artworkLibrary.dispose();
     this.palettes.dispose();
-    this.historyPreviewClosed=true;for(const abort of this.historyPreviews)abort.abort(new DOMException("Editor closed.","AbortError"));this.historyPreviews.clear();
+    this.historyPreviewClosed = true;
+    for (const abort of this.historyPreviews)
+      abort.abort(new DOMException("Editor closed.", "AbortError"));
+    this.historyPreviews.clear();
     this.lensProfiles.dispose();
     this.chatGpt.dispose();
     this.brushPresets.dispose();

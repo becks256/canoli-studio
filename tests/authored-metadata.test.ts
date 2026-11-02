@@ -1,4 +1,4 @@
-import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
+import { SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA } from "../src/core/model";
 import { describe, it, expect } from "vitest";
 import { Document, RasterLayer, LayerMetadata } from "../src/dom";
 import { parseCommands } from "../src/core/validation";
@@ -74,22 +74,33 @@ describe("authored layer metadata", () => {
 });
 
 it("keeps metadata snapshots and keyword getters independent through attachment, reset and undo", () => {
-  const layer = new RasterLayer({assetId:"source",width:10,height:10});
+  const layer = new RasterLayer({ assetId: "source", width: 10, height: 10 });
   const keywords = ["original"];
-  layer.metadata = new LayerMetadata({title:"Detached",keywords});
+  layer.metadata = new LayerMetadata({ title: "Detached", keywords });
   keywords.push("caller edit");
-  const handle = layer.metadata, before = handle.toJSON();
-  const document = new Document(); document.layers.add(layer);
-  const returned = handle.keywords; returned.push("getter edit");
+  const handle = layer.metadata,
+    before = handle.toJSON();
+  const document = new Document();
+  document.layers.add(layer);
+  const returned = handle.keywords;
+  returned.push("getter edit");
   expect(handle.keywords).toEqual(["original"]);
   document.transaction("Metadata", () => {
     handle.title = "Attached";
     expect(handle.title).toBe("Attached");
     handle.keywords = ["updated"];
   });
-  expect(before.title).toBe("Detached");expect(before.keywords).toEqual(["original"]);
-  handle.reset();expect(handle.title).toBe("");expect(handle.keywords).toEqual([]);
-  document.undo();expect(handle.title).toBe("Attached");expect(handle.keywords).toEqual(["updated"]);
-  document.undo();expect(handle.title).toBe("Detached");expect(handle.keywords).toEqual(["original"]);
-  layer.remove();expect(()=>handle.toJSON()).toThrow("current document revision");
+  expect(before.title).toBe("Detached");
+  expect(before.keywords).toEqual(["original"]);
+  handle.reset();
+  expect(handle.title).toBe("");
+  expect(handle.keywords).toEqual([]);
+  document.undo();
+  expect(handle.title).toBe("Attached");
+  expect(handle.keywords).toEqual(["updated"]);
+  document.undo();
+  expect(handle.title).toBe("Detached");
+  expect(handle.keywords).toEqual(["original"]);
+  layer.remove();
+  expect(() => handle.toJSON()).toThrow("current document revision");
 });

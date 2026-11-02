@@ -32,14 +32,14 @@ before/after. Each case records 20 paced edits after initial document readiness,
 the matching prepared model, actual canvas pixels, source SHA/dimensions and
 20 exact undo operations. Rendering is Canvas2D on this host.
 
-| Control | Pair | Canvas-copy p95 before / after, ms |
-| --- | --- | --- |
-| LUT | 1 | 219.9 / 100.9 |
-| LUT | 2 | 213.7 / 89.0 |
-| LUT | 3 | 218.2 / 88.6 |
-| Gradient Map | 1 | 231.1 / 93.3 |
-| Gradient Map | 2 | 224.6 / 96.3 |
-| Gradient Map | 3 | 238.7 / 95.8 |
+| Control      | Pair | Canvas-copy p95 before / after, ms |
+| ------------ | ---- | ---------------------------------- |
+| LUT          | 1    | 219.9 / 100.9                      |
+| LUT          | 2    | 213.7 / 89.0                       |
+| LUT          | 3    | 218.2 / 88.6                       |
+| Gradient Map | 1    | 231.1 / 93.3                       |
+| Gradient Map | 2    | 224.6 / 96.3                       |
+| Gradient Map | 3    | 238.7 / 95.8                       |
 
 No long tasks were observed in these paced control cases, before or after.
 The final complete performance sweep records LUT / Gradient Map copy p95 of

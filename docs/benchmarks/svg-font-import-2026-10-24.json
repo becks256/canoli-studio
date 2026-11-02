@@ -208,21 +208,13 @@
       "pixels": [
         {
           "path": "svg-font-import.e2e.ts-exp-31cd8-xt-undo-and-reopened-pixels/reference.png",
-          "dimensions": [
-            480,
-            300
-          ],
+          "dimensions": [480, 300],
           "rgbaSha256": "eb6bcc9992b093011c5afefd2c31bedcd516914260de5b795ab7d4ddb88be27b",
-          "equal": [
-            "imported.png"
-          ]
+          "equal": ["imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-11ae4-s-retain-supplied-originals/svg-font-reference.png",
-          "dimensions": [
-            300,
-            140
-          ],
+          "dimensions": [300, 140],
           "rgbaSha256": "28b38cce031b1600d24474640b004a8a49b9ad334386805da9bcb2efb071de99",
           "equal": [
             "svg-font-imported.png",
@@ -232,47 +224,27 @@
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-eb6b3-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "13ab3c990a1ede956618f13940ce30d838f2fab0eaa7c79c42b8794a8d5ced5f",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-a62e7-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "13ab3c990a1ede956618f13940ce30d838f2fab0eaa7c79c42b8794a8d5ced5f",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-78c82-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "d6dbda73c0e4a758054d018ca2995c0db7893075b4d2b57d6926a5b640606fe1",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-7cb28-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "13ab3c990a1ede956618f13940ce30d838f2fab0eaa7c79c42b8794a8d5ced5f",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         }
       ]
     },
@@ -404,21 +376,13 @@
       "pixels": [
         {
           "path": "svg-font-import.e2e.ts-exp-31cd8-xt-undo-and-reopened-pixels/reference.png",
-          "dimensions": [
-            480,
-            300
-          ],
+          "dimensions": [480, 300],
           "rgbaSha256": "eb6bcc9992b093011c5afefd2c31bedcd516914260de5b795ab7d4ddb88be27b",
-          "equal": [
-            "imported.png"
-          ]
+          "equal": ["imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-11ae4-s-retain-supplied-originals/svg-font-reference.png",
-          "dimensions": [
-            300,
-            140
-          ],
+          "dimensions": [300, 140],
           "rgbaSha256": "28b38cce031b1600d24474640b004a8a49b9ad334386805da9bcb2efb071de99",
           "equal": [
             "svg-font-imported.png",
@@ -428,113 +392,61 @@
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-eb6b3-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "13ab3c990a1ede956618f13940ce30d838f2fab0eaa7c79c42b8794a8d5ced5f",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-a62e7-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "13ab3c990a1ede956618f13940ce30d838f2fab0eaa7c79c42b8794a8d5ced5f",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-78c82-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "d6dbda73c0e4a758054d018ca2995c0db7893075b4d2b57d6926a5b640606fe1",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-SVG-7cb28-d-independent-native-pixels/format-reference.png",
-          "dimensions": [
-            280,
-            100
-          ],
+          "dimensions": [280, 100],
           "rgbaSha256": "13ab3c990a1ede956618f13940ce30d838f2fab0eaa7c79c42b8794a8d5ced5f",
-          "equal": [
-            "format-imported.png"
-          ]
+          "equal": ["format-imported.png"]
         },
         {
           "path": "svg-font-import.e2e.ts-esc-c9f44-ns-actual-browser-placement/svg-css-geometry-3-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "cafdeb4703a82b9f610bc07e6185c011c99885ca633f18f422a6d940fe309cec",
-          "equal": [
-            "svg-css-geometry-3-imported.png"
-          ],
-          "authoredPosition": [
-            10,
-            28
-          ],
+          "equal": ["svg-css-geometry-3-imported.png"],
+          "authoredPosition": [10, 28],
           "attributeOnlyCssIgnored": true,
           "positionPixelsVerified": true
         },
         {
           "path": "svg-font-import.e2e.ts-esc-c9f44-ns-actual-browser-placement/svg-css-geometry-2-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "cafdeb4703a82b9f610bc07e6185c011c99885ca633f18f422a6d940fe309cec",
-          "equal": [
-            "svg-css-geometry-2-imported.png"
-          ],
-          "authoredPosition": [
-            10,
-            28
-          ],
+          "equal": ["svg-css-geometry-2-imported.png"],
+          "authoredPosition": [10, 28],
           "attributeOnlyCssIgnored": true,
           "positionPixelsVerified": true
         },
         {
           "path": "svg-font-import.e2e.ts-esc-c9f44-ns-actual-browser-placement/svg-css-geometry-1-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "2ac06b874bb143792c5b4fa7358d71f5165685dfa913859e38075a2a08ff82a1",
-          "equal": [
-            "svg-css-geometry-1-imported.png"
-          ],
-          "authoredPosition": [
-            50,
-            0
-          ],
+          "equal": ["svg-css-geometry-1-imported.png"],
+          "authoredPosition": [50, 0],
           "attributeOnlyCssIgnored": false,
           "positionPixelsVerified": true
         },
         {
           "path": "svg-font-import.e2e.ts-esc-c9f44-ns-actual-browser-placement/svg-css-geometry-0-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "2ac06b874bb143792c5b4fa7358d71f5165685dfa913859e38075a2a08ff82a1",
-          "equal": [
-            "svg-css-geometry-0-imported.png"
-          ],
-          "authoredPosition": [
-            50,
-            0
-          ],
+          "equal": ["svg-css-geometry-0-imported.png"],
+          "authoredPosition": [50, 0],
           "attributeOnlyCssIgnored": false,
           "positionPixelsVerified": true
         }
@@ -566,10 +478,7 @@
       "pixels": [
         {
           "path": "production.e2e.ts-producti-3c1a8--undo-and-project-originals/svg-font-reference.png",
-          "dimensions": [
-            300,
-            140
-          ],
+          "dimensions": [300, 140],
           "rgbaSha256": "28b38cce031b1600d24474640b004a8a49b9ad334386805da9bcb2efb071de99",
           "equal": [
             "svg-font-imported.png",
@@ -579,69 +488,37 @@
         },
         {
           "path": "production.e2e.ts-producti-2b7a9-t-without-developer-globals/svg-css-geometry-3-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "cafdeb4703a82b9f610bc07e6185c011c99885ca633f18f422a6d940fe309cec",
-          "equal": [
-            "svg-css-geometry-3-imported.png"
-          ],
-          "authoredPosition": [
-            10,
-            28
-          ],
+          "equal": ["svg-css-geometry-3-imported.png"],
+          "authoredPosition": [10, 28],
           "attributeOnlyCssIgnored": true,
           "positionPixelsVerified": true
         },
         {
           "path": "production.e2e.ts-producti-2b7a9-t-without-developer-globals/svg-css-geometry-2-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "cafdeb4703a82b9f610bc07e6185c011c99885ca633f18f422a6d940fe309cec",
-          "equal": [
-            "svg-css-geometry-2-imported.png"
-          ],
-          "authoredPosition": [
-            10,
-            28
-          ],
+          "equal": ["svg-css-geometry-2-imported.png"],
+          "authoredPosition": [10, 28],
           "attributeOnlyCssIgnored": true,
           "positionPixelsVerified": true
         },
         {
           "path": "production.e2e.ts-producti-2b7a9-t-without-developer-globals/svg-css-geometry-1-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "2ac06b874bb143792c5b4fa7358d71f5165685dfa913859e38075a2a08ff82a1",
-          "equal": [
-            "svg-css-geometry-1-imported.png"
-          ],
-          "authoredPosition": [
-            50,
-            0
-          ],
+          "equal": ["svg-css-geometry-1-imported.png"],
+          "authoredPosition": [50, 0],
           "attributeOnlyCssIgnored": false,
           "positionPixelsVerified": true
         },
         {
           "path": "production.e2e.ts-producti-2b7a9-t-without-developer-globals/svg-css-geometry-0-reference.png",
-          "dimensions": [
-            100,
-            40
-          ],
+          "dimensions": [100, 40],
           "rgbaSha256": "2ac06b874bb143792c5b4fa7358d71f5165685dfa913859e38075a2a08ff82a1",
-          "equal": [
-            "svg-css-geometry-0-imported.png"
-          ],
-          "authoredPosition": [
-            50,
-            0
-          ],
+          "equal": ["svg-css-geometry-0-imported.png"],
+          "authoredPosition": [50, 0],
           "attributeOnlyCssIgnored": false,
           "positionPixelsVerified": true
         }
@@ -649,22 +526,13 @@
     },
     "independentLargeImage": {
       "Pillow": "10.3.0",
-      "dimensions": [
-        10000,
-        5000
-      ],
+      "dimensions": [10000, 5000],
       "pixels": 50000000,
       "rgbaSamples": 200000000,
       "maximumError": 0,
       "textReference": {
-        "position": [
-          2016,
-          2024
-        ],
-        "dimensions": [
-          600,
-          200
-        ]
+        "position": [2016, 2024],
+        "dimensions": [600, 200]
       },
       "nativePngSha256": "3936227dbbeca08835e236a0f6c45c9a802228575c41c18f5bc48e0930930bfb",
       "textReferenceSha256": "c38d4264c0898747ae40014674cbdf972f70aeb92bdaaa1b6126f3c5b4928a20",
@@ -3525,10 +3393,7 @@
             "path": "*"
           }
         ],
-        "navigations": [
-          "/",
-          "/"
-        ],
+        "navigations": ["/", "/"],
         "messages": [
           "[vite] connecting...",
           "[vite] connected.",
@@ -3575,13 +3440,8 @@
           "zod"
         ],
         "events": [],
-        "navigations": [
-          "/"
-        ],
-        "messages": [
-          "[vite] connecting...",
-          "[vite] connected."
-        ],
+        "navigations": ["/"],
+        "messages": ["[vite] connecting...", "[vite] connected."],
         "result": {
           "version": 1,
           "width": 300,
@@ -3640,13 +3500,8 @@
           "zod"
         ],
         "events": [],
-        "navigations": [
-          "/"
-        ],
-        "messages": [
-          "[vite] connecting...",
-          "[vite] connected."
-        ],
+        "navigations": ["/"],
+        "messages": ["[vite] connecting...", "[vite] connected."],
         "result": {
           "version": 1,
           "width": 300,
@@ -3851,18 +3706,8 @@
           "property": "none",
           "value": "",
           "cssSupported": null,
-          "referenceBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
-          "nativeBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
+          "referenceBounds": [20, 39, 112, 59],
+          "nativeBounds": [20, 39, 112, 59],
           "maximumError": 0,
           "error": "",
           "inspection": {
@@ -3892,18 +3737,8 @@
           "property": "dx",
           "value": "50px",
           "cssSupported": false,
-          "referenceBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
-          "nativeBounds": [
-            70,
-            39,
-            162,
-            59
-          ],
+          "referenceBounds": [20, 39, 112, 59],
+          "nativeBounds": [70, 39, 162, 59],
           "maximumError": 255,
           "error": "",
           "inspection": {
@@ -3933,18 +3768,8 @@
           "property": "dy",
           "value": "20px",
           "cssSupported": false,
-          "referenceBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
-          "nativeBounds": [
-            20,
-            59,
-            112,
-            79
-          ],
+          "referenceBounds": [20, 39, 112, 59],
+          "nativeBounds": [20, 59, 112, 79],
           "maximumError": 255,
           "error": "",
           "inspection": {
@@ -3979,18 +3804,8 @@
           "property": "none",
           "value": "",
           "cssSupported": null,
-          "referenceBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
-          "nativeBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
+          "referenceBounds": [20, 39, 112, 59],
+          "nativeBounds": [20, 39, 112, 59],
           "maximumError": 0,
           "error": "",
           "inspection": {
@@ -4020,18 +3835,8 @@
           "property": "dx",
           "value": "50px",
           "cssSupported": false,
-          "referenceBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
-          "nativeBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
+          "referenceBounds": [20, 39, 112, 59],
+          "nativeBounds": [20, 39, 112, 59],
           "maximumError": 0,
           "error": "Error: This SVG has unsupported editable features. Review the report and explicitly choose flattened import.",
           "inspection": {
@@ -4063,18 +3868,8 @@
           "property": "dy",
           "value": "20px",
           "cssSupported": false,
-          "referenceBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
-          "nativeBounds": [
-            20,
-            39,
-            112,
-            59
-          ],
+          "referenceBounds": [20, 39, 112, 59],
+          "nativeBounds": [20, 39, 112, 59],
           "maximumError": 0,
           "error": "Error: This SVG has unsupported editable features. Review the report and explicitly choose flattened import.",
           "inspection": {

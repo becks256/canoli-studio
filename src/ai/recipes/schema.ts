@@ -1,18 +1,29 @@
-import {paintOperationSchema,pathSchema} from '../../core/drawing';
-import {recipeDeliverySchema} from './delivery';
+import { paintOperationSchema, pathSchema } from "../../core/drawing";
+import { recipeDeliverySchema } from "./delivery";
 import { z } from "zod";
 import type { Recipe } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
-import {paragraphOverrideKeysSchema} from '../../core/paragraph-styles';
-import {recipeFontFilesSchema} from './fonts';
-import {layerAlignmentSchema} from '../../core/layer-layout';
+import { paragraphOverrideKeysSchema } from "../../core/paragraph-styles";
+import { recipeFontFilesSchema } from "./fonts";
+import { layerAlignmentSchema } from "../../core/layer-layout";
 
-export const recipeParagraphStyleTargetSchema=z.discriminatedUnion('by',[
-  z.object({by:z.literal('name'),name:z.string().trim().min(1).max(80)}).strict(),
-  z.object({by:z.literal('stepResult'),stepId:z.string().min(1).max(120)}).strict(),
+export const recipeParagraphStyleTargetSchema = z.discriminatedUnion("by", [
+  z
+    .object({ by: z.literal("name"), name: z.string().trim().min(1).max(80) })
+    .strict(),
+  z
+    .object({ by: z.literal("stepResult"), stepId: z.string().min(1).max(120) })
+    .strict(),
 ]);
-const recipeParagraphFormatSchema=z.record(z.string(),z.unknown());
-const recipeParagraphBaseSchema=z.object({style:recipeParagraphStyleTargetSchema,overrides:recipeParagraphFormatSchema}).strict().nullable().optional();
+const recipeParagraphFormatSchema = z.record(z.string(), z.unknown());
+const recipeParagraphBaseSchema = z
+  .object({
+    style: recipeParagraphStyleTargetSchema,
+    overrides: recipeParagraphFormatSchema,
+  })
+  .strict()
+  .nullable()
+  .optional();
 
 export function recipeOutputBindingsUnique(data: {
   steps: { id: string; outputVar?: string }[];
@@ -76,7 +87,15 @@ export const semanticTargetSchema: z.ZodTypeAny = z
     pattern: z.string().min(1).max(240).optional(),
     literal: z.boolean().optional(),
     kind: z
-      .enum(["raster", "group", "paint", "vector", "text", "adjustment", "smart-object"])
+      .enum([
+        "raster",
+        "group",
+        "paint",
+        "vector",
+        "text",
+        "adjustment",
+        "smart-object",
+      ])
       .optional(),
     tag: z.string().min(1).max(80).optional(),
     stepId: z.string().min(1).max(120).optional(),
@@ -131,31 +150,128 @@ export const stepConditionSchema = z
   });
 
 // Parameter expressions are resolved and then validated by the native options contract.
-const rawNumber=z.union([z.number().finite(),z.string().min(1)]);
-export const recipeRawDevelopmentSchema=z.object({
-  lens:z.union([z.record(z.string(),z.unknown()),z.string().min(1)]).optional(),
-  image:rawNumber.optional(),whiteBalance:z.string().min(1).optional(),demosaic:z.string().min(1).optional(),
-  exposure:rawNumber.optional(),highlightPreservation:rawNumber.optional(),highlights:rawNumber.optional(),
-  multipliers:z.object({red:rawNumber.optional(),green:rawNumber.optional(),blue:rawNumber.optional()}).strict().optional(),
-}).strict();
+const rawNumber = z.union([z.number().finite(), z.string().min(1)]);
+export const recipeRawDevelopmentSchema = z
+  .object({
+    lens: z
+      .union([z.record(z.string(), z.unknown()), z.string().min(1)])
+      .optional(),
+    image: rawNumber.optional(),
+    whiteBalance: z.string().min(1).optional(),
+    demosaic: z.string().min(1).optional(),
+    exposure: rawNumber.optional(),
+    highlightPreservation: rawNumber.optional(),
+    highlights: rawNumber.optional(),
+    multipliers: z
+      .object({
+        red: rawNumber.optional(),
+        green: rawNumber.optional(),
+        blue: rawNumber.optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
-  z.object({type:z.literal("layer.place"),reference:semanticTargetSchema.nullable(),placement:z.enum(["before","after","inside"]),preservePosition:z.boolean()}).strict(),
-  z.object({type:z.literal("paint.add"),stroke:paintOperationSchema}).strict(),
-  z.object({type:z.literal("path.add"),path:pathSchema}).strict(),
-  z.object({type:z.literal('layer.align'),targets:z.array(semanticTargetSchema).min(1),alignment:layerAlignmentSchema,reference:z.discriminatedUnion('type',[
-    z.object({type:z.literal('selection')}).strict(),z.object({type:z.literal('canvas')}).strict(),z.object({type:z.literal('layer'),layer:semanticTargetSchema}).strict(),
-  ]).optional()}).strict(),
-  z.object({type:z.literal('font.file.add'),id:z.string().regex(/^[a-f0-9]{64}$/)}).strict(),
-  z.object({type:z.literal('font.file.rename'),id:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().min(1).max(240)}).strict(),
-  z.object({type:z.literal('font.file.remove'),id:z.string().regex(/^[a-f0-9]{64}$/),replaceWith:z.string().min(1).max(240).optional()}).strict(),
-  z.object({type:z.literal('document.font.replace'),from:z.string().min(1).max(240),to:z.string().min(1).max(240)}).strict(),
-  z.object({type:z.literal("raw.develop"),development:recipeRawDevelopmentSchema,allowPrecisionLoss:z.literal(true)}).strict(),
-  z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
-  z.object({type:z.literal('paragraphStyle.update'),style:recipeParagraphStyleTargetSchema,name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
-  z.object({type:z.literal('paragraphStyle.remove'),style:recipeParagraphStyleTargetSchema}).strict(),
-  z.object({type:z.literal('text.paragraphStyle'),style:recipeParagraphStyleTargetSchema.nullable(),keepOverrides:z.boolean().optional()}).strict(),
-  z.object({type:z.literal('text.paragraphOverrides.clear'),keys:paragraphOverrideKeysSchema.optional()}).strict(),
+  z
+    .object({
+      type: z.literal("layer.place"),
+      reference: semanticTargetSchema.nullable(),
+      placement: z.enum(["before", "after", "inside"]),
+      preservePosition: z.boolean(),
+    })
+    .strict(),
+  z
+    .object({ type: z.literal("paint.add"), stroke: paintOperationSchema })
+    .strict(),
+  z.object({ type: z.literal("path.add"), path: pathSchema }).strict(),
+  z
+    .object({
+      type: z.literal("layer.align"),
+      targets: z.array(semanticTargetSchema).min(1),
+      alignment: layerAlignmentSchema,
+      reference: z
+        .discriminatedUnion("type", [
+          z.object({ type: z.literal("selection") }).strict(),
+          z.object({ type: z.literal("canvas") }).strict(),
+          z
+            .object({ type: z.literal("layer"), layer: semanticTargetSchema })
+            .strict(),
+        ])
+        .optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("font.file.add"),
+      id: z.string().regex(/^[a-f0-9]{64}$/),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("font.file.rename"),
+      id: z.string().regex(/^[a-f0-9]{64}$/),
+      name: z.string().min(1).max(240),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("font.file.remove"),
+      id: z.string().regex(/^[a-f0-9]{64}$/),
+      replaceWith: z.string().min(1).max(240).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("document.font.replace"),
+      from: z.string().min(1).max(240),
+      to: z.string().min(1).max(240),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("raw.develop"),
+      development: recipeRawDevelopmentSchema,
+      allowPrecisionLoss: z.literal(true),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("paragraphStyle.ensure"),
+      name: z.string().min(1).max(80),
+      format: recipeParagraphFormatSchema,
+      basedOn: recipeParagraphBaseSchema,
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("paragraphStyle.update"),
+      style: recipeParagraphStyleTargetSchema,
+      name: z.string().min(1).max(80),
+      format: recipeParagraphFormatSchema,
+      basedOn: recipeParagraphBaseSchema,
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("paragraphStyle.remove"),
+      style: recipeParagraphStyleTargetSchema,
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("text.paragraphStyle"),
+      style: recipeParagraphStyleTargetSchema.nullable(),
+      keepOverrides: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("text.paragraphOverrides.clear"),
+      keys: paragraphOverrideKeysSchema.optional(),
+    })
+    .strict(),
   z.object({
     type: z.literal("layer.translate"),
     dx: z.union([z.number(), z.string()]),
@@ -193,7 +309,9 @@ export const recipeActionSchema = z.discriminatedUnion("type", [
       })
       .passthrough(),
     parentTarget: semanticTargetSchema.optional(),
-    paragraphStyles:z.record(z.string().min(1),recipeParagraphStyleTargetSchema).optional(),
+    paragraphStyles: z
+      .record(z.string().min(1), recipeParagraphStyleTargetSchema)
+      .optional(),
   }),
   z.object({
     type: z.literal("effect.tone"),
@@ -231,7 +349,7 @@ export const recipeActionSchema = z.discriminatedUnion("type", [
     effectIndex: z.number().int().nonnegative().optional(),
   }),
   z.object({ type: z.literal("effect.reset") }),
-  z.object({type:z.literal('document.precision.float')}).strict(),
+  z.object({ type: z.literal("document.precision.float") }).strict(),
   z.object({
     type: z.enum(["document.resize", "document.resizeImage"]),
     width: z.union([z.number(), z.string()]),
@@ -282,9 +400,13 @@ export const recipeStepSchema = z.object({
 
 export const recipeSchema = z
   .object({
-    schemaVersion: z.union([z.literal(RECIPE_SCHEMA_VERSION),z.literal(2),z.literal(3)]),
-    delivery:recipeDeliverySchema.optional(),
-    fontFiles:recipeFontFilesSchema.optional(),
+    schemaVersion: z.union([
+      z.literal(RECIPE_SCHEMA_VERSION),
+      z.literal(2),
+      z.literal(3),
+    ]),
+    delivery: recipeDeliverySchema.optional(),
+    fontFiles: recipeFontFilesSchema.optional(),
     id: z.string().min(1).max(120),
     name: z.string().min(1).max(240),
     description: z.string().max(4000),
@@ -298,7 +420,23 @@ export const recipeSchema = z
     created: z.string().optional(),
     modified: z.string().optional(),
   })
-  .refine(data=>(data.schemaVersion===3?data.delivery!==undefined:data.delivery===undefined)&&(data.schemaVersion===1?data.fontFiles===undefined:data.schemaVersion===2?data.fontFiles!==undefined:true)&&(!data.steps.some(step=>step.action.type.startsWith('font.file.'))||!!data.fontFiles?.length),{message:'Font dependencies require recipe version 2/3; delivery dependencies require version 3 and a complete package.'})
+  .refine(
+    (data) =>
+      (data.schemaVersion === 3
+        ? data.delivery !== undefined
+        : data.delivery === undefined) &&
+      (data.schemaVersion === 1
+        ? data.fontFiles === undefined
+        : data.schemaVersion === 2
+          ? data.fontFiles !== undefined
+          : true) &&
+      (!data.steps.some((step) => step.action.type.startsWith("font.file.")) ||
+        !!data.fontFiles?.length),
+    {
+      message:
+        "Font dependencies require recipe version 2/3; delivery dependencies require version 3 and a complete package.",
+    },
+  )
   .refine(
     (data) => {
       // Check that step IDs are unique

@@ -128,7 +128,8 @@ test("tabs retain independent recovery checkpoints", async ({
 });
 
 test("blocked storage reports failure without stopping editing or project downloads", async ({
-  browser, baseURL,
+  browser,
+  baseURL,
 }) => {
   const context = await browser.newContext();
   await context.addInitScript(() =>
@@ -360,42 +361,166 @@ test("recovery dialog reports when it restores an older intact checkpoint", asyn
   );
 });
 
-test("recovery captures mutable callers and immutable revisions independently of later edits", async ({page}) => {
-  await page.goto('/');
+test("recovery captures mutable callers and immutable revisions independently of later edits", async ({
+  page,
+}) => {
+  await page.goto("/");
   const result = await page.evaluate(async () => {
-    const {editor:e,TextLayer}=window.luma;
-    e.newDocument({width:200,height:100});
-    const layer=e.document.layers.add(new TextLayer({text:'Original'}));
-    const repository=e.recovery.repository;
-    const mutable=e.document.toJSON();
-    const first=repository.save('mutable-capture',mutable,e.assetStore);
-    mutable.name='Changed caller';
-    if(mutable.children[0].kind==='text') mutable.children[0].text='Changed caller';
-    const shallow=Object.freeze(e.document.toJSON());
-    const third=repository.save('shallow-frozen-capture',shallow,e.assetStore);
-    if(shallow.children[0].kind==='text') shallow.children[0].text='Changed nested caller';
-    const immutable=e.document.getSnapshot().document;
-    const second=repository.save('immutable-capture',immutable,e.assetStore);
-    layer.text='Later revision';
-    e.document.name='Changed live';
-    await Promise.all([first,second,third]);
-    const entries=await repository.list();
-    return ['mutable-capture','immutable-capture','shallow-frozen-capture'].map(id=>{
-      const entry=entries.find(entry=>entry.id===id)!;
-      return {name:entry.document.name, layer:entry.document.children[0], originalName:immutable.name};
+    const { editor: e, TextLayer } = window.luma;
+    e.newDocument({ width: 200, height: 100 });
+    const layer = e.document.layers.add(new TextLayer({ text: "Original" }));
+    const repository = e.recovery.repository;
+    const mutable = e.document.toJSON();
+    const first = repository.save("mutable-capture", mutable, e.assetStore);
+    mutable.name = "Changed caller";
+    if (mutable.children[0].kind === "text")
+      mutable.children[0].text = "Changed caller";
+    const shallow = Object.freeze(e.document.toJSON());
+    const third = repository.save(
+      "shallow-frozen-capture",
+      shallow,
+      e.assetStore,
+    );
+    if (shallow.children[0].kind === "text")
+      shallow.children[0].text = "Changed nested caller";
+    const immutable = e.document.getSnapshot().document;
+    const second = repository.save(
+      "immutable-capture",
+      immutable,
+      e.assetStore,
+    );
+    layer.text = "Later revision";
+    e.document.name = "Changed live";
+    await Promise.all([first, second, third]);
+    const entries = await repository.list();
+    return [
+      "mutable-capture",
+      "immutable-capture",
+      "shallow-frozen-capture",
+    ].map((id) => {
+      const entry = entries.find((entry) => entry.id === id)!;
+      return {
+        name: entry.document.name,
+        layer: entry.document.children[0],
+        originalName: immutable.name,
+      };
     });
   });
-  for(const entry of result){expect(entry.name).toBe(entry.originalName);expect(entry.layer).toMatchObject({kind:'text',text:'Original'});}
+  for (const entry of result) {
+    expect(entry.name).toBe(entry.originalName);
+    expect(entry.layer).toMatchObject({ kind: "text", text: "Original" });
+  }
 });
 
-for(const target of ['checkpoints','assets'] as const)test(`synchronous ${target} write failures preserve the previous recovery checkpoint and original error`,async({page},info)=>{
- const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');
- const result=await page.evaluate(async target=>{
-  const {RecoveryRepository}=await import(/* @vite-ignore */String('/src/core/recovery.ts')),{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts')),{readProject}=await import(/* @vite-ignore */String('/src/core/project.ts')),{Document,RasterLayer}=window.luma;
-  const repository=new RecoveryRepository(),assets=new AssetStore(),doc=new Document({name:'Retained checkpoint',width:8,height:8}),canvas=new OffscreenCanvas(8,8),context=canvas.getContext('2d')!;context.fillStyle='#804020';context.fillRect(0,0,8,8);const first=await assets.add(await canvas.convertToBlob({type:'image/png'}),'Original.png');doc.layers.add(new RasterLayer({assetId:first.id,width:8,height:8}));const id='event-handler-failure';await repository.save(id,doc.getSnapshot().document,assets);const before=await readProject(await repository.project(id));
-  context.fillStyle='#204080';context.fillRect(0,0,8,8);const second=await assets.add(await canvas.convertToBlob({type:'image/png'}),'Later.png');doc.layers.add(new RasterLayer({assetId:second.id,width:8,height:8}));const original=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.transaction.db.name==='luma-recovery'&&this.name===target)throw new DOMException('Injected '+target+' quota','QuotaExceededError');return original.apply(this,args);};let error={name:'',message:''};
-  try{await repository.save(id,doc.getSnapshot().document,assets);}catch(cause){error={name:(cause as Error).name,message:(cause as Error).message};}finally{IDBObjectStore.prototype.put=original;}
-  try{const after=await readProject(await repository.project(id)),entries=(await repository.list()).find((entry:import('../src/core/recovery').RecoveryEntry)=>entry.id===id)!;return{error,before:JSON.stringify(before.document),after:JSON.stringify(after.document),blobBefore:[...new Uint8Array(await before.entries[0].blob.arrayBuffer())],blobAfter:[...new Uint8Array(await after.entries[0].blob.arrayBuffer())],entryAssets:entries.assetKeys.length,projectAssets:after.entries.length,previous:entries.previous?.length??0};}finally{assets.dispose();}
- },target);
- expect(result.error).toEqual({name:'QuotaExceededError',message:'Injected '+target+' quota'});expect(result.after).toBe(result.before);expect(result.blobAfter).toEqual(result.blobBefore);expect(result.entryAssets).toBe(1);expect(result.projectAssets).toBe(1);expect(result.previous).toBe(0);expect(errors).toEqual([]);await info.attach('recovery-write-rollback',{body:JSON.stringify({target,...result,uncaughtErrors:errors}),contentType:'application/json'});
-});
+for (const target of ["checkpoints", "assets"] as const)
+  test(`synchronous ${target} write failures preserve the previous recovery checkpoint and original error`, async ({
+    page,
+  }, info) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/");
+    const result = await page.evaluate(async (target) => {
+      const { RecoveryRepository } = await import(
+          /* @vite-ignore */ String("/src/core/recovery.ts")
+        ),
+        { AssetStore } = await import(
+          /* @vite-ignore */ String("/src/core/assets.ts")
+        ),
+        { readProject } = await import(
+          /* @vite-ignore */ String("/src/core/project.ts")
+        ),
+        { Document, RasterLayer } = window.luma;
+      const repository = new RecoveryRepository(),
+        assets = new AssetStore(),
+        doc = new Document({
+          name: "Retained checkpoint",
+          width: 8,
+          height: 8,
+        }),
+        canvas = new OffscreenCanvas(8, 8),
+        context = canvas.getContext("2d")!;
+      context.fillStyle = "#804020";
+      context.fillRect(0, 0, 8, 8);
+      const first = await assets.add(
+        await canvas.convertToBlob({ type: "image/png" }),
+        "Original.png",
+      );
+      doc.layers.add(
+        new RasterLayer({ assetId: first.id, width: 8, height: 8 }),
+      );
+      const id = "event-handler-failure";
+      await repository.save(id, doc.getSnapshot().document, assets);
+      const before = await readProject(await repository.project(id));
+      context.fillStyle = "#204080";
+      context.fillRect(0, 0, 8, 8);
+      const second = await assets.add(
+        await canvas.convertToBlob({ type: "image/png" }),
+        "Later.png",
+      );
+      doc.layers.add(
+        new RasterLayer({ assetId: second.id, width: 8, height: 8 }),
+      );
+      const original = IDBObjectStore.prototype.put;
+      IDBObjectStore.prototype.put = function (
+        ...args: Parameters<IDBObjectStore["put"]>
+      ) {
+        if (
+          this.transaction.db.name === "luma-recovery" &&
+          this.name === target
+        )
+          throw new DOMException(
+            "Injected " + target + " quota",
+            "QuotaExceededError",
+          );
+        return original.apply(this, args);
+      };
+      let error = { name: "", message: "" };
+      try {
+        await repository.save(id, doc.getSnapshot().document, assets);
+      } catch (cause) {
+        error = {
+          name: (cause as Error).name,
+          message: (cause as Error).message,
+        };
+      } finally {
+        IDBObjectStore.prototype.put = original;
+      }
+      try {
+        const after = await readProject(await repository.project(id)),
+          entries = (await repository.list()).find(
+            (entry: import("../src/core/recovery").RecoveryEntry) =>
+              entry.id === id,
+          )!;
+        return {
+          error,
+          before: JSON.stringify(before.document),
+          after: JSON.stringify(after.document),
+          blobBefore: [
+            ...new Uint8Array(await before.entries[0].blob.arrayBuffer()),
+          ],
+          blobAfter: [
+            ...new Uint8Array(await after.entries[0].blob.arrayBuffer()),
+          ],
+          entryAssets: entries.assetKeys.length,
+          projectAssets: after.entries.length,
+          previous: entries.previous?.length ?? 0,
+        };
+      } finally {
+        assets.dispose();
+      }
+    }, target);
+    expect(result.error).toEqual({
+      name: "QuotaExceededError",
+      message: "Injected " + target + " quota",
+    });
+    expect(result.after).toBe(result.before);
+    expect(result.blobAfter).toEqual(result.blobBefore);
+    expect(result.entryAssets).toBe(1);
+    expect(result.projectAssets).toBe(1);
+    expect(result.previous).toBe(0);
+    expect(errors).toEqual([]);
+    await info.attach("recovery-write-rollback", {
+      body: JSON.stringify({ target, ...result, uncaughtErrors: errors }),
+      contentType: "application/json",
+    });
+  });

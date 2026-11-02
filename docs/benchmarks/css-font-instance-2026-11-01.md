@@ -4,16 +4,16 @@ This F08/F10 increment connects original-source shaping to native CSS weight,
 width and observed style-axis/default behavior. Full native typography and the
 original roadmap remain open. [Private contract](../FLOAT_TEXT.md#css-selected-source-font-instances-private).
 
-| Check | Result |
-| --- | --- |
-| Full build and TypeScript | Pass |
-| Full unit/API suite | 3,379 pass across 334 files |
-| Complete affected native browser run | 47 pass across six files |
-| Production worker and typography regressions | Six pass |
-| Independent FontTools static-instance reference matrix | 36 exact full RGBA and advance matches across three sizes and two transforms |
-| Native relative/fractional weights, descriptor clamps and non-lattice explicit settings | Six exact whole-run matches; unchanged model/source and immutable captured metadata |
-| CSS-selected glyphs through actual Float32 WASM paint | Exact independently calculated ordered alpha, signed HDR RGB, alpha 1e-8 and complete window-word partitions |
-| Existing 50 MP RAW/variable-font workflow | Full original identity and 10,000 × 5,000 output retained; all 480,000 RGBA samples in the complete independent 600 × 200 text reference region match |
+| Check                                                                                   | Result                                                                                                                                                |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full build and TypeScript                                                               | Pass                                                                                                                                                  |
+| Full unit/API suite                                                                     | 3,379 pass across 334 files                                                                                                                           |
+| Complete affected native browser run                                                    | 47 pass across six files                                                                                                                              |
+| Production worker and typography regressions                                            | Six pass                                                                                                                                              |
+| Independent FontTools static-instance reference matrix                                  | 36 exact full RGBA and advance matches across three sizes and two transforms                                                                          |
+| Native relative/fractional weights, descriptor clamps and non-lattice explicit settings | Six exact whole-run matches; unchanged model/source and immutable captured metadata                                                                   |
+| CSS-selected glyphs through actual Float32 WASM paint                                   | Exact independently calculated ordered alpha, signed HDR RGB, alpha 1e-8 and complete window-word partitions                                          |
+| Existing 50 MP RAW/variable-font workflow                                               | Full original identity and 10,000 × 5,000 output retained; all 480,000 RGBA samples in the complete independent 600 × 200 text reference region match |
 
 The fixture is original geometric artwork with wght, wdth, ital and slnt axes.
 Independent static references cover ordinary/fractional weights, wide slant,

@@ -1,8 +1,8 @@
 export interface ShortcutAction {
   id: string;
   label: string;
-  category?:string;
-  description?:string;
+  category?: string;
+  description?: string;
   keys: string[];
   run(): void;
   enabled?(): boolean;
@@ -12,14 +12,25 @@ export interface ShortcutAction {
 /** Fixed composite-widget keys; scoped to the focused Layers tree. Global
  * editor actions remain registered separately below and in App's registry. */
 export const LAYER_TREE_BINDINGS = {
-  previous: 'ArrowUp', next: 'ArrowDown', first: 'Home', last: 'End',
-  expand: 'ArrowRight', collapse: 'ArrowLeft', select: 'Enter', toggle: ' ',
-  selectAll: 'Mod+a',
+  previous: "ArrowUp",
+  next: "ArrowDown",
+  first: "Home",
+  last: "End",
+  expand: "ArrowRight",
+  collapse: "ArrowLeft",
+  select: "Enter",
+  toggle: " ",
+  selectAll: "Mod+a",
 };
 
 /** Scoped to a focused image perspective corner; never handled in fields. */
-export const PERSPECTIVE_CORNER_BINDINGS:Readonly<Record<string,{x:number;y:number}>>={
-  ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},
+export const PERSPECTIVE_CORNER_BINDINGS: Readonly<
+  Record<string, { x: number; y: number }>
+> = {
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
 };
 
 export function isTextInput(target: EventTarget | null): boolean {
@@ -74,7 +85,12 @@ export class ShortcutRegistry {
     const action = this.actions.find((entry) =>
       entry.keys.some((key) => matchesShortcut(event, key)),
     );
-    if (!action || (busy && !action.allowWhileBusy) || action.enabled?.() === false) return false;
+    if (
+      !action ||
+      (busy && !action.allowWhileBusy) ||
+      action.enabled?.() === false
+    )
+      return false;
     event.preventDefault();
     action.run();
     return true;
@@ -106,9 +122,9 @@ export function formatShortcut(shortcut: string): string {
 
 // Binding definitions are shared by action registration and keyboard help.
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
-  'chatgpt-connection': [],
+  "chatgpt-connection": [],
   account: [],
-  'edit-perspective': [],
+  "edit-perspective": [],
   "artwork-library": [],
   "history-inspector": [],
   "color-palettes": [],
@@ -159,7 +175,16 @@ export const SHORTCUT_BINDINGS: Record<string, string[]> = {
 };
 // Alignment actions are available to command search and custom bindings; none
 // takes over a default typing shortcut.
-for(const reference of ['selection','canvas','layer'])for(const alignment of ['left','center','right','top','middle','bottom'])SHORTCUT_BINDINGS[`align-${alignment}-${reference}`]=[];
+for (const reference of ["selection", "canvas", "layer"])
+  for (const alignment of [
+    "left",
+    "center",
+    "right",
+    "top",
+    "middle",
+    "bottom",
+  ])
+    SHORTCUT_BINDINGS[`align-${alignment}-${reference}`] = [];
 
 export const TOOL_SHORTCUTS = [
   ["artboard", "Artboard editor", "a"],

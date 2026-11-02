@@ -446,9 +446,7 @@
       "count": 750,
       "ms": 356.7000000178814,
       "error": "",
-      "logs": [
-        "750"
-      ],
+      "logs": ["750"],
       "revisions": 1,
       "paths": 750,
       "undoEqual": true,
@@ -515,9 +513,7 @@
           "prepareMs": 8.700000017881393
         }
       ],
-      "longTasks": [
-        117
-      ]
+      "longTasks": [117]
     },
     {
       "paths": 1,
@@ -532,10 +528,7 @@
           "prepareMs": 8
         }
       ],
-      "longTasks": [
-        102,
-        84
-      ]
+      "longTasks": [102, 84]
     }
   ],
   "validation": {

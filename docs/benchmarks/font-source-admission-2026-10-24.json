@@ -77,9 +77,7 @@
         "scripts/build-font-notices.mjs",
         "public/font-parser-notices.txt"
       ],
-      "changedReleaseResources": [
-        "font-parser-notices.txt"
-      ],
+      "changedReleaseResources": ["font-parser-notices.txt"],
       "unchangedReleaseResources": 101,
       "compiledSiteUnchanged": true,
       "licenseWordingPreserved": true,

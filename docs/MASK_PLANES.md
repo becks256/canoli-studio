@@ -15,9 +15,15 @@ const plane = new MaskPlane({
   reference: { assetId: originalAssetId },
   basis: new AffineTransform(),
   pose: {
-    width: 100, height: 80,
+    width: 100,
+    height: 80,
     perspective: new PerspectiveTransform({
-      corners: [{x:0,y:0},{x:1,y:0},{x:.8,y:1},{x:.1,y:1}],
+      corners: [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 0.8, y: 1 },
+        { x: 0.1, y: 1 },
+      ],
     }),
     transform: AffineTransform.translation(40, 30),
   },
@@ -48,10 +54,16 @@ Use the existing shared OO mutations for ordinary edits:
 const layer = document.selectedLayer;
 if (!layer?.mask) throw new Error("Choose a masked layer.");
 layer.setMaskLinked(false); // preserve current coverage in document space
-layer.paintMask(new BrushStroke({
-  points: [{x: 90, y: 70}], size: 12, pressureSize: false,
-}), "hide", {space: "placed"});
-layer.setMaskLinked(true);  // preserve coverage, follow future owner changes
+layer.paintMask(
+  new BrushStroke({
+    points: [{ x: 90, y: 70 }],
+    size: 12,
+    pressureSize: false,
+  }),
+  "hide",
+  { space: "placed" },
+);
+layer.setMaskLinked(true); // preserve coverage, follow future owner changes
 ```
 
 The same behavior applies to `SmartObjectLayer.setFilterMaskLinked` and

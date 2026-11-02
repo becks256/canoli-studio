@@ -1,16 +1,8 @@
 {
   "license": "CC0-1.0; original geometric test artwork",
   "axes": {
-    "TEST": [
-      0,
-      0,
-      100
-    ],
-    "wght": [
-      400,
-      400,
-      800
-    ]
+    "TEST": [0, 0, 100],
+    "wght": [400, 400, 800]
   },
   "reference": {
     "TEST": 50,
@@ -18,11 +10,7 @@
   },
   "fallback": {
     "unicode": 66,
-    "TESTRange": [
-      0,
-      0,
-      25
-    ],
+    "TESTRange": [0, 0, 25],
     "reference": {
       "TEST": 25,
       "wght": 600

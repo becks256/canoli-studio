@@ -1,4 +1,4 @@
-import {expectPenControl} from './pen-control-position';
+import { expectPenControl } from "./pen-control-position";
 import { expect, test } from "@playwright/test";
 test("public layer rotation renders and survives portable save/reopen", async ({
   page,
@@ -412,7 +412,9 @@ test("pen overlays follow affine artwork while handles retain screen size", asyn
     );
     editor.document.selectedLayer = layer;
   });
-  await page.getByRole("button", { name: "Vector pen (P)", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Vector pen (P)", exact: true })
+    .click();
   await page.keyboard.press("Control+1");
   const controls = page.getByTestId("pen-controls");
   const anchor = controls.locator("rect").first();

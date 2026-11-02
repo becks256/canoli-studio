@@ -62,18 +62,35 @@ regardless of workspace preferences. Proof is never included in delivery.
 ## Trusted browser contract
 
 ```ts
-const profile = await editor.inspectColorProfile(file, file.name, {signal});
+const profile = await editor.inspectColorProfile(file, file.name, { signal });
 // IccProfile owns an immutable Blob, SHA-256, name and cloned native report.
-const warnings = await editor.setColorSettings({
-  output: {profile, intent: 'relative-colorimetric', blackPointCompensation: false},
-  proof: {
-    profile, intent: 'relative-colorimetric', proofIntent: 'relative-colorimetric',
-    blackPointCompensation: false, gamutWarning: true, warningColor: '#00ffff',
+const warnings = await editor.setColorSettings(
+  {
+    output: {
+      profile,
+      intent: "relative-colorimetric",
+      blackPointCompensation: false,
+    },
+    proof: {
+      profile,
+      intent: "relative-colorimetric",
+      proofIntent: "relative-colorimetric",
+      blackPointCompensation: false,
+      gamutWarning: true,
+      warningColor: "#00ffff",
+    },
   },
-}, {signal});
-const result = await editor.export({format: 'png', color: editor.colorSettings.output}, {signal});
-const pages = await editor.exportTiffPages(editor.openDocuments,
-  {variant: 'auto', color: editor.colorSettings.output}, {signal});
+  { signal },
+);
+const result = await editor.export(
+  { format: "png", color: editor.colorSettings.output },
+  { signal },
+);
+const pages = await editor.exportTiffPages(
+  editor.openDocuments,
+  { variant: "auto", color: editor.colorSettings.output },
+  { signal },
+);
 ```
 
 `ColorOutput.profile` accepts the four built-in IDs or an inspected host

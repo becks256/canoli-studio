@@ -1,5 +1,5 @@
-import {createDeflate} from "node:zlib";
-import {once} from "node:events";
+import { createDeflate } from "node:zlib";
+import { once } from "node:events";
 
 function pngChunk(name: string, data: Buffer) {
   const result = Buffer.alloc(data.length + 12);

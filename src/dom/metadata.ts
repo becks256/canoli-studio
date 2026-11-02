@@ -16,9 +16,7 @@ export class LayerMetadata {
   }
   toJSON(): AuthoredMetadataData {
     return structuredClone(
-      this.layer
-        ? (this.layer._read().metadata ?? emptyMetadata())
-        : this.data,
+      this.layer ? (this.layer._read().metadata ?? emptyMetadata()) : this.data,
     );
   }
   update(values: Partial<AuthoredMetadataData>) {

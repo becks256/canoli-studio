@@ -29,7 +29,8 @@ test("multi-layer selection supports shared nudge, alignment, drag and undo", as
       window.luma.editor.document.toJSON().children.map((l) => [l.x, l.y]),
     );
   const viewport = page.locator(".viewport");
-  await viewport.focus(); await expect(viewport).toBeFocused();
+  await viewport.focus();
+  await expect(viewport).toBeFocused();
   await page.keyboard.press("ArrowRight");
   expect(await positions()).toEqual([
     [41, 40],

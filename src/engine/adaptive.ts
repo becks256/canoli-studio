@@ -1,5 +1,5 @@
 import { checkRenderCurrent } from "./render-control";
-import{isFloatDocument}from'../core/float-document';
+import { isFloatDocument } from "../core/float-document";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
 import { CanvasRenderer } from "./renderer";
@@ -9,7 +9,7 @@ import { WebGpuRenderer } from "./gpu/renderer";
 import type { ViewportFrame } from "./gpu/renderer";
 
 /** CPU export/reference API stays stable; viewport frames select GPU capability. */
-import {IccProofProcessor} from './icc-proof';
+import { IccProofProcessor } from "./icc-proof";
 
 export class AdaptiveRenderer extends CanvasRenderer {
   private readonly proof = new IccProofProcessor();
@@ -34,10 +34,12 @@ export class AdaptiveRenderer extends CanvasRenderer {
     options: RenderOptions = {},
   ): Promise<ViewportFrame> {
     checkRenderCurrent(options.isCancelled);
-    if(isFloatDocument(document)){
-      this.proof.reset();return this.prepareFallback(document,assets,options);
+    if (isFloatDocument(document)) {
+      this.proof.reset();
+      return this.prepareFallback(document, assets, options);
     }
-    if(options.colorProof)return this.prepareFallback(document,assets,options);
+    if (options.colorProof)
+      return this.prepareFallback(document, assets, options);
     this.proof.reset();
     try {
       const gpu = await this.gpu.prepare(document, assets, options);
@@ -59,8 +61,14 @@ export class AdaptiveRenderer extends CanvasRenderer {
     options: RenderOptions = {},
   ): Promise<ViewportFrame> {
     const result = await this.render(document, assets, options);
-    try{if(options.colorProof&&!isFloatDocument(document))await this.proof.apply(result,options.colorProof,options.isCancelled);checkRenderCurrent(options.isCancelled);}
-    catch(error){release(result);throw error;}
+    try {
+      if (options.colorProof && !isFloatDocument(document))
+        await this.proof.apply(result, options.colorProof, options.isCancelled);
+      checkRenderCurrent(options.isCancelled);
+    } catch (error) {
+      release(result);
+      throw error;
+    }
     return {
       backend: "canvas2d",
       width: result.width,

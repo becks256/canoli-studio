@@ -8,13 +8,13 @@ unfinished. [Public contract and limits](../FLOAT_TEXT.md).
 
 ## Current evidence
 
-| Check | Terminal result | Scope |
-| --- | --- | --- |
-| `npm run build` | Pass | WASM, isolated runtime/workers, typecheck, production assets/docs |
-| `npm test -- --maxWorkers=2` | 3,427 pass / 346 files | Complete unit/API suite, actual WASM and separate REST |
-| Focused native browser run | 11 pass | Connected tool/Inspector/scenes/transport/ownership/file/50 MP window |
-| Production browser run | 21 pass, no skips/flakes | Actual UI and native output without development globals; emitted native dependencies |
-| Complete affected source run | 240 pass / 38 files, no skips/flakes | Previous 225 native cases, 11 connected workflows, 4 legacy isolated refusal cases |
+| Check                        | Terminal result                      | Scope                                                                                |
+| ---------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
+| `npm run build`              | Pass                                 | WASM, isolated runtime/workers, typecheck, production assets/docs                    |
+| `npm test -- --maxWorkers=2` | 3,427 pass / 346 files               | Complete unit/API suite, actual WASM and separate REST                               |
+| Focused native browser run   | 11 pass                              | Connected tool/Inspector/scenes/transport/ownership/file/50 MP window                |
+| Production browser run       | 21 pass, no skips/flakes             | Actual UI and native output without development globals; emitted native dependencies |
+| Complete affected source run | 240 pass / 38 files, no skips/flakes | Previous 225 native cases, 11 connected workflows, 4 legacy isolated refusal cases   |
 
 The complete source run takes 28.7 minutes on this host. A hash audit confirms no
 engine/test/script drift during it. It includes ordinary byte 50 MP text/RAW

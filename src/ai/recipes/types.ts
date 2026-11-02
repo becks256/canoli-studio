@@ -1,14 +1,18 @@
 import type { LayerData, ToneEffectData } from "../../core/model";
 import type { EditorCommand } from "../../core/commands";
 import type { SelectionData } from "../../core/drawing";
-import type {ParagraphFormat} from '../../core/paragraph-styles';
+import type { ParagraphFormat } from "../../core/paragraph-styles";
 
 /** Recipe references never contain a source document's style identity. */
 export type RecipeParagraphStyleTarget =
-  | {by:'name';name:string}
-  | {by:'stepResult';stepId:string};
-export type RecipeParagraphFormat = {[K in keyof ParagraphFormat]:ParagraphFormat[K]|string};
-export interface RecipeParagraphBase {style:RecipeParagraphStyleTarget;overrides:Partial<RecipeParagraphFormat>}
+  { by: "name"; name: string } | { by: "stepResult"; stepId: string };
+export type RecipeParagraphFormat = {
+  [K in keyof ParagraphFormat]: ParagraphFormat[K] | string;
+};
+export interface RecipeParagraphBase {
+  style: RecipeParagraphStyleTarget;
+  overrides: Partial<RecipeParagraphFormat>;
+}
 
 export const RECIPE_SCHEMA_VERSION = 1;
 
@@ -67,40 +71,91 @@ export interface StepCondition {
 }
 
 export interface RecipeLensCorrection {
-  version?:1;enabled?:boolean|string;scale?:number|string;
-  center?:{x?:number|string;y?:number|string};
-  distortion?:{k1?:number|string;k2?:number|string;k3?:number|string};
-  chromatic?:{red?:number|string;blue?:number|string};
-  vignette?:{k1?:number|string;k2?:number|string;k3?:number|string};
-  profile?:import('../../core/interchange/lens/schema').LensProfileSelectionOptions|string;
+  version?: 1;
+  enabled?: boolean | string;
+  scale?: number | string;
+  center?: { x?: number | string; y?: number | string };
+  distortion?: {
+    k1?: number | string;
+    k2?: number | string;
+    k3?: number | string;
+  };
+  chromatic?: { red?: number | string; blue?: number | string };
+  vignette?: {
+    k1?: number | string;
+    k2?: number | string;
+    k3?: number | string;
+  };
+  profile?:
+    | import("../../core/interchange/lens/schema").LensProfileSelectionOptions
+    | string;
 }
 export type RecipeRawDevelopment = {
-  [K in keyof import('../../core/interchange/raw/types').RawDevelopOptions]?:
-    K extends 'multipliers' ? {red?:number|string;green?:number|string;blue?:number|string}
-    : K extends 'lens' ? RecipeLensCorrection|string
-    : import('../../core/interchange/raw/types').RawDevelopOptions[K]|string;
+  [
+    K in keyof import("../../core/interchange/raw/types").RawDevelopOptions
+  ]?: K extends "multipliers"
+    ? { red?: number | string; green?: number | string; blue?: number | string }
+    : K extends "lens"
+      ? RecipeLensCorrection | string
+      : | import("../../core/interchange/raw/types").RawDevelopOptions[K]
+        | string;
 };
 export interface PlannedRawDevelopment {
-  assetId:string;
-  sourceAssetId:string;
-  options:import('../../core/interchange/raw/types').RawDecodeSettings;
+  assetId: string;
+  sourceAssetId: string;
+  options: import("../../core/interchange/raw/types").RawDecodeSettings;
 }
 
 export type RecipeAction =
-  | {type:"layer.place";reference:SemanticTarget|null;placement:"before"|"after"|"inside";preservePosition:boolean}
-  | {type:"paint.add";stroke:import("../../core/drawing").PaintOperationData}
-  | {type:"path.add";path:import("../../core/drawing").VectorPathData}
-  | {type:'layer.align';targets:SemanticTarget[];alignment:import('../../core/layer-layout').LayerAlignment;reference?:{type:'selection'}|{type:'canvas'}|{type:'layer';layer:SemanticTarget}}
-  | {type:'font.file.add';id:string}
-  | {type:'font.file.rename';id:string;name:string}
-  | {type:'font.file.remove';id:string;replaceWith?:string}
-  | {type:'raw.develop';development:RecipeRawDevelopment;allowPrecisionLoss:true}
-  | {type:'paragraphStyle.ensure';name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
-  | {type:'paragraphStyle.update';style:RecipeParagraphStyleTarget;name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
-  | {type:'paragraphStyle.remove';style:RecipeParagraphStyleTarget}
-  | {type:'text.paragraphStyle';style:RecipeParagraphStyleTarget|null;keepOverrides?:boolean}
-  | {type:'text.paragraphOverrides.clear';keys?:(keyof ParagraphFormat)[]}
-  | {type:'document.font.replace';from:string;to:string}
+  | {
+      type: "layer.place";
+      reference: SemanticTarget | null;
+      placement: "before" | "after" | "inside";
+      preservePosition: boolean;
+    }
+  | {
+      type: "paint.add";
+      stroke: import("../../core/drawing").PaintOperationData;
+    }
+  | { type: "path.add"; path: import("../../core/drawing").VectorPathData }
+  | {
+      type: "layer.align";
+      targets: SemanticTarget[];
+      alignment: import("../../core/layer-layout").LayerAlignment;
+      reference?:
+        | { type: "selection" }
+        | { type: "canvas" }
+        | { type: "layer"; layer: SemanticTarget };
+    }
+  | { type: "font.file.add"; id: string }
+  | { type: "font.file.rename"; id: string; name: string }
+  | { type: "font.file.remove"; id: string; replaceWith?: string }
+  | {
+      type: "raw.develop";
+      development: RecipeRawDevelopment;
+      allowPrecisionLoss: true;
+    }
+  | {
+      type: "paragraphStyle.ensure";
+      name: string;
+      format: RecipeParagraphFormat;
+      basedOn?: RecipeParagraphBase | null;
+    }
+  | {
+      type: "paragraphStyle.update";
+      style: RecipeParagraphStyleTarget;
+      name: string;
+      format: RecipeParagraphFormat;
+      basedOn?: RecipeParagraphBase | null;
+    }
+  | { type: "paragraphStyle.remove"; style: RecipeParagraphStyleTarget }
+  | {
+      type: "text.paragraphStyle";
+      style: RecipeParagraphStyleTarget | null;
+      keepOverrides?: boolean;
+    }
+  | { type: "text.paragraphOverrides.clear"; keys?: (keyof ParagraphFormat)[] }
+  | { type: "document.font.replace"; from: string; to: string }
   | { type: "layer.translate"; dx: number | string; dy: number | string }
   | {
       type: "layer.update";
@@ -127,7 +182,7 @@ export type RecipeAction =
       };
       parentTarget?: SemanticTarget;
       /** Map template-local binding IDs to portable style references, including group text. */
-      paragraphStyles?:Record<string,RecipeParagraphStyleTarget>;
+      paragraphStyles?: Record<string, RecipeParagraphStyleTarget>;
     }
   | {
       type: "effect.tone";
@@ -149,7 +204,7 @@ export type RecipeAction =
     }
   | { type: "effect.remove"; effectId?: string; effectIndex?: number }
   | { type: "effect.reset" }
-  | {type:'document.precision.float'}
+  | { type: "document.precision.float" }
   | {
       type: "document.resize" | "document.resizeImage";
       width: number | string;
@@ -197,10 +252,10 @@ export interface RecipeStep {
 }
 
 export interface Recipe {
-  schemaVersion: 1|2|3;
-  delivery?:import('./delivery').RecipeDelivery;
+  schemaVersion: 1 | 2 | 3;
+  delivery?: import("./delivery").RecipeDelivery;
   /** Versions 2 and 3. Exact source/face metadata; bytes belong to a package/store. */
-  fontFiles?:import('../../core/font-files').FontFileData[];
+  fontFiles?: import("../../core/font-files").FontFileData[];
   id: string;
   name: string;
   description: string;

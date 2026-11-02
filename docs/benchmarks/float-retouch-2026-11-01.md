@@ -13,17 +13,17 @@ Byte repairs retain their numerical operator and tolerance units.
 
 Verification on Linux x64, Node 26.13.0 and Chromium 153.0.8010.12:
 
-| Check | Accepted evidence |
-| --- | --- |
-| Build/typecheck | Full build, 50 generated developer guides, typecheck |
-| Unit/API/native | 3,355 cases across 330 files; actual emitted WASM |
-| Source browser | 61 distinct cases across 16 files, including focused rechecks |
-| Production | Eight distinct cases across three files; no developer globals |
-| Numerical oracle | Independent NumPy/SciPy source/mixed equations, irregular/soft support, donor scores/ties; equation and Float32 storage bounds |
-| Native replay | Rotated/reflected masks, Color Overlay, Fill, layer/group opacity; exact staged scalar colors, alpha and native partitions |
-| Full production TIFF | 198,404 values per output; Patch clean field exact; Healing/reopened RGB error at most 5.960464477539063e-8; alpha and untouched pixels exact |
-| New 50 MP repair | Original 10,000x5,000 geometry/bytes exact; 64x48 / 12,288-value edit window independently solved; max error 5.221247079134628e-8 versus bound 3.788246741661659e-7 |
-| Existing full 50 MP regressions | Float32/uint16 clipping, original exposure and full-tone delivery pass complete native readers |
+| Check                           | Accepted evidence                                                                                                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Build/typecheck                 | Full build, 50 generated developer guides, typecheck                                                                                                                |
+| Unit/API/native                 | 3,355 cases across 330 files; actual emitted WASM                                                                                                                   |
+| Source browser                  | 61 distinct cases across 16 files, including focused rechecks                                                                                                       |
+| Production                      | Eight distinct cases across three files; no developer globals                                                                                                       |
+| Numerical oracle                | Independent NumPy/SciPy source/mixed equations, irregular/soft support, donor scores/ties; equation and Float32 storage bounds                                      |
+| Native replay                   | Rotated/reflected masks, Color Overlay, Fill, layer/group opacity; exact staged scalar colors, alpha and native partitions                                          |
+| Full production TIFF            | 198,404 values per output; Patch clean field exact; Healing/reopened RGB error at most 5.960464477539063e-8; alpha and untouched pixels exact                       |
+| New 50 MP repair                | Original 10,000x5,000 geometry/bytes exact; 64x48 / 12,288-value edit window independently solved; max error 5.221247079134628e-8 versus bound 3.788246741661659e-7 |
+| Existing full 50 MP regressions | Float32/uint16 clipping, original exposure and full-tone delivery pass complete native readers                                                                      |
 
 The native host/isolated examples preserve one Undo, original sources and exact
 project reopening. Source/Destination agree; Healing retains unquantized global

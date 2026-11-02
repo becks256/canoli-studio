@@ -34,10 +34,10 @@ return the expected layer count, no commands and no revision change. Rendering
 is excluded by the hidden layer. No other heavy verification runs during timing.
 
 | Pair | Transport median before / after, ms | Transport p95 before / after, ms |
-| --- | --- | --- |
-| 1 | 280.6 / 231.0 | 306.6 / 246.0 |
-| 2 | 280.9 / 233.7 | 293.6 / 246.2 |
-| 3 | 284.0 / 228.9 | 318.5 / 246.7 |
+| ---- | ----------------------------------- | -------------------------------- |
+| 1    | 280.6 / 231.0                       | 306.6 / 246.0                    |
+| 2    | 280.9 / 233.7                       | 293.6 / 246.2                    |
+| 3    | 284.0 / 228.9                       | 318.5 / 246.7                    |
 
 The p95 uses nearest rank over 20 samples; all samples, including the first fresh
 run, remain in the evidence. No main-thread long tasks are observed in these

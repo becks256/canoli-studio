@@ -4,9 +4,16 @@ import { examplePlugin } from "../src/plugins";
 test("plugins install inertly, execute named commands, undo, persist, update and remove", async ({
   page,
 }, info) => {
-  const reloadFailures:{path:string;error:string|null}[]=[],pageErrors:string[]=[];
-  page.on('requestfailed',request=>{if(request.url().startsWith('http://127.0.0.1:'))reloadFailures.push({path:new URL(request.url()).pathname,error:request.failure()?.errorText??null});});
-  page.on('pageerror',error=>pageErrors.push(error.message));
+  const reloadFailures: { path: string; error: string | null }[] = [],
+    pageErrors: string[] = [];
+  page.on("requestfailed", (request) => {
+    if (request.url().startsWith("http://127.0.0.1:"))
+      reloadFailures.push({
+        path: new URL(request.url()).pathname,
+        error: request.failure()?.errorText ?? null,
+      });
+  });
+  page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto("/");
   await page.getByRole("button", { name: "Plugins (Mod+Shift+L)" }).click();
   await page.getByRole("button", { name: "Load example", exact: true }).click();
@@ -68,8 +75,17 @@ test("plugins install inertly, execute named commands, undo, persist, update and
     page.getByRole("button", { name: "Run Add guide frame", exact: true }),
   ).toHaveCount(0);
   await page.reload();
-  try{await expect(page.getByRole("button", {name:"History",exact:true})).toBeVisible();}
-  catch(error){await info.attach('plugin-reload-errors',{body:JSON.stringify({reloadFailures,pageErrors}),contentType:'application/json'});throw error;}
+  try {
+    await expect(
+      page.getByRole("button", { name: "History", exact: true }),
+    ).toBeVisible();
+  } catch (error) {
+    await info.attach("plugin-reload-errors", {
+      body: JSON.stringify({ reloadFailures, pageErrors }),
+      contentType: "application/json",
+    });
+    throw error;
+  }
   expect(
     await page.evaluate(
       () => window.luma.editor.plugins.getSnapshot().plugins.length,

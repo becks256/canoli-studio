@@ -19,7 +19,7 @@ export function CommandPalette({
   onExecute(action: ShortcutAction): void;
 }) {
   const [query, setQuery] = useState("");
-  const [selectedId,setSelectedId]=useState<string|null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const listId = useId();
   const list = useRef<HTMLDivElement>(null);
   const search = useRef<HTMLInputElement>(null);
@@ -30,8 +30,15 @@ export function CommandPalette({
     actions.filter((a) => a.id !== "command-palette"),
     query,
   );
-  const active=selectedId===null?(results.length?0:-1):results.findIndex(action=>action.id===selectedId);
-  useEffect(()=>{if(selectedId===null&&results.length)setSelectedId(results[0].id);},[selectedId,results]);
+  const active =
+    selectedId === null
+      ? results.length
+        ? 0
+        : -1
+      : results.findIndex((action) => action.id === selectedId);
+  useEffect(() => {
+    if (selectedId === null && results.length) setSelectedId(results[0].id);
+  }, [selectedId, results]);
   const run = (action: ShortcutAction) => {
     if (!busy && action.enabled?.() !== false) onExecute(action);
   };
@@ -62,7 +69,7 @@ export function CommandPalette({
           aria-expanded="true"
           aria-controls={listId}
           aria-activedescendant={
-            active>=0 ? `${listId}-${active}` : undefined
+            active >= 0 ? `${listId}-${active}` : undefined
           }
           value={query}
           placeholder="Search tools, layers, and actions…"
@@ -80,10 +87,23 @@ export function CommandPalette({
               event.preventDefault();
               event.stopPropagation();
               if (!results.length) return;
-              if (event.key === "Enter") {if(active>=0)run(results[active]);}
-              else if(event.key==='Home')setSelectedId(results[0].id);
-              else if(event.key==='End')setSelectedId(results.at(-1)!.id);
-              else setSelectedId(results[active<0?(event.key==='ArrowDown'?0:results.length-1):(active+(event.key==='ArrowDown'?1:-1)+results.length)%results.length].id);
+              if (event.key === "Enter") {
+                if (active >= 0) run(results[active]);
+              } else if (event.key === "Home") setSelectedId(results[0].id);
+              else if (event.key === "End") setSelectedId(results.at(-1)!.id);
+              else
+                setSelectedId(
+                  results[
+                    active < 0
+                      ? event.key === "ArrowDown"
+                        ? 0
+                        : results.length - 1
+                      : (active +
+                          (event.key === "ArrowDown" ? 1 : -1) +
+                          results.length) %
+                        results.length
+                  ].id,
+                );
             }
           }}
         />
@@ -110,14 +130,22 @@ export function CommandPalette({
             <span>
               <small>{commandCategory(action)}</small>
               {action.label}
-              {action.description&&<span className="command-result-description">{action.description}</span>}
+              {action.description && (
+                <span className="command-result-description">
+                  {action.description}
+                </span>
+              )}
             </span>
             {action.keys[0] && <kbd>{formatShortcut(action.keys[0])}</kbd>}
           </div>
         ))}
       </div>
       {!results.length && <p role="status">No matching commands.</p>}
-      {results.length>0&&active<0&&<p role="status">The selected item is no longer available. Choose another result.</p>}
+      {results.length > 0 && active < 0 && (
+        <p role="status">
+          The selected item is no longer available. Choose another result.
+        </p>
+      )}
       <p className="command-hint">
         ↑ ↓ to navigate · Enter to run · Escape to close
       </p>

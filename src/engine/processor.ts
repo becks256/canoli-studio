@@ -1,33 +1,113 @@
-import {validateHdrWetField} from '../core/hdr-wet-field';
-import {validateWetField} from '../core/wet-field';
-import {floatWetLoadSchema,floatWetMixSchema,floatWetOpacitySchema,validateFloatWetCarried,validateFloatWetResult,type FloatWetLoadOptions,type FloatWetLoadSettings,type FloatWetResult} from '../core/float-wet';
-import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
-import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
-import {compileProjectiveField,type ProjectiveFieldOptions} from '../core/projective-field';
-import {compileMappedField,type MappedFieldOptions} from '../core/mapped-field';
-import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
-import{parseFloatTransfer,type FloatTransferAdjustment}from'../core/float-transfer';
-import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,validateFloatStyleResult,type FloatStyleResult,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
-import{floatConvolutionSchema,floatConvolutionLength,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
-import{compileFloatStyle}from'../core/float-style';
-import type{LayerStyleData}from'../core/drawing';
-import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
-import { medianRadiusSchema } from '../core/smart/median-filter';
-import {bilateralOptionsSchema,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
-import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings } from "../core/color-range";
-import { textureMaskOptionsSchema, type TextureMaskOptions, type TextureMaskSettings } from '../core/brush-texture';
-import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintLoadSettings, type WetPaintMixOptions, type WetPaintMixSettings, type WetPaintResult } from '../core/wet-paint';
-import { validateWetPixels, validateWetCarried, validateWetCoverage } from './wet-paint';
-import { captureLutHeader, lutAdjustmentSchema, type LutAdjustmentData } from "../core/lut";
-import { whiteBalanceAdjustmentSchema, type WhiteBalanceAdjustmentData } from "../core/white-balance";
-import { gradientMapAdjustmentSchema, type GradientMapAdjustmentData } from "../core/gradient-map";
+import { validateHdrWetField } from "../core/hdr-wet-field";
+import { validateWetField } from "../core/wet-field";
+import {
+  floatWetLoadSchema,
+  floatWetMixSchema,
+  floatWetOpacitySchema,
+  validateFloatWetCarried,
+  validateFloatWetResult,
+  type FloatWetLoadOptions,
+  type FloatWetLoadSettings,
+  type FloatWetResult,
+} from "../core/float-wet";
+import {
+  compileFloatColor,
+  parseFloatColor,
+  type FloatColorAdjustment,
+} from "../core/float-color";
+import {
+  compileProjectiveSample,
+  type ProjectiveSampleOptions,
+} from "../core/projective-sampling";
+import {
+  compileProjectiveField,
+  type ProjectiveFieldOptions,
+} from "../core/projective-field";
+import {
+  compileMappedField,
+  type MappedFieldOptions,
+} from "../core/mapped-field";
+import {
+  floatTonalOptionsSchema,
+  type FloatTonalOptions,
+} from "../core/float-tonal";
+import {
+  parseFloatTransfer,
+  type FloatTransferAdjustment,
+} from "../core/float-transfer";
+import {
+  floatCompositeOptionsSchema,
+  floatToneOptionsSchema,
+  validateFloatWorkerWindow,
+  validateFloatStyleResult,
+  type FloatStyleResult,
+  type FloatCompositeOptions,
+  type FloatToneOptions,
+} from "./float-pixels";
+import {
+  floatConvolutionSchema,
+  floatConvolutionLength,
+  validateFloatAlpha,
+  type FloatConvolutionOptions,
+} from "../core/float-shadow";
+import { compileFloatStyle } from "../core/float-style";
+import type { LayerStyleData } from "../core/drawing";
+import {
+  redEyeAdjustmentSchema,
+  type RedEyeAdjustmentData,
+} from "../core/red-eye";
+import { medianRadiusSchema } from "../core/smart/median-filter";
+import {
+  bilateralOptionsSchema,
+  type BilateralFilterOptions,
+} from "../core/smart/bilateral-filter";
+import {
+  colorRangeOptionsSchema,
+  type ColorRangeOptions,
+  type ColorRangeSettings,
+} from "../core/color-range";
+import {
+  textureMaskOptionsSchema,
+  type TextureMaskOptions,
+  type TextureMaskSettings,
+} from "../core/brush-texture";
+import {
+  wetPaintLoadSchema,
+  wetPaintMixSchema,
+  type WetPaintLoadOptions,
+  type WetPaintLoadSettings,
+  type WetPaintMixOptions,
+  type WetPaintMixSettings,
+  type WetPaintResult,
+} from "../core/wet-paint";
+import {
+  validateWetPixels,
+  validateWetCarried,
+  validateWetCoverage,
+} from "./wet-paint";
+import {
+  captureLutHeader,
+  lutAdjustmentSchema,
+  type LutAdjustmentData,
+} from "../core/lut";
+import {
+  whiteBalanceAdjustmentSchema,
+  type WhiteBalanceAdjustmentData,
+} from "../core/white-balance";
+import {
+  gradientMapAdjustmentSchema,
+  type GradientMapAdjustmentData,
+} from "../core/gradient-map";
 import type { ClipboardRequest, ClipboardResult } from "./clipboard";
-import type { SelectionModificationRequest, SelectionModificationProgress } from "../core/selection-modification";
-import type { ChannelCoverageRequest } from '../core/alpha-channels';
-import type { QuickSelectionRequest } from '../core/quick-selection';
-import type { SubjectRequest } from '../core/subject-selection';
-import type {MattingTileRequest,MattingTileResult} from './matting-tile';
-import type {ClosedFormDiagnostics} from '../intelligence/matting/closed-form';
+import type {
+  SelectionModificationRequest,
+  SelectionModificationProgress,
+} from "../core/selection-modification";
+import type { ChannelCoverageRequest } from "../core/alpha-channels";
+import type { QuickSelectionRequest } from "../core/quick-selection";
+import type { SubjectRequest } from "../core/subject-selection";
+import type { MattingTileRequest, MattingTileResult } from "./matting-tile";
+import type { ClosedFormDiagnostics } from "../intelligence/matting/closed-form";
 import type { SelectionData } from "../core/drawing";
 import type { CoverageRequest, PixelCoverage } from "../core/pixel-selection";
 import {
@@ -36,7 +116,10 @@ import {
   chromaticAdjustmentSchema,
   type ChromaticAdjustmentData,
 } from "../core/adjustments";
-import { spatialFilterSupport, type SpatialFilterOptions } from "../core/smart/spatial-filter";
+import {
+  spatialFilterSupport,
+  type SpatialFilterOptions,
+} from "../core/smart/spatial-filter";
 import type {
   DonorSearchOptions,
   DonorSearchResult,
@@ -49,9 +132,18 @@ import type {
 import type { BlendIfData } from "../core/drawing";
 import type { ToneEffectData } from "../core/model";
 import type { HistogramData } from "../core/histogram";
-export interface FloatLookupLease{apply(pixels:Float32Array):Promise<Float32Array>;dispose():void}
+export interface FloatLookupLease {
+  apply(pixels: Float32Array): Promise<Float32Array>;
+  dispose(): void;
+}
 import type { SelectionTile, FeatherTile } from "./wasm";
-import {captureFloatPoissonOptions,validateFloatRetouchPixels,validateFloatRetouchCoverage,validateFloatPoissonResult,type FloatPoissonBlendResult} from '../core/retouch/float-types';
+import {
+  captureFloatPoissonOptions,
+  validateFloatRetouchPixels,
+  validateFloatRetouchCoverage,
+  validateFloatPoissonResult,
+  type FloatPoissonBlendResult,
+} from "../core/retouch/float-types";
 
 export class PixelProcessor {
   private worker = new Worker(new URL("./pixels.worker.ts", import.meta.url), {
@@ -60,7 +152,12 @@ export class PixelProcessor {
   private sequence = 0;
   private pending = new Map<
     number,
-    { resolve(value: any): void; reject(error: Error): void; onProgress?(value: SelectionModificationProgress): void;expectedReply?:string }
+    {
+      resolve(value: any): void;
+      reject(error: Error): void;
+      onProgress?(value: SelectionModificationProgress): void;
+      expectedReply?: string;
+    }
   >();
   readonly ready: Promise<void>;
   private failure: Error | null = null;
@@ -91,32 +188,55 @@ export class PixelProcessor {
         const request = this.pending.get(event.data.id);
         if (!request) return;
         if (event.data.type === "progress") {
-          try { request.onProgress?.(event.data.progress); }
-          catch (error) { this.pending.delete(event.data.id); request.reject(error instanceof Error ? error : new Error(String(error))); }
+          try {
+            request.onProgress?.(event.data.progress);
+          } catch (error) {
+            this.pending.delete(event.data.id);
+            request.reject(
+              error instanceof Error ? error : new Error(String(error)),
+            );
+          }
           return;
         }
         this.pending.delete(event.data.id);
         if (event.data.error) request.reject(new Error(event.data.error));
-        else if(request.expectedReply&&!Object.hasOwn(event.data,request.expectedReply))request.reject(new Error('Image worker returned the wrong native retouch result kind.'));
-        else if(event.data.floatPoissonResult)request.resolve(event.data.floatPoissonResult);
-        else if(event.data.floatDonorResult)request.resolve(event.data.floatDonorResult);
+        else if (
+          request.expectedReply &&
+          !Object.hasOwn(event.data, request.expectedReply)
+        )
+          request.reject(
+            new Error(
+              "Image worker returned the wrong native retouch result kind.",
+            ),
+          );
+        else if (event.data.floatPoissonResult)
+          request.resolve(event.data.floatPoissonResult);
+        else if (event.data.floatDonorResult)
+          request.resolve(event.data.floatDonorResult);
         else if (event.data.png) request.resolve(event.data.png);
         else if (event.data.clipboard) request.resolve(event.data.clipboard);
         else if (event.data.coverage) request.resolve(event.data.coverage);
-        else if (event.data.selectionResult) request.resolve(event.data.selectionResult);
-        else if (event.data.mattingTile) request.resolve(event.data.mattingTile);
-        else if (event.data.mattingDiagnostics) request.resolve(event.data.mattingDiagnostics);
-        else if (event.data.colorRangeCoverage) request.resolve(event.data.colorRangeCoverage);
+        else if (event.data.selectionResult)
+          request.resolve(event.data.selectionResult);
+        else if (event.data.mattingTile)
+          request.resolve(event.data.mattingTile);
+        else if (event.data.mattingDiagnostics)
+          request.resolve(event.data.mattingDiagnostics);
+        else if (event.data.colorRangeCoverage)
+          request.resolve(event.data.colorRangeCoverage);
         else if (event.data.histogram) request.resolve(event.data.histogram);
-        else if (event.data.floatLookupHandle!==undefined)request.resolve(event.data.floatLookupHandle);
+        else if (event.data.floatLookupHandle !== undefined)
+          request.resolve(event.data.floatLookupHandle);
         else if (event.data.donorResult)
           request.resolve(event.data.donorResult);
         else if (event.data.floatStyle) request.resolve(event.data.floatStyle);
-        else if (event.data.floatWetPaint) request.resolve(event.data.floatWetPaint);
+        else if (event.data.floatWetPaint)
+          request.resolve(event.data.floatWetPaint);
         else if (event.data.poissonResult)
           request.resolve(event.data.poissonResult);
         else if (event.data.wetPaint) request.resolve(event.data.wetPaint);
-        else if (event.data.wetPaintCarried) request.resolve(event.data.wetPaintCarried);
+        else if (event.data.wetPaintCarried)
+          request.resolve(event.data.wetPaintCarried);
         else request.resolve(event.data.pixels);
       };
     });
@@ -125,146 +245,618 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
-  async floatPoissonBlend(target:Float32Array,donor:Float32Array,width:number,height:number,coverage:Uint8Array|Uint8ClampedArray,input:PoissonBlendOptions={}):Promise<FloatPoissonBlendResult>{
-    validateFloatRetouchPixels(target,width,height);validateFloatRetouchPixels(donor,width,height);validateFloatRetouchCoverage(coverage,width,height);
-    const options=captureFloatPoissonOptions(input),pixels=target.slice(),sample=donor.slice(),support=coverage.slice(),alpha=new Uint32Array(width*height),words=new Uint32Array(pixels.buffer);
-    for(let p=0;p<alpha.length;p++)alpha[p]=words[p*4+3];
-    const result=await this.request(new Uint8ClampedArray(0),{floatPoisson:{pixels,donor:sample,width,height,coverage:support,options}},undefined,'floatPoissonResult');
-    validateFloatPoissonResult(result,width,height,options,alpha);return result;
-  }
-  async findFloatDonor(input:Float32Array,width:number,height:number,coverage:Uint8Array|Uint8ClampedArray,options:DonorSearchOptions={}):Promise<DonorSearchResult>{
-    validateFloatRetouchPixels(input,width,height);validateFloatRetouchCoverage(coverage,width,height);
-    if(!options||Object.keys(options).some(key=>key!=='radius'))throw new Error('Invalid float donor search options.');const radius=options.radius??64;
-    if(!Number.isSafeInteger(radius)||radius<1)throw new Error('Donor search radius must be a positive safe integer.');
-    const result=await this.request(new Uint8ClampedArray(0),{floatDonor:{pixels:input.slice(),width,height,coverage:coverage.slice(),options:{radius}}},undefined,'floatDonorResult');
-    if(!result||Object.keys(result).some(key=>!['x','y','score','candidates'].includes(key))||![result.x,result.y,result.candidates].every(Number.isSafeInteger)||Math.abs(result.x)>radius||Math.abs(result.y)>radius||Math.abs(result.x)>=width||Math.abs(result.y)>=height||result.x===0&&result.y===0||!Number.isFinite(result.score)||result.score<0||result.candidates<1)throw new Error('Invalid native float donor-search result.');return result;
-  }
-  async floatCompositeHdrWet(pixels:Float32Array,field:Float64Array,opacity=1):Promise<Float32Array>{
-    validateFloatWorkerWindow(pixels);validateHdrWetField(field,pixels.length/4);floatWetOpacitySchema.parse(opacity);const length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatCompositeHdrWet:{pixels:pixels.slice(),field:field.slice(),opacity}});
-    validateFloatWorkerWindow(result);if(result.length!==length||result.byteOffset||result.byteLength!==result.buffer.byteLength)throw new Error('HDR wet compositor returned incomplete output.');return result;
-  }
-  async floatProjectiveHdrWet(field:Float64Array,input:ProjectiveFieldOptions):Promise<Float64Array>{
-    const {options}=compileProjectiveField(input);if(options.background!==0)throw new Error('HDR wet fields require zero background.');validateHdrWetField(field,options.source.width*options.source.height);
-    const result=await this.request(new Uint8ClampedArray(0),{floatProjectiveHdrWet:{field:field.slice(),options}});
-    validateHdrWetField(result,options.output.width*options.output.height);if(result.byteOffset||result.byteLength!==result.buffer.byteLength)throw new Error('HDR wet sampler returned incomplete output.');return result;
-  }
-  async floatMappedHdrWet(field:Float64Array,input:MappedFieldOptions):Promise<Float64Array>{
-    const {options}=compileMappedField(input);if(options.background!==0)throw new Error('HDR wet fields require zero background.');validateHdrWetField(field,options.source.width*options.source.height);
-    const result=await this.request(new Uint8ClampedArray(0),{floatMappedHdrWet:{field:field.slice(),options}});
-    validateHdrWetField(result,options.output.width*options.output.height);if(result.byteOffset||result.byteLength!==result.buffer.byteLength)throw new Error('HDR wet sampler returned incomplete output.');return result;
-  }
-
-  async floatWetLoad(pixels:Float32Array,input:FloatWetLoadOptions={}):Promise<Float32Array>{
-    validateFloatWorkerWindow(pixels);const options=floatWetLoadSchema.parse(input),length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatWetLoad:{pixels:pixels.slice(),options}});
-    validateFloatWetCarried(result,length);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Float wet reservoir result must own its complete buffer.');return result;
-  }
-  async floatWetMix(pixels:Float32Array,carried:Float32Array,coverage:Float32Array,input:WetPaintMixOptions={}):Promise<FloatWetResult>{
-    validateFloatWorkerWindow(pixels);validateFloatWetCarried(carried,pixels.length);validateFloatAlpha(coverage,pixels.length/4);const options=floatWetMixSchema.parse(input),length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatWetMix:{pixels:pixels.slice(),carried:carried.slice(),coverage:coverage.slice(),options}});
-    validateFloatWetResult(result,length);return result;
-  }
-  async floatWetEnvelope(before:Float32Array,after:Float32Array,coverage:Float32Array,opacity=1):Promise<Float32Array>{
-    validateFloatWorkerWindow(before);validateFloatWorkerWindow(after);if(before.length!==after.length)throw new Error('Float wet envelope geometry differs.');validateFloatAlpha(coverage,before.length/4);floatWetOpacitySchema.parse(opacity);const length=before.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatWetEnvelope:{before:before.slice(),after:after.slice(),coverage:coverage.slice(),opacity}});
-    validateFloatWorkerWindow(result);if(result.length!==length||result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Float wet envelope result geometry differs.');return result;
-  }
-  async floatTonal(pixels:Float32Array,coverage:Float32Array,input:FloatTonalOptions):Promise<Float32Array>{
-    const options=floatTonalOptionsSchema.parse(input);validateFloatWorkerWindow(pixels);validateFloatAlpha(coverage,pixels.length/4);
-    const captured={pixels:pixels.slice(),coverage:coverage.slice(),options},length=pixels.length,alpha=new Uint32Array(length/4),words=new Uint32Array(pixels.buffer,pixels.byteOffset,length);
-    for(let i=0;i<alpha.length;i++)alpha[i]=words[i*4+3];
-    const result=await this.request(new Uint8ClampedArray(0),{floatTonal:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float tonal worker result geometry differs.');
-    const output=new Uint32Array(result.buffer,result.byteOffset,result.length);for(let i=0;i<alpha.length;i++)if(output[i*4+3]!==alpha[i])throw new Error('Float tonal worker changed backdrop alpha.');
+  async floatPoissonBlend(
+    target: Float32Array,
+    donor: Float32Array,
+    width: number,
+    height: number,
+    coverage: Uint8Array | Uint8ClampedArray,
+    input: PoissonBlendOptions = {},
+  ): Promise<FloatPoissonBlendResult> {
+    validateFloatRetouchPixels(target, width, height);
+    validateFloatRetouchPixels(donor, width, height);
+    validateFloatRetouchCoverage(coverage, width, height);
+    const options = captureFloatPoissonOptions(input),
+      pixels = target.slice(),
+      sample = donor.slice(),
+      support = coverage.slice(),
+      alpha = new Uint32Array(width * height),
+      words = new Uint32Array(pixels.buffer);
+    for (let p = 0; p < alpha.length; p++) alpha[p] = words[p * 4 + 3];
+    const result = await this.request(
+      new Uint8ClampedArray(0),
+      {
+        floatPoisson: {
+          pixels,
+          donor: sample,
+          width,
+          height,
+          coverage: support,
+          options,
+        },
+      },
+      undefined,
+      "floatPoissonResult",
+    );
+    validateFloatPoissonResult(result, width, height, options, alpha);
     return result;
   }
-  async floatConvolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Promise<Float32Array>{
-    const settings=floatConvolutionSchema.parse(input);validateFloatAlpha(alpha,settings.width*settings.height);const captured={alpha:alpha.slice(),settings},length=floatConvolutionLength(settings);
-    const result=await this.request(new Uint8ClampedArray(0),{floatConvolveAlpha:captured});validateFloatAlpha(result,length);return result;
+  async findFloatDonor(
+    input: Float32Array,
+    width: number,
+    height: number,
+    coverage: Uint8Array | Uint8ClampedArray,
+    options: DonorSearchOptions = {},
+  ): Promise<DonorSearchResult> {
+    validateFloatRetouchPixels(input, width, height);
+    validateFloatRetouchCoverage(coverage, width, height);
+    if (!options || Object.keys(options).some((key) => key !== "radius"))
+      throw new Error("Invalid float donor search options.");
+    const radius = options.radius ?? 64;
+    if (!Number.isSafeInteger(radius) || radius < 1)
+      throw new Error("Donor search radius must be a positive safe integer.");
+    const result = await this.request(
+      new Uint8ClampedArray(0),
+      {
+        floatDonor: {
+          pixels: input.slice(),
+          width,
+          height,
+          coverage: coverage.slice(),
+          options: { radius },
+        },
+      },
+      undefined,
+      "floatDonorResult",
+    );
+    if (
+      !result ||
+      Object.keys(result).some(
+        (key) => !["x", "y", "score", "candidates"].includes(key),
+      ) ||
+      ![result.x, result.y, result.candidates].every(Number.isSafeInteger) ||
+      Math.abs(result.x) > radius ||
+      Math.abs(result.y) > radius ||
+      Math.abs(result.x) >= width ||
+      Math.abs(result.y) >= height ||
+      (result.x === 0 && result.y === 0) ||
+      !Number.isFinite(result.score) ||
+      result.score < 0 ||
+      result.candidates < 1
+    )
+      throw new Error("Invalid native float donor-search result.");
+    return result;
   }
-  async floatStyle(source:Float32Array,backdrop:Float32Array,input:LayerStyleData):Promise<FloatStyleResult>{
-    const {style}=compileFloatStyle(input);validateFloatWorkerWindow(source);validateFloatWorkerWindow(backdrop);if(source.length!==backdrop.length)throw new Error('Float style source and backdrop geometry differ.');
-    const captured={source:source.slice(),backdrop:backdrop.slice(),style},length=source.length,alpha=new Uint32Array(length/4),words=new Uint32Array(source.buffer,source.byteOffset,source.length);
-    for(let i=0;i<alpha.length;i++)alpha[i]=words[i*4+3];
-    const result=await this.request(new Uint8ClampedArray(0),{floatStyle:captured});validateFloatStyleResult(result,length,alpha);return result;
+  async floatCompositeHdrWet(
+    pixels: Float32Array,
+    field: Float64Array,
+    opacity = 1,
+  ): Promise<Float32Array> {
+    validateFloatWorkerWindow(pixels);
+    validateHdrWetField(field, pixels.length / 4);
+    floatWetOpacitySchema.parse(opacity);
+    const length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatCompositeHdrWet: {
+        pixels: pixels.slice(),
+        field: field.slice(),
+        opacity,
+      },
+    });
+    validateFloatWorkerWindow(result);
+    if (
+      result.length !== length ||
+      result.byteOffset ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error("HDR wet compositor returned incomplete output.");
+    return result;
   }
-  async floatGradient(pixels:Float32Array,input:GradientMapAdjustmentData):Promise<Float32Array>{
-    const adjustment=gradientMapAdjustmentSchema.parse(input);validateFloatWorkerWindow(pixels);const length=pixels.length,result=await this.request(new Uint8ClampedArray(0),{floatGradient:{pixels:pixels.slice(),adjustment}});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');for(let i=0;i<result.length;i++)if(i%4!==3&&(result[i]<0||result[i]>1))throw new Error('Float gradient worker output must stay within normalized linear RGB.');return result;
+  async floatProjectiveHdrWet(
+    field: Float64Array,
+    input: ProjectiveFieldOptions,
+  ): Promise<Float64Array> {
+    const { options } = compileProjectiveField(input);
+    if (options.background !== 0)
+      throw new Error("HDR wet fields require zero background.");
+    validateHdrWetField(field, options.source.width * options.source.height);
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatProjectiveHdrWet: { field: field.slice(), options },
+    });
+    validateHdrWetField(result, options.output.width * options.output.height);
+    if (result.byteOffset || result.byteLength !== result.buffer.byteLength)
+      throw new Error("HDR wet sampler returned incomplete output.");
+    return result;
   }
-  async prepareFloatLookup(input:LutAdjustmentData):Promise<FloatLookupLease>{
-    const adjustment=captureLutHeader(input),handle=await this.request(new Uint8ClampedArray(0),{floatLookupPrepare:adjustment});if(!Number.isSafeInteger(handle)||handle<=0)throw new Error('Float lookup worker returned an invalid captured handle.');let disposed=false;
-    return{apply:async pixels=>{if(disposed)throw new Error('Captured float lookup is disposed.');validateFloatWorkerWindow(pixels);const length=pixels.length,result=await this.request(new Uint8ClampedArray(0),{floatLookupApply:{handle,pixels:pixels.slice()}});if(disposed)throw new Error('Captured float lookup is disposed.');validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;},dispose:()=>{if(disposed)return;disposed=true;void this.request(new Uint8ClampedArray(0),{floatLookupRelease:handle}).catch(()=>{});}};
+  async floatMappedHdrWet(
+    field: Float64Array,
+    input: MappedFieldOptions,
+  ): Promise<Float64Array> {
+    const { options } = compileMappedField(input);
+    if (options.background !== 0)
+      throw new Error("HDR wet fields require zero background.");
+    validateHdrWetField(field, options.source.width * options.source.height);
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatMappedHdrWet: { field: field.slice(), options },
+    });
+    validateHdrWetField(result, options.output.width * options.output.height);
+    if (result.byteOffset || result.byteLength !== result.buffer.byteLength)
+      throw new Error("HDR wet sampler returned incomplete output.");
+    return result;
   }
-  async floatComposite(source:Float32Array,backdrop:Float32Array,options:FloatCompositeOptions={}):Promise<Float32Array>{
-    const settings=floatCompositeOptionsSchema.parse(options);validateFloatWorkerWindow(source);validateFloatWorkerWindow(backdrop);if(source.length!==backdrop.length)throw new Error('Float source and backdrop geometry differ.');
-    if(settings.mask&&(settings.mask.length!==source.length/4||!(settings.mask.buffer instanceof ArrayBuffer)))throw new Error('Float coverage geometry differs.');
-    const captured={source:source.slice(),backdrop:backdrop.slice(),options:{...settings,...(settings.mask?{mask:settings.mask.slice()}:{})}},length=source.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatComposite:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+
+  async floatWetLoad(
+    pixels: Float32Array,
+    input: FloatWetLoadOptions = {},
+  ): Promise<Float32Array> {
+    validateFloatWorkerWindow(pixels);
+    const options = floatWetLoadSchema.parse(input),
+      length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatWetLoad: { pixels: pixels.slice(), options },
+    });
+    validateFloatWetCarried(result, length);
+    if (
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error(
+        "Float wet reservoir result must own its complete buffer.",
+      );
+    return result;
   }
-  async floatColor(pixels:Float32Array,input:FloatColorAdjustment):Promise<Float32Array>{
-    const adjustment=parseFloatColor(input),neutral=compileFloatColor(adjustment).neutral;validateFloatWorkerWindow(pixels);const captured={pixels:pixels.slice(),adjustment},length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatColor:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');
-    if(!neutral)for(let i=0;i<result.length;i++)if(i%4!==3&&(result[i]<0||result[i]>1))throw new Error('Float color worker output must stay within normalized linear RGB.');return result;
+  async floatWetMix(
+    pixels: Float32Array,
+    carried: Float32Array,
+    coverage: Float32Array,
+    input: WetPaintMixOptions = {},
+  ): Promise<FloatWetResult> {
+    validateFloatWorkerWindow(pixels);
+    validateFloatWetCarried(carried, pixels.length);
+    validateFloatAlpha(coverage, pixels.length / 4);
+    const options = floatWetMixSchema.parse(input),
+      length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatWetMix: {
+        pixels: pixels.slice(),
+        carried: carried.slice(),
+        coverage: coverage.slice(),
+        options,
+      },
+    });
+    validateFloatWetResult(result, length);
+    return result;
   }
-  async floatTransfer(pixels:Float32Array,input:FloatTransferAdjustment):Promise<Float32Array>{
-    const adjustment=parseFloatTransfer(input);validateFloatWorkerWindow(pixels);const captured={pixels:pixels.slice(),adjustment},length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatTransfer:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  async floatWetEnvelope(
+    before: Float32Array,
+    after: Float32Array,
+    coverage: Float32Array,
+    opacity = 1,
+  ): Promise<Float32Array> {
+    validateFloatWorkerWindow(before);
+    validateFloatWorkerWindow(after);
+    if (before.length !== after.length)
+      throw new Error("Float wet envelope geometry differs.");
+    validateFloatAlpha(coverage, before.length / 4);
+    floatWetOpacitySchema.parse(opacity);
+    const length = before.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatWetEnvelope: {
+        before: before.slice(),
+        after: after.slice(),
+        coverage: coverage.slice(),
+        opacity,
+      },
+    });
+    validateFloatWorkerWindow(result);
+    if (
+      result.length !== length ||
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error("Float wet envelope result geometry differs.");
+    return result;
   }
-  async floatTone(pixels:Float32Array,options:FloatToneOptions={}):Promise<Float32Array>{
-    const settings=floatToneOptionsSchema.parse(options);validateFloatWorkerWindow(pixels);const captured={pixels:pixels.slice(),options:settings},length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatTone:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  async floatTonal(
+    pixels: Float32Array,
+    coverage: Float32Array,
+    input: FloatTonalOptions,
+  ): Promise<Float32Array> {
+    const options = floatTonalOptionsSchema.parse(input);
+    validateFloatWorkerWindow(pixels);
+    validateFloatAlpha(coverage, pixels.length / 4);
+    const captured = {
+        pixels: pixels.slice(),
+        coverage: coverage.slice(),
+        options,
+      },
+      length = pixels.length,
+      alpha = new Uint32Array(length / 4),
+      words = new Uint32Array(pixels.buffer, pixels.byteOffset, length);
+    for (let i = 0; i < alpha.length; i++) alpha[i] = words[i * 4 + 3];
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatTonal: captured,
+    });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float tonal worker result geometry differs.");
+    const output = new Uint32Array(
+      result.buffer,
+      result.byteOffset,
+      result.length,
+    );
+    for (let i = 0; i < alpha.length; i++)
+      if (output[i * 4 + 3] !== alpha[i])
+        throw new Error("Float tonal worker changed backdrop alpha.");
+    return result;
   }
-  async floatAffine(pixels:Float32Array,matrix:readonly number[]):Promise<Float32Array>{
-    validateFloatWorkerWindow(pixels);if(!Array.isArray(matrix)||matrix.length!==12||![...matrix].every(Number.isFinite))throw new Error('Use twelve finite RGB affine coefficients.');const captured={pixels:pixels.slice(),matrix:[...matrix]},length=pixels.length;
-    const result=await this.request(new Uint8ClampedArray(0),{floatAffine:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  async floatConvolveAlpha(
+    alpha: Float32Array,
+    input: FloatConvolutionOptions,
+  ): Promise<Float32Array> {
+    const settings = floatConvolutionSchema.parse(input);
+    validateFloatAlpha(alpha, settings.width * settings.height);
+    const captured = { alpha: alpha.slice(), settings },
+      length = floatConvolutionLength(settings);
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatConvolveAlpha: captured,
+    });
+    validateFloatAlpha(result, length);
+    return result;
   }
-  async floatProjective(pixels:Float32Array,input:ProjectiveSampleOptions):Promise<Float32Array>{
-    validateFloatWorkerWindow(pixels);const {options}=compileProjectiveSample(input),captured=pixels.slice(),length=options.output.width*options.output.height*4;
-    if(captured.length!==options.source.width*options.source.height*4)throw new Error('Projective source pixels differ from captured window geometry.');
-    const result=await this.request(new Uint8ClampedArray(0),{floatProjective:{pixels:captured,options}});
-    validateFloatWorkerWindow(result);if(result.length!==length||result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Projective worker result differs from captured output geometry.');return result;
+  async floatStyle(
+    source: Float32Array,
+    backdrop: Float32Array,
+    input: LayerStyleData,
+  ): Promise<FloatStyleResult> {
+    const { style } = compileFloatStyle(input);
+    validateFloatWorkerWindow(source);
+    validateFloatWorkerWindow(backdrop);
+    if (source.length !== backdrop.length)
+      throw new Error("Float style source and backdrop geometry differ.");
+    const captured = {
+        source: source.slice(),
+        backdrop: backdrop.slice(),
+        style,
+      },
+      length = source.length,
+      alpha = new Uint32Array(length / 4),
+      words = new Uint32Array(source.buffer, source.byteOffset, source.length);
+    for (let i = 0; i < alpha.length; i++) alpha[i] = words[i * 4 + 3];
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatStyle: captured,
+    });
+    validateFloatStyleResult(result, length, alpha);
+    return result;
   }
-  async floatProjectiveField(alpha:Float32Array,input:ProjectiveFieldOptions):Promise<Float32Array>{
-    const {options}=compileProjectiveField(input);validateFloatAlpha(alpha,options.source.width*options.source.height);
-    const captured=alpha.slice(),length=options.output.width*options.output.height;
-    const result=await this.request(new Uint8ClampedArray(0),{floatProjectiveField:{alpha:captured,options}});
-    validateFloatAlpha(result,length);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Projective field worker result differs from captured output geometry.');return result;
+  async floatGradient(
+    pixels: Float32Array,
+    input: GradientMapAdjustmentData,
+  ): Promise<Float32Array> {
+    const adjustment = gradientMapAdjustmentSchema.parse(input);
+    validateFloatWorkerWindow(pixels);
+    const length = pixels.length,
+      result = await this.request(new Uint8ClampedArray(0), {
+        floatGradient: { pixels: pixels.slice(), adjustment },
+      });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float worker result geometry differs.");
+    for (let i = 0; i < result.length; i++)
+      if (i % 4 !== 3 && (result[i] < 0 || result[i] > 1))
+        throw new Error(
+          "Float gradient worker output must stay within normalized linear RGB.",
+        );
+    return result;
   }
-  async floatMappedField(alpha:Float32Array,input:MappedFieldOptions):Promise<Float32Array>{
-    const {options}=compileMappedField(input);validateFloatAlpha(alpha,options.source.width*options.source.height);
-    const captured=alpha.slice(),length=options.output.width*options.output.height;
-    const result=await this.request(new Uint8ClampedArray(0),{floatMappedField:{alpha:captured,options}});
-    validateFloatAlpha(result,length);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Mapped field worker result differs from captured output geometry.');return result;
+  async prepareFloatLookup(
+    input: LutAdjustmentData,
+  ): Promise<FloatLookupLease> {
+    const adjustment = captureLutHeader(input),
+      handle = await this.request(new Uint8ClampedArray(0), {
+        floatLookupPrepare: adjustment,
+      });
+    if (!Number.isSafeInteger(handle) || handle <= 0)
+      throw new Error(
+        "Float lookup worker returned an invalid captured handle.",
+      );
+    let disposed = false;
+    return {
+      apply: async (pixels) => {
+        if (disposed) throw new Error("Captured float lookup is disposed.");
+        validateFloatWorkerWindow(pixels);
+        const length = pixels.length,
+          result = await this.request(new Uint8ClampedArray(0), {
+            floatLookupApply: { handle, pixels: pixels.slice() },
+          });
+        if (disposed) throw new Error("Captured float lookup is disposed.");
+        validateFloatWorkerWindow(result);
+        if (result.length !== length)
+          throw new Error("Float worker result geometry differs.");
+        return result;
+      },
+      dispose: () => {
+        if (disposed) return;
+        disposed = true;
+        void this.request(new Uint8ClampedArray(0), {
+          floatLookupRelease: handle,
+        }).catch(() => {});
+      },
+    };
   }
-  async floatMappedWet(alpha:Float32Array,input:MappedFieldOptions):Promise<Float32Array>{
-    const {options}=compileMappedField(input);if(options.background!==0)throw new Error('Wet fields require zero background.');validateWetField(alpha,options.source.width*options.source.height);
-    const captured=alpha.slice(),length=options.output.width*options.output.height*5;
-    const result=await this.request(new Uint8ClampedArray(0),{floatMappedWet:{alpha:captured,options}});
-    validateWetField(result,length/5);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Mapped wet worker result differs from captured output geometry.');return result;
+  async floatComposite(
+    source: Float32Array,
+    backdrop: Float32Array,
+    options: FloatCompositeOptions = {},
+  ): Promise<Float32Array> {
+    const settings = floatCompositeOptionsSchema.parse(options);
+    validateFloatWorkerWindow(source);
+    validateFloatWorkerWindow(backdrop);
+    if (source.length !== backdrop.length)
+      throw new Error("Float source and backdrop geometry differ.");
+    if (
+      settings.mask &&
+      (settings.mask.length !== source.length / 4 ||
+        !(settings.mask.buffer instanceof ArrayBuffer))
+    )
+      throw new Error("Float coverage geometry differs.");
+    const captured = {
+        source: source.slice(),
+        backdrop: backdrop.slice(),
+        options: {
+          ...settings,
+          ...(settings.mask ? { mask: settings.mask.slice() } : {}),
+        },
+      },
+      length = source.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatComposite: captured,
+    });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float worker result geometry differs.");
+    return result;
   }
-  async floatProjectiveWet(alpha:Float32Array,input:ProjectiveFieldOptions):Promise<Float32Array>{
-    const {options}=compileProjectiveField(input);validateWetField(alpha,options.source.width*options.source.height);
-    const captured=alpha.slice(),length=options.output.width*options.output.height*5;
-    const result=await this.request(new Uint8ClampedArray(0),{floatProjectiveWet:{alpha:captured,options}});
-    validateWetField(result,length/5);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Projective field worker result differs from captured output geometry.');return result;
+  async floatColor(
+    pixels: Float32Array,
+    input: FloatColorAdjustment,
+  ): Promise<Float32Array> {
+    const adjustment = parseFloatColor(input),
+      neutral = compileFloatColor(adjustment).neutral;
+    validateFloatWorkerWindow(pixels);
+    const captured = { pixels: pixels.slice(), adjustment },
+      length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatColor: captured,
+    });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float worker result geometry differs.");
+    if (!neutral)
+      for (let i = 0; i < result.length; i++)
+        if (i % 4 !== 3 && (result[i] < 0 || result[i] > 1))
+          throw new Error(
+            "Float color worker output must stay within normalized linear RGB.",
+          );
+    return result;
   }
-  async bilateralFilter(pixels:Uint8ClampedArray,width:number,height:number,options:BilateralFilterOptions):Promise<Uint8ClampedArray> {
-    const settings=bilateralOptionsSchema.parse(options);
-    if(!(pixels instanceof Uint8ClampedArray)||![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0)||width>8192||height>8192||width*height>4_000_000||pixels.length!==width*height*4)
-      throw new Error('Invalid bilateral-filter tile geometry.');
-    const length=pixels.length,result=await this.request(pixels.slice(),{bilateralFilter:{width,height,options:settings}});
-    if(!(result instanceof Uint8ClampedArray)||result.length!==length)throw new Error('Invalid bilateral-filter worker result.');
+  async floatTransfer(
+    pixels: Float32Array,
+    input: FloatTransferAdjustment,
+  ): Promise<Float32Array> {
+    const adjustment = parseFloatTransfer(input);
+    validateFloatWorkerWindow(pixels);
+    const captured = { pixels: pixels.slice(), adjustment },
+      length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatTransfer: captured,
+    });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float worker result geometry differs.");
+    return result;
+  }
+  async floatTone(
+    pixels: Float32Array,
+    options: FloatToneOptions = {},
+  ): Promise<Float32Array> {
+    const settings = floatToneOptionsSchema.parse(options);
+    validateFloatWorkerWindow(pixels);
+    const captured = { pixels: pixels.slice(), options: settings },
+      length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatTone: captured,
+    });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float worker result geometry differs.");
+    return result;
+  }
+  async floatAffine(
+    pixels: Float32Array,
+    matrix: readonly number[],
+  ): Promise<Float32Array> {
+    validateFloatWorkerWindow(pixels);
+    if (
+      !Array.isArray(matrix) ||
+      matrix.length !== 12 ||
+      ![...matrix].every(Number.isFinite)
+    )
+      throw new Error("Use twelve finite RGB affine coefficients.");
+    const captured = { pixels: pixels.slice(), matrix: [...matrix] },
+      length = pixels.length;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatAffine: captured,
+    });
+    validateFloatWorkerWindow(result);
+    if (result.length !== length)
+      throw new Error("Float worker result geometry differs.");
+    return result;
+  }
+  async floatProjective(
+    pixels: Float32Array,
+    input: ProjectiveSampleOptions,
+  ): Promise<Float32Array> {
+    validateFloatWorkerWindow(pixels);
+    const { options } = compileProjectiveSample(input),
+      captured = pixels.slice(),
+      length = options.output.width * options.output.height * 4;
+    if (captured.length !== options.source.width * options.source.height * 4)
+      throw new Error(
+        "Projective source pixels differ from captured window geometry.",
+      );
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatProjective: { pixels: captured, options },
+    });
+    validateFloatWorkerWindow(result);
+    if (
+      result.length !== length ||
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error(
+        "Projective worker result differs from captured output geometry.",
+      );
+    return result;
+  }
+  async floatProjectiveField(
+    alpha: Float32Array,
+    input: ProjectiveFieldOptions,
+  ): Promise<Float32Array> {
+    const { options } = compileProjectiveField(input);
+    validateFloatAlpha(alpha, options.source.width * options.source.height);
+    const captured = alpha.slice(),
+      length = options.output.width * options.output.height;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatProjectiveField: { alpha: captured, options },
+    });
+    validateFloatAlpha(result, length);
+    if (
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error(
+        "Projective field worker result differs from captured output geometry.",
+      );
+    return result;
+  }
+  async floatMappedField(
+    alpha: Float32Array,
+    input: MappedFieldOptions,
+  ): Promise<Float32Array> {
+    const { options } = compileMappedField(input);
+    validateFloatAlpha(alpha, options.source.width * options.source.height);
+    const captured = alpha.slice(),
+      length = options.output.width * options.output.height;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatMappedField: { alpha: captured, options },
+    });
+    validateFloatAlpha(result, length);
+    if (
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error(
+        "Mapped field worker result differs from captured output geometry.",
+      );
+    return result;
+  }
+  async floatMappedWet(
+    alpha: Float32Array,
+    input: MappedFieldOptions,
+  ): Promise<Float32Array> {
+    const { options } = compileMappedField(input);
+    if (options.background !== 0)
+      throw new Error("Wet fields require zero background.");
+    validateWetField(alpha, options.source.width * options.source.height);
+    const captured = alpha.slice(),
+      length = options.output.width * options.output.height * 5;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatMappedWet: { alpha: captured, options },
+    });
+    validateWetField(result, length / 5);
+    if (
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error(
+        "Mapped wet worker result differs from captured output geometry.",
+      );
+    return result;
+  }
+  async floatProjectiveWet(
+    alpha: Float32Array,
+    input: ProjectiveFieldOptions,
+  ): Promise<Float32Array> {
+    const { options } = compileProjectiveField(input);
+    validateWetField(alpha, options.source.width * options.source.height);
+    const captured = alpha.slice(),
+      length = options.output.width * options.output.height * 5;
+    const result = await this.request(new Uint8ClampedArray(0), {
+      floatProjectiveWet: { alpha: captured, options },
+    });
+    validateWetField(result, length / 5);
+    if (
+      result.byteOffset !== 0 ||
+      result.byteLength !== result.buffer.byteLength
+    )
+      throw new Error(
+        "Projective field worker result differs from captured output geometry.",
+      );
+    return result;
+  }
+  async bilateralFilter(
+    pixels: Uint8ClampedArray,
+    width: number,
+    height: number,
+    options: BilateralFilterOptions,
+  ): Promise<Uint8ClampedArray> {
+    const settings = bilateralOptionsSchema.parse(options);
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      ![width, height, width * height].every(
+        (v) => Number.isSafeInteger(v) && v > 0,
+      ) ||
+      width > 8192 ||
+      height > 8192 ||
+      width * height > 4_000_000 ||
+      pixels.length !== width * height * 4
+    )
+      throw new Error("Invalid bilateral-filter tile geometry.");
+    const length = pixels.length,
+      result = await this.request(pixels.slice(), {
+        bilateralFilter: { width, height, options: settings },
+      });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error("Invalid bilateral-filter worker result.");
     return result;
   }
 
   /** Capture before readiness/transfer; the caller keeps its original pixels. */
-  async medianFilter(pixels:Uint8ClampedArray,width:number,height:number,radius:number):Promise<Uint8ClampedArray> {
+  async medianFilter(
+    pixels: Uint8ClampedArray,
+    width: number,
+    height: number,
+    radius: number,
+  ): Promise<Uint8ClampedArray> {
     medianRadiusSchema.parse(radius);
-    if (!(pixels instanceof Uint8ClampedArray) || ![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0) || width>8192 || height>8192 || width*height>4_000_000 || pixels.length!==width*height*4)
-      throw new Error('Invalid median-filter tile geometry.');
-    const length=pixels.length, result=await this.request(pixels.slice(),{medianFilter:{width,height,radius}});
-    if (!(result instanceof Uint8ClampedArray) || result.length!==length)
-      throw new Error('Invalid median-filter worker result.');
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      ![width, height, width * height].every(
+        (v) => Number.isSafeInteger(v) && v > 0,
+      ) ||
+      width > 8192 ||
+      height > 8192 ||
+      width * height > 4_000_000 ||
+      pixels.length !== width * height * 4
+    )
+      throw new Error("Invalid median-filter tile geometry.");
+    const length = pixels.length,
+      result = await this.request(pixels.slice(), {
+        medianFilter: { width, height, radius },
+      });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error("Invalid median-filter worker result.");
     return result;
   }
 
@@ -276,12 +868,20 @@ export class PixelProcessor {
     options: SpatialFilterOptions,
   ): Promise<Uint8ClampedArray> {
     spatialFilterSupport(options);
-    if (!(pixels instanceof Uint8ClampedArray) || ![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0) || pixels.length!==width*height*4)
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      ![width, height, width * height].every(
+        (v) => Number.isSafeInteger(v) && v > 0,
+      ) ||
+      pixels.length !== width * height * 4
+    )
       throw new Error("Invalid spatial-filter tile geometry.");
-    const length=pixels.length,result=await this.request(pixels.slice(), {
-      spatialFilter: { width, height, options: { ...options } },
-    });
-    if (!(result instanceof Uint8ClampedArray) || result.length!==length)throw new Error("Invalid spatial-filter worker result.");
+    const length = pixels.length,
+      result = await this.request(pixels.slice(), {
+        spatialFilter: { width, height, options: { ...options } },
+      });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error("Invalid spatial-filter worker result.");
     return result;
   }
   process(
@@ -317,72 +917,194 @@ export class PixelProcessor {
     const settings = hslAdjustmentSchema.parse(adjustment);
     return this.request(pixels.slice(), { hsl: settings });
   }
-  chromatic(pixels: Uint8ClampedArray, adjustment: ChromaticAdjustmentData): Promise<Uint8ClampedArray> {
-    if (pixels.length%4) return Promise.reject(new Error("Chromatic adjustments require complete RGBA pixels."));
-    return this.request(pixels.slice(), { chromatic: chromaticAdjustmentSchema.parse(adjustment) });
+  chromatic(
+    pixels: Uint8ClampedArray,
+    adjustment: ChromaticAdjustmentData,
+  ): Promise<Uint8ClampedArray> {
+    if (pixels.length % 4)
+      return Promise.reject(
+        new Error("Chromatic adjustments require complete RGBA pixels."),
+      );
+    return this.request(pixels.slice(), {
+      chromatic: chromaticAdjustmentSchema.parse(adjustment),
+    });
   }
-  async encodeFrequencyBand(pixels:Uint8ClampedArray,low:Uint8ClampedArray,band:'high'|'correction'):Promise<Uint8ClampedArray>{
-    if(!(pixels instanceof Uint8ClampedArray)||!(low instanceof Uint8ClampedArray)||pixels.length%4||pixels.length!==low.length||!['high','correction'].includes(band))throw new Error('Invalid frequency encoding planes.');
-    const length=pixels.length,result=await this.request(pixels.slice(),{frequencyEncoding:{low:low.slice(),band}});
-    if(!(result instanceof Uint8ClampedArray)||result.length!==length)throw new Error('Invalid frequency encoding worker result.');return result;
-  }
-  async linearBlend(pixels: Uint8ClampedArray, backdrop: Uint8ClampedArray, opacity = 1, mode: "linear-light" | "linear-burn" = "linear-light"): Promise<Uint8ClampedArray> {
-    if (!(pixels instanceof Uint8ClampedArray) || !(backdrop instanceof Uint8ClampedArray) || pixels.length % 4 || pixels.length !== backdrop.length || !Number.isFinite(opacity) || opacity < 0 || opacity > 1 || !["linear-light","linear-burn"].includes(mode)) throw new Error("Invalid linear-blend tile.");
-    const length=pixels.length,result=await this.request(pixels.slice(), { linearBlend: {backdrop:backdrop.slice(),opacity,mode} });
-    if (!(result instanceof Uint8ClampedArray) || result.length !== length) throw new Error("Invalid Linear Light worker result.");
+  async encodeFrequencyBand(
+    pixels: Uint8ClampedArray,
+    low: Uint8ClampedArray,
+    band: "high" | "correction",
+  ): Promise<Uint8ClampedArray> {
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      !(low instanceof Uint8ClampedArray) ||
+      pixels.length % 4 ||
+      pixels.length !== low.length ||
+      !["high", "correction"].includes(band)
+    )
+      throw new Error("Invalid frequency encoding planes.");
+    const length = pixels.length,
+      result = await this.request(pixels.slice(), {
+        frequencyEncoding: { low: low.slice(), band },
+      });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error("Invalid frequency encoding worker result.");
     return result;
   }
-  async redEye(pixels: Uint8ClampedArray, adjustment: RedEyeAdjustmentData): Promise<Uint8ClampedArray> {
-    if (!(pixels instanceof Uint8ClampedArray) || pixels.length % 4 || pixels.length > 0x7fffffff)
-      throw new Error("Red-eye correction requires complete RGBA pixels within the kernel tile range.");
-    const settings = redEyeAdjustmentSchema.parse(adjustment), length = pixels.length;
+  async linearBlend(
+    pixels: Uint8ClampedArray,
+    backdrop: Uint8ClampedArray,
+    opacity = 1,
+    mode: "linear-light" | "linear-burn" = "linear-light",
+  ): Promise<Uint8ClampedArray> {
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      !(backdrop instanceof Uint8ClampedArray) ||
+      pixels.length % 4 ||
+      pixels.length !== backdrop.length ||
+      !Number.isFinite(opacity) ||
+      opacity < 0 ||
+      opacity > 1 ||
+      !["linear-light", "linear-burn"].includes(mode)
+    )
+      throw new Error("Invalid linear-blend tile.");
+    const length = pixels.length,
+      result = await this.request(pixels.slice(), {
+        linearBlend: { backdrop: backdrop.slice(), opacity, mode },
+      });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error("Invalid Linear Light worker result.");
+    return result;
+  }
+  async redEye(
+    pixels: Uint8ClampedArray,
+    adjustment: RedEyeAdjustmentData,
+  ): Promise<Uint8ClampedArray> {
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      pixels.length % 4 ||
+      pixels.length > 0x7fffffff
+    )
+      throw new Error(
+        "Red-eye correction requires complete RGBA pixels within the kernel tile range.",
+      );
+    const settings = redEyeAdjustmentSchema.parse(adjustment),
+      length = pixels.length;
     const result = await this.request(pixels.slice(), { redEye: settings });
     if (!(result instanceof Uint8ClampedArray) || result.length !== length)
       throw new Error("Invalid red-eye worker result.");
     return result;
   }
-  gradientMap(pixels: Uint8ClampedArray, adjustment: GradientMapAdjustmentData): Promise<Uint8ClampedArray> {
-    if (pixels.length % 4) return Promise.reject(new Error("Gradient maps require complete RGBA pixels."));
-    return this.request(pixels.slice(), { gradientMap: gradientMapAdjustmentSchema.parse(adjustment) });
+  gradientMap(
+    pixels: Uint8ClampedArray,
+    adjustment: GradientMapAdjustmentData,
+  ): Promise<Uint8ClampedArray> {
+    if (pixels.length % 4)
+      return Promise.reject(
+        new Error("Gradient maps require complete RGBA pixels."),
+      );
+    return this.request(pixels.slice(), {
+      gradientMap: gradientMapAdjustmentSchema.parse(adjustment),
+    });
   }
-  whiteBalance(pixels: Uint8ClampedArray, adjustment: WhiteBalanceAdjustmentData): Promise<Uint8ClampedArray> {
-    if (pixels.length % 4) return Promise.reject(new Error("White balance requires complete RGBA pixels."));
-    return this.request(pixels.slice(), { whiteBalance: whiteBalanceAdjustmentSchema.parse(adjustment) });
+  whiteBalance(
+    pixels: Uint8ClampedArray,
+    adjustment: WhiteBalanceAdjustmentData,
+  ): Promise<Uint8ClampedArray> {
+    if (pixels.length % 4)
+      return Promise.reject(
+        new Error("White balance requires complete RGBA pixels."),
+      );
+    return this.request(pixels.slice(), {
+      whiteBalance: whiteBalanceAdjustmentSchema.parse(adjustment),
+    });
   }
-  lookup(pixels: Uint8ClampedArray, adjustment: LutAdjustmentData): Promise<Uint8ClampedArray> {
-    return this.request(pixels.slice(), { lookup: lutAdjustmentSchema.parse(adjustment) });
+  lookup(
+    pixels: Uint8ClampedArray,
+    adjustment: LutAdjustmentData,
+  ): Promise<Uint8ClampedArray> {
+    return this.request(pixels.slice(), {
+      lookup: lutAdjustmentSchema.parse(adjustment),
+    });
   }
-  colorRange(pixels:Uint8ClampedArray,options:ColorRangeOptions):Promise<Uint8Array> {
-    return this.request(pixels.slice(),{colorRange:colorRangeOptionsSchema.parse(options)});
+  colorRange(
+    pixels: Uint8ClampedArray,
+    options: ColorRangeOptions,
+  ): Promise<Uint8Array> {
+    return this.request(pixels.slice(), {
+      colorRange: colorRangeOptionsSchema.parse(options),
+    });
   }
   /** Snapshot before readiness; neither source bytes nor caller buffers transfer. */
-  async brushTexture(pixels: Uint8ClampedArray, options: TextureMaskOptions = {},support?:Uint8ClampedArray): Promise<Uint8ClampedArray> {
-    if (!(pixels instanceof Uint8ClampedArray) || pixels.length % 4 || pixels.length > 16_000_000)
-      throw new Error('Texture conversion requires complete RGBA pixels in a working tile of at most 4,000,000 pixels.');
-    if(support!==undefined&&(!(support instanceof Uint8ClampedArray)||support.length!==pixels.length))throw new Error('Texture support must match its RGBA working tile.');
-    const settings = textureMaskOptionsSchema.parse(options), length = pixels.length;
-    const result = await this.request(pixels.slice(), { brushTexture: settings,brushTextureSupport:support?.slice() });
+  async brushTexture(
+    pixels: Uint8ClampedArray,
+    options: TextureMaskOptions = {},
+    support?: Uint8ClampedArray,
+  ): Promise<Uint8ClampedArray> {
+    if (
+      !(pixels instanceof Uint8ClampedArray) ||
+      pixels.length % 4 ||
+      pixels.length > 16_000_000
+    )
+      throw new Error(
+        "Texture conversion requires complete RGBA pixels in a working tile of at most 4,000,000 pixels.",
+      );
+    if (
+      support !== undefined &&
+      (!(support instanceof Uint8ClampedArray) ||
+        support.length !== pixels.length)
+    )
+      throw new Error("Texture support must match its RGBA working tile.");
+    const settings = textureMaskOptionsSchema.parse(options),
+      length = pixels.length;
+    const result = await this.request(pixels.slice(), {
+      brushTexture: settings,
+      brushTextureSupport: support?.slice(),
+    });
     if (!(result instanceof Uint8ClampedArray) || result.length !== length)
-      throw new Error('The texture worker returned invalid coverage pixels.');
+      throw new Error("The texture worker returned invalid coverage pixels.");
     return result;
   }
   /** Prepare carried pigment in the worker without losing sub-byte alpha. */
-  async loadWetPaint(pixels: Uint8ClampedArray, options: WetPaintLoadOptions = {}): Promise<Float32Array> {
+  async loadWetPaint(
+    pixels: Uint8ClampedArray,
+    options: WetPaintLoadOptions = {},
+  ): Promise<Float32Array> {
     validateWetPixels(pixels);
-    const settings = wetPaintLoadSchema.parse(options), length = pixels.length;
-    const result = await this.request(pixels.slice(), { wetPaintLoad: settings });
+    const settings = wetPaintLoadSchema.parse(options),
+      length = pixels.length;
+    const result = await this.request(pixels.slice(), {
+      wetPaintLoad: settings,
+    });
     validateWetCarried(result, length);
     return result;
   }
   /** Capture every input before worker readiness; callers retain all buffers. */
-  async mixWetPaint(pixels: Uint8ClampedArray, carried: Float32Array, coverage: Uint8Array, options: WetPaintMixOptions = {}): Promise<WetPaintResult> {
+  async mixWetPaint(
+    pixels: Uint8ClampedArray,
+    carried: Float32Array,
+    coverage: Uint8Array,
+    options: WetPaintMixOptions = {},
+  ): Promise<WetPaintResult> {
     validateWetPixels(pixels);
     validateWetCarried(carried, pixels.length);
     validateWetCoverage(coverage, pixels.length);
-    const settings = wetPaintMixSchema.parse(options), length = pixels.length;
-    const result = await this.request(pixels.slice(), { wetPaintMix: { carried: carried.slice(), coverage: coverage.slice(), settings } });
-    if (!result || !(result.pixels instanceof Uint8ClampedArray) || result.pixels.length !== length)
-      throw new Error('The wet paint worker returned invalid destination pixels.');
+    const settings = wetPaintMixSchema.parse(options),
+      length = pixels.length;
+    const result = await this.request(pixels.slice(), {
+      wetPaintMix: {
+        carried: carried.slice(),
+        coverage: coverage.slice(),
+        settings,
+      },
+    });
+    if (
+      !result ||
+      !(result.pixels instanceof Uint8ClampedArray) ||
+      result.pixels.length !== length
+    )
+      throw new Error(
+        "The wet paint worker returned invalid destination pixels.",
+      );
     validateWetCarried(result.carried, length);
     return result;
   }
@@ -435,7 +1157,13 @@ export class PixelProcessor {
     inverted = false,
   ): Promise<Uint8ClampedArray> {
     // Public helper retains caller ownership and captures values before readiness.
-    return this.mixFilteredOwned(original.slice(), filtered.slice(), mask.slice(), density, inverted);
+    return this.mixFilteredOwned(
+      original.slice(),
+      filtered.slice(),
+      mask.slice(),
+      density,
+      inverted,
+    );
   }
   /** Internal: consumes exclusively owned arrays; never pass retained cache/caller buffers. */
   mixFilteredOwned(
@@ -469,43 +1197,120 @@ export class PixelProcessor {
   ): Promise<Uint8ClampedArray> {
     return this.request(pixels, { underlying, blend });
   }
-  featheredSelection(tile: SelectionTile, radiusX: number, radiusY: number): Promise<Uint8ClampedArray> {
-    return this.request(new Uint8ClampedArray(0), { featheredSelection: { tile, radiusX, radiusY } });
+  featheredSelection(
+    tile: SelectionTile,
+    radiusX: number,
+    radiusY: number,
+  ): Promise<Uint8ClampedArray> {
+    return this.request(new Uint8ClampedArray(0), {
+      featheredSelection: { tile, radiusX, radiusY },
+    });
   }
   selection(tile: SelectionTile): Promise<Uint8ClampedArray> {
     return this.request(new Uint8ClampedArray(0), { selection: tile });
   }
-  modifySelection(input: SelectionModificationRequest, onProgress?: (value: SelectionModificationProgress) => void): Promise<SelectionData> {
-    return this.request(new Uint8ClampedArray(0), { selectionModification: structuredClone(input) }, onProgress);
+  modifySelection(
+    input: SelectionModificationRequest,
+    onProgress?: (value: SelectionModificationProgress) => void,
+  ): Promise<SelectionData> {
+    return this.request(
+      new Uint8ClampedArray(0),
+      { selectionModification: structuredClone(input) },
+      onProgress,
+    );
   }
-  channelSelection(input:ChannelCoverageRequest,onProgress?:(value:SelectionModificationProgress)=>void):Promise<SelectionData>{
-    return this.request(new Uint8ClampedArray(0),{channelSelection:structuredClone(input)},onProgress);
+  channelSelection(
+    input: ChannelCoverageRequest,
+    onProgress?: (value: SelectionModificationProgress) => void,
+  ): Promise<SelectionData> {
+    return this.request(
+      new Uint8ClampedArray(0),
+      { channelSelection: structuredClone(input) },
+      onProgress,
+    );
   }
   /** Consumes a private native capture; original image assets never transfer. */
-  quickSelection(pixels:Uint8ClampedArray,request:QuickSelectionRequest,onProgress?:(value:SelectionModificationProgress)=>void):Promise<SelectionData>{
-    return this.request(pixels,{quickSelection:structuredClone(request)},onProgress);
+  quickSelection(
+    pixels: Uint8ClampedArray,
+    request: QuickSelectionRequest,
+    onProgress?: (value: SelectionModificationProgress) => void,
+  ): Promise<SelectionData> {
+    return this.request(
+      pixels,
+      { quickSelection: structuredClone(request) },
+      onProgress,
+    );
   }
   /** Consumes only a private source capture, never asset-owned bytes. */
-  selectSubject(pixels:Uint8ClampedArray,request:SubjectRequest,onProgress?:(value:SelectionModificationProgress)=>void):Promise<SelectionData>{
-    return this.request(pixels,{subject:structuredClone(request)},onProgress);
+  selectSubject(
+    pixels: Uint8ClampedArray,
+    request: SubjectRequest,
+    onProgress?: (value: SelectionModificationProgress) => void,
+  ): Promise<SelectionData> {
+    return this.request(
+      pixels,
+      { subject: structuredClone(request) },
+      onProgress,
+    );
   }
   /** Consumes a private padded source tile; results remain outside script globals. */
-  mattingTile(pixels:Uint8ClampedArray,request:MattingTileRequest):Promise<MattingTileResult>{
-    return this.request(pixels,{matting:structuredClone(request)});
+  mattingTile(
+    pixels: Uint8ClampedArray,
+    request: MattingTileRequest,
+  ): Promise<MattingTileResult> {
+    return this.request(pixels, { matting: structuredClone(request) });
   }
-  async beginMatting(width:number,height:number):Promise<void>{await this.request(new Uint8ClampedArray(0),{mattingBegin:{width,height}});}
-  async accumulateMatting(pixels:Uint8ClampedArray,request:MattingTileRequest):Promise<void>{await this.request(pixels,{mattingAccumulate:structuredClone(request)});}
-  solveMatting(onIteration?:(iteration:number,residual:number)=>void):Promise<ClosedFormDiagnostics>{return this.request(new Uint8ClampedArray(0),{mattingSolve:true},value=>{const residual=(value as typeof value&{relativeResidual:number}).relativeResidual;if(!Number.isFinite(residual)||residual<0)throw new Error('Invalid matting solver progress.');onIteration?.(value.completed,residual);});}
+  async beginMatting(width: number, height: number): Promise<void> {
+    await this.request(new Uint8ClampedArray(0), {
+      mattingBegin: { width, height },
+    });
+  }
+  async accumulateMatting(
+    pixels: Uint8ClampedArray,
+    request: MattingTileRequest,
+  ): Promise<void> {
+    await this.request(pixels, { mattingAccumulate: structuredClone(request) });
+  }
+  solveMatting(
+    onIteration?: (iteration: number, residual: number) => void,
+  ): Promise<ClosedFormDiagnostics> {
+    return this.request(
+      new Uint8ClampedArray(0),
+      { mattingSolve: true },
+      (value) => {
+        const residual = (value as typeof value & { relativeResidual: number })
+          .relativeResidual;
+        if (!Number.isFinite(residual) || residual < 0)
+          throw new Error("Invalid matting solver progress.");
+        onIteration?.(value.completed, residual);
+      },
+    );
+  }
   /** Consumes a private captured pixel buffer; original image assets never transfer. */
-  selectionCoverage(pixels: Uint8ClampedArray, options: CoverageRequest): Promise<PixelCoverage> {
-    return this.request(pixels, { coverage: { ...options, wand: options.wand ? { ...options.wand } : undefined } });
+  selectionCoverage(
+    pixels: Uint8ClampedArray,
+    options: CoverageRequest,
+  ): Promise<PixelCoverage> {
+    return this.request(pixels, {
+      coverage: {
+        ...options,
+        wand: options.wand ? { ...options.wand } : undefined,
+      },
+    });
   }
   /** Consumes captured pixels; masking, crop and PNG encoding stay in the worker. */
-  clipboardPixels(pixels: Uint8ClampedArray, options: ClipboardRequest): Promise<ClipboardResult> {
+  clipboardPixels(
+    pixels: Uint8ClampedArray,
+    options: ClipboardRequest,
+  ): Promise<ClipboardResult> {
     return this.request(pixels, { clipboard: { ...options } });
   }
   /** Consumes a private RGBA capture and encodes off the UI thread. */
-  encodePng(pixels: Uint8ClampedArray, width: number, height: number): Promise<Blob> {
+  encodePng(
+    pixels: Uint8ClampedArray,
+    width: number,
+    height: number,
+  ): Promise<Blob> {
     return this.request(pixels, { png: { width, height } });
   }
   feather(pixels: Uint8ClampedArray, tile: FeatherTile) {
@@ -514,31 +1319,91 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
-      floatPoisson?:{pixels:Float32Array;donor:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:PoissonBlendOptions};
-      floatDonor?:{pixels:Float32Array;width:number;height:number;coverage:Uint8Array|Uint8ClampedArray;options:DonorSearchOptions};
-      floatCompositeHdrWet?:{pixels:Float32Array;field:Float64Array;opacity:number};
-      floatProjectiveHdrWet?:{field:Float64Array;options:ProjectiveFieldOptions};
-      floatMappedHdrWet?:{field:Float64Array;options:MappedFieldOptions};
-      floatWetLoad?:{pixels:Float32Array;options:FloatWetLoadSettings};
-      floatWetMix?:{pixels:Float32Array;carried:Float32Array;coverage:Float32Array;options:WetPaintMixSettings};
-      floatWetEnvelope?:{before:Float32Array;after:Float32Array;coverage:Float32Array;opacity:number};
-      floatConvolveAlpha?:{alpha:Float32Array;settings:FloatConvolutionOptions};
-      floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
-      floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
-      floatAffine?:{pixels:Float32Array;matrix:number[]};
-      floatProjective?:{pixels:Float32Array;options:ProjectiveSampleOptions};
-      floatProjectiveField?:{alpha:Float32Array;options:ProjectiveFieldOptions};
-      floatMappedWet?:{alpha:Float32Array;options:MappedFieldOptions};
-      floatMappedField?:{alpha:Float32Array;options:MappedFieldOptions};
-      floatProjectiveWet?:{alpha:Float32Array;options:ProjectiveFieldOptions};
-      floatTone?:{pixels:Float32Array;options:FloatToneOptions};
-      floatTonal?:{pixels:Float32Array;coverage:Float32Array;options:FloatTonalOptions};
-      floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
-      floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
-      floatGradient?:{pixels:Float32Array;adjustment:GradientMapAdjustmentData};
-      floatLookupPrepare?:LutAdjustmentData;
-      floatLookupApply?:{handle:number;pixels:Float32Array};
-      floatLookupRelease?:number;
+      floatPoisson?: {
+        pixels: Float32Array;
+        donor: Float32Array;
+        width: number;
+        height: number;
+        coverage: Uint8Array | Uint8ClampedArray;
+        options: PoissonBlendOptions;
+      };
+      floatDonor?: {
+        pixels: Float32Array;
+        width: number;
+        height: number;
+        coverage: Uint8Array | Uint8ClampedArray;
+        options: DonorSearchOptions;
+      };
+      floatCompositeHdrWet?: {
+        pixels: Float32Array;
+        field: Float64Array;
+        opacity: number;
+      };
+      floatProjectiveHdrWet?: {
+        field: Float64Array;
+        options: ProjectiveFieldOptions;
+      };
+      floatMappedHdrWet?: { field: Float64Array; options: MappedFieldOptions };
+      floatWetLoad?: { pixels: Float32Array; options: FloatWetLoadSettings };
+      floatWetMix?: {
+        pixels: Float32Array;
+        carried: Float32Array;
+        coverage: Float32Array;
+        options: WetPaintMixSettings;
+      };
+      floatWetEnvelope?: {
+        before: Float32Array;
+        after: Float32Array;
+        coverage: Float32Array;
+        opacity: number;
+      };
+      floatConvolveAlpha?: {
+        alpha: Float32Array;
+        settings: FloatConvolutionOptions;
+      };
+      floatStyle?: {
+        source: Float32Array;
+        backdrop: Float32Array;
+        style: LayerStyleData;
+      };
+      floatComposite?: {
+        source: Float32Array;
+        backdrop: Float32Array;
+        options: FloatCompositeOptions;
+      };
+      floatAffine?: { pixels: Float32Array; matrix: number[] };
+      floatProjective?: {
+        pixels: Float32Array;
+        options: ProjectiveSampleOptions;
+      };
+      floatProjectiveField?: {
+        alpha: Float32Array;
+        options: ProjectiveFieldOptions;
+      };
+      floatMappedWet?: { alpha: Float32Array; options: MappedFieldOptions };
+      floatMappedField?: { alpha: Float32Array; options: MappedFieldOptions };
+      floatProjectiveWet?: {
+        alpha: Float32Array;
+        options: ProjectiveFieldOptions;
+      };
+      floatTone?: { pixels: Float32Array; options: FloatToneOptions };
+      floatTonal?: {
+        pixels: Float32Array;
+        coverage: Float32Array;
+        options: FloatTonalOptions;
+      };
+      floatTransfer?: {
+        pixels: Float32Array;
+        adjustment: FloatTransferAdjustment;
+      };
+      floatColor?: { pixels: Float32Array; adjustment: FloatColorAdjustment };
+      floatGradient?: {
+        pixels: Float32Array;
+        adjustment: GradientMapAdjustmentData;
+      };
+      floatLookupPrepare?: LutAdjustmentData;
+      floatLookupApply?: { handle: number; pixels: Float32Array };
+      floatLookupRelease?: number;
       filteredMix?: {
         filtered: Uint8ClampedArray;
         mask: Uint8ClampedArray;
@@ -550,8 +1415,12 @@ export class PixelProcessor {
         height: number;
         options: SpatialFilterOptions;
       };
-      medianFilter?: {width:number;height:number;radius:number};
-      bilateralFilter?: {width:number;height:number;options:BilateralFilterOptions};
+      medianFilter?: { width: number; height: number; radius: number };
+      bilateralFilter?: {
+        width: number;
+        height: number;
+        options: BilateralFilterOptions;
+      };
       donorSearch?: {
         width: number;
         height: number;
@@ -573,21 +1442,36 @@ export class PixelProcessor {
       };
       hsl?: HslAdjustmentData;
       chromatic?: ChromaticAdjustmentData;
-      frequencyEncoding?: {low:Uint8ClampedArray;band:"high"|"correction"};
-      linearBlend?: { backdrop: Uint8ClampedArray; opacity: number; mode: "linear-light" | "linear-burn" };
+      frequencyEncoding?: {
+        low: Uint8ClampedArray;
+        band: "high" | "correction";
+      };
+      linearBlend?: {
+        backdrop: Uint8ClampedArray;
+        opacity: number;
+        mode: "linear-light" | "linear-burn";
+      };
       redEye?: RedEyeAdjustmentData;
       gradientMap?: GradientMapAdjustmentData;
       whiteBalance?: WhiteBalanceAdjustmentData;
       lookup?: LutAdjustmentData;
-      colorRange?:ColorRangeSettings;
+      colorRange?: ColorRangeSettings;
       brushTexture?: TextureMaskSettings;
-      brushTextureSupport?:Uint8ClampedArray;
-      wetPaintLoad?:WetPaintLoadSettings;
-      wetPaintMix?:{carried:Float32Array;coverage:Uint8Array;settings:WetPaintMixSettings};
+      brushTextureSupport?: Uint8ClampedArray;
+      wetPaintLoad?: WetPaintLoadSettings;
+      wetPaintMix?: {
+        carried: Float32Array;
+        coverage: Uint8Array;
+        settings: WetPaintMixSettings;
+      };
       effects?: ToneEffectData[];
       underlying?: Uint8ClampedArray;
       blend?: BlendIfData;
-      featheredSelection?: { tile: SelectionTile; radiusX: number; radiusY: number };
+      featheredSelection?: {
+        tile: SelectionTile;
+        radiusX: number;
+        radiusY: number;
+      };
       selection?: SelectionTile;
       feather?: FeatherTile;
       lut?: Uint8Array;
@@ -605,12 +1489,12 @@ export class PixelProcessor {
       quickSelection?: QuickSelectionRequest;
       subject?: SubjectRequest;
       matting?: MattingTileRequest;
-      mattingBegin?:{width:number;height:number};
-      mattingAccumulate?:MattingTileRequest;
-      mattingSolve?:boolean;
+      mattingBegin?: { width: number; height: number };
+      mattingAccumulate?: MattingTileRequest;
+      mattingSolve?: boolean;
     },
     onProgress?: (value: SelectionModificationProgress) => void,
-    expectedReply?:string,
+    expectedReply?: string,
   ): Promise<any> {
     await this.ready;
     if (this.failure) throw this.failure;
@@ -632,33 +1516,75 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
-    if(payload.floatPoisson){tryTransfer(payload.floatPoisson.pixels.buffer);tryTransfer(payload.floatPoisson.donor.buffer);tryTransfer(payload.floatPoisson.coverage.buffer);}
-    if(payload.floatDonor){tryTransfer(payload.floatDonor.pixels.buffer);tryTransfer(payload.floatDonor.coverage.buffer);}
-    if(payload.floatCompositeHdrWet){tryTransfer(payload.floatCompositeHdrWet.pixels.buffer);tryTransfer(payload.floatCompositeHdrWet.field.buffer);}
-    if(payload.floatProjectiveHdrWet)tryTransfer(payload.floatProjectiveHdrWet.field.buffer);
-    if(payload.floatMappedHdrWet)tryTransfer(payload.floatMappedHdrWet.field.buffer);
-    if(payload.floatWetLoad)tryTransfer(payload.floatWetLoad.pixels.buffer);
-    if(payload.floatWetMix){tryTransfer(payload.floatWetMix.pixels.buffer);tryTransfer(payload.floatWetMix.carried.buffer);tryTransfer(payload.floatWetMix.coverage.buffer);}
-    if(payload.floatWetEnvelope){tryTransfer(payload.floatWetEnvelope.before.buffer);tryTransfer(payload.floatWetEnvelope.after.buffer);tryTransfer(payload.floatWetEnvelope.coverage.buffer);}
-    if(payload.floatConvolveAlpha)tryTransfer(payload.floatConvolveAlpha.alpha.buffer);
-    if(payload.floatStyle){tryTransfer(payload.floatStyle.source.buffer);tryTransfer(payload.floatStyle.backdrop.buffer);}
-    if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
-    if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
-    if(payload.floatProjective)tryTransfer(payload.floatProjective.pixels.buffer);
-    if(payload.floatProjectiveField)tryTransfer(payload.floatProjectiveField.alpha.buffer);
-    if(payload.floatMappedWet)tryTransfer(payload.floatMappedWet.alpha.buffer);
-    if(payload.floatMappedField)tryTransfer(payload.floatMappedField.alpha.buffer);
-    if(payload.floatProjectiveWet)tryTransfer(payload.floatProjectiveWet.alpha.buffer);
-    if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
-    if(payload.floatTonal){tryTransfer(payload.floatTonal.pixels.buffer);tryTransfer(payload.floatTonal.coverage.buffer);}
-    if(payload.floatTransfer)tryTransfer(payload.floatTransfer.pixels.buffer);
-    if(payload.floatColor)tryTransfer(payload.floatColor.pixels.buffer);
-    if(payload.floatGradient)tryTransfer(payload.floatGradient.pixels.buffer);
-    if(payload.floatLookupApply)tryTransfer(payload.floatLookupApply.pixels.buffer);
-    if(payload.brushTextureSupport)tryTransfer(payload.brushTextureSupport.buffer);
-    if(payload.frequencyEncoding)tryTransfer(payload.frequencyEncoding.low.buffer);
-    if(payload.linearBlend)tryTransfer(payload.linearBlend.backdrop.buffer);
-    if(payload.wetPaintMix){tryTransfer(payload.wetPaintMix.carried.buffer);tryTransfer(payload.wetPaintMix.coverage.buffer);}
+    if (payload.floatPoisson) {
+      tryTransfer(payload.floatPoisson.pixels.buffer);
+      tryTransfer(payload.floatPoisson.donor.buffer);
+      tryTransfer(payload.floatPoisson.coverage.buffer);
+    }
+    if (payload.floatDonor) {
+      tryTransfer(payload.floatDonor.pixels.buffer);
+      tryTransfer(payload.floatDonor.coverage.buffer);
+    }
+    if (payload.floatCompositeHdrWet) {
+      tryTransfer(payload.floatCompositeHdrWet.pixels.buffer);
+      tryTransfer(payload.floatCompositeHdrWet.field.buffer);
+    }
+    if (payload.floatProjectiveHdrWet)
+      tryTransfer(payload.floatProjectiveHdrWet.field.buffer);
+    if (payload.floatMappedHdrWet)
+      tryTransfer(payload.floatMappedHdrWet.field.buffer);
+    if (payload.floatWetLoad) tryTransfer(payload.floatWetLoad.pixels.buffer);
+    if (payload.floatWetMix) {
+      tryTransfer(payload.floatWetMix.pixels.buffer);
+      tryTransfer(payload.floatWetMix.carried.buffer);
+      tryTransfer(payload.floatWetMix.coverage.buffer);
+    }
+    if (payload.floatWetEnvelope) {
+      tryTransfer(payload.floatWetEnvelope.before.buffer);
+      tryTransfer(payload.floatWetEnvelope.after.buffer);
+      tryTransfer(payload.floatWetEnvelope.coverage.buffer);
+    }
+    if (payload.floatConvolveAlpha)
+      tryTransfer(payload.floatConvolveAlpha.alpha.buffer);
+    if (payload.floatStyle) {
+      tryTransfer(payload.floatStyle.source.buffer);
+      tryTransfer(payload.floatStyle.backdrop.buffer);
+    }
+    if (payload.floatComposite) {
+      tryTransfer(payload.floatComposite.source.buffer);
+      tryTransfer(payload.floatComposite.backdrop.buffer);
+      tryTransfer(payload.floatComposite.options.mask?.buffer);
+    }
+    if (payload.floatAffine) tryTransfer(payload.floatAffine.pixels.buffer);
+    if (payload.floatProjective)
+      tryTransfer(payload.floatProjective.pixels.buffer);
+    if (payload.floatProjectiveField)
+      tryTransfer(payload.floatProjectiveField.alpha.buffer);
+    if (payload.floatMappedWet)
+      tryTransfer(payload.floatMappedWet.alpha.buffer);
+    if (payload.floatMappedField)
+      tryTransfer(payload.floatMappedField.alpha.buffer);
+    if (payload.floatProjectiveWet)
+      tryTransfer(payload.floatProjectiveWet.alpha.buffer);
+    if (payload.floatTone) tryTransfer(payload.floatTone.pixels.buffer);
+    if (payload.floatTonal) {
+      tryTransfer(payload.floatTonal.pixels.buffer);
+      tryTransfer(payload.floatTonal.coverage.buffer);
+    }
+    if (payload.floatTransfer) tryTransfer(payload.floatTransfer.pixels.buffer);
+    if (payload.floatColor) tryTransfer(payload.floatColor.pixels.buffer);
+    if (payload.floatGradient) tryTransfer(payload.floatGradient.pixels.buffer);
+    if (payload.floatLookupApply)
+      tryTransfer(payload.floatLookupApply.pixels.buffer);
+    if (payload.brushTextureSupport)
+      tryTransfer(payload.brushTextureSupport.buffer);
+    if (payload.frequencyEncoding)
+      tryTransfer(payload.frequencyEncoding.low.buffer);
+    if (payload.linearBlend) tryTransfer(payload.linearBlend.backdrop.buffer);
+    if (payload.wetPaintMix) {
+      tryTransfer(payload.wetPaintMix.carried.buffer);
+      tryTransfer(payload.wetPaintMix.coverage.buffer);
+    }
     if (payload.filteredMix) {
       // Both mixing entry points supply exclusively owned buffers here.
       tryTransfer(payload.filteredMix.filtered.buffer);
@@ -684,7 +1610,7 @@ export class PixelProcessor {
       }
     }
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject, onProgress,expectedReply });
+      this.pending.set(id, { resolve, reject, onProgress, expectedReply });
       try {
         this.worker.postMessage({ id, pixels, ...payload }, transfer);
       } catch (error) {

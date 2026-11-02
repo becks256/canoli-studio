@@ -39,7 +39,9 @@ test.describe("Color Management and PSD Interchange (T17: F10, F11)", () => {
     // 4. Verify the dialog describes the built-in profile boundary.
     const iccBox = dialog.locator(".icc-inspector-box");
     await expect(iccBox).toBeVisible();
-    await expect(iccBox).toContainText("Built-in RGB profiles use XYZ connections");
+    await expect(iccBox).toContainText(
+      "Built-in RGB profiles use XYZ connections",
+    );
 
     // 5. Test Soft-Proofing toggle and controls
     const softProofCheckbox = dialog.getByLabel(

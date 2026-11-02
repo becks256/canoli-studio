@@ -1,6 +1,11 @@
-import type { DistributionAxis, DistributionMode, LayerAlignment, AlignmentTarget } from "../core/layer-layout";
+import type {
+  DistributionAxis,
+  DistributionMode,
+  LayerAlignment,
+  AlignmentTarget,
+} from "../core/layer-layout";
 import { AffineTransform } from "../core/affine";
-import {Layer,type Document} from "./index";
+import { Layer, type Document } from "./index";
 import { findParent, isLocked } from "../core/model";
 import {
   layerTransform,
@@ -8,8 +13,8 @@ import {
   unionBounds,
   parentSpaceDelta,
 } from "../core/spatial";
-export type {LayerAlignment} from '../core/layer-layout';
-export type LayerAlignmentReference='selection'|'canvas'|Layer;
+export type { LayerAlignment } from "../core/layer-layout";
+export type LayerAlignmentReference = "selection" | "canvas" | Layer;
 /** Document-owned layer selection, independent of the pixel marquee. */
 export class LayerSelection {
   constructor(private readonly document: Document) {}
@@ -111,14 +116,29 @@ export class LayerSelection {
       for (const { layer, transform } of changes) layer.transform = transform;
     });
   }
-  align(alignment:LayerAlignment,reference:LayerAlignmentReference='selection') {
-    let target:AlignmentTarget;
-    if(typeof reference==='string')target={type:reference};
-    else{
-      if(!(reference instanceof Layer)||reference.document!==this.document||!reference.isAttached)throw new Error('The alignment key must be an attached layer from this document.');
-      target={type:'layer',id:reference.id};
+  align(
+    alignment: LayerAlignment,
+    reference: LayerAlignmentReference = "selection",
+  ) {
+    let target: AlignmentTarget;
+    if (typeof reference === "string") target = { type: reference };
+    else {
+      if (
+        !(reference instanceof Layer) ||
+        reference.document !== this.document ||
+        !reference.isAttached
+      )
+        throw new Error(
+          "The alignment key must be an attached layer from this document.",
+        );
+      target = { type: "layer", id: reference.id };
     }
-    this.document._dispatch({type:'layer.align',ids:this.layers.map(layer=>layer.id),alignment,target});
+    this.document._dispatch({
+      type: "layer.align",
+      ids: this.layers.map((layer) => layer.id),
+      alignment,
+      target,
+    });
   }
   flip(axis: DistributionAxis) {
     this.document._dispatch({

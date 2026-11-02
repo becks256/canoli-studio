@@ -1,6 +1,9 @@
 import type { AssetStore } from "../core/assets";
-import {isFloatDocument} from '../core/float-document';
-import {prepareFloatRetouchPatch,type PreparedFloatPatch} from './float-retouch';
+import { isFloatDocument } from "../core/float-document";
+import {
+  prepareFloatRetouchPatch,
+  type PreparedFloatPatch,
+} from "./float-retouch";
 import {
   selectionRegionTransform,
   selectionSchema,
@@ -23,7 +26,7 @@ import {
 } from "./retouch-sampling";
 
 export interface PreparedBytePatch {
-  precision?:undefined;
+  precision?: undefined;
   bounds: RenderRegion;
   pixels: Uint8ClampedArray;
   correctedPixels: Uint8ClampedArray;
@@ -31,7 +34,7 @@ export interface PreparedBytePatch {
   iterations: number;
   residual: number;
 }
-export type PreparedPatch=PreparedBytePatch|PreparedFloatPatch;
+export type PreparedPatch = PreparedBytePatch | PreparedFloatPatch;
 
 /** Prepare a patch privately; only a converged result may reach a future host commit. */
 export async function prepareRetouchPatch(
@@ -44,9 +47,21 @@ export async function prepareRetouchPatch(
   sampling: RetouchSamplingOptions,
   options: PatchOptions = {},
   signal?: AbortSignal,
-  current?:()=>void,
+  current?: () => void,
 ): Promise<PreparedPatch> {
-  if(isFloatDocument(document))return prepareFloatRetouchPatch(document,assets,renderer,processor,selection,sourceOffset,sampling,options,signal,current);
+  if (isFloatDocument(document))
+    return prepareFloatRetouchPatch(
+      document,
+      assets,
+      renderer,
+      processor,
+      selection,
+      sourceOffset,
+      sampling,
+      options,
+      signal,
+      current,
+    );
   const snapshot = retouchSampleDocument(document, sampling);
   let capturedSelection = selectionSchema.parse(selection);
   const offset = { ...sourceOffset };

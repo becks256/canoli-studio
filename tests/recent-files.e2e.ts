@@ -1,132 +1,1144 @@
-import {test,expect,type Page} from '@playwright/test';
-import {createHash} from 'node:crypto';
-import {readFile} from 'node:fs/promises';
-import {spawnSync} from 'node:child_process';
+import { test, expect, type Page } from "@playwright/test";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 
-async function flush(page:Page){await page.evaluate(()=>window.luma.editor.recentFiles.flush());}
-async function open(page:Page){await page.getByRole('button',{name:'Recent files',exact:true}).click();return page.getByRole('dialog',{name:'Recent files',exact:true});}
-async function seed(page:Page,name='Original.png'){
- await page.goto('/');return page.evaluate(async name=>{const {editor}=window.luma;const canvas=new OffscreenCanvas(32,24),context=canvas.getContext('2d')!;context.fillStyle='#804020';context.fillRect(2,3,17,12);const blob=await canvas.convertToBlob({type:'image/png'}),file=new File([blob],name,{type:'image/png',lastModified:123456789});await editor.openImage(file);await editor.recentFiles.flush();return{bytes:[...new Uint8Array(await file.arrayBuffer())],entry:editor.recentFiles.getSnapshot().entries.find(entry=>entry.name===name)!,doc:JSON.stringify(editor.document.toJSON())};},name);
+async function flush(page: Page) {
+  await page.evaluate(() => window.luma.editor.recentFiles.flush());
+}
+async function open(page: Page) {
+  await page.getByRole("button", { name: "Recent files", exact: true }).click();
+  return page.getByRole("dialog", { name: "Recent files", exact: true });
+}
+async function seed(page: Page, name = "Original.png") {
+  await page.goto("/");
+  return page.evaluate(async (name) => {
+    const { editor } = window.luma;
+    const canvas = new OffscreenCanvas(32, 24),
+      context = canvas.getContext("2d")!;
+    context.fillStyle = "#804020";
+    context.fillRect(2, 3, 17, 12);
+    const blob = await canvas.convertToBlob({ type: "image/png" }),
+      file = new File([blob], name, {
+        type: "image/png",
+        lastModified: 123456789,
+      });
+    await editor.openImage(file);
+    await editor.recentFiles.flush();
+    return {
+      bytes: [...new Uint8Array(await file.arrayBuffer())],
+      entry: editor.recentFiles
+        .getSnapshot()
+        .entries.find((entry) => entry.name === name)!,
+      doc: JSON.stringify(editor.document.toJSON()),
+    };
+  }, name);
 }
 
-test('real recent hash worker reads bounded chunks, preserves source and cancels active work',async({page},info)=>{
- await page.goto('/');const expected=createHash('sha256');for(let i=0;i<17;i++)expected.update(Buffer.alloc(1024*1024,31));expected.update(Buffer.alloc(19,7));
- const result=await page.evaluate(async()=>{
-  const {hashRecentBlob}=await import(/* @vite-ignore */String('/src/workspace/recent-hash.ts')),chunk=new Uint8Array(1024*1024).fill(31),blob=new Blob([...Array.from({length:17},()=>chunk),new Uint8Array(19).fill(7)]),NativeWorker=window.Worker,original=Blob.prototype.arrayBuffer;let terminated=0,started=0,postedBlob=false,transfers=0,abortCurrent:AbortController|null=null;
-  class ObservedWorker extends NativeWorker{constructor(url:string|URL,options?:WorkerOptions){super(url,options);this.addEventListener('message',event=>{if(event.data?.type==='started'){started++;if(abortCurrent)setTimeout(()=>abortCurrent?.abort(new Error('Cancel active recent hash')),10);}});}override postMessage(value:unknown,transferOrOptions?:Transferable[]|StructuredSerializeOptions){if(value&&typeof value==='object'&&'blob'in value)postedBlob=value.blob instanceof Blob;if(Array.isArray(transferOrOptions))transfers+=transferOrOptions.length;super.postMessage(value,transferOrOptions as StructuredSerializeOptions);}override terminate(){terminated++;super.terminate();}}
-  Blob.prototype.arrayBuffer=function(){if(this.size>1024*1024)throw new Error('Whole-file host allocation');return original.call(this);};window.Worker=ObservedWorker;
-  try{const digest=await hashRecentBlob(blob),abort=new AbortController();abortCurrent=abort;let error='';try{await hashRecentBlob(blob,abort.signal);}catch(cause){error=String(cause);}return{digest,size:blob.size,started,terminated,postedBlob,transfers,error,sourceExtent:blob.size};}finally{window.Worker=NativeWorker;Blob.prototype.arrayBuffer=original;}
- });
- expect(result.digest).toBe(expected.digest('hex'));expect(result.sourceExtent).toBe(17*1024*1024+19);expect(result.started).toBe(2);expect(result.terminated).toBe(2);expect(result.postedBlob).toBe(true);expect(result.transfers).toBe(0);expect(result.error).toMatch(/Cancel active recent hash/);await info.attach('bounded-hash',{body:JSON.stringify(result),contentType:'application/json'});
+test("real recent hash worker reads bounded chunks, preserves source and cancels active work", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  const expected = createHash("sha256");
+  for (let i = 0; i < 17; i++) expected.update(Buffer.alloc(1024 * 1024, 31));
+  expected.update(Buffer.alloc(19, 7));
+  const result = await page.evaluate(async () => {
+    const { hashRecentBlob } = await import(
+        /* @vite-ignore */ String("/src/workspace/recent-hash.ts")
+      ),
+      chunk = new Uint8Array(1024 * 1024).fill(31),
+      blob = new Blob([
+        ...Array.from({ length: 17 }, () => chunk),
+        new Uint8Array(19).fill(7),
+      ]),
+      NativeWorker = window.Worker,
+      original = Blob.prototype.arrayBuffer;
+    let terminated = 0,
+      started = 0,
+      postedBlob = false,
+      transfers = 0,
+      abortCurrent: AbortController | null = null;
+    class ObservedWorker extends NativeWorker {
+      constructor(url: string | URL, options?: WorkerOptions) {
+        super(url, options);
+        this.addEventListener("message", (event) => {
+          if (event.data?.type === "started") {
+            started++;
+            if (abortCurrent)
+              setTimeout(
+                () =>
+                  abortCurrent?.abort(new Error("Cancel active recent hash")),
+                10,
+              );
+          }
+        });
+      }
+      override postMessage(
+        value: unknown,
+        transferOrOptions?: Transferable[] | StructuredSerializeOptions,
+      ) {
+        if (value && typeof value === "object" && "blob" in value)
+          postedBlob = value.blob instanceof Blob;
+        if (Array.isArray(transferOrOptions))
+          transfers += transferOrOptions.length;
+        super.postMessage(
+          value,
+          transferOrOptions as StructuredSerializeOptions,
+        );
+      }
+      override terminate() {
+        terminated++;
+        super.terminate();
+      }
+    }
+    Blob.prototype.arrayBuffer = function () {
+      if (this.size > 1024 * 1024)
+        throw new Error("Whole-file host allocation");
+      return original.call(this);
+    };
+    window.Worker = ObservedWorker;
+    try {
+      const digest = await hashRecentBlob(blob),
+        abort = new AbortController();
+      abortCurrent = abort;
+      let error = "";
+      try {
+        await hashRecentBlob(blob, abort.signal);
+      } catch (cause) {
+        error = String(cause);
+      }
+      return {
+        digest,
+        size: blob.size,
+        started,
+        terminated,
+        postedBlob,
+        transfers,
+        error,
+        sourceExtent: blob.size,
+      };
+    } finally {
+      window.Worker = NativeWorker;
+      Blob.prototype.arrayBuffer = original;
+    }
+  });
+  expect(result.digest).toBe(expected.digest("hex"));
+  expect(result.sourceExtent).toBe(17 * 1024 * 1024 + 19);
+  expect(result.started).toBe(2);
+  expect(result.terminated).toBe(2);
+  expect(result.postedBlob).toBe(true);
+  expect(result.transfers).toBe(0);
+  expect(result.error).toMatch(/Cancel active recent hash/);
+  await info.attach("bounded-hash", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
 });
 
-test('recent copies preserve original bytes and metadata, reopen as independent documents, and survive removal',async({page},info)=>{
- const seeded=await seed(page);await page.evaluate(()=>{const {editor,TextLayer}=window.luma;editor.document.layers.add(new TextLayer({text:'Later edits remain here',fontFamily:'monospace',fontSize:12}));});const before=await page.evaluate(()=>({json:JSON.stringify(window.luma.editor.document.toJSON()),past:window.luma.editor.document.getSnapshot().past.length,id:window.luma.editor.documentSessions.find(session=>session.document===window.luma.editor.document)!.id}));
- const dialog=await open(page);await expect(dialog).toContainText('saved local copies');await dialog.getByRole('button',{name:'Open local copy Original.png',exact:true}).click();await expect(dialog).toHaveCount(0);await expect(page.locator('.layer-row')).toHaveCount(1);await flush(page);
- const result=await page.evaluate(async({id,entryId})=>{const {editor}=window.luma,prior=editor.documentSessions.find(session=>session.id===id)!,copy=await editor.recentFiles.read(entryId),source=editor.assetStore.values()[0];return{prior:{json:JSON.stringify(prior.document.toJSON()),past:prior.document.getSnapshot().past.length},opened:{width:editor.document.width,height:editor.document.height,past:editor.document.getSnapshot().past.length},file:{name:copy.file.name,type:copy.file.type,lastModified:copy.file.lastModified,bytes:[...new Uint8Array(await copy.file.arrayBuffer())]},original:[...new Uint8Array(await source.blob.arrayBuffer())]};},{id:before.id,entryId:seeded.entry.id!});
- expect(result.prior).toEqual({json:before.json,past:before.past});expect(result.opened).toEqual({width:32,height:24,past:0});expect(result.file).toEqual({name:'Original.png',type:'image/png',lastModified:123456789,bytes:seeded.bytes});expect(result.original).toEqual(seeded.bytes);
- const removed=await open(page);await removed.getByRole('button',{name:'Remove local copy Original.png',exact:true}).click();await expect(removed).toContainText('No recent local copies');await removed.getByRole('button',{name:'Done',exact:true}).click();expect(await page.evaluate(async()=>[...new Uint8Array(await window.luma.editor.assetStore.values()[0].blob.arrayBuffer())])).toEqual(seeded.bytes);await page.reload();const empty=await open(page);await expect(empty).toContainText('No recent local copies');await info.attach('recent-original-preservation',{body:JSON.stringify(result),contentType:'application/json'});
+test("recent copies preserve original bytes and metadata, reopen as independent documents, and survive removal", async ({
+  page,
+}, info) => {
+  const seeded = await seed(page);
+  await page.evaluate(() => {
+    const { editor, TextLayer } = window.luma;
+    editor.document.layers.add(
+      new TextLayer({
+        text: "Later edits remain here",
+        fontFamily: "monospace",
+        fontSize: 12,
+      }),
+    );
+  });
+  const before = await page.evaluate(() => ({
+    json: JSON.stringify(window.luma.editor.document.toJSON()),
+    past: window.luma.editor.document.getSnapshot().past.length,
+    id: window.luma.editor.documentSessions.find(
+      (session) => session.document === window.luma.editor.document,
+    )!.id,
+  }));
+  const dialog = await open(page);
+  await expect(dialog).toContainText("saved local copies");
+  await dialog
+    .getByRole("button", { name: "Open local copy Original.png", exact: true })
+    .click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator(".layer-row")).toHaveCount(1);
+  await flush(page);
+  const result = await page.evaluate(
+    async ({ id, entryId }) => {
+      const { editor } = window.luma,
+        prior = editor.documentSessions.find((session) => session.id === id)!,
+        copy = await editor.recentFiles.read(entryId),
+        source = editor.assetStore.values()[0];
+      return {
+        prior: {
+          json: JSON.stringify(prior.document.toJSON()),
+          past: prior.document.getSnapshot().past.length,
+        },
+        opened: {
+          width: editor.document.width,
+          height: editor.document.height,
+          past: editor.document.getSnapshot().past.length,
+        },
+        file: {
+          name: copy.file.name,
+          type: copy.file.type,
+          lastModified: copy.file.lastModified,
+          bytes: [...new Uint8Array(await copy.file.arrayBuffer())],
+        },
+        original: [...new Uint8Array(await source.blob.arrayBuffer())],
+      };
+    },
+    { id: before.id, entryId: seeded.entry.id! },
+  );
+  expect(result.prior).toEqual({ json: before.json, past: before.past });
+  expect(result.opened).toEqual({ width: 32, height: 24, past: 0 });
+  expect(result.file).toEqual({
+    name: "Original.png",
+    type: "image/png",
+    lastModified: 123456789,
+    bytes: seeded.bytes,
+  });
+  expect(result.original).toEqual(seeded.bytes);
+  const removed = await open(page);
+  await removed
+    .getByRole("button", {
+      name: "Remove local copy Original.png",
+      exact: true,
+    })
+    .click();
+  await expect(removed).toContainText("No recent local copies");
+  await removed.getByRole("button", { name: "Done", exact: true }).click();
+  expect(
+    await page.evaluate(async () => [
+      ...new Uint8Array(
+        await window.luma.editor.assetStore.values()[0].blob.arrayBuffer(),
+      ),
+    ]),
+  ).toEqual(seeded.bytes);
+  await page.reload();
+  const empty = await open(page);
+  await expect(empty).toContainText("No recent local copies");
+  await info.attach("recent-original-preservation", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
 });
 
-test('real IndexedDB deduplicates payloads, retains twenty entries, and rolls back aborted writes',async({page},info)=>{
- await seed(page);
- const result=await page.evaluate(async()=>{
-  const {editor}=window.luma,library=editor.recentFiles,source=(await library.read(library.getSnapshot().entries[0].id!)).file;for(let i=0;i<22;i++){library.remember(new File([source],`Copy ${i}.png`,{type:source.type}),'image');await library.flush();}
-  const counts=async()=>{const db=await new Promise<IDBDatabase>((resolve,reject)=>{const request=indexedDB.open('luma-recent-files');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});try{return await new Promise<{entries:number;blobs:number}>((resolve,reject)=>{const tx=db.transaction(['entries','blobs'],'readonly'),entries=tx.objectStore('entries').count(),blobs=tx.objectStore('blobs').count();tx.oncomplete=()=>resolve({entries:entries.result,blobs:blobs.result});tx.onabort=()=>reject(tx.error);});}finally{db.close();}};
-  const before=await counts(),names=library.getSnapshot().entries.map(entry=>entry.name),original=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){const request=original.apply(this,args);if(this.transaction.db.name==='luma-recent-files')this.transaction.abort();return request;};try{library.remember(new File([source],'Rejected.png',{type:source.type}),'image');await library.flush();}finally{IDBObjectStore.prototype.put=original;}
-  const after=await counts(),error=library.getSnapshot().error;await library.refresh();return{before,after,names,error,restored:library.getSnapshot().entries.map(entry=>entry.name)};
- });
- expect(result.before).toEqual({entries:20,blobs:1});expect(result.after).toEqual(result.before);expect(result.names).toHaveLength(20);expect(result.names).not.toContain('Original.png');expect(result.names).not.toContain('Copy 0.png');expect(result.restored).toEqual(result.names);expect(result.error).not.toBe('');await info.attach('recent-durable-retention',{body:JSON.stringify(result),contentType:'application/json'});
+test("real IndexedDB deduplicates payloads, retains twenty entries, and rolls back aborted writes", async ({
+  page,
+}, info) => {
+  await seed(page);
+  const result = await page.evaluate(async () => {
+    const { editor } = window.luma,
+      library = editor.recentFiles,
+      source = (await library.read(library.getSnapshot().entries[0].id!)).file;
+    for (let i = 0; i < 22; i++) {
+      library.remember(
+        new File([source], `Copy ${i}.png`, { type: source.type }),
+        "image",
+      );
+      await library.flush();
+    }
+    const counts = async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open("luma-recent-files");
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      try {
+        return await new Promise<{ entries: number; blobs: number }>(
+          (resolve, reject) => {
+            const tx = db.transaction(["entries", "blobs"], "readonly"),
+              entries = tx.objectStore("entries").count(),
+              blobs = tx.objectStore("blobs").count();
+            tx.oncomplete = () =>
+              resolve({ entries: entries.result, blobs: blobs.result });
+            tx.onabort = () => reject(tx.error);
+          },
+        );
+      } finally {
+        db.close();
+      }
+    };
+    const before = await counts(),
+      names = library.getSnapshot().entries.map((entry) => entry.name),
+      original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (
+      ...args: Parameters<IDBObjectStore["put"]>
+    ) {
+      const request = original.apply(this, args);
+      if (this.transaction.db.name === "luma-recent-files")
+        this.transaction.abort();
+      return request;
+    };
+    try {
+      library.remember(
+        new File([source], "Rejected.png", { type: source.type }),
+        "image",
+      );
+      await library.flush();
+    } finally {
+      IDBObjectStore.prototype.put = original;
+    }
+    const after = await counts(),
+      error = library.getSnapshot().error;
+    await library.refresh();
+    return {
+      before,
+      after,
+      names,
+      error,
+      restored: library.getSnapshot().entries.map((entry) => entry.name),
+    };
+  });
+  expect(result.before).toEqual({ entries: 20, blobs: 1 });
+  expect(result.after).toEqual(result.before);
+  expect(result.names).toHaveLength(20);
+  expect(result.names).not.toContain("Original.png");
+  expect(result.names).not.toContain("Copy 0.png");
+  expect(result.restored).toEqual(result.names);
+  expect(result.error).not.toBe("");
+  await info.attach("recent-durable-retention", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
 });
 
-test('corrupt entries remain discoverable and corrupt payloads cannot replace the active document',async({page})=>{
- const seeded=await seed(page);await page.evaluate(async()=>{const {editor}=window.luma,entry=editor.recentFiles.getSnapshot().entries[0],db=await new Promise<IDBDatabase>(resolve=>{const request=indexedDB.open('luma-recent-files');request.onsuccess=()=>resolve(request.result);});try{await new Promise<void>((resolve,reject)=>{const tx=db.transaction(['entries','blobs'],'readwrite'),record=tx.objectStore('entries').get(entry.id!);record.onsuccess=()=>tx.objectStore('blobs').put(new Blob([new Uint8Array(record.result.size)]),record.result.sha256);tx.objectStore('entries').put({version:999},'damaged-entry');tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error);});}finally{db.close();}await editor.recentFiles.refresh();});
- const dialog=await open(page);await expect(dialog).toContainText('Unavailable local copy');await dialog.getByRole('button',{name:'Open local copy Original.png',exact:true}).click();await expect(dialog.getByRole('alert')).toContainText('integrity');expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(seeded.doc);await dialog.getByRole('button',{name:'Remove local copy Unavailable local copy',exact:true}).click();await expect(dialog).not.toContainText('Unavailable local copy');await dialog.getByRole('button',{name:'Clear local copies',exact:true}).click();await expect(dialog).toContainText('No recent local copies');
+test("corrupt entries remain discoverable and corrupt payloads cannot replace the active document", async ({
+  page,
+}) => {
+  const seeded = await seed(page);
+  await page.evaluate(async () => {
+    const { editor } = window.luma,
+      entry = editor.recentFiles.getSnapshot().entries[0],
+      db = await new Promise<IDBDatabase>((resolve) => {
+        const request = indexedDB.open("luma-recent-files");
+        request.onsuccess = () => resolve(request.result);
+      });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(["entries", "blobs"], "readwrite"),
+          record = tx.objectStore("entries").get(entry.id!);
+        record.onsuccess = () =>
+          tx
+            .objectStore("blobs")
+            .put(
+              new Blob([new Uint8Array(record.result.size)]),
+              record.result.sha256,
+            );
+        tx.objectStore("entries").put({ version: 999 }, "damaged-entry");
+        tx.oncomplete = () => resolve();
+        tx.onabort = () => reject(tx.error);
+      });
+    } finally {
+      db.close();
+    }
+    await editor.recentFiles.refresh();
+  });
+  const dialog = await open(page);
+  await expect(dialog).toContainText("Unavailable local copy");
+  await dialog
+    .getByRole("button", { name: "Open local copy Original.png", exact: true })
+    .click();
+  await expect(dialog.getByRole("alert")).toContainText("integrity");
+  expect(
+    await page.evaluate(() =>
+      JSON.stringify(window.luma.editor.document.toJSON()),
+    ),
+  ).toBe(seeded.doc);
+  await dialog
+    .getByRole("button", {
+      name: "Remove local copy Unavailable local copy",
+      exact: true,
+    })
+    .click();
+  await expect(dialog).not.toContainText("Unavailable local copy");
+  await dialog
+    .getByRole("button", { name: "Clear local copies", exact: true })
+    .click();
+  await expect(dialog).toContainText("No recent local copies");
 });
 
-for(const notify of [true,false])test(`cross-tab clearing invalidates in-flight preparations ${notify?'with notifications':'without notifications'}`,async({page,context},info)=>{
- if(!notify)await context.addInitScript(()=>{const Native=window.BroadcastChannel;window.BroadcastChannel=class extends Native{override postMessage(value:unknown){if(this.name!=='luma-recent-files')super.postMessage(value);}};});
- await seed(page);const second=await context.newPage();await second.goto('/');await second.evaluate(()=>window.luma.editor.recentFiles.flush());
- await page.evaluate(async()=>{const service=window.luma.editor.recentFiles,source=(await service.read(service.getSnapshot().entries[0].id!)).file,original=Worker.prototype.postMessage;(window as unknown as {releaseRecentHash:()=>void;recentHashHeld:boolean}).recentHashHeld=false;Worker.prototype.postMessage=function(value:unknown,...rest:unknown[]){if(value&&typeof value==='object'&&'type'in value&&value.type==='hash'){const worker=this;(window as unknown as {recentHashHeld:boolean}).recentHashHeld=true;(window as unknown as {releaseRecentHash:()=>void}).releaseRecentHash=()=>{original.call(worker,value,...rest as [StructuredSerializeOptions]);};return;}return original.call(this,value,...rest as [StructuredSerializeOptions]);};service.remember(new File([source],'Late.png',{type:source.type}),'image');});
- await page.waitForFunction(()=>(window as unknown as {recentHashHeld:boolean}).recentHashHeld);await second.evaluate(()=>window.luma.editor.recentFiles.clear());await page.evaluate(()=>(window as unknown as {releaseRecentHash:()=>void}).releaseRecentHash());await flush(page);if(!notify)expect(await page.evaluate(()=>window.luma.editor.recentFiles.getSnapshot().error)).toContain('changed while');await page.evaluate(()=>window.luma.editor.recentFiles.refresh());expect(await page.evaluate(()=>window.luma.editor.recentFiles.getSnapshot().entries)).toEqual([]);await second.close();await info.attach('cross-tab-clear',{body:JSON.stringify({notifications:notify,lateCopyPublished:false}),contentType:'application/json'});
+for (const notify of [true, false])
+  test(`cross-tab clearing invalidates in-flight preparations ${notify ? "with notifications" : "without notifications"}`, async ({
+    page,
+    context,
+  }, info) => {
+    if (!notify)
+      await context.addInitScript(() => {
+        const Native = window.BroadcastChannel;
+        window.BroadcastChannel = class extends Native {
+          override postMessage(value: unknown) {
+            if (this.name !== "luma-recent-files") super.postMessage(value);
+          }
+        };
+      });
+    await seed(page);
+    const second = await context.newPage();
+    await second.goto("/");
+    await second.evaluate(() => window.luma.editor.recentFiles.flush());
+    await page.evaluate(async () => {
+      const service = window.luma.editor.recentFiles,
+        source = (await service.read(service.getSnapshot().entries[0].id!))
+          .file,
+        original = Worker.prototype.postMessage;
+      (
+        window as unknown as {
+          releaseRecentHash: () => void;
+          recentHashHeld: boolean;
+        }
+      ).recentHashHeld = false;
+      Worker.prototype.postMessage = function (
+        value: unknown,
+        ...rest: unknown[]
+      ) {
+        if (
+          value &&
+          typeof value === "object" &&
+          "type" in value &&
+          value.type === "hash"
+        ) {
+          const worker = this;
+          (window as unknown as { recentHashHeld: boolean }).recentHashHeld =
+            true;
+          (
+            window as unknown as { releaseRecentHash: () => void }
+          ).releaseRecentHash = () => {
+            original.call(
+              worker,
+              value,
+              ...(rest as [StructuredSerializeOptions]),
+            );
+          };
+          return;
+        }
+        return original.call(
+          this,
+          value,
+          ...(rest as [StructuredSerializeOptions]),
+        );
+      };
+      service.remember(
+        new File([source], "Late.png", { type: source.type }),
+        "image",
+      );
+    });
+    await page.waitForFunction(
+      () => (window as unknown as { recentHashHeld: boolean }).recentHashHeld,
+    );
+    await second.evaluate(() => window.luma.editor.recentFiles.clear());
+    await page.evaluate(() =>
+      (
+        window as unknown as { releaseRecentHash: () => void }
+      ).releaseRecentHash(),
+    );
+    await flush(page);
+    if (!notify)
+      expect(
+        await page.evaluate(
+          () => window.luma.editor.recentFiles.getSnapshot().error,
+        ),
+      ).toContain("changed while");
+    await page.evaluate(() => window.luma.editor.recentFiles.refresh());
+    expect(
+      await page.evaluate(
+        () => window.luma.editor.recentFiles.getSnapshot().entries,
+      ),
+    ).toEqual([]);
+    await second.close();
+    await info.attach("cross-tab-clear", {
+      body: JSON.stringify({ notifications: notify, lateCopyPublished: false }),
+      contentType: "application/json",
+    });
+  });
+
+test("initial recent database upgrades without rewriting original entries or payloads", async ({
+  page,
+}, info) => {
+  const seeded = await seed(page);
+  const result = await page.evaluate(async () => {
+    const { editor } = window.luma,
+      entryId = editor.recentFiles.getSnapshot().entries[0].id!,
+      source = await editor.recentFiles.read(entryId);
+    editor.recentFiles.dispose();
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.deleteDatabase("luma-recent-files");
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+      request.onblocked = () =>
+        reject(new Error("Unexpected live recent database connection"));
+    });
+    const sha256 = [
+        ...new Uint8Array(
+          await crypto.subtle.digest(
+            "SHA-256",
+            await source.file.arrayBuffer(),
+          ),
+        ),
+      ]
+        .map((v) => v.toString(16).padStart(2, "0"))
+        .join(""),
+      legacy = {
+        version: 1,
+        id: "legacy-copy",
+        kind: "image",
+        name: source.file.name,
+        mime: source.file.type,
+        size: source.file.size,
+        sha256,
+        lastModified: source.file.lastModified,
+        openedAt: 123456789,
+        rank: 7,
+      };
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("luma-recent-files", 1);
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore("entries");
+        request.result.createObjectStore("blobs");
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(["entries", "blobs"], "readwrite");
+      tx.objectStore("entries").put(legacy, legacy.id);
+      tx.objectStore("blobs").put(source.file.slice(), sha256);
+      tx.oncomplete = () => resolve();
+      tx.onabort = () => reject(tx.error);
+    });
+    db.close();
+    const { RecentFileRepository } = await import(
+        /* @vite-ignore */ String("/src/workspace/recent-files.ts")
+      ),
+      repository = new RecentFileRepository();
+    try {
+      const rows = await repository.list(),
+        stored = await repository.get(legacy.id),
+        generation = await repository.generation();
+      return {
+        rows,
+        entry: stored.entry,
+        legacy,
+        generation,
+        bytes: [...new Uint8Array(await stored.blob.arrayBuffer())],
+      };
+    } finally {
+      repository.dispose();
+    }
+  });
+  expect(result.entry).toEqual(result.legacy);
+  expect(result.bytes).toEqual(seeded.bytes);
+  expect(result.generation).toBe("initial");
+  expect(result.rows).toHaveLength(1);
+  expect(result.rows[0]).toMatchObject({
+    id: "legacy-copy",
+    name: "Original.png",
+    lastModified: 123456789,
+  });
+  await info.attach("recent-database-upgrade", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
 });
 
-test('initial recent database upgrades without rewriting original entries or payloads',async({page},info)=>{
- const seeded=await seed(page);
- const result=await page.evaluate(async()=>{
-  const {editor}=window.luma,entryId=editor.recentFiles.getSnapshot().entries[0].id!,source=await editor.recentFiles.read(entryId);editor.recentFiles.dispose();
-  await new Promise<void>((resolve,reject)=>{const request=indexedDB.deleteDatabase('luma-recent-files');request.onsuccess=()=>resolve();request.onerror=()=>reject(request.error);request.onblocked=()=>reject(new Error('Unexpected live recent database connection'));});
-  const sha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',await source.file.arrayBuffer()))].map(v=>v.toString(16).padStart(2,'0')).join(''),legacy={version:1,id:'legacy-copy',kind:'image',name:source.file.name,mime:source.file.type,size:source.file.size,sha256,lastModified:source.file.lastModified,openedAt:123456789,rank:7};
-  const db=await new Promise<IDBDatabase>((resolve,reject)=>{const request=indexedDB.open('luma-recent-files',1);request.onupgradeneeded=()=>{request.result.createObjectStore('entries');request.result.createObjectStore('blobs');};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
-  await new Promise<void>((resolve,reject)=>{const tx=db.transaction(['entries','blobs'],'readwrite');tx.objectStore('entries').put(legacy,legacy.id);tx.objectStore('blobs').put(source.file.slice(),sha256);tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error);});db.close();
-  const {RecentFileRepository}=await import(/* @vite-ignore */String('/src/workspace/recent-files.ts')),repository=new RecentFileRepository();
-  try{const rows=await repository.list(),stored=await repository.get(legacy.id),generation=await repository.generation();return{rows,entry:stored.entry,legacy,generation,bytes:[...new Uint8Array(await stored.blob.arrayBuffer())]};}finally{repository.dispose();}
- });
- expect(result.entry).toEqual(result.legacy);expect(result.bytes).toEqual(seeded.bytes);expect(result.generation).toBe('initial');expect(result.rows).toHaveLength(1);expect(result.rows[0]).toMatchObject({id:'legacy-copy',name:'Original.png',lastModified:123456789});await info.attach('recent-database-upgrade',{body:JSON.stringify(result),contentType:'application/json'});
+test("palette keeps resource identity across asynchronous changes and opens documents without history changes", async ({
+  page,
+}) => {
+  await seed(page, "First.png");
+  await page.evaluate(() => {
+    const { editor } = window.luma;
+    editor.newDocument({ name: "Second", width: 400, height: 300 });
+  });
+  await page
+    .getByRole("button", { name: "Find a command (Mod+K)", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+      name: "Find a command",
+      exact: true,
+    }),
+    search = dialog.getByRole("combobox", {
+      name: "Search commands",
+      exact: true,
+    });
+  await search.fill("First");
+  await expect(
+    dialog.getByRole("option").filter({ hasText: "Recent files" }),
+  ).toHaveCount(1);
+  await page.keyboard.press("End");
+  const selected = await search.getAttribute("aria-activedescendant");
+  await page.evaluate(() => window.luma.editor.recentFiles.clear());
+  await expect(dialog.getByRole("status")).toContainText("no longer available");
+  await page.keyboard.press("Enter");
+  await expect(dialog).toBeVisible();
+  expect(await page.evaluate(() => window.luma.editor.document.name)).toBe(
+    "Second",
+  );
+  await page.keyboard.press("Home");
+  await expect(
+    dialog.getByRole("option").filter({ hasText: "Open documents" }),
+  ).toHaveCount(1);
+  await page.keyboard.press("Enter");
+  await expect(dialog).toHaveCount(0);
+  expect(
+    await page.evaluate(() => ({
+      name: window.luma.editor.document.name,
+      past: window.luma.editor.document.getSnapshot().past.length,
+    })),
+  ).toEqual({ name: "First", past: 0 });
+  expect(selected).not.toBeNull();
 });
 
-test('palette keeps resource identity across asynchronous changes and opens documents without history changes',async({page})=>{
- await seed(page,'First.png');await page.evaluate(()=>{const {editor}=window.luma;editor.newDocument({name:'Second',width:400,height:300});});await page.getByRole('button',{name:'Find a command (Mod+K)',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Find a command',exact:true}),search=dialog.getByRole('combobox',{name:'Search commands',exact:true});await search.fill('First');await expect(dialog.getByRole('option').filter({hasText:'Recent files'})).toHaveCount(1);await page.keyboard.press('End');const selected=await search.getAttribute('aria-activedescendant');await page.evaluate(()=>window.luma.editor.recentFiles.clear());await expect(dialog.getByRole('status')).toContainText('no longer available');await page.keyboard.press('Enter');await expect(dialog).toBeVisible();expect(await page.evaluate(()=>window.luma.editor.document.name)).toBe('Second');await page.keyboard.press('Home');await expect(dialog.getByRole('option').filter({hasText:'Open documents'})).toHaveCount(1);await page.keyboard.press('Enter');await expect(dialog).toHaveCount(0);expect(await page.evaluate(()=>({name:window.luma.editor.document.name,past:window.luma.editor.document.getSnapshot().past.length}))).toEqual({name:'First',past:0});expect(selected).not.toBeNull();
+test("50 MP recent file reopens native pixels and original bytes after reload without changing edited tabs", async ({
+  page,
+}, info) => {
+  test.setTimeout(180000);
+  const bytes = [...(await readFile("tests/fixtures/matting/native-50mp.png"))];
+  await page.goto("/");
+  const seeded = await page.evaluate(async (bytes) => {
+    const { editor } = window.luma;
+    await editor.openImage(
+      new File([new Uint8Array(bytes)], "Native 50 MP.png", {
+        type: "image/png",
+      }),
+    );
+    await editor.recentFiles.flush();
+    return {
+      size: [editor.document.width, editor.document.height],
+      id: editor.recentFiles
+        .getSnapshot()
+        .entries.find((entry) => entry.name === "Native 50 MP.png")!.id!,
+    };
+  }, bytes);
+  expect(seeded.size).toEqual([10000, 5000]);
+  await page.reload();
+  const edited = await page.evaluate(() => {
+    const { editor, TextLayer } = window.luma;
+    editor.document.name = "Keep edited tab";
+    editor.document.layers.add(
+      new TextLayer({
+        text: "Keep this separate edited document",
+        fontFamily: "monospace",
+        fontSize: 16,
+      }),
+    );
+    return {
+      id: editor.documentSessions.find(
+        (session) => session.document === editor.document,
+      )!.id,
+      json: JSON.stringify(editor.document.toJSON()),
+      past: editor.document.getSnapshot().past.length,
+    };
+  });
+  const dialog = await open(page);
+  await dialog
+    .getByRole("button", {
+      name: "Open local copy Native 50 MP.png",
+      exact: true,
+    })
+    .click();
+  await expect(dialog).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() => window.luma.editor.document.width))
+    .toBe(10000);
+  const result = await page.evaluate(async (bytes) => {
+    const { editor } = window.luma,
+      source = editor.assetStore.values()[0],
+      original = new Uint8Array(await source.blob.arrayBuffer()),
+      png = await editor.exportPng();
+    (window as unknown as { recent50MpPng: Blob }).recent50MpPng = png;
+    return {
+      size: [editor.document.width, editor.document.height],
+      sourceSize: [source.width, source.height],
+      originalExact:
+        original.length === bytes.length &&
+        original.every((value, index) => value === bytes[index]),
+      pngSize: png.size,
+      past: editor.document.getSnapshot().past.length,
+    };
+  }, bytes);
+  expect(result.size).toEqual([10000, 5000]);
+  expect(result.sourceSize).toEqual(result.size);
+  expect(result.originalExact).toBe(true);
+  expect(result.past).toBe(0);
+  expect(
+    await page.evaluate((id) => {
+      const session = window.luma.editor.documentSessions.find(
+        (session) => session.id === id,
+      )!;
+      return {
+        json: JSON.stringify(session.document.toJSON()),
+        past: session.document.getSnapshot().past.length,
+      };
+    }, edited.id),
+  ).toEqual({ json: edited.json, past: edited.past });
+  const download = page.waitForEvent("download");
+  await page.evaluate(() => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(
+      (window as unknown as { recent50MpPng: Blob }).recent50MpPng,
+    );
+    a.download = "recent-50mp.png";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  const path = info.outputPath("recent-50mp.png");
+  await (await download).saveAs(path);
+  const decoded = spawnSync(
+    "python3",
+    [
+      "scripts/check-recent-file-pixels.py",
+      "tests/fixtures/matting/native-50mp.png",
+      path,
+    ],
+    { encoding: "utf8", timeout: 120000 },
+  );
+  expect(decoded.status, decoded.stderr || decoded.stdout).toBe(0);
+  await info.attach("recent-native-50mp", {
+    body: JSON.stringify({
+      runtime: result,
+      decoder: JSON.parse(decoded.stdout),
+    }),
+    contentType: "application/json",
+  });
 });
 
-test('50 MP recent file reopens native pixels and original bytes after reload without changing edited tabs',async({page},info)=>{
- test.setTimeout(180000);const bytes=[...await readFile('tests/fixtures/matting/native-50mp.png')];await page.goto('/');const seeded=await page.evaluate(async bytes=>{const {editor}=window.luma;await editor.openImage(new File([new Uint8Array(bytes)],'Native 50 MP.png',{type:'image/png'}));await editor.recentFiles.flush();return{size:[editor.document.width,editor.document.height],id:editor.recentFiles.getSnapshot().entries.find(entry=>entry.name==='Native 50 MP.png')!.id!};},bytes);expect(seeded.size).toEqual([10000,5000]);await page.reload();const edited=await page.evaluate(()=>{const {editor,TextLayer}=window.luma;editor.document.name='Keep edited tab';editor.document.layers.add(new TextLayer({text:'Keep this separate edited document',fontFamily:'monospace',fontSize:16}));return{id:editor.documentSessions.find(session=>session.document===editor.document)!.id,json:JSON.stringify(editor.document.toJSON()),past:editor.document.getSnapshot().past.length};});const dialog=await open(page);await dialog.getByRole('button',{name:'Open local copy Native 50 MP.png',exact:true}).click();await expect(dialog).toHaveCount(0);await expect.poll(()=>page.evaluate(()=>window.luma.editor.document.width)).toBe(10000);const result=await page.evaluate(async bytes=>{const {editor}=window.luma,source=editor.assetStore.values()[0],original=new Uint8Array(await source.blob.arrayBuffer()),png=await editor.exportPng();(window as unknown as {recent50MpPng:Blob}).recent50MpPng=png;return{size:[editor.document.width,editor.document.height],sourceSize:[source.width,source.height],originalExact:original.length===bytes.length&&original.every((value,index)=>value===bytes[index]),pngSize:png.size,past:editor.document.getSnapshot().past.length};},bytes);expect(result.size).toEqual([10000,5000]);expect(result.sourceSize).toEqual(result.size);expect(result.originalExact).toBe(true);expect(result.past).toBe(0);expect(await page.evaluate(id=>{const session=window.luma.editor.documentSessions.find(session=>session.id===id)!;return{json:JSON.stringify(session.document.toJSON()),past:session.document.getSnapshot().past.length};},edited.id)).toEqual({json:edited.json,past:edited.past});const download=page.waitForEvent('download');await page.evaluate(()=>{const a=document.createElement('a');a.href=URL.createObjectURL((window as unknown as {recent50MpPng:Blob}).recent50MpPng);a.download='recent-50mp.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);});const path=info.outputPath('recent-50mp.png');await(await download).saveAs(path);const decoded=spawnSync('python3',['scripts/check-recent-file-pixels.py','tests/fixtures/matting/native-50mp.png',path],{encoding:'utf8',timeout:120000});expect(decoded.status,decoded.stderr||decoded.stdout).toBe(0);await info.attach('recent-native-50mp',{body:JSON.stringify({runtime:result,decoder:JSON.parse(decoded.stdout)}),contentType:'application/json'});
+for (const kind of ["svg", "tiff", "photoshop"] as const)
+  test(`recent ${kind} reopens through actual conversion preflight instead of silently flattening`, async ({
+    page,
+  }) => {
+    const path =
+        kind === "tiff"
+          ? "tests/fixtures/tiff/multipage.tif"
+          : kind === "photoshop"
+            ? "tests/fixtures/psd/basic-rgb-8bit.psd"
+            : null,
+      bytes = path
+        ? [...(await readFile(path))]
+        : [
+            ...new TextEncoder().encode(
+              '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48"><rect width="32" height="24" fill="#804020"/></svg>',
+            ),
+          ];
+    await page.goto("/");
+    const name =
+      "Recent." + (kind === "svg" ? "svg" : kind === "tiff" ? "tif" : "psd");
+    await page.evaluate(
+      async ({ kind, bytes, name }) => {
+        const editor = window.luma.editor,
+          file = new File([new Uint8Array(bytes)], name, {
+            type:
+              kind === "svg"
+                ? "image/svg+xml"
+                : kind === "tiff"
+                  ? "image/tiff"
+                  : "image/vnd.adobe.photoshop",
+          });
+        if (kind === "svg") await editor.openSvg(file);
+        else if (kind === "tiff") await editor.openTiff(file);
+        else await editor.openPsd(file);
+        await editor.recentFiles.flush();
+      },
+      { kind, bytes, name },
+    );
+    const before = await page.evaluate(() =>
+      JSON.stringify(window.luma.editor.document.toJSON()),
+    );
+    const dialog = await open(page);
+    await dialog
+      .getByRole("button", { name: "Open local copy " + name, exact: true })
+      .click();
+    await expect(dialog).toHaveCount(0);
+    const preflight = page.getByRole("dialog", {
+      name:
+        kind === "svg"
+          ? "Import SVG"
+          : kind === "tiff"
+            ? "Import TIFF"
+            : /Photoshop/,
+    });
+    await expect(preflight).toBeVisible();
+    expect(
+      await page.evaluate(() =>
+        JSON.stringify(window.luma.editor.document.toJSON()),
+      ),
+    ).toBe(before);
+    await preflight
+      .getByRole("button", { name: "Cancel", exact: true })
+      .click();
+    expect(
+      await page.evaluate(() =>
+        JSON.stringify(window.luma.editor.document.toJSON()),
+      ),
+    ).toBe(before);
+  });
+
+for (const action of ["edit", "dispose", "abort"] as const)
+  test(`image opening ${action} rejects stale work and releases staged native pixels`, async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const result = await page.evaluate(async (action) => {
+      const { EditorApplication } = await import(
+          /* @vite-ignore */ String("/src/editor.ts")
+        ),
+        { AssetStore } = await import(
+          /* @vite-ignore */ String("/src/core/assets.ts")
+        ),
+        editor = new EditorApplication(),
+        canvas = new OffscreenCanvas(16, 16);
+      canvas.getContext("2d")!.fillRect(0, 0, 16, 16);
+      const file = new File(
+          [await canvas.convertToBlob({ type: "image/png" })],
+          "Guarded.png",
+          { type: "image/png" },
+        ),
+        original = AssetStore.prototype.add;
+      let release!: () => void, ready!: () => void;
+      const gate = new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+        started = new Promise<void>((resolve) => {
+          ready = resolve;
+        });
+      let bitmap: ImageBitmap | undefined;
+      AssetStore.prototype.add = async function (
+        ...args: Parameters<import("../src/core/assets").AssetStore["add"]>
+      ) {
+        const asset = await original.apply(this, args);
+        bitmap = asset.bitmap;
+        ready();
+        await gate;
+        return asset;
+      };
+      const abort = new AbortController();
+      let error = "";
+      try {
+        const opening = editor
+          .openImage(file, { signal: abort.signal })
+          .catch((cause: unknown) => {
+            error = String(cause);
+          });
+        await started;
+        if (action === "edit") editor.document.name = "A later edit";
+        else if (action === "dispose") editor.dispose();
+        else abort.abort(new Error("Cancel image opening"));
+        release();
+        await opening;
+      } finally {
+        AssetStore.prototype.add = original;
+      }
+      const result = {
+        error,
+        released: bitmap?.width === 0 && bitmap?.height === 0,
+        documents: editor.openDocuments.length,
+        name: editor.document.name,
+        entries: editor.recentFiles.getSnapshot().entries.length,
+      };
+      if (action !== "dispose") editor.dispose();
+      return result;
+    }, action);
+    expect(result.error).toMatch(/changed|disposed|Cancel image/);
+    expect(result.released).toBe(true);
+    expect(result.documents).toBe(action === "dispose" ? 0 : 1);
+    if (action === "edit") expect(result.name).toBe("A later edit");
+    expect(result.entries).toBe(0);
+  });
+
+test("named project host example and recent quota failure keep accepted native artwork usable", async ({
+  page,
+}, info) => {
+  const seeded = await seed(page);
+  const result = await page.evaluate(async () => {
+    const { editor } = window.luma,
+      blob = await editor.saveProject();
+    editor.recentFiles.remember(
+      new File([blob], "Artwork.luma", {
+        type: blob.type,
+        lastModified: Date.now(),
+      }),
+      "project",
+    );
+    await editor.recentFiles.flush();
+    const status = editor.recentFiles.getSnapshot(),
+      entry = status.entries.find((entry) => entry.name === "Artwork.luma")!,
+      copy = await editor.recentFiles.read(entry.id!),
+      expected = new Uint8Array(await blob.arrayBuffer()),
+      actual = new Uint8Array(await copy.file.arrayBuffer()),
+      source = (
+        await editor.recentFiles.read(
+          status.entries.find((entry) => entry.name === "Original.png")!.id!,
+        )
+      ).file;
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (
+      ...args: Parameters<IDBObjectStore["put"]>
+    ) {
+      if (this.transaction.db.name === "luma-recent-files")
+        throw new DOMException("Recent test quota", "QuotaExceededError");
+      return original.apply(this, args);
+    };
+    try {
+      await editor.openImage(
+        new File([source], "Accepted after quota.png", { type: source.type }),
+      );
+      await editor.recentFiles.flush();
+    } finally {
+      IDBObjectStore.prototype.put = original;
+    }
+    return {
+      projectExact:
+        expected.length === actual.length &&
+        expected.every((v, i) => v === actual[i]),
+      kind: copy.kind,
+      projectName: copy.file.name,
+      source: [
+        ...new Uint8Array(
+          await editor.assetStore.values()[0].blob.arrayBuffer(),
+        ),
+      ],
+      name: editor.document.name,
+      size: [editor.document.width, editor.document.height],
+      past: editor.document.getSnapshot().past.length,
+      error: editor.recentFiles.getSnapshot().error,
+      rows: editor.recentFiles.getSnapshot().entries.map((entry) => entry.name),
+    };
+  });
+  expect(result.projectExact).toBe(true);
+  expect(result.kind).toBe("project");
+  expect(result.projectName).toBe("Artwork.luma");
+  expect(result.source).toEqual(seeded.bytes);
+  expect(result.name).toBe("Accepted after quota");
+  expect(result.size).toEqual([32, 24]);
+  expect(result.past).toBe(0);
+  expect(result.error).toContain("storage is full");
+  expect(result.rows.sort()).toEqual(["Artwork.luma", "Original.png"]);
+  const dialog = await open(page);
+  await expect(dialog.getByRole("alert")).toContainText("storage is full");
+  await page.screenshot({
+    path: info.outputPath("recent-quota-artwork-retained.png"),
+  });
+  await info.attach("recent-quota-and-host-example", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
 });
 
-for(const kind of ['svg','tiff','photoshop'] as const)test(`recent ${kind} reopens through actual conversion preflight instead of silently flattening`,async({page})=>{
- const path=kind==='tiff'?'tests/fixtures/tiff/multipage.tif':kind==='photoshop'?'tests/fixtures/psd/basic-rgb-8bit.psd':null,bytes=path?[...await readFile(path)]:[...new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48"><rect width="32" height="24" fill="#804020"/></svg>')];await page.goto('/');
- const name='Recent.'+(kind==='svg'?'svg':kind==='tiff'?'tif':'psd');await page.evaluate(async({kind,bytes,name})=>{const editor=window.luma.editor,file=new File([new Uint8Array(bytes)],name,{type:kind==='svg'?'image/svg+xml':kind==='tiff'?'image/tiff':'image/vnd.adobe.photoshop'});if(kind==='svg')await editor.openSvg(file);else if(kind==='tiff')await editor.openTiff(file);else await editor.openPsd(file);await editor.recentFiles.flush();},{kind,bytes,name});const before=await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()));const dialog=await open(page);await dialog.getByRole('button',{name:'Open local copy '+name,exact:true}).click();await expect(dialog).toHaveCount(0);const preflight=page.getByRole('dialog',{name:kind==='svg'?'Import SVG':kind==='tiff'?'Import TIFF':/Photoshop/});await expect(preflight).toBeVisible();expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(before);await preflight.getByRole('button',{name:'Cancel',exact:true}).click();expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(before);
+test("same-named changed originals remain distinct while an exact repeat reuses its own recent identity", async ({
+  page,
+}, info) => {
+  const seeded = await seed(page);
+  const result = await page.evaluate(async (originalId) => {
+    const { editor } = window.luma,
+      original = (await editor.recentFiles.read(originalId)).file,
+      canvas = new OffscreenCanvas(32, 24);
+    canvas.getContext("2d")!.fillRect(0, 0, 32, 24);
+    const changed = new File(
+      [await canvas.convertToBlob({ type: "image/png" })],
+      original.name,
+      { type: original.type, lastModified: -1234 },
+    );
+    await editor.openImage(changed);
+    await editor.recentFiles.flush();
+    const second = editor.recentFiles
+        .getSnapshot()
+        .entries.find((entry) => entry.id !== originalId)!,
+      newBytes = [
+        ...new Uint8Array(
+          await (await editor.recentFiles.read(second.id!)).file.arrayBuffer(),
+        ),
+      ];
+    editor.recentFiles.remember(original, "image");
+    await editor.recentFiles.flush();
+    const entries = editor.recentFiles.getSnapshot().entries,
+      first = await editor.recentFiles.read(originalId),
+      newCopy = await editor.recentFiles.read(second.id!);
+    return {
+      entries,
+      oldBytes: [...new Uint8Array(await first.file.arrayBuffer())],
+      newBytes,
+      newCopy: [...new Uint8Array(await newCopy.file.arrayBuffer())],
+      lastModified: newCopy.file.lastModified,
+      originalId,
+    };
+  }, seeded.entry.id!);
+  expect(result.entries).toHaveLength(2);
+  expect(result.entries[0].id).toBe(result.originalId);
+  expect(new Set(result.entries.map((entry) => entry.id)).size).toBe(2);
+  expect(result.entries.every((entry) => entry.name === "Original.png")).toBe(
+    true,
+  );
+  expect(result.oldBytes).toEqual(seeded.bytes);
+  expect(result.newBytes).not.toEqual(seeded.bytes);
+  expect(result.newCopy).toEqual(result.newBytes);
+  expect(result.lastModified).toBe(-1234);
+  await info.attach("recent-same-name-distinct-copies", {
+    body: JSON.stringify(result),
+    contentType: "application/json",
+  });
 });
 
-for(const action of ['edit','dispose','abort'] as const)test(`image opening ${action} rejects stale work and releases staged native pixels`,async({page})=>{
- await page.goto('/');const result=await page.evaluate(async action=>{
-  const {EditorApplication}=await import(/* @vite-ignore */String('/src/editor.ts')),{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts')),editor=new EditorApplication(),canvas=new OffscreenCanvas(16,16);canvas.getContext('2d')!.fillRect(0,0,16,16);const file=new File([await canvas.convertToBlob({type:'image/png'})],'Guarded.png',{type:'image/png'}),original=AssetStore.prototype.add;
-  let release!:()=>void,ready!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;}),started=new Promise<void>(resolve=>{ready=resolve;});let bitmap:ImageBitmap|undefined;AssetStore.prototype.add=async function(...args:Parameters<import('../src/core/assets').AssetStore['add']>){const asset=await original.apply(this,args);bitmap=asset.bitmap;ready();await gate;return asset;};
-  const abort=new AbortController();let error='';try{const opening=editor.openImage(file,{signal:abort.signal}).catch((cause:unknown)=>{error=String(cause);});await started;if(action==='edit')editor.document.name='A later edit';else if(action==='dispose')editor.dispose();else abort.abort(new Error('Cancel image opening'));release();await opening;}finally{AssetStore.prototype.add=original;}
-  const result={error,released:bitmap?.width===0&&bitmap?.height===0,documents:editor.openDocuments.length,name:editor.document.name,entries:editor.recentFiles.getSnapshot().entries.length};if(action!=='dispose')editor.dispose();return result;
- },action);expect(result.error).toMatch(/changed|disposed|Cancel image/);expect(result.released).toBe(true);expect(result.documents).toBe(action==='dispose'?0:1);if(action==='edit')expect(result.name).toBe('A later edit');expect(result.entries).toBe(0);
+test("palette distinguishes open sessions loaded from the same serialized document identity", async ({
+  page,
+}, info) => {
+  await seed(page);
+  const before = await page.evaluate(async () => {
+    const { editor } = window.luma,
+      blob = await editor.saveProject(),
+      file = new File([blob], "Original.luma", { type: blob.type });
+    await editor.openProject(file);
+    await editor.openProject(file);
+    await editor.recentFiles.flush();
+    const sessions = editor.documentSessions.filter(
+      (session) => session.document.name === "Original",
+    );
+    return sessions.map((session) => ({
+      id: session.id,
+      documentId: session.document.id,
+      json: JSON.stringify(session.document.toJSON()),
+      past: session.document.getSnapshot().past.length,
+    }));
+  });
+  expect(before).toHaveLength(3);
+  expect(new Set(before.map((session) => session.documentId)).size).toBe(1);
+  expect(new Set(before.map((session) => session.id)).size).toBe(3);
+  await page
+    .getByRole("button", { name: "Find a command (Mod+K)", exact: true })
+    .click();
+  const palette = page.getByRole("dialog", {
+    name: "Find a command",
+    exact: true,
+  });
+  await palette
+    .getByRole("combobox", { name: "Search commands", exact: true })
+    .fill("Original open documents");
+  const options = palette.getByRole("option");
+  await expect(options).toHaveCount(3);
+  await options.nth(1).click();
+  await expect(palette).toHaveCount(0);
+  const after = await page.evaluate(() => {
+    const { editor } = window.luma;
+    return {
+      active: editor.documentSessions.find(
+        (session) => session.document === editor.document,
+      )!.id,
+      sessions: editor.documentSessions
+        .filter((session) => session.document.name === "Original")
+        .map((session) => ({
+          id: session.id,
+          documentId: session.document.id,
+          json: JSON.stringify(session.document.toJSON()),
+          past: session.document.getSnapshot().past.length,
+        })),
+    };
+  });
+  expect(after.active).toBe(before[1].id);
+  expect(after.sessions).toEqual(before);
+  await info.attach("recent-equal-document-session-identities", {
+    body: JSON.stringify({ before, after }),
+    contentType: "application/json",
+  });
 });
 
-
-test('named project host example and recent quota failure keep accepted native artwork usable',async({page},info)=>{
- const seeded=await seed(page);
- const result=await page.evaluate(async()=>{
-  const {editor}=window.luma,blob=await editor.saveProject();
-  editor.recentFiles.remember(new File([blob], 'Artwork.luma', {type:blob.type,lastModified:Date.now()}),'project');
-  await editor.recentFiles.flush();const status=editor.recentFiles.getSnapshot(),entry=status.entries.find(entry=>entry.name==='Artwork.luma')!,copy=await editor.recentFiles.read(entry.id!),expected=new Uint8Array(await blob.arrayBuffer()),actual=new Uint8Array(await copy.file.arrayBuffer()),source=(await editor.recentFiles.read(status.entries.find(entry=>entry.name==='Original.png')!.id!)).file;
-  const original=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.transaction.db.name==='luma-recent-files')throw new DOMException('Recent test quota','QuotaExceededError');return original.apply(this,args);};
-  try{await editor.openImage(new File([source],'Accepted after quota.png',{type:source.type}));await editor.recentFiles.flush();}finally{IDBObjectStore.prototype.put=original;}
-  return{projectExact:expected.length===actual.length&&expected.every((v,i)=>v===actual[i]),kind:copy.kind,projectName:copy.file.name,source:[...new Uint8Array(await editor.assetStore.values()[0].blob.arrayBuffer())],name:editor.document.name,size:[editor.document.width,editor.document.height],past:editor.document.getSnapshot().past.length,error:editor.recentFiles.getSnapshot().error,rows:editor.recentFiles.getSnapshot().entries.map(entry=>entry.name)};
- });
- expect(result.projectExact).toBe(true);expect(result.kind).toBe('project');expect(result.projectName).toBe('Artwork.luma');expect(result.source).toEqual(seeded.bytes);expect(result.name).toBe('Accepted after quota');expect(result.size).toEqual([32,24]);expect(result.past).toBe(0);expect(result.error).toContain('storage is full');expect(result.rows.sort()).toEqual(['Artwork.luma','Original.png']);const dialog=await open(page);await expect(dialog.getByRole('alert')).toContainText('storage is full');await page.screenshot({path:info.outputPath('recent-quota-artwork-retained.png')});await info.attach('recent-quota-and-host-example',{body:JSON.stringify(result),contentType:'application/json'});
+test("long unbroken filenames remain fully readable and actionable in command search", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  const name = "Artwork_" + "long_".repeat(170) + ".png";
+  await seed(page, name);
+  await page
+    .getByRole("button", { name: "Find a command (Mod+K)", exact: true })
+    .click();
+  const palette = page.getByRole("dialog", {
+    name: "Find a command",
+    exact: true,
+  });
+  await palette
+    .getByRole("combobox", { name: "Search commands", exact: true })
+    .fill("Artwork_");
+  const recent = palette
+    .getByRole("option")
+    .filter({ hasText: "Recent files" });
+  await expect(recent).toHaveCount(1);
+  await expect(recent).toContainText(name);
+  const geometry = await palette
+    .locator(".command-results")
+    .evaluate((element) => ({
+      width: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }));
+  expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.width + 1);
+  await recent.scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: info.outputPath("recent-long-filename-search.png"),
+  });
+  await recent.click();
+  await expect(palette).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() => window.luma.editor.documentSessions.length))
+    .toBe(2);
+  expect(
+    await page.evaluate(
+      () => window.luma.editor.document.getSnapshot().past.length,
+    ),
+  ).toBe(0);
+  await info.attach("recent-long-filename-layout", {
+    body: JSON.stringify({
+      nameLength: name.length,
+      geometry,
+      nativeCopyOpened: true,
+    }),
+    contentType: "application/json",
+  });
 });
 
-test('same-named changed originals remain distinct while an exact repeat reuses its own recent identity',async({page},info)=>{
- const seeded=await seed(page);
- const result=await page.evaluate(async originalId=>{
-  const {editor}=window.luma,original=(await editor.recentFiles.read(originalId)).file,canvas=new OffscreenCanvas(32,24);canvas.getContext('2d')!.fillRect(0,0,32,24);const changed=new File([await canvas.convertToBlob({type:'image/png'})],original.name,{type:original.type,lastModified:-1234});
-  await editor.openImage(changed);await editor.recentFiles.flush();const second=editor.recentFiles.getSnapshot().entries.find(entry=>entry.id!==originalId)!,newBytes=[...new Uint8Array(await (await editor.recentFiles.read(second.id!)).file.arrayBuffer())];
-  editor.recentFiles.remember(original,'image');await editor.recentFiles.flush();const entries=editor.recentFiles.getSnapshot().entries,first=await editor.recentFiles.read(originalId),newCopy=await editor.recentFiles.read(second.id!);
-  return{entries,oldBytes:[...new Uint8Array(await first.file.arrayBuffer())],newBytes,newCopy:[...new Uint8Array(await newCopy.file.arrayBuffer())],lastModified:newCopy.file.lastModified,originalId};
- },seeded.entry.id!);
- expect(result.entries).toHaveLength(2);expect(result.entries[0].id).toBe(result.originalId);expect(new Set(result.entries.map(entry=>entry.id)).size).toBe(2);expect(result.entries.every(entry=>entry.name==='Original.png')).toBe(true);expect(result.oldBytes).toEqual(seeded.bytes);expect(result.newBytes).not.toEqual(seeded.bytes);expect(result.newCopy).toEqual(result.newBytes);expect(result.lastModified).toBe(-1234);await info.attach('recent-same-name-distinct-copies',{body:JSON.stringify(result),contentType:'application/json'});
-});
-
-test('palette distinguishes open sessions loaded from the same serialized document identity',async({page},info)=>{
- await seed(page);
- const before=await page.evaluate(async()=>{
-  const {editor}=window.luma,blob=await editor.saveProject(),file=new File([blob],'Original.luma',{type:blob.type});await editor.openProject(file);await editor.openProject(file);await editor.recentFiles.flush();const sessions=editor.documentSessions.filter(session=>session.document.name==='Original');return sessions.map(session=>({id:session.id,documentId:session.document.id,json:JSON.stringify(session.document.toJSON()),past:session.document.getSnapshot().past.length}));
- });
- expect(before).toHaveLength(3);expect(new Set(before.map(session=>session.documentId)).size).toBe(1);expect(new Set(before.map(session=>session.id)).size).toBe(3);
- await page.getByRole('button',{name:'Find a command (Mod+K)',exact:true}).click();const palette=page.getByRole('dialog',{name:'Find a command',exact:true});await palette.getByRole('combobox',{name:'Search commands',exact:true}).fill('Original open documents');const options=palette.getByRole('option');await expect(options).toHaveCount(3);await options.nth(1).click();await expect(palette).toHaveCount(0);
- const after=await page.evaluate(()=>{const {editor}=window.luma;return{active:editor.documentSessions.find(session=>session.document===editor.document)!.id,sessions:editor.documentSessions.filter(session=>session.document.name==='Original').map(session=>({id:session.id,documentId:session.document.id,json:JSON.stringify(session.document.toJSON()),past:session.document.getSnapshot().past.length}))};});expect(after.active).toBe(before[1].id);expect(after.sessions).toEqual(before);await info.attach('recent-equal-document-session-identities',{body:JSON.stringify({before,after}),contentType:'application/json'});
-});
-
-
-test('long unbroken filenames remain fully readable and actionable in command search',async({page},info)=>{
- await page.setViewportSize({width:1280,height:720});const name='Artwork_'+('long_'.repeat(170))+'.png';await seed(page,name);await page.getByRole('button',{name:'Find a command (Mod+K)',exact:true}).click();const palette=page.getByRole('dialog',{name:'Find a command',exact:true});await palette.getByRole('combobox',{name:'Search commands',exact:true}).fill('Artwork_');const recent=palette.getByRole('option').filter({hasText:'Recent files'});await expect(recent).toHaveCount(1);await expect(recent).toContainText(name);const geometry=await palette.locator('.command-results').evaluate(element=>({width:element.clientWidth,scrollWidth:element.scrollWidth}));expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.width+1);await recent.scrollIntoViewIfNeeded();await page.screenshot({path:info.outputPath('recent-long-filename-search.png')});await recent.click();await expect(palette).toHaveCount(0);await expect.poll(()=>page.evaluate(()=>window.luma.editor.documentSessions.length)).toBe(2);expect(await page.evaluate(()=>window.luma.editor.document.getSnapshot().past.length)).toBe(0);await info.attach('recent-long-filename-layout',{body:JSON.stringify({nameLength:name.length,geometry,nativeCopyOpened:true}),contentType:'application/json'});
-});
-
-for(const denial of ['construction','sending'] as const)test(`denied recent notification ${denial} retains verified local copies without preventing editor startup`,async({page},info)=>{
- const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.addInitScript(denial=>{const Native=window.BroadcastChannel;window.BroadcastChannel=class extends Native{constructor(name:string){if(denial==='construction'&&name==='luma-recent-files')throw new DOMException('Notifications unavailable','SecurityError');super(name);}override postMessage(value:unknown){if(denial==='sending'&&this.name==='luma-recent-files')throw new DOMException('Notifications unavailable','SecurityError');super.postMessage(value);}};},denial);const seeded=await seed(page);const result=await page.evaluate(async id=>{const library=window.luma.editor.recentFiles,copy=await library.read(id);return{available:library.getSnapshot().available,error:library.getSnapshot().error,bytes:[...new Uint8Array(await copy.file.arrayBuffer())]};},seeded.entry.id!);expect(result.available).toBe(true);expect(result.error).toBe('');expect(result.bytes).toEqual(seeded.bytes);expect(errors).toEqual([]);await info.attach('recent-notification-denial',{body:JSON.stringify({available:true,originalExact:true,uncaughtErrors:errors}),contentType:'application/json'});
-});
+for (const denial of ["construction", "sending"] as const)
+  test(`denied recent notification ${denial} retains verified local copies without preventing editor startup`, async ({
+    page,
+  }, info) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript((denial) => {
+      const Native = window.BroadcastChannel;
+      window.BroadcastChannel = class extends Native {
+        constructor(name: string) {
+          if (denial === "construction" && name === "luma-recent-files")
+            throw new DOMException(
+              "Notifications unavailable",
+              "SecurityError",
+            );
+          super(name);
+        }
+        override postMessage(value: unknown) {
+          if (denial === "sending" && this.name === "luma-recent-files")
+            throw new DOMException(
+              "Notifications unavailable",
+              "SecurityError",
+            );
+          super.postMessage(value);
+        }
+      };
+    }, denial);
+    const seeded = await seed(page);
+    const result = await page.evaluate(async (id) => {
+      const library = window.luma.editor.recentFiles,
+        copy = await library.read(id);
+      return {
+        available: library.getSnapshot().available,
+        error: library.getSnapshot().error,
+        bytes: [...new Uint8Array(await copy.file.arrayBuffer())],
+      };
+    }, seeded.entry.id!);
+    expect(result.available).toBe(true);
+    expect(result.error).toBe("");
+    expect(result.bytes).toEqual(seeded.bytes);
+    expect(errors).toEqual([]);
+    await info.attach("recent-notification-denial", {
+      body: JSON.stringify({
+        available: true,
+        originalExact: true,
+        uncaughtErrors: errors,
+      }),
+      contentType: "application/json",
+    });
+  });

@@ -86,22 +86,36 @@ The solid brush fully covers its explicit clip without resizing original assets
 or the document.
 
 <!-- example: float-tonal -->
+
 ```js
-const retouch = document.layers.add(new AdjustmentLayer({
-  name: "Linear burn",
-  adjustment: { kind: "tonal", strokes: [] },
-}));
-retouch.addTonalStroke(new TonalStroke({
-  brush: new BrushStroke({
-    points: [{ x: 200, y: 150, pressure: 1 }],
-    size: 2048, hardness: 1, flow: 1, opacity: 1,
-    clip: new MarqueeSelection({
-      shape: "rectangle", x: 0, y: 0, width: 400, height: 300,
-    }),
+const retouch = document.layers.add(
+  new AdjustmentLayer({
+    name: "Linear burn",
+    adjustment: { kind: "tonal", strokes: [] },
   }),
-  mode: "burn", range: "highlights", exposure: 0.5,
-  protectTones: true,
-}));
+);
+retouch.addTonalStroke(
+  new TonalStroke({
+    brush: new BrushStroke({
+      points: [{ x: 200, y: 150, pressure: 1 }],
+      size: 2048,
+      hardness: 1,
+      flow: 1,
+      opacity: 1,
+      clip: new MarqueeSelection({
+        shape: "rectangle",
+        x: 0,
+        y: 0,
+        width: 400,
+        height: 300,
+      }),
+    }),
+    mode: "burn",
+    range: "highlights",
+    exposure: 0.5,
+    protectTones: true,
+  }),
+);
 document.selectedLayer = retouch;
 ```
 
@@ -123,12 +137,16 @@ assumption; an embedded supported RGB ICC profile remains authoritative.
 Trusted browser host:
 
 ```ts
-await editor.openTiff(file, {
-  page: 0,
-  editingPrecision: 'float32',
-  // Required only when the original page has no ICC profile:
-  floatColorSpace: 'linear-srgb',
-}, {signal, onProgress});
+await editor.openTiff(
+  file,
+  {
+    page: 0,
+    editingPrecision: "float32",
+    // Required only when the original page has no ICC profile:
+    floatColorSpace: "linear-srgb",
+  },
+  { signal, onProgress },
+);
 ```
 
 `editingPrecision?: 'float32'` is optional. Omission retains the old byte import.
@@ -165,9 +183,15 @@ Trusted host signature:
 
 ```ts
 await editor.convertDocumentToFloat(
-  {signal, onProgress},
-  {output: {profile: 'display-p3', intent: 'relative-colorimetric',
-            blackPointCompensation: false}, proof: null},
+  { signal, onProgress },
+  {
+    output: {
+      profile: "display-p3",
+      intent: "relative-colorimetric",
+      blackPointCompensation: false,
+    },
+    proof: null,
+  },
 );
 ```
 
@@ -206,11 +230,13 @@ still requires final source admission before rendering or host publication.
 For an already-open original high-precision TIFF, an ordinary isolated script can use:
 
 <!-- example: float-exposure -->
+
 ```js
 document.convertToFloat();
 const original = document.layers.at(0);
-if (!(original instanceof RasterLayer)) throw new Error('Select a raster original');
-original.adjustments.add(new ToneAdjustment({exposure: 1}));
+if (!(original instanceof RasterLayer))
+  throw new Error("Select a raster original");
+original.adjustments.add(new ToneAdjustment({ exposure: 1 }));
 ```
 
 Full tone uses the same existing options and properties, with exposure −3…3
@@ -219,14 +245,20 @@ In byte documents the existing encoded-sRGB byte operator remains unchanged.
 Float documents apply the working-linear definitions above. For example:
 
 <!-- example: float-tone -->
+
 ```js
 document.convertToFloat();
 const original = document.layers.at(0);
-if (!(original instanceof RasterLayer)) throw new Error('Select a raster original');
+if (!(original instanceof RasterLayer))
+  throw new Error("Select a raster original");
 document.selectedLayer = original;
-original.adjustments.add(new ToneAdjustment({
-  exposure: 0.7, contrast: 37, saturation: -43,
-}));
+original.adjustments.add(
+  new ToneAdjustment({
+    exposure: 0.7,
+    contrast: 37,
+    saturation: -43,
+  }),
+);
 ```
 
 The existing isolated execution transaction, expected revision, command limit,
@@ -320,15 +352,18 @@ camera multipliers, reconstruct clipped data or establish physical/HDR quality.
 For an already-open original-bearing float TIFF:
 
 <!-- example: float-white-balance -->
+
 ```js
 document.convertToFloat();
-const balance = document.layers.add(new AdjustmentLayer({
-  name: 'Linear white balance',
-  adjustment: {kind: 'white-balance', temperature: 10000, tint: 100},
-}));
+const balance = document.layers.add(
+  new AdjustmentLayer({
+    name: "Linear white balance",
+    adjustment: { kind: "white-balance", temperature: 10000, tint: 100 },
+  }),
+);
 balance.opacity = 0.75;
 document.selectedLayer = balance;
-print('Linear white balance ready');
+print("Linear white balance ready");
 ```
 
 Schema 49 and all grants remain unchanged. Older implementations that reject
@@ -421,24 +456,40 @@ rather than flattening them.
 Open an original-backed TIFF in float mode first:
 
 <!-- example: float-palette -->
+
 ```js
 document.convertToFloat();
-const one = document.layers.add(new AdjustmentLayer({name:'Float Lookup 1D'}));
-one.setLut('TITLE "Float 1D"\nLUT_1D_SIZE 3\n-.1 0 1.1\n.25 .5 .5\n1 .9 -.1',
-  {amount:37.25, interpolation:'tetrahedral'});
-const three = document.layers.add(new AdjustmentLayer({name:'Float Lookup 3D'}));
-three.setLut('TITLE "Float 3D"\nLUT_3D_SIZE 2\n0 0 0\n0 0 1\n0 1 0\n0 1 1\n1 0 0\n1 0 1\n1 1 0\n1 1 1',
-  {amount:62.5, interpolation:'tetrahedral'});
-const gradient = document.layers.add(new AdjustmentLayer({
-  name:'Float Gradient', opacity:.625,
-  adjustment:{kind:'gradient-map', reverse:false, stops:[
-    {position:0,color:'#171b46'},
-    {position:.45,color:'#b65a74'},
-    {position:1,color:'#ffe4a0'},
-  ]},
-}));
+const one = document.layers.add(
+  new AdjustmentLayer({ name: "Float Lookup 1D" }),
+);
+one.setLut('TITLE "Float 1D"\nLUT_1D_SIZE 3\n-.1 0 1.1\n.25 .5 .5\n1 .9 -.1', {
+  amount: 37.25,
+  interpolation: "tetrahedral",
+});
+const three = document.layers.add(
+  new AdjustmentLayer({ name: "Float Lookup 3D" }),
+);
+three.setLut(
+  'TITLE "Float 3D"\nLUT_3D_SIZE 2\n0 0 0\n0 0 1\n0 1 0\n0 1 1\n1 0 0\n1 0 1\n1 1 0\n1 1 1',
+  { amount: 62.5, interpolation: "tetrahedral" },
+);
+const gradient = document.layers.add(
+  new AdjustmentLayer({
+    name: "Float Gradient",
+    opacity: 0.625,
+    adjustment: {
+      kind: "gradient-map",
+      reverse: false,
+      stops: [
+        { position: 0, color: "#171b46" },
+        { position: 0.45, color: "#b65a74" },
+        { position: 1, color: "#ffe4a0" },
+      ],
+    },
+  }),
+);
 document.selectedLayer = gradient;
-print('Float palette controls ready');
+print("Float palette controls ready");
 ```
 
 Independent references use pinned Colour Science 0.4.6 Cube reading and 1D/3D
@@ -457,7 +508,7 @@ The existing `AdjustmentLayer` DTOs also work in float documents:
   saturation/lightness are −100…100. All three fields are required; neutral is
   exactly zero for all three. Trusted `defaultHslAdjustment()` returns that DTO.
 - Color Balance: `{kind: 'color-balance', shadows, midtones, highlights,
-  preserveLuminosity}`. Each range is exactly `{red, green, blue}` with required
+preserveLuminosity}`. Each range is exactly `{red, green, blue}` with required
   finite values −100…100; luminosity preservation is a required boolean. Trusted
   `defaultColorBalanceAdjustment()` zeroes the nine channels and enables
   preservation. All-zero channels are neutral with either boolean value.
@@ -511,28 +562,41 @@ implementations that reject these kinds continue to reject those documents.
 Open a normalized original unsigned-16 TIFF in float editing mode first:
 
 <!-- example: float-color -->
+
 ```js
 document.convertToFloat();
-document.layers.add(new AdjustmentLayer({
-  name: 'Float HSL',
-  adjustment: {kind: 'hsl', hue: 37.25, saturation: -43.5, lightness: 21.75},
-}));
-document.layers.add(new AdjustmentLayer({
-  name: 'Float Color Balance',
-  adjustment: {
-    kind: 'color-balance',
-    shadows: {red: -37.25, green: 12.5, blue: 71.25},
-    midtones: {red: 27.5, green: -41.25, blue: 16.75},
-    highlights: {red: 53.5, green: 19.25, blue: -61.5},
-    preserveLuminosity: true,
-  },
-}));
-const vibrance = document.layers.add(new AdjustmentLayer({
-  name: 'Float Vibrance', opacity: 0.625,
-  adjustment: {kind: 'vibrance', vibrance: 37.25, saturation: -41.5},
-}));
+document.layers.add(
+  new AdjustmentLayer({
+    name: "Float HSL",
+    adjustment: {
+      kind: "hsl",
+      hue: 37.25,
+      saturation: -43.5,
+      lightness: 21.75,
+    },
+  }),
+);
+document.layers.add(
+  new AdjustmentLayer({
+    name: "Float Color Balance",
+    adjustment: {
+      kind: "color-balance",
+      shadows: { red: -37.25, green: 12.5, blue: 71.25 },
+      midtones: { red: 27.5, green: -41.25, blue: 16.75 },
+      highlights: { red: 53.5, green: 19.25, blue: -61.5 },
+      preserveLuminosity: true,
+    },
+  }),
+);
+const vibrance = document.layers.add(
+  new AdjustmentLayer({
+    name: "Float Vibrance",
+    opacity: 0.625,
+    adjustment: { kind: "vibrance", vibrance: 37.25, saturation: -41.5 },
+  }),
+);
 document.selectedLayer = vibrance;
-print('Float color controls ready');
+print("Float color controls ready");
 ```
 
 Independent references use Python colorsys HLS and a vectorized equivalent
@@ -580,26 +644,56 @@ RGB samples below/above that range in edge bins. They describe sampled working
 colors, rather than SDR preview values or an exact whole-original distribution.
 
 <!-- example: float-transfer -->
+
 ```js
 document.convertToFloat();
 const image = document.layers.at(0);
-if (!(image instanceof RasterLayer)) throw new Error('Select an original raster');
-const curve = document.layers.add(new AdjustmentLayer({
-  name: 'Linear curve',
-  adjustment: {kind: 'curves', rgb: [
-    {x: 0, y: 0}, {x: 64, y: 48}, {x: 128, y: 168}, {x: 255, y: 255},
-  ], red: [{x: 0, y: 0}, {x: 120, y: 160}, {x: 255, y: 255}]},
-}));
-const levels = document.layers.add(new AdjustmentLayer({
-  name: 'Linear levels', opacity: 0.625,
-  adjustment: {kind: 'levels', rgb: {
-    inputBlack: 12, inputWhite: 244, gamma: 0.85,
-    outputBlack: 4, outputWhite: 251,
-  }},
-}));
-levels.mask = new LayerMask({selection: new MarqueeSelection({
-  shape: 'rectangle', x: 15, y: 10, width: 90, height: 55,
-})});
+if (!(image instanceof RasterLayer))
+  throw new Error("Select an original raster");
+const curve = document.layers.add(
+  new AdjustmentLayer({
+    name: "Linear curve",
+    adjustment: {
+      kind: "curves",
+      rgb: [
+        { x: 0, y: 0 },
+        { x: 64, y: 48 },
+        { x: 128, y: 168 },
+        { x: 255, y: 255 },
+      ],
+      red: [
+        { x: 0, y: 0 },
+        { x: 120, y: 160 },
+        { x: 255, y: 255 },
+      ],
+    },
+  }),
+);
+const levels = document.layers.add(
+  new AdjustmentLayer({
+    name: "Linear levels",
+    opacity: 0.625,
+    adjustment: {
+      kind: "levels",
+      rgb: {
+        inputBlack: 12,
+        inputWhite: 244,
+        gamma: 0.85,
+        outputBlack: 4,
+        outputWhite: 251,
+      },
+    },
+  }),
+);
+levels.mask = new LayerMask({
+  selection: new MarqueeSelection({
+    shape: "rectangle",
+    x: 15,
+    y: 10,
+    width: 90,
+    height: 55,
+  }),
+});
 document.selectedLayer = levels;
 ```
 
@@ -623,18 +717,33 @@ Byte prepared replacements and interactive color painting remain unsupported.
 Prepared HDR raster replacements use the schema 57 contract above.
 
 <!-- example: float-erasure -->
+
 ```js
 document.convertToFloat();
 const image = document.layers.at(0);
-if (!(image instanceof RasterLayer)) throw new Error('Select an original raster');
+if (!(image instanceof RasterLayer))
+  throw new Error("Select an original raster");
 document.selectedLayer = image;
-for (let i = 0; i < 2; i++) image.clear(new MarqueeSelection({
-  shape: 'pixels', x: 15, y: 10, width: 90, height: 55,
-  coverage: {width: 1, height: 1, runs: [1, 128]},
-}));
-image.clear(new MarqueeSelection({
-  shape: 'rectangle', x: 140, y: 80, width: 60, height: 100,
-}));
+for (let i = 0; i < 2; i++)
+  image.clear(
+    new MarqueeSelection({
+      shape: "pixels",
+      x: 15,
+      y: 10,
+      width: 90,
+      height: 55,
+      coverage: { width: 1, height: 1, runs: [1, 128] },
+    }),
+  );
+image.clear(
+  new MarqueeSelection({
+    shape: "rectangle",
+    x: 140,
+    y: 80,
+    width: 60,
+    height: 100,
+  }),
+);
 ```
 
 ## Sibling clipping in float documents
@@ -669,22 +778,38 @@ suffice; installation is inert.
 For an original-bearing float document:
 
 <!-- example: float-clipping -->
+
 ```js
 const base = document.layers.at(0);
-if (!(base instanceof RasterLayer)) throw new Error('Open a float TIFF raster');
-base.name = 'Float clipping base';
+if (!(base instanceof RasterLayer)) throw new Error("Open a float TIFF raster");
+base.name = "Float clipping base";
 base.fillOpacity = 0.375;
 base.opacity = 0.75;
-base.mask = new LayerMask({linked: false, selection: new MarqueeSelection({
-  shape: 'rectangle', x: 15, y: 10, width: 90, height: 55,
-})});
-const member = new RasterLayer({
-  name: 'Clipped float tone', assetId: base.assetId,
-  width: base.width, height: base.height, opacity: 0.5, clipped: true,
+base.mask = new LayerMask({
+  linked: false,
+  selection: new MarqueeSelection({
+    shape: "rectangle",
+    x: 15,
+    y: 10,
+    width: 90,
+    height: 55,
+  }),
 });
-member.adjustments.add(new ToneAdjustment({
-  exposure: 1, contrast: 25, saturation: -40,
-}));
+const member = new RasterLayer({
+  name: "Clipped float tone",
+  assetId: base.assetId,
+  width: base.width,
+  height: base.height,
+  opacity: 0.5,
+  clipped: true,
+});
+member.adjustments.add(
+  new ToneAdjustment({
+    exposure: 1,
+    contrast: 25,
+    saturation: -40,
+  }),
+);
 document.layers.add(member);
 document.selectedLayer = member;
 ```
@@ -733,27 +858,39 @@ isolated example. Its original colors must be in range; the script never reads,
 clamps or rewrites original pixels.
 
 <!-- example: float-blends -->
+
 ```js
 const original = document.layers.at(0);
-if (document.precision !== 'float32' || !(original instanceof RasterLayer)) {
-  throw new Error('Open a normalized original TIFF in float editing mode first.');
+if (document.precision !== "float32" || !(original instanceof RasterLayer)) {
+  throw new Error(
+    "Open a normalized original TIFF in float editing mode first.",
+  );
 }
 const screen = new RasterLayer({
-  name: 'Linear screen', assetId: original.assetId,
-  width: original.width, height: original.height,
-  blendMode: 'screen', opacity: 0.75,
+  name: "Linear screen",
+  assetId: original.assetId,
+  width: original.width,
+  height: original.height,
+  blendMode: "screen",
+  opacity: 0.75,
 });
-screen.adjustments.add(new ToneAdjustment({
-  exposure: -0.5, contrast: -20, saturation: -25,
-}));
+screen.adjustments.add(
+  new ToneAdjustment({
+    exposure: -0.5,
+    contrast: -20,
+    saturation: -25,
+  }),
+);
 document.layers.add(screen);
 const color = new AdjustmentLayer({
-  name: 'Linear color', blendMode: 'color', opacity: 0.5,
-  adjustment: {kind: 'tone', exposure: 0, contrast: -20, saturation: -25},
+  name: "Linear color",
+  blendMode: "color",
+  opacity: 0.5,
+  adjustment: { kind: "tone", exposure: 0, contrast: -20, saturation: -25 },
 });
 document.layers.add(color);
 document.selectedLayer = color;
-print('Linear float blends ready');
+print("Linear float blends ready");
 ```
 
 Independent REST sessions accept the same mode metadata and revision/history
@@ -830,11 +967,16 @@ load and disposes its privately prepared sources; Undo cannot admit that state.
 ## Delivery
 
 ```ts
-await editor.export({format: 'tiff', tiffPrecision: 'float32'});
-await editor.export({format: 'tiff', tiffPrecision: 'uint16',
-                     color: {profile: 'display-p3'}});
-await editor.exportTiffPages(editor.openDocuments,
-                            {precision: 'float32', variant: 'auto'});
+await editor.export({ format: "tiff", tiffPrecision: "float32" });
+await editor.export({
+  format: "tiff",
+  tiffPrecision: "uint16",
+  color: { profile: "display-p3" },
+});
+await editor.exportTiffPages(editor.openDocuments, {
+  precision: "float32",
+  variant: "auto",
+});
 ```
 
 `ExportOptions.tiffPrecision?: 'uint8' | 'uint16' | 'float32'` and multipage
@@ -936,7 +1078,6 @@ or document capture is retained by the idle transform. Explicit ICC session
 disposal still terminates immediately. Source validation, exact output/window
 validation, shared commands, Undo, plugin grants and separate REST are unchanged.
 
-
 ## Color Overlay and Blend If
 
 Existing `LayerStyle` and `BlendIf` constructors now work on float rasters,
@@ -977,23 +1118,36 @@ For an already-open original high-precision TIFF, this example runs through the
 ordinary isolated scripting host with existing document grants:
 
 <!-- example: float-style -->
+
 ```js
 document.convertToFloat();
 const original = document.layers.at(0);
-if (!(original instanceof RasterLayer)) throw new Error('Open a TIFF original');
+if (!(original instanceof RasterLayer)) throw new Error("Open a TIFF original");
 original.styles = new LayerStyle({
-  colorOverlay: {enabled: true, color: '#ad3f79', opacity: .375},
-  blendIf: new BlendIf({enabled: true, channel: 'red',
-    source: [12.25, 67.5, 193.75, 246.5], underlying: [0, 0, 255, 255]})
+  colorOverlay: { enabled: true, color: "#ad3f79", opacity: 0.375 },
+  blendIf: new BlendIf({
+    enabled: true,
+    channel: "red",
+    source: [12.25, 67.5, 193.75, 246.5],
+    underlying: [0, 0, 255, 255],
+  }),
 });
-const tone = document.layers.add(new AdjustmentLayer({
-  name: 'Float appearance', opacity: .75, fillOpacity: .625,
-  adjustment: {kind: 'tone', exposure: .5, contrast: 0, saturation: 0}
-}));
+const tone = document.layers.add(
+  new AdjustmentLayer({
+    name: "Float appearance",
+    opacity: 0.75,
+    fillOpacity: 0.625,
+    adjustment: { kind: "tone", exposure: 0.5, contrast: 0, saturation: 0 },
+  }),
+);
 tone.styles = new LayerStyle({
-  colorOverlay: {enabled: true, color: '#2468ac', opacity: .125},
-  blendIf: new BlendIf({enabled: true, channel: 'green',
-    source: [8, 32, 224, 252], underlying: [0, 48, 208, 255]})
+  colorOverlay: { enabled: true, color: "#2468ac", opacity: 0.125 },
+  blendIf: new BlendIf({
+    enabled: true,
+    channel: "green",
+    source: [8, 32, 224, 252],
+    underlying: [0, 48, 208, 255],
+  }),
 });
 document.selectedLayer = tone;
 ```
@@ -1006,7 +1160,6 @@ renderer limits and do not synchronize with the browser. Malformed native
 results, nonfinite colors, changed alpha, coverage outside [0,1] and wrong window
 shapes reject before publication; caller buffers remain attached. The dated
 roadmap records verified coverage and remaining F10/F14/device/quality gates.
-
 
 ## Native float drop shadows
 
@@ -1055,26 +1208,43 @@ Open an original-backed TIFF in float mode first. This isolated example is one
 ordinary script transaction and leaves a visible shadow at zero Fill:
 
 <!-- example: float-shadow -->
+
 ```js
 const layer = document.layers.at(0);
 layer.fillOpacity = 0;
-layer.mask = new LayerMask({linked:false, selection:new MarqueeSelection({
-  shape:'rectangle', x:64, y:64, width:128, height:128,
-})});
-layer.styles = new LayerStyle({dropShadow:{
-  enabled:true, color:'#ad3f79', opacity:.625, x:9.25, y:-4.75, blur:2.5,
-}});
-document.layers.add(new AdjustmentLayer({name:'Float shadow adjustment',
-  adjustment:{kind:'tone', exposure:0, contrast:0, saturation:0},
-}));
+layer.mask = new LayerMask({
+  linked: false,
+  selection: new MarqueeSelection({
+    shape: "rectangle",
+    x: 64,
+    y: 64,
+    width: 128,
+    height: 128,
+  }),
+});
+layer.styles = new LayerStyle({
+  dropShadow: {
+    enabled: true,
+    color: "#ad3f79",
+    opacity: 0.625,
+    x: 9.25,
+    y: -4.75,
+    blur: 2.5,
+  },
+});
+document.layers.add(
+  new AdjustmentLayer({
+    name: "Float shadow adjustment",
+    adjustment: { kind: "tone", exposure: 0, contrast: 0, saturation: 0 },
+  }),
+);
 document.selectedLayer = layer;
-print('Float shadow example ready');
+print("Float shadow example ready");
 ```
 
 This extends the existing linear-sRGB float scene subset. It does not establish
 Photoshop shadow equivalence, all-float layer/tool support, HDR/CMYK delivery,
 sustained 60fps or complete editor/device/process-memory performance acceptance.
-
 
 Native shadow evaluation validates complete returned alpha planes before omitting
 zero convolution work. At zero Fill, an unmodified original raster on the native
@@ -1086,7 +1256,6 @@ backdrop even when the shadow is empty. Capture/source lifetime checks guard
 these paths, including cancellation after an empty mask read. These are private
 execution optimizations, with unchanged public style/history/transport semantics.
 
-
 ## Native float wet-paint dependency and subsequent integration
 
 Private linear Float32 wet load, deposit/pre-deposit pickup and completed-stroke
@@ -1095,7 +1264,6 @@ They do not enable Smudge/Mixer in float documents. Float retained preparation
 is specified below. The byte PNG replacement transport cannot retain HDR edits;
 public retained authoring, HDR assets/replay and persistence still need connection. [Numerical/ownership contract and verification scope](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
 
-
 Private retained float wet preparation now preserves original-derived Float32
 destinations and signed/HDR spatial pigment through append, snapshots, finish
 and source closure. These read-only job results do not become document edits.
@@ -1103,13 +1271,11 @@ HDR replacement assets, composed replay/projection, source-bearing persistence
 and public authoring/previews/commit remain required; float Smudge/Mixer stay
 unavailable. [Retained preparation contract](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
 
-
 Private prepared HDR assets now retain straight Float32 TIFF samples, validate
 complete color/coverage pairs and sample Float64 intermediate replacement fields
 before a single native Float32 composition. This is not yet a document wet
 stroke or native history/project transport. Public replay and authoring remain
 required; float Smudge/Mixer stay unavailable. [Contract](HDR_WET_FIELDS.md).
-
 
 ## Current trusted wet authoring integration
 

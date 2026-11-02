@@ -8,7 +8,9 @@ export const fullscreen = /* wgsl */ `
 `;
 
 /** Separate stop buffer keeps ordinary paint/composite uniforms small. */
-export const gradientMap = fullscreen + /* wgsl */ `
+export const gradientMap =
+  fullscreen +
+  /* wgsl */ `
 struct Params { count: f32, reverse: f32, unused: vec2f, stops: array<vec4f, 32> }
 @group(0) @binding(0) var source: texture_2d<f32>;
 @group(0) @binding(1) var backdrop: texture_2d<f32>;
@@ -30,7 +32,9 @@ struct Params { count: f32, reverse: f32, unused: vec2f, stops: array<vec4f, 32>
 `;
 
 /** Portable float32 table in a read-only storage buffer; interpolation is explicit. */
-export const lookup = fullscreen + /* wgsl */ `
+export const lookup =
+  fullscreen +
+  /* wgsl */ `
 struct Params { a: vec4f, minimum: vec4f, span: vec4f, unused: vec4f, extra: vec4f }
 @group(0) @binding(0) var source: texture_2d<f32>;
 @group(0) @binding(1) var backdrop: texture_2d<f32>;

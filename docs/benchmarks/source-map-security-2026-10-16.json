@@ -10,14 +10,8 @@
     "verifiedDate": "2026-10-16"
   },
   "change": {
-    "dependencyChain": [
-      "vite@8.3.0",
-      "postcss@8.5.28",
-      "source-map-js@1.2.2"
-    ],
-    "changedLockEntries": [
-      "node_modules/source-map-js"
-    ],
+    "dependencyChain": ["vite@8.3.0", "postcss@8.5.28", "source-map-js@1.2.2"],
+    "changedLockEntries": ["node_modules/source-map-js"],
     "before": {
       "version": "1.2.1",
       "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz",
@@ -195,9 +189,7 @@
               "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
               "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
               "severity": "high",
-              "cwe": [
-                "CWE-1284"
-              ],
+              "cwe": ["CWE-1284"],
               "cvss": {
                 "score": 7.5,
                 "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
@@ -207,9 +199,7 @@
           ],
           "effects": [],
           "range": "1.0.0 - 1.2.1",
-          "nodes": [
-            "node_modules/source-map-js"
-          ],
+          "nodes": ["node_modules/source-map-js"],
           "fixAvailable": true
         }
       },

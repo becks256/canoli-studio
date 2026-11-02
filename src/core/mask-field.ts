@@ -1,78 +1,193 @@
-import {mappedMaskBrushBounds} from './mask-plane-brush';
-import {AffineTransform,type AffineBounds} from './affine';
-import {strokeBounds,selectionRegionTransform} from './drawing';
-import {maskNativeEditIndex,type LayerMaskData} from './masks';
-import {captureFieldBounds,compileProjectiveField} from './projective-field';
-import {perspectiveLocalQuad,perspectiveRect} from './perspective';
-import {ProjectiveTransform} from './projective';
+import { mappedMaskBrushBounds } from "./mask-plane-brush";
+import { AffineTransform, type AffineBounds } from "./affine";
+import { strokeBounds, selectionRegionTransform } from "./drawing";
+import { maskNativeEditIndex, type LayerMaskData } from "./masks";
+import { captureFieldBounds, compileProjectiveField } from "./projective-field";
+import { perspectiveLocalQuad, perspectiveRect } from "./perspective";
+import { ProjectiveTransform } from "./projective";
 
 /** Conservative raw deviation support, before feather/settings. A horizon
  * intersection marks unbounded support; its finite bounds are diagnostic only.
  * Background is the authored paint base; the byte rasterizer captures its
  * actual alpha word. Bounds are an address space, never an allocation limit. */
-export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,bitmap?:{width:number;height:number}) {
+export function maskFieldGeometry(
+  mask: LayerMaskData,
+  transform: AffineTransform,
+  bitmap?: { width: number; height: number },
+) {
   // Prepared wet coverage reconstructs the whole mask on its own pixel grid
   // before affine sampling. Its interpolation support grows with that mapping.
-  let unbounded=false;
-  const nativeStart=maskNativeEditIndex(mask),prefix=nativeStart<0?mask.strokes:mask.strokes?.slice(0,nativeStart);
-  const nativeWet=!!prefix?.some(entry=>entry.mode==='wet'&&entry.stroke.opacity>0);
-  const basis=nativeWet?new AffineTransform():transform;
-  const rects:AffineBounds[]=[];
-  const add=(bounds:AffineBounds,matrix=basis)=>rects.push(matrix.bounds(bounds));
-  if(mask.kind==='bitmap'){
-    if(!bitmap||![bitmap.width,bitmap.height].every(v=>Number.isSafeInteger(v)&&v>0))throw new Error('Mask bitmap requires its complete native geometry.');
-    add({x:0,y:0,width:bitmap.width,height:bitmap.height});
-  }else if(mask.kind==='selection'){
-    for(const region of mask.selection.regions)add(region,basis.multiply(selectionRegionTransform(region)));
-  }else if(mask.kind==='vector'){
-    for(const path of mask.paths){
-      if(!path.points.length)continue;
-      let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity;
-      for(const point of path.points)for(const p of [point,point.in,point.out]){left=Math.min(left,p.x);top=Math.min(top,p.y);right=Math.max(right,p.x);bottom=Math.max(bottom,p.y);}
-      add({x:left,y:top,width:right-left,height:bottom-top});
+  let unbounded = false;
+  const nativeStart = maskNativeEditIndex(mask),
+    prefix =
+      nativeStart < 0 ? mask.strokes : mask.strokes?.slice(0, nativeStart);
+  const nativeWet = !!prefix?.some(
+    (entry) => entry.mode === "wet" && entry.stroke.opacity > 0,
+  );
+  const basis = nativeWet ? new AffineTransform() : transform;
+  const rects: AffineBounds[] = [];
+  const add = (bounds: AffineBounds, matrix = basis) =>
+    rects.push(matrix.bounds(bounds));
+  if (mask.kind === "bitmap") {
+    if (
+      !bitmap ||
+      ![bitmap.width, bitmap.height].every(
+        (v) => Number.isSafeInteger(v) && v > 0,
+      )
+    )
+      throw new Error("Mask bitmap requires its complete native geometry.");
+    add({ x: 0, y: 0, width: bitmap.width, height: bitmap.height });
+  } else if (mask.kind === "selection") {
+    for (const region of mask.selection.regions)
+      add(region, basis.multiply(selectionRegionTransform(region)));
+  } else if (mask.kind === "vector") {
+    for (const path of mask.paths) {
+      if (!path.points.length) continue;
+      let left = Infinity,
+        top = Infinity,
+        right = -Infinity,
+        bottom = -Infinity;
+      for (const point of path.points)
+        for (const p of [point, point.in, point.out]) {
+          left = Math.min(left, p.x);
+          top = Math.min(top, p.y);
+          right = Math.max(right, p.x);
+          bottom = Math.max(bottom, p.y);
+        }
+      add({ x: left, y: top, width: right - left, height: bottom - top });
     }
-  }else if(mask.kind==='raster-erasures'){
-    for(const entry of mask.erasures){
-      let bounds=strokeBounds(entry.stroke);
-      if(entry.placement){
+  } else if (mask.kind === "raster-erasures") {
+    for (const entry of mask.erasures) {
+      let bounds = strokeBounds(entry.stroke);
+      if (entry.placement) {
         // Captured coverage is bilinearly sampled from a fixed ceil-sized
         // lattice. Include its border neighbors BEFORE later mask resizing;
         // two output pixels cannot cover a magnified interpolation tail.
-        const source=entry.placement.bounds,sx=Math.ceil(entry.width)/entry.width,sy=Math.ceil(entry.height)/entry.height;
-        const x=(Math.floor(source.x*sx)-1)/sx,y=(Math.floor(source.y*sy)-1)/sy;
-        bounds={x,y,width:(Math.ceil((source.x+source.width)*sx)+1)/sx-x,height:(Math.ceil((source.y+source.height)*sy)+1)/sy-y};
+        const source = entry.placement.bounds,
+          sx = Math.ceil(entry.width) / entry.width,
+          sy = Math.ceil(entry.height) / entry.height;
+        const x = (Math.floor(source.x * sx) - 1) / sx,
+          y = (Math.floor(source.y * sy) - 1) / sy;
+        bounds = {
+          x,
+          y,
+          width: (Math.ceil((source.x + source.width) * sx) + 1) / sx - x,
+          height: (Math.ceil((source.y + source.height) * sy) + 1) / sy - y,
+        };
       }
-      add(bounds,basis.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)));
+      add(
+        bounds,
+        basis.multiply(
+          AffineTransform.scale(
+            mask.width / entry.width,
+            mask.height / entry.height,
+          ),
+        ),
+      );
     }
   }
-  for(const entry of mask.strokes??[]){
-    if(entry.mode==='wet'){if(entry.stroke.opacity===0)continue;try{add(strokeBounds(entry.stroke));}catch{unbounded=true;}continue;}
-    if(!entry.placement){add(strokeBounds(entry.stroke));continue;}
-    const p=entry.placement;
-    if('geometry'in p){const box=mappedMaskBrushBounds(p,strokeBounds(entry.stroke));if(box)add(box);else unbounded=true;continue;}
-    const width=Math.ceil(p.width),height=Math.ceil(p.height),sx=width/p.width,sy=height/p.height,stroke=strokeBounds(entry.stroke);
-    try{
+  for (const entry of mask.strokes ?? []) {
+    if (entry.mode === "wet") {
+      if (entry.stroke.opacity === 0) continue;
+      try {
+        add(strokeBounds(entry.stroke));
+      } catch {
+        unbounded = true;
+      }
+      continue;
+    }
+    if (!entry.placement) {
+      add(strokeBounds(entry.stroke));
+      continue;
+    }
+    const p = entry.placement;
+    if ("geometry" in p) {
+      const box = mappedMaskBrushBounds(p, strokeBounds(entry.stroke));
+      if (box) add(box);
+      else unbounded = true;
+      continue;
+    }
+    const width = Math.ceil(p.width),
+      height = Math.ceil(p.height),
+      sx = width / p.width,
+      sy = height / p.height,
+      stroke = strokeBounds(entry.stroke);
+    try {
       // Bound the complete captured raster and its bilinear neighbors, then
       // invert in a corner-relative frame. A horizon intersection has genuinely
       // unbounded pullback support and must use the streaming field path.
-      const frame=compileProjectiveField({sourceWidth:width,sourceHeight:height,corners:perspectiveLocalQuad(width,height,p.perspective),field:{x:0,y:0,width:1,height:1},source:{x:0,y:0,width:1,height:1},output:{x:0,y:0,width:1,height:1},background:0});
-      const x=Math.floor(stroke.x*sx)-3,y=Math.floor(stroke.y*sy)-3;
-      const matrix=ProjectiveTransform.fromAffine(AffineTransform.fromJSON(p.basis).inverse().multiply(AffineTransform.scale(1/sx,1/sy))).multiply(new ProjectiveTransform(Array.from(frame.values.subarray(0,9))));
-      add(perspectiveRect(matrix,{x:x-frame.inputOrigin.x,y:y-frame.inputOrigin.y,width:Math.ceil((stroke.x+stroke.width)*sx)+3-x,height:Math.ceil((stroke.y+stroke.height)*sy)+3-y}).bounds);
-    }catch{unbounded=true;}
-  }
-  let bounds={x:0,y:0,width:1,height:1};
-  if(rects.length){
-    let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity;
-    for(const rect of rects){left=Math.min(left,rect.x);top=Math.min(top,rect.y);right=Math.max(right,rect.x+rect.width);bottom=Math.max(bottom,rect.y+rect.height);}
-    // Cover rasterization/antialias support beyond the geometric hull. This is
-    // source-grid padding; document-space feather halos are supplied later.
-    const x=Math.floor(left)-2,y=Math.floor(top)-2;
-    bounds={x,y,width:Math.ceil(right)+2-x,height:Math.ceil(bottom)+2-y};
-    if(nativeWet){
-      const mapped=transform.bounds(bounds),x=Math.floor(mapped.x)-2,y=Math.floor(mapped.y)-2;
-      bounds={x,y,width:Math.ceil(mapped.x+mapped.width)+2-x,height:Math.ceil(mapped.y+mapped.height)+2-y};
+      const frame = compileProjectiveField({
+        sourceWidth: width,
+        sourceHeight: height,
+        corners: perspectiveLocalQuad(width, height, p.perspective),
+        field: { x: 0, y: 0, width: 1, height: 1 },
+        source: { x: 0, y: 0, width: 1, height: 1 },
+        output: { x: 0, y: 0, width: 1, height: 1 },
+        background: 0,
+      });
+      const x = Math.floor(stroke.x * sx) - 3,
+        y = Math.floor(stroke.y * sy) - 3;
+      const matrix = ProjectiveTransform.fromAffine(
+        AffineTransform.fromJSON(p.basis)
+          .inverse()
+          .multiply(AffineTransform.scale(1 / sx, 1 / sy)),
+      ).multiply(
+        new ProjectiveTransform(Array.from(frame.values.subarray(0, 9))),
+      );
+      add(
+        perspectiveRect(matrix, {
+          x: x - frame.inputOrigin.x,
+          y: y - frame.inputOrigin.y,
+          width: Math.ceil((stroke.x + stroke.width) * sx) + 3 - x,
+          height: Math.ceil((stroke.y + stroke.height) * sy) + 3 - y,
+        }).bounds,
+      );
+    } catch {
+      unbounded = true;
     }
   }
-  return {bounds:captureFieldBounds(bounds),background:mask.kind==='paint'?mask.base:mask.kind==='raster-erasures'?1:0,...(unbounded?{unbounded:true}:{})};
+  let bounds = { x: 0, y: 0, width: 1, height: 1 };
+  if (rects.length) {
+    let left = Infinity,
+      top = Infinity,
+      right = -Infinity,
+      bottom = -Infinity;
+    for (const rect of rects) {
+      left = Math.min(left, rect.x);
+      top = Math.min(top, rect.y);
+      right = Math.max(right, rect.x + rect.width);
+      bottom = Math.max(bottom, rect.y + rect.height);
+    }
+    // Cover rasterization/antialias support beyond the geometric hull. This is
+    // source-grid padding; document-space feather halos are supplied later.
+    const x = Math.floor(left) - 2,
+      y = Math.floor(top) - 2;
+    bounds = {
+      x,
+      y,
+      width: Math.ceil(right) + 2 - x,
+      height: Math.ceil(bottom) + 2 - y,
+    };
+    if (nativeWet) {
+      const mapped = transform.bounds(bounds),
+        x = Math.floor(mapped.x) - 2,
+        y = Math.floor(mapped.y) - 2;
+      bounds = {
+        x,
+        y,
+        width: Math.ceil(mapped.x + mapped.width) + 2 - x,
+        height: Math.ceil(mapped.y + mapped.height) + 2 - y,
+      };
+    }
+  }
+  return {
+    bounds: captureFieldBounds(bounds),
+    background:
+      mask.kind === "paint"
+        ? mask.base
+        : mask.kind === "raster-erasures"
+          ? 1
+          : 0,
+    ...(unbounded ? { unbounded: true } : {}),
+  };
 }

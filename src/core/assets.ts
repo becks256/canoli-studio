@@ -1,16 +1,32 @@
-import{FloatRasterSource}from'./float-source/source';
-import type{ColorOutput}from'./color/color-settings';
+import { FloatRasterSource } from "./float-source/source";
+import type { ColorOutput } from "./color/color-settings";
 import { MetadataService } from "../intelligence/metadata/service";
-import {FontSourceStore} from '../fonts/store';
+import { FontSourceStore } from "../fonts/store";
 import { AnalysisService } from "../intelligence/candidates/service";
 import { id } from "./model";
-import {decodeTiffFile} from './interchange/tiff/client';
-import {decodeAvifFile} from './interchange/avif/client';
-import {hasAvifBrand} from './interchange/avif/sniff';
-import {ownRawSource,verifyRawSource,type RawImageSource} from './interchange/raw/source';
-import {avifDecodeOptionsSchema,type AvifDecodeOptions,type AvifDecodeSettings,type AvifImportReport} from './interchange/avif/types';
-import {tiffDecodeOptionsSchema,tiffFloatColorSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl,type TiffFloatColor} from './interchange/tiff/types';
-import {FLOAT_SOURCE_NATIVE_SHA} from './float-source/types';
+import { decodeTiffFile } from "./interchange/tiff/client";
+import { decodeAvifFile } from "./interchange/avif/client";
+import { hasAvifBrand } from "./interchange/avif/sniff";
+import {
+  ownRawSource,
+  verifyRawSource,
+  type RawImageSource,
+} from "./interchange/raw/source";
+import {
+  avifDecodeOptionsSchema,
+  type AvifDecodeOptions,
+  type AvifDecodeSettings,
+  type AvifImportReport,
+} from "./interchange/avif/types";
+import {
+  tiffDecodeOptionsSchema,
+  tiffFloatColorSchema,
+  type TiffDecodeOptions,
+  type TiffDecodeSettings,
+  type TiffImportControl,
+  type TiffFloatColor,
+} from "./interchange/tiff/types";
+import { FLOAT_SOURCE_NATIVE_SHA } from "./float-source/types";
 
 export interface SerializedAsset {
   id: string;
@@ -26,14 +42,18 @@ export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
   thumbnail: string;
   readonly tiff?: Readonly<TiffDecodeSettings>;
   /** Derived, checked color conversion of a float source; originals remain authoritative. */
-  readonly tiffColor?:Readonly<TiffFloatColor>;
+  readonly tiffColor?: Readonly<TiffFloatColor>;
   readonly avif?: Readonly<AvifDecodeSettings>;
   /** Derived from original bytes on decode; not a second persisted source of truth. */
   readonly avifReport?: Readonly<AvifImportReport>;
   /** Accepted PNG plus an immutable, complete sensor original and development record. */
   readonly raw?: Readonly<RawImageSource>;
 }
-export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions;avif?:AvifDecodeOptions;raw?:RawImageSource}
+export interface AssetImportOptions extends TiffImportControl {
+  tiff?: TiffDecodeOptions;
+  avif?: AvifDecodeOptions;
+  raw?: RawImageSource;
+}
 
 interface SharedBitmap {
   readonly bitmap: ImageBitmap;
@@ -41,37 +61,73 @@ interface SharedBitmap {
 }
 const sharedRecords = new WeakSet<ImageAsset>();
 const encodedRecords = new WeakSet<ImageAsset>();
-export function isFloatAsset(asset:Pick<ImageAsset,'tiff'>){return asset.tiff?.editingPrecision==='float32';}
-export function assetBitmapMatches(asset:ImageAsset):boolean{
- const factor=isFloatAsset(asset)?Math.min(1,96/asset.width,96/asset.height):1;
- return asset.bitmap.width===Math.max(1,Math.round(asset.width*factor))&&asset.bitmap.height===Math.max(1,Math.round(asset.height*factor));
+export function isFloatAsset(asset: Pick<ImageAsset, "tiff">) {
+  return asset.tiff?.editingPrecision === "float32";
+}
+export function assetBitmapMatches(asset: ImageAsset): boolean {
+  const factor = isFloatAsset(asset)
+    ? Math.min(1, 96 / asset.width, 96 / asset.height)
+    : 1;
+  return (
+    asset.bitmap.width === Math.max(1, Math.round(asset.width * factor)) &&
+    asset.bitmap.height === Math.max(1, Math.round(asset.height * factor))
+  );
 }
 
 /** Pins immutable bytes and geometry, plus a real surface when this host has one. */
-export function captureAssetSource(assets:AssetStore,assetId:string){
-  const alive=assets.captureLifetime(),asset=assets.get(assetId),blob=asset.blob,raw=asset.raw,tiff=asset.tiff,color=asset.tiffColor,avif=asset.avif,width=asset.width,height=asset.height;
-  const bitmap=encodedRecords.has(asset)?null:asset.bitmap;
-  const check=()=>{
-    alive();if(!assets.has(assetId)||assets.get(assetId)!==asset||asset.blob!==blob||asset.raw!==raw||asset.tiff!==tiff||asset.tiffColor!==color||asset.avif!==avif||asset.width!==width||asset.height!==height||
-      bitmap&&(asset.bitmap!==bitmap||!assetBitmapMatches(asset)))throw new Error('Source image asset changed.');
+export function captureAssetSource(assets: AssetStore, assetId: string) {
+  const alive = assets.captureLifetime(),
+    asset = assets.get(assetId),
+    blob = asset.blob,
+    raw = asset.raw,
+    tiff = asset.tiff,
+    color = asset.tiffColor,
+    avif = asset.avif,
+    width = asset.width,
+    height = asset.height;
+  const bitmap = encodedRecords.has(asset) ? null : asset.bitmap;
+  const check = () => {
+    alive();
+    if (
+      !assets.has(assetId) ||
+      assets.get(assetId) !== asset ||
+      asset.blob !== blob ||
+      asset.raw !== raw ||
+      asset.tiff !== tiff ||
+      asset.tiffColor !== color ||
+      asset.avif !== avif ||
+      asset.width !== width ||
+      asset.height !== height ||
+      (bitmap && (asset.bitmap !== bitmap || !assetBitmapMatches(asset)))
+    )
+      throw new Error("Source image asset changed.");
   };
-  check();return{asset,check};
+  check();
+  return { asset, check };
 }
 
 export class AssetStore {
-  readonly fonts:FontSourceStore;
-  constructor(options:{fontSources?:ConstructorParameters<typeof FontSourceStore>[0]}={}){this.fonts=new FontSourceStore(options.fontSources);}
+  readonly fonts: FontSourceStore;
+  constructor(
+    options: {
+      fontSources?: ConstructorParameters<typeof FontSourceStore>[0];
+    } = {},
+  ) {
+    this.fonts = new FontSourceStore(options.fontSources);
+  }
   readonly metadata = new MetadataService();
   readonly analysis = new AnalysisService();
   private assets = new Map<string, ImageAsset>();
-  private floatAssets=new Set<string>();
-  get hasFloatAssets(){return this.floatAssets.size>0;}
+  private floatAssets = new Set<string>();
+  get hasFloatAssets() {
+    return this.floatAssets.size > 0;
+  }
   private generation = 0;
   private pending = new Set<string>();
   private disposed = false;
   private shared = new Map<string, SharedBitmap>();
   private assertOpen() {
-    if (this.disposed) throw new Error('The asset store is disposed.');
+    if (this.disposed) throw new Error("The asset store is disposed.");
   }
   /** Guards asynchronous ownership transfers against disposal of their target store. */
   captureLifetime(): () => void {
@@ -98,10 +154,12 @@ export class AssetStore {
 
   install(asset: ImageAsset, analyzeMetadata = true): ImageAsset {
     this.assertOpen();
-    if (this.assets.has(asset.id) || this.pending.has(asset.id)) throw new Error("Duplicate asset ID.");
-    if (sharedRecords.has(asset)) throw new Error('Use shareTo for a borrowed shared asset.');
+    if (this.assets.has(asset.id) || this.pending.has(asset.id))
+      throw new Error("Duplicate asset ID.");
+    if (sharedRecords.has(asset))
+      throw new Error("Use shareTo for a borrowed shared asset.");
     this.assets.set(asset.id, asset);
-    if(isFloatAsset(asset))this.floatAssets.add(asset.id);
+    if (isFloatAsset(asset)) this.floatAssets.add(asset.id);
     if (analyzeMetadata) {
       this.metadata.analyze(asset.id, {
         blob: asset.blob,
@@ -115,48 +173,125 @@ export class AssetStore {
 
   /** Headless adapter only, after validating the complete encoded image.
    * Pixel access must use that host's decoder. No ImageBitmap is fabricated. */
-  installEncoded(input:Omit<ImageAsset,'bitmap'|'thumbnail'>):ImageAsset{
-    if(input.blob.type!=='image/png'||!Number.isSafeInteger(input.width)||!Number.isSafeInteger(input.height)||input.width<=0||input.height<=0||!Number.isSafeInteger(input.width*input.height*4))throw new Error('Invalid encoded PNG asset geometry.');
-    const asset:ImageAsset=Object.freeze({...input,...(input.raw?{raw:ownRawSource(input.raw)}:{}),thumbnail:'',get bitmap():ImageBitmap{throw new Error('This encoded image has no browser bitmap. Use the headless pixel decoder.');}});
-    encodedRecords.add(asset);return this.install(asset,false);
+  installEncoded(input: Omit<ImageAsset, "bitmap" | "thumbnail">): ImageAsset {
+    if (
+      input.blob.type !== "image/png" ||
+      !Number.isSafeInteger(input.width) ||
+      !Number.isSafeInteger(input.height) ||
+      input.width <= 0 ||
+      input.height <= 0 ||
+      !Number.isSafeInteger(input.width * input.height * 4)
+    )
+      throw new Error("Invalid encoded PNG asset geometry.");
+    const asset: ImageAsset = Object.freeze({
+      ...input,
+      ...(input.raw ? { raw: ownRawSource(input.raw) } : {}),
+      thumbnail: "",
+      get bitmap(): ImageBitmap {
+        throw new Error(
+          "This encoded image has no browser bitmap. Use the headless pixel decoder.",
+        );
+      },
+    });
+    encodedRecords.add(asset);
+    return this.install(asset, false);
   }
 
   /** Trusted encoded host only, after validating the complete original, native
    * samples and bounded sRGB PNG thumbnail. No browser bitmap is fabricated. */
-  installEncodedTiff(input:Omit<ImageAsset,'bitmap'>):ImageAsset{
-    const tiff=Object.freeze(tiffDecodeOptionsSchema.parse(input.tiff)),color=tiffFloatColorSchema.parse(input.tiffColor);
-    if(input.blob.type!=='image/tiff'||tiff.editingPrecision!=='float32'||color.wasmSha256!==FLOAT_SOURCE_NATIVE_SHA||input.raw||input.avif||![input.width,input.height].every(value=>Number.isSafeInteger(value)&&value>0)||!Number.isSafeInteger(input.width*input.height*4)||typeof input.thumbnail!=='string'||!input.thumbnail.startsWith('data:image/png;base64,')||input.thumbnail.length>(96*96*8+65536)*2)throw new Error('A verified native float TIFF and bounded encoded preview are required.');
-    Object.freeze(color.source);Object.freeze(color.warnings);Object.freeze(color);
-    const asset:ImageAsset=Object.freeze({...input,tiff,tiffColor:color,get bitmap():ImageBitmap{throw new Error('This native TIFF has no browser bitmap. Use its verified float source service.');}});
-    encodedRecords.add(asset);return this.install(asset,false);
+  installEncodedTiff(input: Omit<ImageAsset, "bitmap">): ImageAsset {
+    const tiff = Object.freeze(tiffDecodeOptionsSchema.parse(input.tiff)),
+      color = tiffFloatColorSchema.parse(input.tiffColor);
+    if (
+      input.blob.type !== "image/tiff" ||
+      tiff.editingPrecision !== "float32" ||
+      color.wasmSha256 !== FLOAT_SOURCE_NATIVE_SHA ||
+      input.raw ||
+      input.avif ||
+      ![input.width, input.height].every(
+        (value) => Number.isSafeInteger(value) && value > 0,
+      ) ||
+      !Number.isSafeInteger(input.width * input.height * 4) ||
+      typeof input.thumbnail !== "string" ||
+      !input.thumbnail.startsWith("data:image/png;base64,") ||
+      input.thumbnail.length > (96 * 96 * 8 + 65536) * 2
+    )
+      throw new Error(
+        "A verified native float TIFF and bounded encoded preview are required.",
+      );
+    Object.freeze(color.source);
+    Object.freeze(color.warnings);
+    Object.freeze(color);
+    const asset: ImageAsset = Object.freeze({
+      ...input,
+      tiff,
+      tiffColor: color,
+      get bitmap(): ImageBitmap {
+        throw new Error(
+          "This native TIFF has no browser bitmap. Use its verified float source service.",
+        );
+      },
+    });
+    encodedRecords.add(asset);
+    return this.install(asset, false);
   }
 
   /** Explicit shared ownership; returned records/bitmap are borrowed and immutable.
    * Ordinary install continues to adopt a caller-owned bitmap without sharing it. */
-  shareTo(destination: AssetStore, assetId: string, sharedId = id()): Readonly<ImageAsset> {
+  shareTo(
+    destination: AssetStore,
+    assetId: string,
+    sharedId = id(),
+  ): Readonly<ImageAsset> {
     this.assertOpen();
     destination.assertOpen();
-    if (typeof sharedId !== 'string' || !sharedId || sharedId.length > 240) throw new Error('A shared asset requires an ID of 1–240 characters.');
-    if (this.pending.has(assetId)) throw new Error('The source image import has not finished.');
-    const source = this.get(assetId), bitmap = source.bitmap;
-    if (source.id !== assetId || !Number.isSafeInteger(source.width) || !Number.isSafeInteger(source.height) ||
-        source.width <= 0 || source.height <= 0 || !assetBitmapMatches(source))
-      throw new Error('The source bitmap or its original dimensions changed.');
+    if (typeof sharedId !== "string" || !sharedId || sharedId.length > 240)
+      throw new Error("A shared asset requires an ID of 1–240 characters.");
+    if (this.pending.has(assetId))
+      throw new Error("The source image import has not finished.");
+    const source = this.get(assetId),
+      bitmap = source.bitmap;
+    if (
+      source.id !== assetId ||
+      !Number.isSafeInteger(source.width) ||
+      !Number.isSafeInteger(source.height) ||
+      source.width <= 0 ||
+      source.height <= 0 ||
+      !assetBitmapMatches(source)
+    )
+      throw new Error("The source bitmap or its original dimensions changed.");
     if (destination === this && sharedId === assetId) return source;
-    if (destination.assets.has(sharedId) || destination.pending.has(sharedId)) throw new Error('Duplicate asset ID.');
+    if (destination.assets.has(sharedId) || destination.pending.has(sharedId))
+      throw new Error("Duplicate asset ID.");
     let lease = this.shared.get(assetId);
-    if (lease && lease.bitmap !== bitmap) throw new Error('The shared source bitmap changed.');
+    if (lease && lease.bitmap !== bitmap)
+      throw new Error("The shared source bitmap changed.");
     const copy: ImageAsset = Object.freeze({
-      id: sharedId, name: source.name, width: source.width, height: source.height,
-      blob: source.blob, bitmap, thumbnail: source.thumbnail,
-      ...(source.tiff ? {tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff)),...(source.tiffColor?{tiffColor:source.tiffColor}:{})} : {}),
-      ...(source.avif ? {avif: Object.freeze(avifDecodeOptionsSchema.parse(source.avif)),avifReport:source.avifReport} : {}),
-      ...(source.raw ? {raw:ownRawSource(source.raw)} : {}),
+      id: sharedId,
+      name: source.name,
+      width: source.width,
+      height: source.height,
+      blob: source.blob,
+      bitmap,
+      thumbnail: source.thumbnail,
+      ...(source.tiff
+        ? {
+            tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff)),
+            ...(source.tiffColor ? { tiffColor: source.tiffColor } : {}),
+          }
+        : {}),
+      ...(source.avif
+        ? {
+            avif: Object.freeze(avifDecodeOptionsSchema.parse(source.avif)),
+            avifReport: source.avifReport,
+          }
+        : {}),
+      ...(source.raw ? { raw: ownRawSource(source.raw) } : {}),
     });
-    lease ??= {bitmap, owners: 1};
+    lease ??= { bitmap, owners: 1 };
     this.shared.set(assetId, lease);
     destination.assets.set(sharedId, copy);
-    if(isFloatAsset(copy))destination.floatAssets.add(sharedId);
+    if (isFloatAsset(copy)) destination.floatAssets.add(sharedId);
     destination.shared.set(sharedId, lease);
     sharedRecords.add(source);
     sharedRecords.add(copy);
@@ -165,8 +300,24 @@ export class AssetStore {
   }
 
   /** Trusted readonly precision lease, independent of this store's bitmap lifetime. */
-  captureFloatSource(assetId:string,output:ColorOutput={profile:'linear-srgb'}):FloatRasterSource{
-    this.assertOpen();const asset=this.get(assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Choose a retained unsigned 16-bit or float32 TIFF source; byte proxies are not precision sources.');return FloatRasterSource.capture(asset.blob,asset.width,asset.height,asset.tiff,asset.tiffColor.source,output);
+  captureFloatSource(
+    assetId: string,
+    output: ColorOutput = { profile: "linear-srgb" },
+  ): FloatRasterSource {
+    this.assertOpen();
+    const asset = this.get(assetId);
+    if (!asset.tiff || !asset.tiffColor)
+      throw new Error(
+        "Choose a retained unsigned 16-bit or float32 TIFF source; byte proxies are not precision sources.",
+      );
+    return FloatRasterSource.capture(
+      asset.blob,
+      asset.width,
+      asset.height,
+      asset.tiff,
+      asset.tiffColor.source,
+      output,
+    );
   }
 
   async add(
@@ -178,17 +329,46 @@ export class AssetStore {
   ): Promise<ImageAsset> {
     this.assertOpen();
     options.signal?.throwIfAborted();
-    if (!["image/png", "image/jpeg", "image/webp", "image/tiff", "image/avif"].includes(blob.type))
+    if (
+      ![
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/tiff",
+        "image/avif",
+      ].includes(blob.type)
+    )
       throw new Error("Use a PNG, JPEG, WebP, supported TIFF or AVIF image.");
-    if(options.tiff!==undefined&&blob.type!=='image/tiff')throw new Error('TIFF decoding settings require a TIFF source.');
-    if(options.avif!==undefined&&blob.type!=='image/avif')throw new Error('AVIF decoding settings require an AVIF source.');
-    const current=this.captureLifetime(),check=()=>{current();options.signal?.throwIfAborted();};
-    const raw=options.raw?await verifyRawSource(options.raw,blob,undefined,undefined,check):undefined;
-    const tiff=blob.type==='image/tiff'?Object.freeze(tiffDecodeOptionsSchema.parse(options.tiff??{})):undefined;
-    const avif=blob.type==='image/avif'?Object.freeze(avifDecodeOptionsSchema.parse(options.avif??{})):undefined;
-    if(!avif){
-      const current=this.captureLifetime(),check=()=>{current();options.signal?.throwIfAborted();};
-      if(await hasAvifBrand(blob,check))throw new Error('AVIF source bytes require image/avif and explicit AVIF decoding choices.');
+    if (options.tiff !== undefined && blob.type !== "image/tiff")
+      throw new Error("TIFF decoding settings require a TIFF source.");
+    if (options.avif !== undefined && blob.type !== "image/avif")
+      throw new Error("AVIF decoding settings require an AVIF source.");
+    const current = this.captureLifetime(),
+      check = () => {
+        current();
+        options.signal?.throwIfAborted();
+      };
+    const raw = options.raw
+      ? await verifyRawSource(options.raw, blob, undefined, undefined, check)
+      : undefined;
+    const tiff =
+      blob.type === "image/tiff"
+        ? Object.freeze(tiffDecodeOptionsSchema.parse(options.tiff ?? {}))
+        : undefined;
+    const avif =
+      blob.type === "image/avif"
+        ? Object.freeze(avifDecodeOptionsSchema.parse(options.avif ?? {}))
+        : undefined;
+    if (!avif) {
+      const current = this.captureLifetime(),
+        check = () => {
+          current();
+          options.signal?.throwIfAborted();
+        };
+      if (await hasAvifBrand(blob, check))
+        throw new Error(
+          "AVIF source bytes require image/avif and explicit AVIF decoding choices.",
+        );
       check();
     }
     if (this.assets.has(assetId) || this.pending.has(assetId))
@@ -196,27 +376,83 @@ export class AssetStore {
     const generation = this.generation;
     this.pending.add(assetId);
     let bitmap!: ImageBitmap;
-    let nativeFloat:{width:number;height:number}|undefined;
-    let avifReport:Readonly<AvifImportReport>|undefined;
-    let tiffColor:Readonly<TiffFloatColor>|undefined;
+    let nativeFloat: { width: number; height: number } | undefined;
+    let avifReport: Readonly<AvifImportReport> | undefined;
+    let tiffColor: Readonly<TiffFloatColor> | undefined;
     try {
-      let decoded=blob;
-      if(tiff){
-        if(typeof createImageBitmap==='undefined')throw new Error('TIFF source pixels require the browser image host.');const control={signal:options.signal,onProgress:(p:import('./interchange/tiff/types').TiffImportProgress)=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}};
-        if(tiff.editingPrecision==='float32'){const{prepareFloatAsset}=await import('../engine/float-asset'),result=await prepareFloatAsset(blob,tiff,control);bitmap=result.bitmap;nativeFloat={width:result.width,height:result.height};tiffColor=result.color;}
-        else{const result=await decodeTiffFile(blob,tiff,control);decoded=result.png;if(result.color){Object.freeze(result.color.source);Object.freeze(result.color.warnings);tiffColor=Object.freeze(result.color);}}
+      let decoded = blob;
+      if (tiff) {
+        if (typeof createImageBitmap === "undefined")
+          throw new Error("TIFF source pixels require the browser image host.");
+        const control = {
+          signal: options.signal,
+          onProgress: (
+            p: import("./interchange/tiff/types").TiffImportProgress,
+          ) => {
+            if (generation !== this.generation)
+              throw new Error("The asset store changed during import.");
+            options.onProgress?.(p);
+          },
+        };
+        if (tiff.editingPrecision === "float32") {
+          const { prepareFloatAsset } = await import("../engine/float-asset"),
+            result = await prepareFloatAsset(blob, tiff, control);
+          bitmap = result.bitmap;
+          nativeFloat = { width: result.width, height: result.height };
+          tiffColor = result.color;
+        } else {
+          const result = await decodeTiffFile(blob, tiff, control);
+          decoded = result.png;
+          if (result.color) {
+            Object.freeze(result.color.source);
+            Object.freeze(result.color.warnings);
+            tiffColor = Object.freeze(result.color);
+          }
+        }
       }
-      if(avif){
-        if(typeof createImageBitmap==='undefined')throw new Error('AVIF source pixels require the browser image host.');
-        const result=await decodeAvifFile(blob,avif,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}});
-        decoded=result.png;Object.freeze(result.report.crop);Object.freeze(result.report.color);Object.freeze(result.report.warnings);Object.freeze(result.report.unsupported);avifReport=Object.freeze(result.report);
+      if (avif) {
+        if (typeof createImageBitmap === "undefined")
+          throw new Error("AVIF source pixels require the browser image host.");
+        const result = await decodeAvifFile(blob, avif, {
+          signal: options.signal,
+          onProgress: (p) => {
+            if (generation !== this.generation)
+              throw new Error("The asset store changed during import.");
+            options.onProgress?.(p);
+          },
+        });
+        decoded = result.png;
+        Object.freeze(result.report.crop);
+        Object.freeze(result.report.color);
+        Object.freeze(result.report.warnings);
+        Object.freeze(result.report.unsupported);
+        avifReport = Object.freeze(result.report);
       }
       options.signal?.throwIfAborted();
-      if(nativeFloat){/* The display-only bitmap was prepared from original float samples. */}
-      else if (typeof createImageBitmap !== "undefined") {
+      if (nativeFloat) {
+        /* The display-only bitmap was prepared from original float samples. */
+      } else if (typeof createImageBitmap !== "undefined") {
         bitmap = await createImageBitmap(decoded);
-        if(raw&&(bitmap.width!==raw.report.displayWidth||bitmap.height!==raw.report.displayHeight)){bitmap.close();throw new Error('Decoded RAW working bitmap differs from its accepted dimensions.');}
-        if(avifReport&&(bitmap.width!==avifReport.displayWidth||bitmap.height!==avifReport.displayHeight)){bitmap.close();throw new Error('Decoded AVIF bitmap dimensions differ from the inspected presentation.');}
+        if (
+          raw &&
+          (bitmap.width !== raw.report.displayWidth ||
+            bitmap.height !== raw.report.displayHeight)
+        ) {
+          bitmap.close();
+          throw new Error(
+            "Decoded RAW working bitmap differs from its accepted dimensions.",
+          );
+        }
+        if (
+          avifReport &&
+          (bitmap.width !== avifReport.displayWidth ||
+            bitmap.height !== avifReport.displayHeight)
+        ) {
+          bitmap.close();
+          throw new Error(
+            "Decoded AVIF bitmap dimensions differ from the inspected presentation.",
+          );
+        }
       } else {
         bitmap = {
           width: 512,
@@ -225,9 +461,9 @@ export class AssetStore {
         } as unknown as ImageBitmap;
       }
     } catch (error) {
-      if(nativeFloat)bitmap.close();
+      if (nativeFloat) bitmap.close();
       this.pending.delete(assetId);
-      if(tiff||avif||options.signal?.aborted)throw error;
+      if (tiff || avif || options.signal?.aborted) throw error;
       throw new Error(
         "The browser could not decode this image. Check the file format and available device memory.",
       );
@@ -255,17 +491,17 @@ export class AssetStore {
       const asset: ImageAsset = {
         id: assetId,
         name,
-        width: nativeFloat?.width??bitmap!.width,
-        height: nativeFloat?.height??bitmap!.height,
+        width: nativeFloat?.width ?? bitmap!.width,
+        height: nativeFloat?.height ?? bitmap!.height,
         blob,
         bitmap,
         thumbnail: thumbnailDataUrl,
-        ...(tiff?{tiff,...(tiffColor?{tiffColor}:{})}:{}),
-        ...(avif?{avif,avifReport}:{}),
-        ...(raw?{raw}:{}),
+        ...(tiff ? { tiff, ...(tiffColor ? { tiffColor } : {}) } : {}),
+        ...(avif ? { avif, avifReport } : {}),
+        ...(raw ? { raw } : {}),
       };
       this.assets.set(assetId, asset);
-      if(isFloatAsset(asset))this.floatAssets.add(assetId);
+      if (isFloatAsset(asset)) this.floatAssets.add(assetId);
       published = asset;
       if (analyzeMetadata)
         this.metadata.analyze(assetId, {
@@ -275,14 +511,18 @@ export class AssetStore {
           height: asset.height,
         });
       if (generation !== this.generation || this.assets.get(assetId) !== asset)
-        throw new Error('The asset store changed during import.');
+        throw new Error("The asset store changed during import.");
       return asset;
     } catch (error) {
       if (!published) bitmap.close();
       else if (this.assets.get(assetId) === published) {
         this.assets.delete(assetId);
         this.release(assetId, published);
-        try { this.metadata.remove(assetId); } catch { /* Preserve the import error after releasing its image. */ }
+        try {
+          this.metadata.remove(assetId);
+        } catch {
+          /* Preserve the import error after releasing its image. */
+        }
       }
       throw error;
     } finally {
@@ -292,7 +532,7 @@ export class AssetStore {
 
   private release(assetId: string, asset: ImageAsset) {
     this.floatAssets.delete(assetId);
-    if(encodedRecords.has(asset))return;
+    if (encodedRecords.has(asset)) return;
     const lease = this.shared.get(assetId);
     this.shared.delete(assetId);
     if (!lease) asset.bitmap.close();
@@ -300,8 +540,9 @@ export class AssetStore {
   }
 
   remove(assetId: string) {
-    try { this.metadata.remove(assetId); }
-    finally {
+    try {
+      this.metadata.remove(assetId);
+    } finally {
       const asset = this.assets.get(assetId);
       if (asset) {
         this.assets.delete(assetId);
@@ -315,13 +556,25 @@ export class AssetStore {
     this.disposed = true;
     this.generation++;
     let failure: unknown;
-    try { this.metadata.dispose(); } catch (error) { failure = error; }
+    try {
+      this.metadata.dispose();
+    } catch (error) {
+      failure = error;
+    }
     for (const [assetId, asset] of this.assets) {
       this.assets.delete(assetId);
-      try { this.release(assetId, asset); } catch (error) { failure ??= error; }
+      try {
+        this.release(assetId, asset);
+      } catch (error) {
+        failure ??= error;
+      }
     }
     this.assets.clear();
-    try{this.fonts.dispose();}catch(error){failure??=error;}
+    try {
+      this.fonts.dispose();
+    } catch (error) {
+      failure ??= error;
+    }
     if (failure) throw failure;
   }
 }

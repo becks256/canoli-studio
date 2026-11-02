@@ -627,78 +627,155 @@ test("developer docs link, anchors and documented scripts work in the actual san
   // These snippets require a retained RAW original or a trusted host, rather
   // than the generic sample/isolated context. Their dedicated suites execute
   // the exact guide snippets with those prerequisites and verify real output.
-  const contextualExamples:Record<string,string> = {
-    'font-relink-trusted':'tests/font-lifetime.e2e.ts',
-    'raw-shooting-metadata':'tests/raw-shooting.e2e.ts',
-    'raw-lens-development':'tests/raw-lens.e2e.ts',
-    'raw-profile-development':'tests/raw-profile.e2e.ts',
-    'raw-isolated-development':'tests/raw-scripting.e2e.ts',
-    'raw-development-recipe':'tests/raw-recipes.e2e.ts',
-    'raw-native-batch':'tests/raw-batch.e2e.ts',
-    'artwork-library-trusted':'tests/artwork-library.e2e.ts',
+  const contextualExamples: Record<string, string> = {
+    "font-relink-trusted": "tests/font-lifetime.e2e.ts",
+    "raw-shooting-metadata": "tests/raw-shooting.e2e.ts",
+    "raw-lens-development": "tests/raw-lens.e2e.ts",
+    "raw-profile-development": "tests/raw-profile.e2e.ts",
+    "raw-isolated-development": "tests/raw-scripting.e2e.ts",
+    "raw-development-recipe": "tests/raw-recipes.e2e.ts",
+    "raw-native-batch": "tests/raw-batch.e2e.ts",
+    "artwork-library-trusted": "tests/artwork-library.e2e.ts",
   };
   expect(examples.length).toBeGreaterThanOrEqual(8);
-  for (const [name,suite] of Object.entries(contextualExamples)) {
-    expect(examples.some(example=>example[1]===name),name).toBe(true);
-    expect(await readFile(suite,'utf8'),suite).toContain(`example: ${name}`);
+  for (const [name, suite] of Object.entries(contextualExamples)) {
+    expect(
+      examples.some((example) => example[1] === name),
+      name,
+    ).toBe(true);
+    expect(await readFile(suite, "utf8"), suite).toContain(`example: ${name}`);
   }
   for (const [, name, code] of examples) {
     if (contextualExamples[name]) continue;
-    const fixture = ({
-      "tiff-import-edit": "tests/fixtures/tiff/rgba-1.tif",
-      "photoshop-import-edit": "tests/fixtures/psd/masks/black-raw.psd",
-      "photoshop-mask-edit": "tests/fixtures/psd/masks/black-raw.psd",
-      "photoshop-group-edit": "tests/fixtures/psd/groups/normal.psd",
-      "embedded-font-axes": "tests/fixtures/font-variations/Axes.ttf",
-      "embedded-font-script": "tests/fixtures/fonts/Regular.ttf",
-    } as Record<string, string>)[name];
-    const bytes = fixture ? [...await readFile(fixture)] : null;
-    const needsFixture = Boolean(fixture) || ['wet-prepared','wet-mask-prepared','frequency-shared-radius'].includes(name);
-    const result = await page.evaluate(async ({ code, fixture, bytes, name, needsFixture }) => {
-      const e = window.luma.editor;
-      if (['wet-prepared','wet-mask-prepared'].includes(name)) {
-        const { encodeRgbaPng } = await import(/* @vite-ignore */ String('/src/engine/png.ts'));
-        e.newDocument({ width: 16, height: 16 });
-        for (const [title, rgba] of [['Wet output', [255, 0, 0, 128]], ['Wet coverage', [255, 255, 255, 255]]] as const) {
-          const asset = await e.assetStore.add(await encodeRgbaPng(Uint8Array.from(rgba), 1, 1), title, undefined, false);
-          e.document.layers.add(new window.luma.RasterLayer({ name: title, assetId: asset.id, width: 1, height: 1, visible: false }));
-        }
-      } else if(name==='text-explicit-reflow') {
-        e.newDocument({width:480,height:320});
-        e.document.selectedLayer=e.document.layers.add(new window.luma.TextLayer({text:'Reflow fixture',fontFamily:'serif',fontSize:32}));
-      } else if (bytes && fixture?.endsWith('.ttf')) {
-        e.newDocument({width:480,height:320});
-        const font=await e.document.fonts.embed(new File([new Uint8Array(bytes)],fixture));
-        e.document.selectedLayer=e.document.layers.add(new window.luma.TextLayer({text:'AAAA',fontFamily:font.family,fontSize:40}));
-      } else if (bytes && fixture?.endsWith(".tif"))
-        await e.openTiff(new File([new Uint8Array(bytes)], fixture, {type:"image/tiff"}));
-      else if (bytes)
-        await e.openPsd(new Uint8Array(bytes), {mode:"layered"});
-      else await e.openSample();
-      if (name === 'frequency-shared-radius') {
-        await e.separateFrequencies(e.document.selectedLayer!.id, {sigma:2});
-        await e.editSmartObject(e.document.selectedLayer as import('../src/dom').SmartObjectLayer);
-        const group = e.document.layers.at(0);
-        if (!(group instanceof window.luma.LayerGroup)) throw new Error('Missing frequency fixture group.');
-        e.document.selectedLayer = group.layers.at(2)!;
-      }
-      const before = JSON.stringify(e.document.toJSON());
-      const sources = async () => Promise.all(e.assetStore.values().map(async asset =>
-        [asset.id, [...new Uint8Array(await crypto.subtle.digest("SHA-256", await asset.blob.arrayBuffer()))]]));
-      const originalSources = needsFixture ? await sources() : null;
-      try {
-        const logs = await e.runScript(code);
-        if (needsFixture) {
-          const edited = before !== JSON.stringify(e.document.toJSON());
-          e.document.undo();
-          return {logs, edited, exactUndo:before === JSON.stringify(e.document.toJSON()),
-            sameSources:JSON.stringify(originalSources) === JSON.stringify(await sources())};
-        }
-        return { logs };
-      } catch (error) {
-        return { error: (error as Error).message };
-      }
-    }, {code, fixture, bytes, name, needsFixture}).catch(error=>{throw new Error(`Documented example ${name}: ${error.message}`);});
+    const fixture = (
+      {
+        "tiff-import-edit": "tests/fixtures/tiff/rgba-1.tif",
+        "photoshop-import-edit": "tests/fixtures/psd/masks/black-raw.psd",
+        "photoshop-mask-edit": "tests/fixtures/psd/masks/black-raw.psd",
+        "photoshop-group-edit": "tests/fixtures/psd/groups/normal.psd",
+        "embedded-font-axes": "tests/fixtures/font-variations/Axes.ttf",
+        "embedded-font-script": "tests/fixtures/fonts/Regular.ttf",
+      } as Record<string, string>
+    )[name];
+    const bytes = fixture ? [...(await readFile(fixture))] : null;
+    const needsFixture =
+      Boolean(fixture) ||
+      ["wet-prepared", "wet-mask-prepared", "frequency-shared-radius"].includes(
+        name,
+      );
+    const result = await page
+      .evaluate(
+        async ({ code, fixture, bytes, name, needsFixture }) => {
+          const e = window.luma.editor;
+          if (["wet-prepared", "wet-mask-prepared"].includes(name)) {
+            const { encodeRgbaPng } = await import(
+              /* @vite-ignore */ String("/src/engine/png.ts")
+            );
+            e.newDocument({ width: 16, height: 16 });
+            for (const [title, rgba] of [
+              ["Wet output", [255, 0, 0, 128]],
+              ["Wet coverage", [255, 255, 255, 255]],
+            ] as const) {
+              const asset = await e.assetStore.add(
+                await encodeRgbaPng(Uint8Array.from(rgba), 1, 1),
+                title,
+                undefined,
+                false,
+              );
+              e.document.layers.add(
+                new window.luma.RasterLayer({
+                  name: title,
+                  assetId: asset.id,
+                  width: 1,
+                  height: 1,
+                  visible: false,
+                }),
+              );
+            }
+          } else if (name === "text-explicit-reflow") {
+            e.newDocument({ width: 480, height: 320 });
+            e.document.selectedLayer = e.document.layers.add(
+              new window.luma.TextLayer({
+                text: "Reflow fixture",
+                fontFamily: "serif",
+                fontSize: 32,
+              }),
+            );
+          } else if (bytes && fixture?.endsWith(".ttf")) {
+            e.newDocument({ width: 480, height: 320 });
+            const font = await e.document.fonts.embed(
+              new File([new Uint8Array(bytes)], fixture),
+            );
+            e.document.selectedLayer = e.document.layers.add(
+              new window.luma.TextLayer({
+                text: "AAAA",
+                fontFamily: font.family,
+                fontSize: 40,
+              }),
+            );
+          } else if (bytes && fixture?.endsWith(".tif"))
+            await e.openTiff(
+              new File([new Uint8Array(bytes)], fixture, {
+                type: "image/tiff",
+              }),
+            );
+          else if (bytes)
+            await e.openPsd(new Uint8Array(bytes), { mode: "layered" });
+          else await e.openSample();
+          if (name === "frequency-shared-radius") {
+            await e.separateFrequencies(e.document.selectedLayer!.id, {
+              sigma: 2,
+            });
+            await e.editSmartObject(
+              e.document.selectedLayer as import("../src/dom").SmartObjectLayer,
+            );
+            const group = e.document.layers.at(0);
+            if (!(group instanceof window.luma.LayerGroup))
+              throw new Error("Missing frequency fixture group.");
+            e.document.selectedLayer = group.layers.at(2)!;
+          }
+          const before = JSON.stringify(e.document.toJSON());
+          const sources = async () =>
+            Promise.all(
+              e.assetStore
+                .values()
+                .map(async (asset) => [
+                  asset.id,
+                  [
+                    ...new Uint8Array(
+                      await crypto.subtle.digest(
+                        "SHA-256",
+                        await asset.blob.arrayBuffer(),
+                      ),
+                    ),
+                  ],
+                ]),
+            );
+          const originalSources = needsFixture ? await sources() : null;
+          try {
+            const logs = await e.runScript(code);
+            if (needsFixture) {
+              const edited = before !== JSON.stringify(e.document.toJSON());
+              e.document.undo();
+              return {
+                logs,
+                edited,
+                exactUndo: before === JSON.stringify(e.document.toJSON()),
+                sameSources:
+                  JSON.stringify(originalSources) ===
+                  JSON.stringify(await sources()),
+              };
+            }
+            return { logs };
+          } catch (error) {
+            return { error: (error as Error).message };
+          }
+        },
+        { code, fixture, bytes, name, needsFixture },
+      )
+      .catch((error) => {
+        throw new Error(`Documented example ${name}: ${error.message}`);
+      });
     expect(result.error, name).toBeUndefined();
     if (needsFixture) {
       expect(result.edited, name).toBe(true);
@@ -708,43 +785,78 @@ test("developer docs link, anchors and documented scripts work in the actual san
   }
 });
 
-test("dense Pen hit testing avoids point copies and preserves preview, cancellation and undo", async ({page}) => {
+test("dense Pen hit testing avoids point copies and preserves preview, cancellation and undo", async ({
+  page,
+}) => {
   await page.goto("/");
-  await page.getByRole("button",{name:"Move tool (V)",exact:true}).click();
-  await page.evaluate(()=>{
-    const {editor,VectorLayer,VectorPath}=window.luma;
-    editor.newDocument({width:800,height:600});
-    const layer=editor.document.layers.add(new VectorLayer());
-    layer.paths.add(new VectorPath({points:Array.from({length:8000},(_,i)=>({x:20+i%20*30,y:20+Math.floor(i/20)*30}))}));
-    editor.document.selectedLayer=layer;
-    const descriptor=Object.getOwnPropertyDescriptor(VectorPath.prototype,"points")!;
-    (window as any).pointReads=0;
-    Object.defineProperty(VectorPath.prototype,"points",{...descriptor,get(){(window as any).pointReads++;return descriptor.get!.call(this);}});
+  await page
+    .getByRole("button", { name: "Move tool (V)", exact: true })
+    .click();
+  await page.evaluate(() => {
+    const { editor, VectorLayer, VectorPath } = window.luma;
+    editor.newDocument({ width: 800, height: 600 });
+    const layer = editor.document.layers.add(new VectorLayer());
+    layer.paths.add(
+      new VectorPath({
+        points: Array.from({ length: 8000 }, (_, i) => ({
+          x: 20 + (i % 20) * 30,
+          y: 20 + Math.floor(i / 20) * 30,
+        })),
+      }),
+    );
+    editor.document.selectedLayer = layer;
+    const descriptor = Object.getOwnPropertyDescriptor(
+      VectorPath.prototype,
+      "points",
+    )!;
+    (window as any).pointReads = 0;
+    Object.defineProperty(VectorPath.prototype, "points", {
+      ...descriptor,
+      get() {
+        (window as any).pointReads++;
+        return descriptor.get!.call(this);
+      },
+    });
   });
-  await page.getByRole("button",{name:"Vector pen (P)",exact:true}).click();
+  await page
+    .getByRole("button", { name: "Vector pen (P)", exact: true })
+    .click();
   await page.keyboard.press("Control+1");
-  await expect(page.getByText("8000 anchors",{exact:false})).toBeVisible();
-  const box=(await page.locator(".canvas-wrap").boundingBox())!;
-  await page.mouse.move(box.x+590,box.y+290);
+  await expect(page.getByText("8000 anchors", { exact: false })).toBeVisible();
+  const box = (await page.locator(".canvas-wrap").boundingBox())!;
+  await page.mouse.move(box.x + 590, box.y + 290);
   await page.mouse.down();
-  await page.mouse.move(box.x+580,box.y+280);
-  expect(await page.evaluate(()=>{
-    const layer=window.luma.editor.document.getSnapshot().document.children[0];
-    return layer.kind==="vector" ? layer.paths[0].points[199].x : null;
-  })).toBe(590);
+  await page.mouse.move(box.x + 580, box.y + 280);
+  expect(
+    await page.evaluate(() => {
+      const layer =
+        window.luma.editor.document.getSnapshot().document.children[0];
+      return layer.kind === "vector" ? layer.paths[0].points[199].x : null;
+    }),
+  ).toBe(590);
   await page.mouse.up();
-  await expect.poll(()=>page.evaluate(()=>{
-    const layer=window.luma.editor.document.selectedLayer!.toJSON();
-    return layer.kind==="vector" ? layer.paths[0].points[199].x : null;
-  })).toBe(580);
-  expect(await page.evaluate(()=>(window as any).pointReads)).toBe(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const layer = window.luma.editor.document.selectedLayer!.toJSON();
+        return layer.kind === "vector" ? layer.paths[0].points[199].x : null;
+      }),
+    )
+    .toBe(580);
+  expect(await page.evaluate(() => (window as any).pointReads)).toBe(0);
   await page.keyboard.press("Control+z");
-  await expect(page.getByText("8000 anchors",{exact:false})).toBeVisible();
-  const beforeCancel=await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()));
-  await page.mouse.move(box.x+590,box.y+290);
+  await expect(page.getByText("8000 anchors", { exact: false })).toBeVisible();
+  const beforeCancel = await page.evaluate(() =>
+    JSON.stringify(window.luma.editor.document.toJSON()),
+  );
+  await page.mouse.move(box.x + 590, box.y + 290);
   await page.mouse.down();
-  await page.mouse.move(box.x+570,box.y+270);
+  await page.mouse.move(box.x + 570, box.y + 270);
   await page.keyboard.press("Escape");
   await page.mouse.up();
-  expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(beforeCancel);
+  expect(
+    await page.evaluate(() =>
+      JSON.stringify(window.luma.editor.document.toJSON()),
+    ),
+  ).toBe(beforeCancel);
 });

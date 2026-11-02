@@ -118,10 +118,7 @@
   "generatorSha256": "97e9fcf3bc3756e09e785a305a294f49d2a1316404a40972cad23e8a5b0d8318",
   "height": 13,
   "original": {
-    "defectCenter": [
-      128,
-      96
-    ],
+    "defectCenter": [128, 96],
     "defectRadius": 3,
     "height": 193,
     "width": 257

@@ -5,11 +5,7 @@
     "before": {
       "restoreMs": 876.9000000059605,
       "maxFrameGapMs": 356.40000000596046,
-      "longTasks": [
-        289,
-        160,
-        350
-      ],
+      "longTasks": [289, 160, 350],
       "skipped": 0,
       "bytes": 7817311,
       "savedAt": 1791792227737

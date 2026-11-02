@@ -13,20 +13,8 @@
     "document": 22,
     "projectContainer": 3,
     "workspaceSnapshot": 2,
-    "legacyNativeDefaults": [
-      "round",
-      "round",
-      4,
-      [],
-      0
-    ],
-    "svgDefaults": [
-      "butt",
-      "miter",
-      4,
-      [],
-      0
-    ]
+    "legacyNativeDefaults": ["round", "round", 4, [], 0],
+    "svgDefaults": ["butt", "miter", 4, [], 0]
   },
   "implementation": {
     "styles": "Optional cap/join/miter/dash-array/dash-offset records; defensive dash ownership, strict shared path schemas, commands/locks/revisions/undo; OO constructors/setters and all shape factories",
@@ -127,45 +115,14 @@
     "bytes": 212952,
     "sourceBytes": 209602,
     "sourceUnchanged": true,
-    "sourceSize": [
-      10000,
-      5000
-    ],
-    "dimensions": [
-      10000,
-      5000
-    ],
+    "sourceSize": [10000, 5000],
+    "dimensions": [10000, 5000],
     "samples": [
-      [
-        40,
-        60,
-        80,
-        255
-      ],
-      [
-        0,
-        255,
-        0,
-        255
-      ],
-      [
-        40,
-        60,
-        80,
-        255
-      ],
-      [
-        0,
-        255,
-        0,
-        255
-      ],
-      [
-        40,
-        60,
-        80,
-        255
-      ]
+      [40, 60, 80, 255],
+      [0, 255, 0, 255],
+      [40, 60, 80, 255],
+      [0, 255, 0, 255],
+      [40, 60, 80, 255]
     ],
     "tiles": 395,
     "released": true
@@ -751,14 +708,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-round.json": {
       "mode": "round",
@@ -818,14 +769,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-square.json": {
       "mode": "square",
@@ -885,14 +830,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-square-diagonal.json": {
       "mode": "square-diagonal",
@@ -952,14 +891,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        197,
-        195
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [197, 195]
     },
     "canoli-vector-stroke-bevel.json": {
       "mode": "bevel",
@@ -1031,14 +964,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-miter.json": {
       "mode": "miter",
@@ -1110,14 +1037,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        255,
-        255
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [255, 255],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-miter-low.json": {
       "mode": "miter-low",
@@ -1189,14 +1110,8 @@
         "dash": "none",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-dash-even.json": {
       "mode": "dash-even",
@@ -1246,10 +1161,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1259,14 +1171,8 @@
         "dash": "16 8",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-dash-odd.json": {
       "mode": "dash-odd",
@@ -1316,11 +1222,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          12,
-          6,
-          4
-        ],
+        "strokeDashArray": [12, 6, 4],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1330,14 +1232,8 @@
         "dash": "12 6 4",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-dash-zero.json": {
       "mode": "dash-zero",
@@ -1387,10 +1283,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          0,
-          0
-        ],
+        "strokeDashArray": [0, 0],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1400,14 +1293,8 @@
         "dash": "0 0",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-dash-zero-gap.json": {
       "mode": "dash-zero-gap",
@@ -1457,10 +1344,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          0,
-          16
-        ],
+        "strokeDashArray": [0, 16],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1470,14 +1354,8 @@
         "dash": "0 16",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-dash-negative-offset.json": {
       "mode": "dash-negative-offset",
@@ -1527,10 +1405,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": -7
       },
       "attributes": {
@@ -1540,14 +1415,8 @@
         "dash": "16 8",
         "offset": "-7"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-dash-positive-offset.json": {
       "mode": "dash-positive-offset",
@@ -1597,10 +1466,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": 13
       },
       "attributes": {
@@ -1610,14 +1476,8 @@
         "dash": "16 8",
         "offset": "13"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-curve-dash.json": {
       "mode": "curve-dash",
@@ -1679,10 +1539,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1692,14 +1549,8 @@
         "dash": "16 8",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-closed-dash.json": {
       "mode": "closed-dash",
@@ -1773,10 +1624,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1786,14 +1634,8 @@
         "dash": "16 8",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-affine.json": {
       "mode": "affine",
@@ -1843,10 +1685,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1856,14 +1695,8 @@
         "dash": "16 8",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-reset.json": {
       "mode": "reset",
@@ -1913,10 +1746,7 @@
         "strokeCap": "round",
         "strokeJoin": "round",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          16,
-          8
-        ],
+        "strokeDashArray": [16, 8],
         "strokeDashOffset": 0
       },
       "attributes": {
@@ -1926,14 +1756,8 @@
         "dash": "16 8",
         "offset": "0"
       },
-      "miterTip": [
-        0,
-        0
-      ],
-      "squareCorner": [
-        0,
-        0
-      ]
+      "miterTip": [0, 0],
+      "squareCorner": [0, 0]
     },
     "canoli-vector-stroke-ui.json": {
       "styles": {
@@ -1983,11 +1807,7 @@
         "strokeCap": "square",
         "strokeJoin": "miter",
         "strokeMiterLimit": 12,
-        "strokeDashArray": [
-          12,
-          6,
-          4
-        ],
+        "strokeDashArray": [12, 6, 4],
         "strokeDashOffset": -7
       },
       "rejected": true
@@ -1997,45 +1817,14 @@
       "bytes": 212952,
       "sourceBytes": 209602,
       "sourceUnchanged": true,
-      "sourceSize": [
-        10000,
-        5000
-      ],
-      "dimensions": [
-        10000,
-        5000
-      ],
+      "sourceSize": [10000, 5000],
+      "dimensions": [10000, 5000],
       "samples": [
-        [
-          40,
-          60,
-          80,
-          255
-        ],
-        [
-          0,
-          255,
-          0,
-          255
-        ],
-        [
-          40,
-          60,
-          80,
-          255
-        ],
-        [
-          0,
-          255,
-          0,
-          255
-        ],
-        [
-          40,
-          60,
-          80,
-          255
-        ]
+        [40, 60, 80, 255],
+        [0, 255, 0, 255],
+        [40, 60, 80, 255],
+        [0, 255, 0, 255],
+        [40, 60, 80, 255]
       ],
       "tiles": 395,
       "released": true
@@ -2046,12 +1835,7 @@
           "stage": "initial",
           "alpha": 0,
           "premult": 0.4980392156862763,
-          "point": [
-            0,
-            255,
-            0,
-            255
-          ],
+          "point": [0, 255, 0, 255],
           "uploads": 1,
           "changed": true
         },
@@ -2059,12 +1843,7 @@
           "stage": "changed",
           "alpha": 0,
           "premult": 0.4980392156862763,
-          "point": [
-            0,
-            255,
-            0,
-            255
-          ],
+          "point": [0, 255, 0, 255],
           "uploads": 2,
           "changed": true
         },
@@ -2072,12 +1851,7 @@
           "stage": "repeat",
           "alpha": 0,
           "premult": 0.4980392156862763,
-          "point": [
-            0,
-            255,
-            0,
-            255
-          ],
+          "point": [0, 255, 0, 255],
           "uploads": 2,
           "changed": false
         }
@@ -2105,30 +1879,10 @@
       "images": 0,
       "exact": true,
       "samples": [
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          128,
-          64,
-          32,
-          255
-        ],
-        [
-          0,
-          0,
-          0,
-          0
-        ]
+        [128, 64, 32, 255],
+        [0, 0, 0, 0],
+        [128, 64, 32, 255],
+        [0, 0, 0, 0]
       ]
     },
     "canoli-vector-stroke-zero-caps.json": [
@@ -3238,30 +2992,12 @@
       "paths": 6,
       "images": 0,
       "samples": [
-        [
-          255,
-          255
-        ],
-        [
-          255,
-          255
-        ],
-        [
-          0,
-          0
-        ],
-        [
-          255,
-          255
-        ],
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          0
-        ]
+        [255, 255],
+        [255, 255],
+        [0, 0],
+        [255, 255],
+        [0, 0],
+        [0, 0]
       ],
       "interiorErrors": 0,
       "contourErrors": 0,

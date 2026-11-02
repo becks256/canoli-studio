@@ -12,13 +12,13 @@ share this behavior. Vector-mask Pen retains its existing target behavior.
 
 ## Verification
 
-| Check | Result |
-| --- | --- |
-| Full unit/API/native suite, two workers | 3,216 passed, 0 failed, 312 files |
-| Complete affected browser matrix | 52 passed across 5 files; no skips, retries, flakes or runner errors |
-| Normal production workflows | 2 passed; no debug globals |
-| Production build and typecheck | Passed; final application assets compared against the tested build |
-| Default test discovery | Source suite excludes production specs; production suite includes all 16 dedicated files |
+| Check                                   | Result                                                                                   |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Full unit/API/native suite, two workers | 3,216 passed, 0 failed, 312 files                                                        |
+| Complete affected browser matrix        | 52 passed across 5 files; no skips, retries, flakes or runner errors                     |
+| Normal production workflows             | 2 passed; no debug globals                                                               |
+| Production build and typecheck          | Passed; final application assets compared against the tested build                       |
+| Default test discovery                  | Source suite excludes production specs; production suite includes all 16 dedicated files |
 
 The full Vitest suite reused the actual WASM produced by `npm test`/the build.
 The sandboxed `npm test` run failed on blocked loopback listens and subprocesses;

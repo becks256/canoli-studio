@@ -24,39 +24,16 @@
       "sha256": "806d8f024ae85dd626adac4a64434cf990e3a87169a91799faaca6735ba1660a"
     }
   },
-  "latinCoverage": [
-    32,
-    65,
-    86,
-    97,
-    102,
-    105
-  ],
+  "latinCoverage": [32, 65, 86, 97, 102, 105],
   "variableFallback": {
     "coverageChange": "A becomes B, source GID retained",
     "requestedAxes": {
-      "TEST": [
-        25,
-        50,
-        75
-      ],
-      "wght": [
-        300,
-        500,
-        700
-      ]
+      "TEST": [25, 50, 75],
+      "wght": [300, 500, 700]
     },
     "effectiveAxes": {
-      "TEST": [
-        25,
-        50,
-        75
-      ],
-      "wght": [
-        400.0,
-        500,
-        700
-      ]
+      "TEST": [25, 50, 75],
+      "wght": [400.0, 500, 700]
     }
   }
 }

@@ -6,11 +6,18 @@ export interface PsdZipRequest {
   prediction: boolean;
 }
 
-export async function decodePsdZip(request: PsdZipRequest): Promise<Uint8Array> {
+export async function decodePsdZip(
+  request: PsdZipRequest,
+): Promise<Uint8Array> {
   const { bytes, width, rows, prediction } = request;
   const expected = width * rows;
-  if (!Number.isSafeInteger(width) || width < 0 ||
-      !Number.isSafeInteger(rows) || rows < 0 || !Number.isSafeInteger(expected))
+  if (
+    !Number.isSafeInteger(width) ||
+    width < 0 ||
+    !Number.isSafeInteger(rows) ||
+    rows < 0 ||
+    !Number.isSafeInteger(expected)
+  )
     throw new Error("Invalid Photoshop ZIP channel geometry.");
   if (typeof DecompressionStream === "undefined")
     throw new Error("Photoshop ZIP decoding requires native Deflate support.");
@@ -19,7 +26,9 @@ export async function decodePsdZip(request: PsdZipRequest): Promise<Uint8Array> 
   // Own only this compressed range; the caller's complete input stays untouched.
   const output = new Uint8Array(expected);
   const source = new Blob([new Uint8Array(bytes)]).stream();
-  const reader = source.pipeThrough(new DecompressionStream("deflate")).getReader();
+  const reader = source
+    .pipeThrough(new DecompressionStream("deflate"))
+    .getReader();
   let offset = 0;
   try {
     while (true) {
@@ -43,7 +52,8 @@ export async function decodePsdZip(request: PsdZipRequest): Promise<Uint8Array> 
   // including channel boundaries in the planar merged-image stream.
   if (prediction) {
     for (let y = 0; y < rows; y++) {
-      const start = y * width, end = start + width;
+      const start = y * width,
+        end = start + width;
       for (let p = start + 1; p < end; p++) output[p] += output[p - 1];
     }
   }

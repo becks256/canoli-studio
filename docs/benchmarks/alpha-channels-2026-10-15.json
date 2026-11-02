@@ -17,12 +17,7 @@
   "contract": {
     "maximumSavedChannelsPerDocument": 64,
     "storage": "independent existing SelectionData values: Boolean/affine/geometric/native fractional RLE",
-    "loadOperations": [
-      "replace",
-      "add",
-      "subtract",
-      "intersect"
-    ],
+    "loadOperations": ["replace", "add", "subtract", "intersect"],
     "inverseScope": "current document canvas",
     "byteUnion": "max(a,b)",
     "byteSubtract": "round(a*(1-b/255))",
@@ -44,15 +39,7 @@
     "milliseconds": 1187.300000011921,
     "width": 10000,
     "height": 5000,
-    "alpha": [
-      255,
-      255,
-      255,
-      255,
-      0,
-      255,
-      0
-    ],
+    "alpha": [255, 255, 255, 255, 0, 255, 0],
     "progressFirst": {
       "completed": 0,
       "total": 260
@@ -66,10 +53,7 @@
     "projectRestored": true,
     "sourceBytesUnchanged": true
   },
-  "native50MpEarlierObservationsMs": [
-    13450.100000023842,
-    1154.0999999940395
-  ],
+  "native50MpEarlierObservationsMs": [13450.100000023842, 1154.0999999940395],
   "performanceNotes": "The initial geometry-only case took 13.45 seconds before provably disjoint region culling. Later fixtures also retain a real native PNG source and verify project restoration. These individual container observations are not a controlled same-fixture comparison, gesture percentiles or cross-device speed claims. Exact unsimplified-WASM comparisons cover affine holes and intersections followed by additions across native tile boundaries.",
   "existingRealImage50MpRoundTrip": {
     "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,

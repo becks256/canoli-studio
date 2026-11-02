@@ -71,7 +71,9 @@ export function ArtboardDialog({
     try {
       onResize(width, height);
       onClose();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Resize failed."); }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Resize failed.");
+    }
   };
 
   return (
@@ -82,16 +84,26 @@ export function ArtboardDialog({
     >
       <div className="dialog-heading">
         <div>
-          <span className="section-caption">{image ? "IMAGE DIMENSIONS" : "CANVAS & ARTBOARD"}</span>
-          <h2 id="artboard-title">{image ? "Image size" : "Resize artboard"}</h2>
+          <span className="section-caption">
+            {image ? "IMAGE DIMENSIONS" : "CANVAS & ARTBOARD"}
+          </span>
+          <h2 id="artboard-title">
+            {image ? "Image size" : "Resize artboard"}
+          </h2>
         </div>
-        <IconButton label={image ? "Close image size" : "Close resize artboard"} onClick={onClose} autoFocus>
+        <IconButton
+          label={image ? "Close image size" : "Close resize artboard"}
+          onClick={onClose}
+          autoFocus
+        >
           <X size={19} />
         </IconButton>
       </div>
 
       <p className="script-description">
-        {image ? "Scale the canvas and all artwork together. Layers stay editable and original image assets are preserved. Pixel-based effect settings remain unchanged." : "Change canvas dimensions and pixel bounds. Existing artwork and layers preserve their coordinates and contents."}
+        {image
+          ? "Scale the canvas and all artwork together. Layers stay editable and original image assets are preserved. Pixel-based effect settings remain unchanged."
+          : "Change canvas dimensions and pixel bounds. Existing artwork and layers preserve their coordinates and contents."}
       </p>
 
       {error && <p role="alert">{error}</p>}

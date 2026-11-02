@@ -7,19 +7,19 @@ compressed files, model/IDs, registrations/appearance and transport stay unchang
 Full native typography and the original roadmap remain open.
 [Contract and remaining scope](../FLOAT_TEXT.md#complete-compressed-font-preparation-private).
 
-| Verification | Result |
-| --- | --- |
-| Full build and TypeScript | Pass |
-| Full unit/API suite | 3,392 pass across 335 files |
-| One complete affected native-browser run | 66 pass across seven files |
-| Production decoder, shaping and typography run | Seven pass |
-| Independent FontTools 4.51.0 / Brotli 1.2.1 references | 17 sources pass, including four emitted production outputs |
-| Complete outline/composite/instruction comparison | 587 glyphs, 140 composites and 9,810 glyph-instruction bytes match |
-| Untransformed tables / cmap / horizontal metrics | Exact across every independent case |
-| Native selected-font matrix | 72 exact complete-run matches across geometric and full pinned fonts |
-| Resolved substitution control | Original A→composite substitution applies in source shaping; disabled resolved GID paint matches independently disabled original pixels at three sizes |
-| Actual WASM Float32 paint after compressed preparation | Exact independently computed ordered alpha, signed HDR RGB, alpha 1e-8 and all window words |
-| Existing 50 MP RAW/variable text regression | Original identity/dimensions retained; every RGBA sample in the complete 600 × 200 independent text reference region matches; full PNG bytes match the preceding accepted release |
+| Verification                                           | Result                                                                                                                                                                            |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full build and TypeScript                              | Pass                                                                                                                                                                              |
+| Full unit/API suite                                    | 3,392 pass across 335 files                                                                                                                                                       |
+| One complete affected native-browser run               | 66 pass across seven files                                                                                                                                                        |
+| Production decoder, shaping and typography run         | Seven pass                                                                                                                                                                        |
+| Independent FontTools 4.51.0 / Brotli 1.2.1 references | 17 sources pass, including four emitted production outputs                                                                                                                        |
+| Complete outline/composite/instruction comparison      | 587 glyphs, 140 composites and 9,810 glyph-instruction bytes match                                                                                                                |
+| Untransformed tables / cmap / horizontal metrics       | Exact across every independent case                                                                                                                                               |
+| Native selected-font matrix                            | 72 exact complete-run matches across geometric and full pinned fonts                                                                                                              |
+| Resolved substitution control                          | Original A→composite substitution applies in source shaping; disabled resolved GID paint matches independently disabled original pixels at three sizes                            |
+| Actual WASM Float32 paint after compressed preparation | Exact independently computed ordered alpha, signed HDR RGB, alpha 1e-8 and all window words                                                                                       |
+| Existing 50 MP RAW/variable text regression            | Original identity/dimensions retained; every RGBA sample in the complete 600 × 200 independent text reference region matches; full PNG bytes match the preceding accepted release |
 
 Original generated fixtures retain glyph/composite hints, fpgm/prep/cvt/gasp,
 GSUB/GPOS/vertical layout, CFF and variable data. WOFF2 checks include ordinary

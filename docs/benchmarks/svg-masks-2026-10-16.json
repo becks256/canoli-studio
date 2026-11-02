@@ -79,13 +79,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        0,
-        255,
-        0,
-        255,
-        0
-      ],
+      "samples": [0, 255, 0, 255, 0],
       "embedded": 0,
       "vectorMaskPaths": 1,
       "artworkPaths": 1,
@@ -113,13 +107,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        255,
-        0,
-        255,
-        0,
-        255
-      ],
+      "samples": [255, 0, 255, 0, 255],
       "embedded": 0,
       "vectorMaskPaths": 1,
       "artworkPaths": 1,
@@ -147,13 +135,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        102,
-        255,
-        102,
-        255,
-        102
-      ],
+      "samples": [102, 255, 102, 255, 102],
       "embedded": 0,
       "vectorMaskPaths": 1,
       "artworkPaths": 1,
@@ -181,13 +163,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        255,
-        255,
-        255,
-        255,
-        255
-      ],
+      "samples": [255, 255, 255, 255, 255],
       "embedded": 0,
       "vectorMaskPaths": 1,
       "artworkPaths": 1,
@@ -215,13 +191,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        0,
-        255,
-        255,
-        255,
-        0
-      ],
+      "samples": [0, 255, 255, 255, 0],
       "embedded": 0,
       "vectorMaskPaths": 1,
       "artworkPaths": 1,
@@ -249,13 +219,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        0,
-        0,
-        0,
-        255,
-        0
-      ],
+      "samples": [0, 0, 0, 255, 0],
       "embedded": 0,
       "vectorMaskPaths": 1,
       "artworkPaths": 1,
@@ -283,13 +247,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        113,
-        212,
-        212,
-        212,
-        113
-      ],
+      "samples": [113, 212, 212, 212, 113],
       "embedded": 1,
       "vectorMaskPaths": 0,
       "artworkPaths": 1,
@@ -321,13 +279,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        64,
-        64,
-        134,
-        255,
-        64
-      ],
+      "samples": [64, 64, 134, 255, 64],
       "embedded": 1,
       "vectorMaskPaths": 0,
       "artworkPaths": 1,
@@ -359,13 +311,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
+      "samples": [0, 0, 0, 0, 0],
       "embedded": 1,
       "vectorMaskPaths": 0,
       "artworkPaths": 1,
@@ -397,13 +343,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        64,
-        255,
-        160,
-        64,
-        64
-      ],
+      "samples": [64, 255, 160, 64, 64],
       "embedded": 1,
       "vectorMaskPaths": 0,
       "artworkPaths": 1,
@@ -435,13 +375,7 @@
       "maxAlpha": 0,
       "maxPremult": 0,
       "meanAlpha": 0,
-      "samples": [
-        0,
-        255,
-        179,
-        255,
-        0
-      ],
+      "samples": [0, 255, 179, 255, 0],
       "embedded": 1,
       "vectorMaskPaths": 0,
       "artworkPaths": 1,
@@ -628,10 +562,7 @@
       "invoked": true,
       "prepared": 1,
       "released": true,
-      "progress": [
-        0,
-        0.3333333333333333
-      ],
+      "progress": [0, 0.3333333333333333],
       "retry": true,
       "unchanged": true,
       "revision": 3,
@@ -643,10 +574,7 @@
       "invoked": true,
       "prepared": 1,
       "released": true,
-      "progress": [
-        0,
-        0.3333333333333333
-      ],
+      "progress": [0, 0.3333333333333333],
       "retry": false,
       "unchanged": true,
       "revision": 3,
@@ -658,10 +586,7 @@
       "invoked": true,
       "prepared": 1,
       "released": true,
-      "progress": [
-        0,
-        0.3333333333333333
-      ],
+      "progress": [0, 0.3333333333333333],
       "retry": false,
       "unchanged": true,
       "revision": 3,
@@ -673,10 +598,7 @@
       "invoked": true,
       "prepared": 1,
       "released": true,
-      "progress": [
-        0,
-        0.3333333333333333
-      ],
+      "progress": [0, 0.3333333333333333],
       "retry": false,
       "unchanged": true,
       "revision": 3,
@@ -684,32 +606,15 @@
     }
   },
   "native50MpSvgMask": {
-    "dimensions": [
-      "10000",
-      "5000"
-    ],
+    "dimensions": ["10000", "5000"],
     "tileCount": 50,
     "maxTile": 1024,
-    "samples": [
-      64,
-      255,
-      255,
-      64,
-      64,
-      64,
-      255,
-      64,
-      64,
-      64
-    ],
+    "samples": [64, 255, 255, 64, 64, 64, 255, 64, 64, 64],
     "elapsed": 19682.89999999851,
     "bytes": 1581310,
     "progressFirst": 0,
     "progressLast": 1,
-    "sourceDimensions": [
-      10000,
-      5000
-    ],
+    "sourceDimensions": [10000, 5000],
     "sourceUnchanged": true,
     "unchanged": true,
     "revision": 5,
@@ -725,30 +630,10 @@
     "masks": 2,
     "pngTiles": 1,
     "samples": [
-      [
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        255,
-        0,
-        0,
-        192
-      ],
-      [
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        255,
-        0,
-        0,
-        192
-      ]
+      [0, 0, 0, 0],
+      [255, 0, 0, 192],
+      [0, 0, 0, 0],
+      [255, 0, 0, 192]
     ],
     "oneUndoRemovesPrecedingScriptEdits": true
   },

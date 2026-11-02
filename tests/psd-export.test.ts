@@ -1,102 +1,241 @@
 import { expect, it, beforeEach, afterEach, vi } from "vitest";
-import {encodePhotoshopStrip} from '../src/engine/photoshop-strip';
-import { Document, PaintLayer, AdjustmentLayer, LayerGroup, LayerStyle, defaultGradientMapAdjustment } from "../src/dom";
+import { encodePhotoshopStrip } from "../src/engine/photoshop-strip";
+import {
+  Document,
+  PaintLayer,
+  AdjustmentLayer,
+  LayerGroup,
+  LayerStyle,
+  defaultGradientMapAdjustment,
+} from "../src/dom";
 import { AssetStore } from "../src/core/assets";
 import type { DocumentRenderer, RenderOptions } from "../src/engine/renderer";
 import { exportPsd } from "../src/engine/psd";
 import { getExportCapabilityReport } from "../src/engine/export";
-import { parsePsd, getPsdCapabilityReport } from "../src/core/interchange/psd/parser";
+import {
+  parsePsd,
+  getPsdCapabilityReport,
+} from "../src/core/interchange/psd/parser";
 
-if (typeof globalThis.ImageData === "undefined") globalThis.ImageData = class {
-  width: number; height: number; data: Uint8ClampedArray;
-  constructor(width: number, height: number) { this.width = width; this.height = height; this.data = new Uint8ClampedArray(width * height * 4); }
-} as unknown as typeof ImageData;
+if (typeof globalThis.ImageData === "undefined")
+  globalThis.ImageData = class {
+    width: number;
+    height: number;
+    data: Uint8ClampedArray;
+    constructor(width: number, height: number) {
+      this.width = width;
+      this.height = height;
+      this.data = new Uint8ClampedArray(width * height * 4);
+    }
+  } as unknown as typeof ImageData;
 
 // Node layout tests use the real strip codec with a task/message adapter.
 // Browser coverage exercises actual module workers and transfer/termination.
-beforeEach(()=>vi.stubGlobal('Worker',class extends EventTarget {
- onmessage:((event:{data:unknown})=>void)|null=null;
- onerror=null;onmessageerror=null;private closed=false;
- postMessage(input:Parameters<typeof structuredClone>[0],transfer:Transferable[]){
-  const value=structuredClone(input,{transfer}) as {id:number;pixels:Uint8ClampedArray;width:number;rows:number;encoding:'layer'|'preview'|'both'};
-  queueMicrotask(()=>{if(!this.closed)this.onmessage?.({data:{id:value.id,channels:encodePhotoshopStrip(value.pixels,value.width,value.rows,value.encoding)}});});
- }
- terminate(){this.closed=true;}
-}));
-afterEach(()=>vi.unstubAllGlobals());
+beforeEach(() =>
+  vi.stubGlobal(
+    "Worker",
+    class extends EventTarget {
+      onmessage: ((event: { data: unknown }) => void) | null = null;
+      onerror = null;
+      onmessageerror = null;
+      private closed = false;
+      postMessage(
+        input: Parameters<typeof structuredClone>[0],
+        transfer: Transferable[],
+      ) {
+        const value = structuredClone(input, { transfer }) as {
+          id: number;
+          pixels: Uint8ClampedArray;
+          width: number;
+          rows: number;
+          encoding: "layer" | "preview" | "both";
+        };
+        queueMicrotask(() => {
+          if (!this.closed)
+            this.onmessage?.({
+              data: {
+                id: value.id,
+                channels: encodePhotoshopStrip(
+                  value.pixels,
+                  value.width,
+                  value.rows,
+                  value.encoding,
+                ),
+              },
+            });
+        });
+      }
+      terminate() {
+        this.closed = true;
+      }
+    },
+  ),
+);
+afterEach(() => vi.unstubAllGlobals());
 
 function fixture() {
-  const calls: { x: number; y: number; width: number; height: number }[] = [], canvases: HTMLCanvasElement[] = [];
+  const calls: { x: number; y: number; width: number; height: number }[] = [],
+    canvases: HTMLCanvasElement[] = [];
   const renderer = {
     async render(_document: unknown, _assets: unknown, options: RenderOptions) {
-      const region = options.region!; calls.push({ ...region });
+      const region = options.region!;
+      calls.push({ ...region });
       const data = new Uint8ClampedArray(region.width * region.height * 4);
-      for (let y = 0; y < region.height; y++) for (let x = 0; x < region.width; x++)
-        data.set([(x + region.x) % 256, (y + region.y) % 256, 140, (y + region.y) % 2 ? 128 : 255], (y * region.width + x) * 4);
-      const canvas = { width: region.width, height: region.height, getContext: () => ({ getImageData: () => ({ data }) }) } as unknown as HTMLCanvasElement;
-      canvases.push(canvas); return canvas;
-    }, clearCache() {}, dispose() {},
+      for (let y = 0; y < region.height; y++)
+        for (let x = 0; x < region.width; x++)
+          data.set(
+            [
+              (x + region.x) % 256,
+              (y + region.y) % 256,
+              140,
+              (y + region.y) % 2 ? 128 : 255,
+            ],
+            (y * region.width + x) * 4,
+          );
+      const canvas = {
+        width: region.width,
+        height: region.height,
+        getContext: () => ({ getImageData: () => ({ data }) }),
+      } as unknown as HTMLCanvasElement;
+      canvases.push(canvas);
+      return canvas;
+    },
+    clearCache() {},
+    dispose() {},
   } as DocumentRenderer;
   return { renderer, calls, canvases, assets: new AssetStore() };
 }
 
 it("assembles native RLE rows across bounded tiles without changing source state or retaining canvases", async () => {
-  const doc = new Document({ width: 2050, height: 130 }); doc.layers.add(new PaintLayer({ name: "Pixels 🎨" }));
-  const before = doc.toJSON(), { renderer, assets, calls, canvases } = fixture();
+  const doc = new Document({ width: 2050, height: 130 });
+  doc.layers.add(new PaintLayer({ name: "Pixels 🎨" }));
+  const before = doc.toJSON(),
+    { renderer, assets, calls, canvases } = fixture();
   const progress: number[] = [];
-  const blob = await exportPsd(before, assets, renderer, "layers", { onProgress: value => { if (value.fraction !== null) progress.push(value.fraction); } });
+  const blob = await exportPsd(before, assets, renderer, "layers", {
+    onProgress: (value) => {
+      if (value.fraction !== null) progress.push(value.fraction);
+    },
+  });
   const parsed = parsePsd(await blob.arrayBuffer());
-  expect(parsed.header.width).toBe(2050); expect(parsed.header.height).toBe(130);
+  expect(parsed.header.width).toBe(2050);
+  expect(parsed.header.height).toBe(130);
   expect(parsed.layers[0].name).toBe("Pixels 🎨");
-  for (const [x, y] of [[0, 0], [2047, 63], [2048, 64], [2049, 129]]) {
+  for (const [x, y] of [
+    [0, 0],
+    [2047, 63],
+    [2048, 64],
+    [2049, 129],
+  ]) {
     const index = (y * 2050 + x) * 4;
-    expect([...parsed.layers[0].imageData!.data.slice(index, index + 4)]).toEqual([x % 256, y % 256, 140, y % 2 ? 128 : 255]);
+    expect([
+      ...parsed.layers[0].imageData!.data.slice(index, index + 4),
+    ]).toEqual([x % 256, y % 256, 140, y % 2 ? 128 : 255]);
     expect(parsed.composite!.data[index + 3]).toBe(y % 2 ? 128 : 255);
   }
   expect(calls.length).toBeGreaterThan(2);
-  expect(calls.every(call => call.width <= 2048 && call.height <= 64 && call.width * call.height * 4 <= 1_000_000)).toBe(true);
-  expect(canvases.every(canvas => canvas.width === 0 && canvas.height === 0)).toBe(true);
-  expect(progress.at(-1)).toBe(1); expect(progress.every((value, i) => i === 0 || value >= progress[i - 1])).toBe(true);
+  expect(
+    calls.every(
+      (call) =>
+        call.width <= 2048 &&
+        call.height <= 64 &&
+        call.width * call.height * 4 <= 1_000_000,
+    ),
+  ).toBe(true);
+  expect(
+    canvases.every((canvas) => canvas.width === 0 && canvas.height === 0),
+  ).toBe(true);
+  expect(progress.at(-1)).toBe(1);
+  expect(
+    progress.every((value, i) => i === 0 || value >= progress[i - 1]),
+  ).toBe(true);
   expect(doc.toJSON()).toEqual(before);
 });
 
 it("rejects format limits and aborts between strips, releasing rendered surfaces before returning", async () => {
   const { renderer, assets, calls, canvases } = fixture();
   const tooWide = new Document({ width: 30001, height: 1 });
-  await expect(exportPsd(tooWide.toJSON(), assets, renderer)).rejects.toThrow(/PSD supports dimensions/);
-  expect(tooWide.width).toBe(30001); expect(calls).toHaveLength(0);
-  const doc = new Document({ width: 32, height: 200 }); doc.layers.add(new PaintLayer());
+  await expect(exportPsd(tooWide.toJSON(), assets, renderer)).rejects.toThrow(
+    /PSD supports dimensions/,
+  );
+  expect(tooWide.width).toBe(30001);
+  expect(calls).toHaveLength(0);
+  const doc = new Document({ width: 32, height: 200 });
+  doc.layers.add(new PaintLayer());
   const abort = new AbortController();
-  await expect(exportPsd(doc.toJSON(), assets, renderer, "layers", {
-    signal: abort.signal, onProgress: value => { if ((value.fraction ?? 0) > 0) abort.abort(); },
-  })).rejects.toMatchObject({ name: "AbortError" });
-  expect(calls).toHaveLength(1); expect(canvases[0].width).toBe(0);
-  await expect(exportPsd(doc.toJSON(), assets, renderer, "layers", { signal: abort.signal })).rejects.toMatchObject({ name: "AbortError" });
+  await expect(
+    exportPsd(doc.toJSON(), assets, renderer, "layers", {
+      signal: abort.signal,
+      onProgress: (value) => {
+        if ((value.fraction ?? 0) > 0) abort.abort();
+      },
+    }),
+  ).rejects.toMatchObject({ name: "AbortError" });
+  expect(calls).toHaveLength(1);
+  expect(canvases[0].width).toBe(0);
+  await expect(
+    exportPsd(doc.toJSON(), assets, renderer, "layers", {
+      signal: abort.signal,
+    }),
+  ).rejects.toMatchObject({ name: "AbortError" });
 });
 
 it("preflight describes scoped dependency merging, native folders and explicit flatten choice", () => {
-  const doc = new Document(); doc.layers.add(new PaintLayer());
-  const group = doc.layers.add(new LayerGroup({ name: "Isolated" })); group.layers.add(new AdjustmentLayer({ adjustment: defaultGradientMapAdjustment() }));
+  const doc = new Document();
+  doc.layers.add(new PaintLayer());
+  const group = doc.layers.add(new LayerGroup({ name: "Isolated" }));
+  group.layers.add(
+    new AdjustmentLayer({ adjustment: defaultGradientMapAdjustment() }),
+  );
   const before = getExportCapabilityReport(doc.toJSON(), { format: "psd" });
-  expect(before.warnings.some(value => /bottom \d/.test(value))).toBe(false);
-  expect(before.featuresPreserved.join(' ')).toContain('Nested folder hierarchy');
-  expect(before.warnings.join(' ')).toContain('group isolation scope');
+  expect(before.warnings.some((value) => /bottom \d/.test(value))).toBe(false);
+  expect(before.featuresPreserved.join(" ")).toContain(
+    "Nested folder hierarchy",
+  );
+  expect(before.warnings.join(" ")).toContain("group isolation scope");
   const top = doc.layers.add(new PaintLayer({ name: "Blend dependent" }));
   top.styles = new LayerStyle({ blendIf: { enabled: true } });
   const report = getExportCapabilityReport(doc.toJSON(), { format: "psd" });
-  expect(report.warnings.some(value => value.includes("bottom 3 top-level layers are merged through “Blend dependent”"))).toBe(true);
-  const flat = getExportCapabilityReport(doc.toJSON(), { format: "psd", psdMode: "flatten" });
-  expect(flat.warnings.some(value => value.includes("one pixel layer"))).toBe(true);
+  expect(
+    report.warnings.some((value) =>
+      value.includes(
+        "bottom 3 top-level layers are merged through “Blend dependent”",
+      ),
+    ),
+  ).toBe(true);
+  const flat = getExportCapabilityReport(doc.toJSON(), {
+    format: "psd",
+    psdMode: "flatten",
+  });
+  expect(flat.warnings.some((value) => value.includes("one pixel layer"))).toBe(
+    true,
+  );
   expect(flat.featuresPreserved).not.toContain("Layer opacity and blend modes");
 });
 
-it('retains real Normal fill tags but requires the actual merged image for unsupported fill semantics',async()=>{
-  const doc=new Document({width:12,height:8});doc.layers.add(new PaintLayer({fillOpacity:.4}));
-  const {renderer,assets}=fixture(),bytes=new Uint8Array(await(await exportPsd(doc.toJSON(),assets,renderer)).arrayBuffer()),parsed=parsePsd(bytes);
-  expect(parsed.layers[0].fillOpacity).toBe(102);expect(getPsdCapabilityReport(parsed).canImportAsLayers).toBe(true);
-  const offset=Buffer.from(bytes).indexOf('8BIMnorm');expect(offset).toBeGreaterThan(0);
-  const nonNormal=bytes.slice();nonNormal.set(new TextEncoder().encode('div '),offset+4);
-  const report=getPsdCapabilityReport(parsePsd(nonNormal));expect(report.hasComposite).toBe(true);expect(report.canImportAsLayers).toBe(false);expect(report.warnings.join(' ')).toContain('fill-opacity semantics require the merged composite');
-  parsed.layers[0].isGroup=true;parsed.layers[0].imageData=undefined;
-  expect(getPsdCapabilityReport(parsed).warnings.join(' ')).toContain('fill-opacity semantics require the merged composite');
+it("retains real Normal fill tags but requires the actual merged image for unsupported fill semantics", async () => {
+  const doc = new Document({ width: 12, height: 8 });
+  doc.layers.add(new PaintLayer({ fillOpacity: 0.4 }));
+  const { renderer, assets } = fixture(),
+    bytes = new Uint8Array(
+      await (await exportPsd(doc.toJSON(), assets, renderer)).arrayBuffer(),
+    ),
+    parsed = parsePsd(bytes);
+  expect(parsed.layers[0].fillOpacity).toBe(102);
+  expect(getPsdCapabilityReport(parsed).canImportAsLayers).toBe(true);
+  const offset = Buffer.from(bytes).indexOf("8BIMnorm");
+  expect(offset).toBeGreaterThan(0);
+  const nonNormal = bytes.slice();
+  nonNormal.set(new TextEncoder().encode("div "), offset + 4);
+  const report = getPsdCapabilityReport(parsePsd(nonNormal));
+  expect(report.hasComposite).toBe(true);
+  expect(report.canImportAsLayers).toBe(false);
+  expect(report.warnings.join(" ")).toContain(
+    "fill-opacity semantics require the merged composite",
+  );
+  parsed.layers[0].isGroup = true;
+  parsed.layers[0].imageData = undefined;
+  expect(getPsdCapabilityReport(parsed).warnings.join(" ")).toContain(
+    "fill-opacity semantics require the merged composite",
+  );
 });

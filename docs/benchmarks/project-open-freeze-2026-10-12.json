@@ -6,10 +6,7 @@
     "after": {
       "openMs": 497.2000000178814,
       "maxFrameGapMs": 207.69999998807907,
-      "longTasks": [
-        195,
-        137
-      ],
+      "longTasks": [195, 137],
       "name": "Listing revision 2",
       "layers": 1,
       "topSelfSamples": [
@@ -168,10 +165,7 @@
     "repeat": {
       "openMs": 501.59999999403954,
       "maxFrameGapMs": 204.80000001192093,
-      "longTasks": [
-        191,
-        147
-      ],
+      "longTasks": [191, 147],
       "name": "Listing revision 2",
       "layers": 1,
       "topSelfSamples": [

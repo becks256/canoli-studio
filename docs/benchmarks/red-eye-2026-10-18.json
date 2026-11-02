@@ -2841,9 +2841,7 @@
                 "id": "",
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
-                "testIgnore": [
-                  "**/production.e2e.ts"
-                ],
+                "testIgnore": ["**/production.e2e.ts"],
                 "testMatch": [
                   "**/red-eye.e2e.ts",
                   "**/red-eye-gpu.e2e.ts",
@@ -2858,10 +2856,7 @@
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -4305,22 +4300,14 @@
                 "id": "",
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
-                "testIgnore": [
-                  "**/production.e2e.ts"
-                ],
-                "testMatch": [
-                  "**/red-eye.e2e.ts",
-                  "**/red-eye-gpu.e2e.ts"
-                ],
+                "testIgnore": ["**/production.e2e.ts"],
+                "testMatch": ["**/red-eye.e2e.ts", "**/red-eye-gpu.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -4663,18 +4650,13 @@
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
                 "testIgnore": [],
-                "testMatch": [
-                  "**/production.e2e.ts"
-                ],
+                "testMatch": ["**/production.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -7834,18 +7816,13 @@
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
                 "testIgnore": [],
-                "testMatch": [
-                  "**/production.e2e.ts"
-                ],
+                "testMatch": ["**/production.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -8010,9 +7987,7 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
               "testMatch": [
                 "**/red-eye.e2e.ts",
                 "**/red-eye-gpu.e2e.ts",
@@ -8025,10 +8000,7 @@
           ],
           "quiet": false,
           "reporter": [
-            [
-              "line",
-              null
-            ],
+            ["line", null],
             [
               "json",
               {
@@ -11357,9 +11329,7 @@
         "dist/wasm/pixels.wasm": "dc899c58f4a6297dc4f90b3433705a412653f22631459ccd9912c14818b0e791"
       }
     },
-    "releaseDelta": [
-      "dist/developer/scripting-api.html"
-    ],
+    "releaseDelta": ["dist/developer/scripting-api.html"],
     "explanation": "After all 83 production workflows passed, only the scripting-guide binding/constructor/kind/member tables changed. A final build retained every other release byte, and both the guide-without-JavaScript and documented red-eye production workflow passed again."
   },
   "method": "Changes were made in the authoritative worktree and compared to the retained cursor-adapter baseline. Final release hashes were pinned before production tests. The final guide-only release correspondence is recorded separately; only raw roadmap/strategy/performance decision logs may change after the final documentation checks. Existing 31 evidence artifacts remain byte-identical."

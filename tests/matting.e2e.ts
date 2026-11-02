@@ -117,7 +117,13 @@ test.describe("Object Selection and Interactive Matting (T19 / A04)", () => {
     });
 
     // The previous notification can still be visible while the new worker runs.
-    await expect.poll(()=>page.evaluate(()=>window.luma.editor.document.selection?.regions.length??0)).toBeGreaterThan(0);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => window.luma.editor.document.selection?.regions.length ?? 0,
+        ),
+      )
+      .toBeGreaterThan(0);
     const ctxMenuSelection = await page.evaluate(() => {
       const sel = window.luma.editor.document.selection;
       return sel !== null && sel.regions.length > 0;

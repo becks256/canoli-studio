@@ -5,8 +5,16 @@
   "operation": { "operation": "contract", "radius": 1 },
   "output": { "width": 10000, "height": 5000, "tiles": 200, "tileEdge": 512 },
   "measurements": [
-    { "run": "initial feature browser suite", "elapsedMs": 2407, "timerResponseMs": 99.09999999403954 },
-    { "run": "final regression suite", "elapsedMs": 2432.9000000059605, "timerResponseMs": 103.19999998807907 }
+    {
+      "run": "initial feature browser suite",
+      "elapsedMs": 2407,
+      "timerResponseMs": 99.09999999403954
+    },
+    {
+      "run": "final regression suite",
+      "elapsedMs": 2432.9000000059605,
+      "timerResponseMs": 103.19999998807907
+    }
   ],
   "timerScope": "setTimeout(0) response while the async operation is pending, immediately after newDocument/selectAll. This includes pending document/render work and is not isolated input-to-visible latency.",
   "correctness": "Native coverage dimensions, boundary/interior alpha, 200-tile progress completion and compact RLE assertions passed.",

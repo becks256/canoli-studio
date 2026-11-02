@@ -31,12 +31,7 @@
       "default": 64
     },
     "defaultOperation": "add",
-    "operations": [
-      "replace",
-      "add",
-      "subtract",
-      "intersect"
-    ],
+    "operations": ["replace", "add", "subtract", "intersect"],
     "sources": [
       "visible merged document",
       "isolated layer branch with world transforms/ancestor appearance",
@@ -69,15 +64,7 @@
     "milliseconds": 2013.699999988079,
     "width": 10000,
     "height": 5000,
-    "samples": [
-      255,
-      255,
-      255,
-      255,
-      0,
-      0,
-      0
-    ],
+    "samples": [255, 255, 255, 255, 0, 0, 0],
     "revisionDelta": 1,
     "progressFirst": {
       "completed": 0,
@@ -126,15 +113,7 @@
       "milliseconds": 2159.4000000059605,
       "width": 10000,
       "height": 5000,
-      "samples": [
-        255,
-        255,
-        255,
-        255,
-        0,
-        0,
-        0
-      ],
+      "samples": [255, 255, 255, 255, 0, 0, 0],
       "revisionDelta": 1,
       "progressFirst": {
         "completed": 0,
@@ -172,15 +151,7 @@
     "width": 10000,
     "height": 5000,
     "milliseconds": 4278.099056,
-    "samples": [
-      255,
-      255,
-      255,
-      255,
-      0,
-      0,
-      0
-    ]
+    "samples": [255, 255, 255, 255, 0, 0, 0]
   },
   "existingRealImage50MpRoundTrip": {
     "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
@@ -189,10 +160,7 @@
   "fixture": {
     "path": "tests/fixtures/color-range/native-50mp.png",
     "sha256": "1e6acdb4bdf16b25b2231f76bf066283db1d8cdec732b416248563473f434a47",
-    "dimensions": [
-      10000,
-      5000
-    ],
+    "dimensions": [10000, 5000],
     "description": "Actual PNG with red/blue native components, distant regions and a diagonally touching island; four-connectivity excludes the disconnected island."
   },
   "validation": {

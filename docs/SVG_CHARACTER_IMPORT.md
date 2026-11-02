@@ -33,12 +33,15 @@ Flattening remains an explicit user choice and discards text editability. Suppor
 The caller supplies a selected `File` as `svgFile`. No chooser, network request or script permission is implied:
 
 <!-- example: svg-character-import-trusted -->
+
 ```js
 const report = await editor.inspectSvg(svgFile);
 if (!report.canImportEditable) {
-  throw new Error("Review the unsupported features before choosing flattened import.");
+  throw new Error(
+    "Review the unsupported features before choosing flattened import.",
+  );
 }
-await editor.openSvg(svgFile, {mode: "editable"});
+await editor.openSvg(svgFile, { mode: "editable" });
 return editor.document.toJSON().schemaVersion;
 ```
 

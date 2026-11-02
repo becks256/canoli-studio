@@ -5,9 +5,7 @@
     "before": {
       "listMs": 303.7999999821186,
       "maxFrameGapMs": 289.5,
-      "longTasks": [
-        280
-      ],
+      "longTasks": [280],
       "entries": [
         {
           "id": "0e5c75e2-f2fb-4df2-86ac-87b8d5154e4a",

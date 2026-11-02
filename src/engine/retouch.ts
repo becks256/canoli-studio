@@ -1,6 +1,6 @@
 import { AffineTransform } from "../core/affine";
-import type {AssetStore} from '../core/assets';
-import type {BrushTextureSampler} from './brush-texture';
+import type { AssetStore } from "../core/assets";
+import type { BrushTextureSampler } from "./brush-texture";
 import { maskStrokeSchema } from "../core/masks";
 import { strokeBounds, type BrushStrokeData } from "../core/drawing";
 import type { DodgeBurnOptions } from "../core/retouch/types";
@@ -17,24 +17,39 @@ export async function renderTonalStroke(
   space: RenderSpace,
   processor: PixelProcessor,
   world = new AffineTransform(),
-  assets?:AssetStore,
-  textures?:BrushTextureSampler,
-  isCancelled?:()=>boolean,
+  assets?: AssetStore,
+  textures?: BrushTextureSampler,
+  isCancelled?: () => boolean,
 ): Promise<Uint8ClampedArray> {
   space = { ...space };
   if (source.length !== space.width * space.height * 4)
     throw new Error("Invalid retouch render tile geometry.");
   const captured = source.slice();
   const options = { ...adjustment, flow: 1 };
-  const coverage = await renderRetouchCoverage(brush, space, processor, world,assets,textures,isCancelled);
-  let left = space.width, top = space.height, right = -1, bottom = -1;
+  const coverage = await renderRetouchCoverage(
+    brush,
+    space,
+    processor,
+    world,
+    assets,
+    textures,
+    isCancelled,
+  );
+  let left = space.width,
+    top = space.height,
+    right = -1,
+    bottom = -1;
   for (let p = 0; p < coverage.length; p++) {
     if (!coverage[p]) continue;
-    const x = p % space.width, y = Math.floor(p / space.width);
-    left = Math.min(left, x); right = Math.max(right, x);
-    top = Math.min(top, y); bottom = Math.max(bottom, y);
+    const x = p % space.width,
+      y = Math.floor(p / space.width);
+    left = Math.min(left, x);
+    right = Math.max(right, x);
+    top = Math.min(top, y);
+    bottom = Math.max(bottom, y);
   }
-  const width = right - left + 1, height = bottom - top + 1;
+  const width = right - left + 1,
+    height = bottom - top + 1;
   // Tonal correction is pointwise. Keep coverage rasterization on its fixed
   // grid, but transfer only covered bounds to the numerical worker.
   if (width > 0 && height > 0 && width * height < coverage.length) {
@@ -42,17 +57,34 @@ export async function renderTonalStroke(
     const mask = new Uint8Array(width * height);
     for (let y = 0; y < height; y++) {
       const start = (top + y) * space.width + left;
-      pixels.set(captured.subarray(start * 4, (start + width) * 4), y * width * 4);
+      pixels.set(
+        captured.subarray(start * 4, (start + width) * 4),
+        y * width * 4,
+      );
       mask.set(coverage.subarray(start, start + width), y * width);
     }
-    const corrected = await processor.dodgeBurn(pixels, width, height, options, mask);
+    const corrected = await processor.dodgeBurn(
+      pixels,
+      width,
+      height,
+      options,
+      mask,
+    );
     for (let y = 0; y < height; y++)
-      captured.set(corrected.subarray(y * width * 4, (y + 1) * width * 4),
-        ((top + y) * space.width + left) * 4);
+      captured.set(
+        corrected.subarray(y * width * 4, (y + 1) * width * 4),
+        ((top + y) * space.width + left) * 4,
+      );
     return captured;
   }
   // Keep validation/error semantics even when no coverage intersects the tile.
-  return processor.dodgeBurn(captured, space.width, space.height, options, coverage);
+  return processor.dodgeBurn(
+    captured,
+    space.width,
+    space.height,
+    options,
+    coverage,
+  );
 }
 
 /** Shared fixed-grid brush coverage for healing and tonal retouching. */
@@ -61,9 +93,9 @@ export async function renderRetouchCoverage(
   space: RenderSpace,
   processor: PixelProcessor,
   world = new AffineTransform(),
-  assets?:AssetStore,
-  textures?:BrushTextureSampler,
-  isCancelled?:()=>boolean,
+  assets?: AssetStore,
+  textures?: BrushTextureSampler,
+  isCancelled?: () => boolean,
 ): Promise<Uint8Array> {
   space = { ...space };
   if (

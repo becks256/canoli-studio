@@ -150,14 +150,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -167,10 +160,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 307681,
       "pngArea": 307681,
@@ -215,14 +205,7 @@
         {
           "length": 72.25,
           "nativeAdvance": 72.24609375,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -233,14 +216,7 @@
         {
           "length": 0,
           "nativeAdvance": 0,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": 0,
@@ -251,14 +227,7 @@
         {
           "length": 72.25,
           "nativeAdvance": 72.24609375,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": 61.03437805175781,
@@ -268,10 +237,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 265617,
       "pngArea": 265617,
@@ -328,14 +294,7 @@
         {
           "length": 187.84375,
           "nativeAdvance": 187.83984375,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -345,10 +304,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 196815,
       "pngArea": 196815,
@@ -393,14 +349,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": -0.1484375,
             "y": -3.765625,
@@ -410,10 +359,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 307642,
       "pngArea": 307642,
@@ -458,14 +404,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": -0.296875,
             "y": -3.765625,
@@ -475,10 +414,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 307665,
       "pngArea": 307665,
@@ -523,14 +459,7 @@
         {
           "length": 187.84375,
           "nativeAdvance": 187.83984375,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -540,10 +469,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 260997,
       "pngArea": 260997,
@@ -588,14 +514,7 @@
         {
           "length": 187.84375,
           "nativeAdvance": 187.83984375,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0.15625,
             "y": -3.765625,
@@ -605,10 +524,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 260975,
       "pngArea": 260975,
@@ -653,14 +569,7 @@
         {
           "length": 155.609375,
           "nativeAdvance": 155.59375,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0.1953125,
             "y": -3.765625,
@@ -670,10 +579,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 271099,
       "pngArea": 271099,
@@ -718,14 +624,7 @@
         {
           "length": 230.22372436523438,
           "nativeAdvance": 230.2890625,
-          "matrix": [
-            1,
-            0.10000000149011612,
-            0.25,
-            1,
-            33,
-            31.00000001490116
-          ],
+          "matrix": [1, 0.10000000149011612, 0.25, 1, 33, 31.00000001490116],
           "box": {
             "x": 0,
             "y": -4.359751224517822,
@@ -735,10 +634,7 @@
         }
       ],
       "textAreaRatio": 0.9994134303500913,
-      "centroidDelta": [
-        -0.11318105752781094,
-        -0.00826396173644639
-      ],
+      "centroidDelta": [-0.11318105752781094, -0.00826396173644639],
       "meanAlpha": 0.06913636363636363,
       "svgArea": 388243,
       "pngArea": 388411,
@@ -783,14 +679,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -800,10 +689,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 407571,
       "pngArea": 407571,
@@ -848,14 +734,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -865,10 +744,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 309252,
       "pngArea": 309252,
@@ -913,14 +789,7 @@
         {
           "length": 230.296875,
           "nativeAdvance": 230.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -930,10 +799,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 307681,
       "pngArea": 307681,
@@ -978,14 +844,7 @@
         {
           "length": 275.640625,
           "nativeAdvance": 275.63671875,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -4.765625,
@@ -995,10 +854,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 441022,
       "pngArea": 441022,
@@ -1043,14 +899,7 @@
         {
           "length": 202.22665405273438,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            -1,
-            0.10000000149011612,
-            0.25,
-            1,
-            283,
-            31.00000001490116
-          ],
+          "matrix": [-1, 0.10000000149011612, 0.25, 1, 283, 31.00000001490116],
           "box": {
             "x": 0,
             "y": -4.359751224517822,
@@ -1060,10 +909,7 @@
         }
       ],
       "textAreaRatio": 1.0019948026234378,
-      "centroidDelta": [
-        -0.0492844983176326,
-        -0.01620531990980112
-      ],
+      "centroidDelta": [-0.0492844983176326, -0.01620531990980112],
       "meanAlpha": 0.061261363636363635,
       "svgArea": 304428,
       "pngArea": 304025,
@@ -1108,14 +954,7 @@
         {
           "length": 202.2408447265625,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1.5,
-            0,
-            0,
-            0.75,
-            35,
-            27
-          ],
+          "matrix": [1.5, 0, 0, 0.75, 35, 27],
           "box": {
             "x": 0,
             "y": -3.6907505989074707,
@@ -1125,10 +964,7 @@
         }
       ],
       "textAreaRatio": 0.9987735767335196,
-      "centroidDelta": [
-        -0.08267202567026288,
-        0.00024453887576214584
-      ],
+      "centroidDelta": [-0.08267202567026288, 0.00024453887576214584],
       "meanAlpha": 0.051875,
       "svgArea": 321068,
       "pngArea": 321337,
@@ -1173,14 +1009,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -1190,10 +1019,7 @@
         }
       ],
       "textAreaRatio": 0.9900892061463125,
-      "centroidDelta": [
-        -0.1699323173639442,
-        -0.03107690547267339
-      ],
+      "centroidDelta": [-0.1699323173639442, -0.03107690547267339],
       "meanAlpha": 0.016329545454545454,
       "svgArea": 211990,
       "pngArea": 213091,
@@ -1243,14 +1069,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -1260,10 +1079,7 @@
         }
       ],
       "textAreaRatio": 0.9773663652415859,
-      "centroidDelta": [
-        -0.2101611924468898,
-        0.034528317136704345
-      ],
+      "centroidDelta": [-0.2101611924468898, 0.034528317136704345],
       "meanAlpha": 0.015125,
       "svgArea": 156798,
       "pngArea": 158067,
@@ -1313,14 +1129,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -1330,10 +1139,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 224745,
       "pngArea": 224745,
@@ -1378,14 +1184,7 @@
         {
           "length": 202.296875,
           "nativeAdvance": 202.2890625,
-          "matrix": [
-            1,
-            0,
-            0,
-            1,
-            30,
-            30
-          ],
+          "matrix": [1, 0, 0, 1, 30, 30],
           "box": {
             "x": 0,
             "y": -3.765625,
@@ -1395,10 +1194,7 @@
         }
       ],
       "textAreaRatio": 1,
-      "centroidDelta": [
-        0,
-        0
-      ],
+      "centroidDelta": [0, 0],
       "meanAlpha": 0,
       "svgArea": 307681,
       "pngArea": 307681,
@@ -1566,10 +1362,7 @@
     "alpha": 0,
     "premult": 0,
     "coverage": 213482,
-    "lines": [
-      "Canoli",
-      "Studio"
-    ],
+    "lines": ["Canoli", "Studio"],
     "embedded": 0
   },
   "pageOnlyFontPortability": {
@@ -1592,16 +1385,10 @@
   "missingCanvasLetterSpacing": {
     "before": {
       "nativePropertyAbsent": true,
-      "spacing": [
-        "0",
-        "8"
-      ]
+      "spacing": ["0", "8"]
     },
     "after": {
-      "spacing": [
-        "0",
-        "0"
-      ],
+      "spacing": ["0", "0"],
       "alpha": 0,
       "premult": 0,
       "unchanged": true,

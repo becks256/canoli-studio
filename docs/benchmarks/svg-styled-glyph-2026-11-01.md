@@ -59,7 +59,6 @@ complete source run passes all 196 cases across twenty files without retries,
 skips or flakes. No runtime code or test assertions were changed to repair the
 server invocation.
 
-
 Independent Pillow decoding compares every RGBA sample in both complete ordinary
 10,000 × 5,000 curved and vertical outputs against independently authored complete
 native SVG references: 200 million samples each, zero channel error and identical

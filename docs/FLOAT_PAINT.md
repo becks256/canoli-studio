@@ -61,13 +61,18 @@ Open a float document first (or convert a blank document using Color settings):
 <!-- example: float-dry-paint -->
 
 ```js
-const paint = document.layers.add(new PaintLayer({name: 'Linear paint'}));
-paint.strokes.add(new PencilStroke({
-  points: [{x: 20.5, y: 20.5}], size: 4, pressureSize: false,
-  color: '#208040', opacity: 0.64123
-}));
+const paint = document.layers.add(new PaintLayer({ name: "Linear paint" }));
+paint.strokes.add(
+  new PencilStroke({
+    points: [{ x: 20.5, y: 20.5 }],
+    size: 4,
+    pressureSize: false,
+    color: "#208040",
+    opacity: 0.64123,
+  }),
+);
 document.selectedLayer = paint;
-print('Editable linear paint ready');
+print("Editable linear paint ready");
 ```
 
 This is a local document edit, with no decoding, host simulation, file, network
@@ -94,7 +99,6 @@ revision/selection conflicts and locks reject atomically. Synchronous trusted
 OO/executor calls still require already validated prepared wet pairs; they do not
 decode pixels inside a transaction. Existing permission and independent REST
 boundaries remain. Stroke removal recording is still unsupported.
-
 
 Recorded `layer.place` actions retain a semantic `reference` (or null for the
 root), native before/after/inside placement and `preservePosition` boolean. The
@@ -138,12 +142,15 @@ REST sessions consume prepared pairs rather than running host simulation.
 <!-- example: float-wet-paint -->
 
 ```js
-const paint = document.layers.add(new PaintLayer({name: 'Wet linear paint'}));
-paint.strokes.add(new PaintFill({
-  bounds: {x: 10, y: 10, width: 24, height: 24}, color: '#208040'
-}));
+const paint = document.layers.add(new PaintLayer({ name: "Wet linear paint" }));
+paint.strokes.add(
+  new PaintFill({
+    bounds: { x: 10, y: 10, width: 24, height: 24 },
+    color: "#208040",
+  }),
+);
 document.selectedLayer = paint;
-print('Wet paint target ready');
+print("Wet paint target ready");
 ```
 
 This isolated example creates editable dry content ready for the trusted

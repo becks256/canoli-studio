@@ -79,10 +79,7 @@
         "coarse": true,
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -113,7 +110,7 @@
             "coarseBlocks": 320,
             "coarseBandwidth": 79,
             "coarseBytes": 952384,
-            "coarseRidge": 1.493082161953328e-08
+            "coarseRidge": 1.493082161953328e-8
           },
           "outputs": [
             {
@@ -170,7 +167,7 @@
             "coarseBlocks": 428,
             "coarseBandwidth": 95,
             "coarseBytes": 1492928,
-            "coarseRidge": 1.507970977454262e-08
+            "coarseRidge": 1.507970977454262e-8
           },
           "outputs": [
             {
@@ -227,7 +224,7 @@
             "coarseBlocks": 527,
             "coarseBandwidth": 119,
             "coarseBytes": 2242976,
-            "coarseRidge": 1.6847268928970598e-08
+            "coarseRidge": 1.6847268928970598e-8
           },
           "outputs": [
             {
@@ -284,7 +281,7 @@
             "coarseBlocks": 708,
             "coarseBandwidth": 135,
             "coarseBytes": 3375808,
-            "coarseRidge": 1.619669488660103e-08
+            "coarseRidge": 1.619669488660103e-8
           },
           "outputs": [
             {
@@ -341,7 +338,7 @@
             "coarseBlocks": 926,
             "coarseBandwidth": 179,
             "coarseBytes": 5719040,
-            "coarseRidge": 1.8630167267125094e-08
+            "coarseRidge": 1.8630167267125094e-8
           },
           "outputs": [
             {
@@ -398,7 +395,7 @@
             "coarseBlocks": 1029,
             "coarseBandwidth": 191,
             "coarseBytes": 6750304,
-            "coarseRidge": 1.9332456036511723e-08
+            "coarseRidge": 1.9332456036511723e-8
           },
           "outputs": [
             {
@@ -455,7 +452,7 @@
             "coarseBlocks": 232,
             "coarseBandwidth": 75,
             "coarseBytes": 660800,
-            "coarseRidge": 1.492235947513672e-08
+            "coarseRidge": 1.492235947513672e-8
           },
           "outputs": [
             {
@@ -512,7 +509,7 @@
             "coarseBlocks": 303,
             "coarseBandwidth": 83,
             "coarseBytes": 940576,
-            "coarseRidge": 1.58895087795404e-08
+            "coarseRidge": 1.58895087795404e-8
           },
           "outputs": [
             {
@@ -569,7 +566,7 @@
             "coarseBlocks": 356,
             "coarseBandwidth": 87,
             "coarseBytes": 1150656,
-            "coarseRidge": 1.499741848378094e-08
+            "coarseRidge": 1.499741848378094e-8
           },
           "outputs": [
             {
@@ -626,7 +623,7 @@
             "coarseBlocks": 465,
             "coarseBandwidth": 111,
             "coarseBytes": 1860064,
-            "coarseRidge": 1.499741848378094e-08
+            "coarseRidge": 1.499741848378094e-8
           },
           "outputs": [
             {
@@ -683,7 +680,7 @@
             "coarseBlocks": 712,
             "coarseBandwidth": 103,
             "coarseBytes": 2665792,
-            "coarseRidge": 1.6753061101780922e-08
+            "coarseRidge": 1.6753061101780922e-8
           },
           "outputs": [
             {
@@ -740,7 +737,7 @@
             "coarseBlocks": 842,
             "coarseBandwidth": 111,
             "coarseBytes": 3368064,
-            "coarseRidge": 1.530816079146172e-08
+            "coarseRidge": 1.530816079146172e-8
           },
           "outputs": [
             {
@@ -797,7 +794,7 @@
             "coarseBlocks": 356,
             "coarseBandwidth": 95,
             "coarseBytes": 1241792,
-            "coarseRidge": 1.8406249974521146e-08
+            "coarseRidge": 1.8406249974521146e-8
           },
           "outputs": [
             {
@@ -854,7 +851,7 @@
             "coarseBlocks": 455,
             "coarseBandwidth": 99,
             "coarseBytes": 1645344,
-            "coarseRidge": 1.4633167134855075e-08
+            "coarseRidge": 1.4633167134855075e-8
           },
           "outputs": [
             {
@@ -911,7 +908,7 @@
             "coarseBlocks": 397,
             "coarseBandwidth": 95,
             "coarseBytes": 1384800,
-            "coarseRidge": 1.8201212434405833e-08
+            "coarseRidge": 1.8201212434405833e-8
           },
           "outputs": [
             {
@@ -968,7 +965,7 @@
             "coarseBlocks": 497,
             "coarseBandwidth": 103,
             "coarseBytes": 1860832,
-            "coarseRidge": 1.6122402409181188e-08
+            "coarseRidge": 1.6122402409181188e-8
           },
           "outputs": [
             {
@@ -1025,7 +1022,7 @@
             "coarseBlocks": 858,
             "coarseBandwidth": 167,
             "coarseBytes": 4969600,
-            "coarseRidge": 1.96550999265655e-08
+            "coarseRidge": 1.96550999265655e-8
           },
           "outputs": [
             {
@@ -1082,7 +1079,7 @@
             "coarseBlocks": 969,
             "coarseBandwidth": 171,
             "coarseBytes": 5736544,
-            "coarseRidge": 2.1401768131768056e-08
+            "coarseRidge": 2.1401768131768056e-8
           },
           "outputs": [
             {
@@ -1139,7 +1136,7 @@
             "coarseBlocks": 249,
             "coarseBandwidth": 79,
             "coarseBytes": 741088,
-            "coarseRidge": 1.5135641121228082e-08
+            "coarseRidge": 1.5135641121228082e-8
           },
           "outputs": [
             {
@@ -1196,7 +1193,7 @@
             "coarseBlocks": 325,
             "coarseBandwidth": 87,
             "coarseBytes": 1050464,
-            "coarseRidge": 1.6306586564465068e-08
+            "coarseRidge": 1.6306586564465068e-8
           },
           "outputs": [
             {
@@ -1253,7 +1250,7 @@
             "coarseBlocks": 458,
             "coarseBandwidth": 143,
             "coarseBytes": 2301056,
-            "coarseRidge": 1.996450648816423e-08
+            "coarseRidge": 1.996450648816423e-8
           },
           "outputs": [
             {
@@ -1310,7 +1307,7 @@
             "coarseBlocks": 547,
             "coarseBandwidth": 143,
             "coarseBytes": 2748192,
-            "coarseRidge": 1.6465940797355217e-08
+            "coarseRidge": 1.6465940797355217e-8
           },
           "outputs": [
             {
@@ -1367,7 +1364,7 @@
             "coarseBlocks": 315,
             "coarseBandwidth": 123,
             "coarseBytes": 1381024,
-            "coarseRidge": 1.5605365109238875e-08
+            "coarseRidge": 1.5605365109238875e-8
           },
           "outputs": [
             {
@@ -1424,7 +1421,7 @@
             "coarseBlocks": 397,
             "coarseBandwidth": 143,
             "coarseBytes": 1994592,
-            "coarseRidge": 1.606559503751702e-08
+            "coarseRidge": 1.606559503751702e-8
           },
           "outputs": [
             {
@@ -1481,7 +1478,7 @@
             "coarseBlocks": 222,
             "coarseBandwidth": 95,
             "coarseBytes": 774400,
-            "coarseRidge": 1.3321465333666718e-08
+            "coarseRidge": 1.3321465333666718e-8
           },
           "outputs": [
             {
@@ -1538,7 +1535,7 @@
             "coarseBlocks": 293,
             "coarseBandwidth": 111,
             "coarseBytes": 1172064,
-            "coarseRidge": 1.7312903157671384e-08
+            "coarseRidge": 1.7312903157671384e-8
           },
           "outputs": [
             {
@@ -1595,7 +1592,7 @@
             "coarseBlocks": 322,
             "coarseBandwidth": 79,
             "coarseBytes": 958336,
-            "coarseRidge": 1.5415317014736052e-08
+            "coarseRidge": 1.5415317014736052e-8
           },
           "outputs": [
             {
@@ -1652,7 +1649,7 @@
             "coarseBlocks": 420,
             "coarseBandwidth": 95,
             "coarseBytes": 1465024,
-            "coarseRidge": 1.7997832232257982e-08
+            "coarseRidge": 1.7997832232257982e-8
           },
           "outputs": [
             {
@@ -1709,7 +1706,7 @@
             "coarseBlocks": 418,
             "coarseBandwidth": 107,
             "coarseBytes": 1618560,
-            "coarseRidge": 1.4758967815433312e-08
+            "coarseRidge": 1.4758967815433312e-8
           },
           "outputs": [
             {
@@ -1766,7 +1763,7 @@
             "coarseBlocks": 527,
             "coarseBandwidth": 123,
             "coarseBytes": 2310432,
-            "coarseRidge": 1.4478399876262663e-08
+            "coarseRidge": 1.4478399876262663e-8
           },
           "outputs": [
             {
@@ -1823,7 +1820,7 @@
             "coarseBlocks": 390,
             "coarseBandwidth": 139,
             "coarseBytes": 1909504,
-            "coarseRidge": 1.4836415282661063e-08
+            "coarseRidge": 1.4836415282661063e-8
           },
           "outputs": [
             {
@@ -1880,7 +1877,7 @@
             "coarseBlocks": 488,
             "coarseBandwidth": 155,
             "coarseBytes": 2639168,
-            "coarseRidge": 1.560388148071132e-08
+            "coarseRidge": 1.560388148071132e-8
           },
           "outputs": [
             {
@@ -1937,7 +1934,7 @@
             "coarseBlocks": 364,
             "coarseBandwidth": 75,
             "coarseBytes": 1036736,
-            "coarseRidge": 2.1066818474130402e-08
+            "coarseRidge": 2.1066818474130402e-8
           },
           "outputs": [
             {
@@ -1994,7 +1991,7 @@
             "coarseBlocks": 424,
             "coarseBandwidth": 87,
             "coarseBytes": 1370432,
-            "coarseRidge": 2.099047412217685e-08
+            "coarseRidge": 2.099047412217685e-8
           },
           "outputs": [
             {
@@ -2051,7 +2048,7 @@
             "coarseBlocks": 874,
             "coarseBandwidth": 151,
             "coarseBytes": 4614784,
-            "coarseRidge": 1.7416664236220378e-08
+            "coarseRidge": 1.7416664236220378e-8
           },
           "outputs": [
             {
@@ -2108,7 +2105,7 @@
             "coarseBlocks": 1004,
             "coarseBandwidth": 155,
             "coarseBytes": 5429696,
-            "coarseRidge": 1.8228010764046538e-08
+            "coarseRidge": 1.8228010764046538e-8
           },
           "outputs": [
             {
@@ -2269,10 +2266,7 @@
         "iterations": "wasm",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -2305,7 +2299,7 @@
             "coarseBlocks": 320,
             "coarseBandwidth": 79,
             "coarseBytes": 952384,
-            "coarseRidge": 1.493082161953328e-08
+            "coarseRidge": 1.493082161953328e-8
           },
           "outputs": [
             {
@@ -2364,7 +2358,7 @@
             "coarseBlocks": 428,
             "coarseBandwidth": 95,
             "coarseBytes": 1492928,
-            "coarseRidge": 1.507970977454262e-08
+            "coarseRidge": 1.507970977454262e-8
           },
           "outputs": [
             {
@@ -2423,7 +2417,7 @@
             "coarseBlocks": 527,
             "coarseBandwidth": 119,
             "coarseBytes": 2242976,
-            "coarseRidge": 1.6847268928970598e-08
+            "coarseRidge": 1.6847268928970598e-8
           },
           "outputs": [
             {
@@ -2482,7 +2476,7 @@
             "coarseBlocks": 708,
             "coarseBandwidth": 135,
             "coarseBytes": 3375808,
-            "coarseRidge": 1.619669488660103e-08
+            "coarseRidge": 1.619669488660103e-8
           },
           "outputs": [
             {
@@ -2541,7 +2535,7 @@
             "coarseBlocks": 926,
             "coarseBandwidth": 179,
             "coarseBytes": 5719040,
-            "coarseRidge": 1.8630167267125094e-08
+            "coarseRidge": 1.8630167267125094e-8
           },
           "outputs": [
             {
@@ -2600,7 +2594,7 @@
             "coarseBlocks": 1029,
             "coarseBandwidth": 191,
             "coarseBytes": 6750304,
-            "coarseRidge": 1.9332456036511723e-08
+            "coarseRidge": 1.9332456036511723e-8
           },
           "outputs": [
             {
@@ -2659,7 +2653,7 @@
             "coarseBlocks": 232,
             "coarseBandwidth": 75,
             "coarseBytes": 660800,
-            "coarseRidge": 1.492235947513672e-08
+            "coarseRidge": 1.492235947513672e-8
           },
           "outputs": [
             {
@@ -2718,7 +2712,7 @@
             "coarseBlocks": 303,
             "coarseBandwidth": 83,
             "coarseBytes": 940576,
-            "coarseRidge": 1.58895087795404e-08
+            "coarseRidge": 1.58895087795404e-8
           },
           "outputs": [
             {
@@ -2777,7 +2771,7 @@
             "coarseBlocks": 356,
             "coarseBandwidth": 87,
             "coarseBytes": 1150656,
-            "coarseRidge": 1.499741848378094e-08
+            "coarseRidge": 1.499741848378094e-8
           },
           "outputs": [
             {
@@ -2836,7 +2830,7 @@
             "coarseBlocks": 465,
             "coarseBandwidth": 111,
             "coarseBytes": 1860064,
-            "coarseRidge": 1.499741848378094e-08
+            "coarseRidge": 1.499741848378094e-8
           },
           "outputs": [
             {
@@ -2895,7 +2889,7 @@
             "coarseBlocks": 712,
             "coarseBandwidth": 103,
             "coarseBytes": 2665792,
-            "coarseRidge": 1.6753061101780922e-08
+            "coarseRidge": 1.6753061101780922e-8
           },
           "outputs": [
             {
@@ -2954,7 +2948,7 @@
             "coarseBlocks": 842,
             "coarseBandwidth": 111,
             "coarseBytes": 3368064,
-            "coarseRidge": 1.530816079146172e-08
+            "coarseRidge": 1.530816079146172e-8
           },
           "outputs": [
             {
@@ -3013,7 +3007,7 @@
             "coarseBlocks": 356,
             "coarseBandwidth": 95,
             "coarseBytes": 1241792,
-            "coarseRidge": 1.8406249974521146e-08
+            "coarseRidge": 1.8406249974521146e-8
           },
           "outputs": [
             {
@@ -3072,7 +3066,7 @@
             "coarseBlocks": 455,
             "coarseBandwidth": 99,
             "coarseBytes": 1645344,
-            "coarseRidge": 1.4633167134855075e-08
+            "coarseRidge": 1.4633167134855075e-8
           },
           "outputs": [
             {
@@ -3131,7 +3125,7 @@
             "coarseBlocks": 397,
             "coarseBandwidth": 95,
             "coarseBytes": 1384800,
-            "coarseRidge": 1.8201212434405833e-08
+            "coarseRidge": 1.8201212434405833e-8
           },
           "outputs": [
             {
@@ -3190,7 +3184,7 @@
             "coarseBlocks": 497,
             "coarseBandwidth": 103,
             "coarseBytes": 1860832,
-            "coarseRidge": 1.6122402409181188e-08
+            "coarseRidge": 1.6122402409181188e-8
           },
           "outputs": [
             {
@@ -3249,7 +3243,7 @@
             "coarseBlocks": 858,
             "coarseBandwidth": 167,
             "coarseBytes": 4969600,
-            "coarseRidge": 1.96550999265655e-08
+            "coarseRidge": 1.96550999265655e-8
           },
           "outputs": [
             {
@@ -3308,7 +3302,7 @@
             "coarseBlocks": 969,
             "coarseBandwidth": 171,
             "coarseBytes": 5736544,
-            "coarseRidge": 2.1401768131768056e-08
+            "coarseRidge": 2.1401768131768056e-8
           },
           "outputs": [
             {
@@ -3367,7 +3361,7 @@
             "coarseBlocks": 249,
             "coarseBandwidth": 79,
             "coarseBytes": 741088,
-            "coarseRidge": 1.5135641121228082e-08
+            "coarseRidge": 1.5135641121228082e-8
           },
           "outputs": [
             {
@@ -3426,7 +3420,7 @@
             "coarseBlocks": 325,
             "coarseBandwidth": 87,
             "coarseBytes": 1050464,
-            "coarseRidge": 1.6306586564465068e-08
+            "coarseRidge": 1.6306586564465068e-8
           },
           "outputs": [
             {
@@ -3485,7 +3479,7 @@
             "coarseBlocks": 458,
             "coarseBandwidth": 143,
             "coarseBytes": 2301056,
-            "coarseRidge": 1.996450648816423e-08
+            "coarseRidge": 1.996450648816423e-8
           },
           "outputs": [
             {
@@ -3544,7 +3538,7 @@
             "coarseBlocks": 547,
             "coarseBandwidth": 143,
             "coarseBytes": 2748192,
-            "coarseRidge": 1.6465940797355217e-08
+            "coarseRidge": 1.6465940797355217e-8
           },
           "outputs": [
             {
@@ -3603,7 +3597,7 @@
             "coarseBlocks": 315,
             "coarseBandwidth": 123,
             "coarseBytes": 1381024,
-            "coarseRidge": 1.5605365109238875e-08
+            "coarseRidge": 1.5605365109238875e-8
           },
           "outputs": [
             {
@@ -3662,7 +3656,7 @@
             "coarseBlocks": 397,
             "coarseBandwidth": 143,
             "coarseBytes": 1994592,
-            "coarseRidge": 1.606559503751702e-08
+            "coarseRidge": 1.606559503751702e-8
           },
           "outputs": [
             {
@@ -3721,7 +3715,7 @@
             "coarseBlocks": 222,
             "coarseBandwidth": 95,
             "coarseBytes": 774400,
-            "coarseRidge": 1.3321465333666718e-08
+            "coarseRidge": 1.3321465333666718e-8
           },
           "outputs": [
             {
@@ -3780,7 +3774,7 @@
             "coarseBlocks": 293,
             "coarseBandwidth": 111,
             "coarseBytes": 1172064,
-            "coarseRidge": 1.7312903157671384e-08
+            "coarseRidge": 1.7312903157671384e-8
           },
           "outputs": [
             {
@@ -3839,7 +3833,7 @@
             "coarseBlocks": 322,
             "coarseBandwidth": 79,
             "coarseBytes": 958336,
-            "coarseRidge": 1.5415317014736052e-08
+            "coarseRidge": 1.5415317014736052e-8
           },
           "outputs": [
             {
@@ -3898,7 +3892,7 @@
             "coarseBlocks": 420,
             "coarseBandwidth": 95,
             "coarseBytes": 1465024,
-            "coarseRidge": 1.7997832232257982e-08
+            "coarseRidge": 1.7997832232257982e-8
           },
           "outputs": [
             {
@@ -3957,7 +3951,7 @@
             "coarseBlocks": 418,
             "coarseBandwidth": 107,
             "coarseBytes": 1618560,
-            "coarseRidge": 1.4758967815433312e-08
+            "coarseRidge": 1.4758967815433312e-8
           },
           "outputs": [
             {
@@ -4016,7 +4010,7 @@
             "coarseBlocks": 527,
             "coarseBandwidth": 123,
             "coarseBytes": 2310432,
-            "coarseRidge": 1.4478399876262663e-08
+            "coarseRidge": 1.4478399876262663e-8
           },
           "outputs": [
             {
@@ -4075,7 +4069,7 @@
             "coarseBlocks": 390,
             "coarseBandwidth": 139,
             "coarseBytes": 1909504,
-            "coarseRidge": 1.4836415282661063e-08
+            "coarseRidge": 1.4836415282661063e-8
           },
           "outputs": [
             {
@@ -4134,7 +4128,7 @@
             "coarseBlocks": 488,
             "coarseBandwidth": 155,
             "coarseBytes": 2639168,
-            "coarseRidge": 1.560388148071132e-08
+            "coarseRidge": 1.560388148071132e-8
           },
           "outputs": [
             {
@@ -4193,7 +4187,7 @@
             "coarseBlocks": 364,
             "coarseBandwidth": 75,
             "coarseBytes": 1036736,
-            "coarseRidge": 2.1066818474130402e-08
+            "coarseRidge": 2.1066818474130402e-8
           },
           "outputs": [
             {
@@ -4252,7 +4246,7 @@
             "coarseBlocks": 424,
             "coarseBandwidth": 87,
             "coarseBytes": 1370432,
-            "coarseRidge": 2.099047412217685e-08
+            "coarseRidge": 2.099047412217685e-8
           },
           "outputs": [
             {
@@ -4311,7 +4305,7 @@
             "coarseBlocks": 874,
             "coarseBandwidth": 151,
             "coarseBytes": 4614784,
-            "coarseRidge": 1.7416664236220378e-08
+            "coarseRidge": 1.7416664236220378e-8
           },
           "outputs": [
             {
@@ -4370,7 +4364,7 @@
             "coarseBlocks": 1004,
             "coarseBandwidth": 155,
             "coarseBytes": 5429696,
-            "coarseRidge": 1.8228010764046538e-08
+            "coarseRidge": 1.8228010764046538e-8
           },
           "outputs": [
             {
@@ -4531,10 +4525,7 @@
         "iterations": "wasm",
         "solver": "closed-form",
         "radius": 10,
-        "smoothness": [
-          0,
-          10
-        ],
+        "smoothness": [0, 10],
         "edgeFeather": 0,
         "contrast": 0,
         "shiftEdge": 0,
@@ -4567,7 +4558,7 @@
             "coarseBlocks": 608,
             "coarseBandwidth": 135,
             "coarseBytes": 2899008,
-            "coarseRidge": 2.1031897787817284e-08
+            "coarseRidge": 2.1031897787817284e-8
           },
           "outputs": [
             {
@@ -4626,7 +4617,7 @@
             "coarseBlocks": 696,
             "coarseBandwidth": 135,
             "coarseBytes": 3318592,
-            "coarseRidge": 1.8597654354338007e-08
+            "coarseRidge": 1.8597654354338007e-8
           },
           "outputs": [
             {
@@ -4685,7 +4676,7 @@
             "coarseBlocks": 388,
             "coarseBandwidth": 79,
             "coarseBytes": 1154752,
-            "coarseRidge": 1.5286193195443754e-08
+            "coarseRidge": 1.5286193195443754e-8
           },
           "outputs": [
             {
@@ -4744,7 +4735,7 @@
             "coarseBlocks": 507,
             "coarseBandwidth": 91,
             "coarseBytes": 1703584,
-            "coarseRidge": 1.600177178986154e-08
+            "coarseRidge": 1.600177178986154e-8
           },
           "outputs": [
             {
@@ -4803,7 +4794,7 @@
             "coarseBlocks": 511,
             "coarseBandwidth": 99,
             "coarseBytes": 1847840,
-            "coarseRidge": 1.5565749015628682e-08
+            "coarseRidge": 1.5565749015628682e-8
           },
           "outputs": [
             {
@@ -4862,7 +4853,7 @@
             "coarseBlocks": 646,
             "coarseBandwidth": 123,
             "coarseBytes": 2832128,
-            "coarseRidge": 1.6548150334294726e-08
+            "coarseRidge": 1.6548150334294726e-8
           },
           "outputs": [
             {
@@ -4921,7 +4912,7 @@
             "coarseBlocks": 234,
             "coarseBandwidth": 103,
             "coarseBytes": 876160,
-            "coarseRidge": 1.5468997722088355e-08
+            "coarseRidge": 1.5468997722088355e-8
           },
           "outputs": [
             {
@@ -4980,7 +4971,7 @@
             "coarseBlocks": 301,
             "coarseBandwidth": 127,
             "coarseBytes": 1358176,
-            "coarseRidge": 1.7725854346483578e-08
+            "coarseRidge": 1.7725854346483578e-8
           },
           "outputs": [
             {
@@ -5039,7 +5030,7 @@
             "coarseBlocks": 266,
             "coarseBandwidth": 75,
             "coarseBytes": 757632,
-            "coarseRidge": 1.4349503658733187e-08
+            "coarseRidge": 1.4349503658733187e-8
           },
           "outputs": [
             {
@@ -5098,7 +5089,7 @@
             "coarseBlocks": 332,
             "coarseBandwidth": 95,
             "coarseBytes": 1158080,
-            "coarseRidge": 1.4758783473868232e-08
+            "coarseRidge": 1.4758783473868232e-8
           },
           "outputs": [
             {
@@ -5157,7 +5148,7 @@
             "coarseBlocks": 398,
             "coarseBandwidth": 115,
             "coarseBytes": 1643008,
-            "coarseRidge": 1.555529161638469e-08
+            "coarseRidge": 1.555529161638469e-8
           },
           "outputs": [
             {
@@ -5216,7 +5207,7 @@
             "coarseBlocks": 513,
             "coarseBandwidth": 123,
             "coarseBytes": 2249056,
-            "coarseRidge": 1.961095388324512e-08
+            "coarseRidge": 1.961095388324512e-8
           },
           "outputs": [
             {
@@ -5275,7 +5266,7 @@
             "coarseBlocks": 847,
             "coarseBandwidth": 143,
             "coarseBytes": 4255392,
-            "coarseRidge": 1.8538955554200608e-08
+            "coarseRidge": 1.8538955554200608e-8
           },
           "outputs": [
             {
@@ -5334,7 +5325,7 @@
             "coarseBlocks": 1084,
             "coarseBandwidth": 159,
             "coarseBytes": 6001088,
-            "coarseRidge": 2.0000198044917268e-08
+            "coarseRidge": 2.0000198044917268e-8
           },
           "outputs": [
             {
@@ -5393,7 +5384,7 @@
             "coarseBlocks": 317,
             "coarseBandwidth": 87,
             "coarseBytes": 1024608,
-            "coarseRidge": 1.58264134328453e-08
+            "coarseRidge": 1.58264134328453e-8
           },
           "outputs": [
             {
@@ -5452,7 +5443,7 @@
             "coarseBlocks": 384,
             "coarseBandwidth": 91,
             "coarseBytes": 1290304,
-            "coarseRidge": 1.6486047642073518e-08
+            "coarseRidge": 1.6486047642073518e-8
           },
           "outputs": [
             {
@@ -5511,7 +5502,7 @@
             "coarseBlocks": 622,
             "coarseBandwidth": 143,
             "coarseBytes": 3124992,
-            "coarseRidge": 1.8132888399120335e-08
+            "coarseRidge": 1.8132888399120335e-8
           },
           "outputs": [
             {
@@ -5570,7 +5561,7 @@
             "coarseBlocks": 710,
             "coarseBandwidth": 147,
             "coarseBytes": 3657984,
-            "coarseRidge": 1.5645958500846128e-08
+            "coarseRidge": 1.5645958500846128e-8
           },
           "outputs": [
             {
@@ -6559,7 +6550,7 @@
       "reportSha256": "c40dccc1153703d861dbb7d13347aa188eb0edbcf15cc7d848da3cee005802d2",
       "candidateAlphaSha256": "dbef4ac17f2ff5567ee8fbbe96495c4a4379e5e3a16ca84da514f84d24c85e8f",
       "maximumByteError": 1,
-      "meanByteError": 1.050420168067227e-05
+      "meanByteError": 1.050420168067227e-5
     },
     {
       "case": "GT13-Trimap1",
@@ -6580,7 +6571,7 @@
       "reportSha256": "6db5b75e89286ab2f5510f5f2abd3a03b8c270ef4a57494ef2b392c3534e437f",
       "candidateAlphaSha256": "b7a5d004d4b6723959ffab5722bb1feb657efb6eaa0ed8a324290030533976cf",
       "maximumByteError": 1,
-      "meanByteError": 1.2605042016806723e-05
+      "meanByteError": 1.2605042016806723e-5
     }
   ],
   "remaining": [
@@ -6605,17 +6596,14 @@
         "coarseBlocks": 320,
         "coarseBandwidth": 79,
         "coarseBytes": 952384,
-        "coarseRidge": 1.493082161953328e-08
+        "coarseRidge": 1.493082161953328e-8
       },
       "width": 800,
       "height": 497,
       "elapsedMs": 1595.9000000003725,
       "responseMs": 0.900000000372529,
       "revisionDelta": 1,
-      "longTasks": [
-        92,
-        70
-      ],
+      "longTasks": [92, 70],
       "solveLast": {
         "completed": 16,
         "total": 33,
@@ -6641,17 +6629,14 @@
         "coarseBlocks": 1029,
         "coarseBandwidth": 191,
         "coarseBytes": 6750304,
-        "coarseRidge": 1.9332456036511723e-08
+        "coarseRidge": 1.9332456036511723e-8
       },
       "width": 800,
       "height": 563,
       "elapsedMs": 7253,
       "responseMs": 1,
       "revisionDelta": 1,
-      "longTasks": [
-        104,
-        86
-      ],
+      "longTasks": [104, 86],
       "solveLast": {
         "completed": 18,
         "total": 37,
@@ -6677,17 +6662,14 @@
         "coarseBlocks": 969,
         "coarseBandwidth": 171,
         "coarseBytes": 5736544,
-        "coarseRidge": 2.1401768131768056e-08
+        "coarseRidge": 2.1401768131768056e-8
       },
       "width": 800,
       "height": 595,
       "elapsedMs": 33018.200000000186,
       "responseMs": 1.099999999627471,
       "revisionDelta": 1,
-      "longTasks": [
-        85,
-        83
-      ],
+      "longTasks": [85, 83],
       "solveLast": {
         "completed": 20,
         "total": 41,
@@ -6713,17 +6695,14 @@
         "coarseBlocks": 424,
         "coarseBandwidth": 87,
         "coarseBytes": 1370432,
-        "coarseRidge": 2.099047412217685e-08
+        "coarseRidge": 2.099047412217685e-8
       },
       "width": 800,
       "height": 532,
       "elapsedMs": 3158.600000000559,
       "responseMs": 1.2000000001862645,
       "revisionDelta": 1,
-      "longTasks": [
-        84,
-        73
-      ],
+      "longTasks": [84, 73],
       "solveLast": {
         "completed": 18,
         "total": 37,
@@ -7634,10 +7613,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT13",
-            "GT04"
-          ],
+          "selectedIds": ["GT13", "GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -7674,10 +7650,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -7709,7 +7682,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08,
+                "coarseRidge": 1.9332456036511723e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -7769,7 +7742,7 @@
                 "coarseBlocks": 969,
                 "coarseBandwidth": 171,
                 "coarseBytes": 5736544,
-                "coarseRidge": 2.1401768131768056e-08,
+                "coarseRidge": 2.1401768131768056e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -7819,10 +7792,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT13",
-            "GT04"
-          ],
+          "selectedIds": ["GT13", "GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -7859,10 +7829,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -7896,7 +7863,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08
+                "coarseRidge": 1.9332456036511723e-8
               },
               "outputs": [
                 {
@@ -7956,7 +7923,7 @@
                 "coarseBlocks": 969,
                 "coarseBandwidth": 171,
                 "coarseBytes": 5736544,
-                "coarseRidge": 2.1401768131768056e-08
+                "coarseRidge": 2.1401768131768056e-8
               },
               "outputs": [
                 {
@@ -8004,10 +7971,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT13",
-            "GT04"
-          ],
+          "selectedIds": ["GT13", "GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -8044,10 +8008,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -8081,7 +8042,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08
+                "coarseRidge": 1.9332456036511723e-8
               },
               "outputs": [
                 {
@@ -8141,7 +8102,7 @@
                 "coarseBlocks": 969,
                 "coarseBandwidth": 171,
                 "coarseBytes": 5736544,
-                "coarseRidge": 2.1401768131768056e-08
+                "coarseRidge": 2.1401768131768056e-8
               },
               "outputs": [
                 {
@@ -8189,10 +8150,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT13",
-            "GT04"
-          ],
+          "selectedIds": ["GT13", "GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -8229,10 +8187,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -8264,7 +8219,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08,
+                "coarseRidge": 1.9332456036511723e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -8324,7 +8279,7 @@
                 "coarseBlocks": 969,
                 "coarseBandwidth": 171,
                 "coarseBytes": 5736544,
-                "coarseRidge": 2.1401768131768056e-08,
+                "coarseRidge": 2.1401768131768056e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -8374,10 +8329,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT13",
-            "GT04"
-          ],
+          "selectedIds": ["GT13", "GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -8414,10 +8366,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -8449,7 +8398,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08,
+                "coarseRidge": 1.9332456036511723e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -8509,7 +8458,7 @@
                 "coarseBlocks": 969,
                 "coarseBandwidth": 171,
                 "coarseBytes": 5736544,
-                "coarseRidge": 2.1401768131768056e-08,
+                "coarseRidge": 2.1401768131768056e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -8559,10 +8508,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT13",
-            "GT04"
-          ],
+          "selectedIds": ["GT13", "GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -8599,10 +8545,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -8636,7 +8579,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08
+                "coarseRidge": 1.9332456036511723e-8
               },
               "outputs": [
                 {
@@ -8696,7 +8639,7 @@
                 "coarseBlocks": 969,
                 "coarseBandwidth": 171,
                 "coarseBytes": 5736544,
-                "coarseRidge": 2.1401768131768056e-08
+                "coarseRidge": 2.1401768131768056e-8
               },
               "outputs": [
                 {
@@ -8744,9 +8687,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT04"
-          ],
+          "selectedIds": ["GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -8783,10 +8724,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -8820,7 +8758,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08
+                "coarseRidge": 1.9332456036511723e-8
               },
               "outputs": [
                 {
@@ -8868,9 +8806,7 @@
           "citation": "Rhemann et al., A Perceptually Motivated Online Benchmark for Image Matting, CVPR 2009",
           "splitRule": "Image IDs divisible by 3 are local holdout; the others are development, both public trimap variants stay in the same split",
           "split": "development",
-          "selectedIds": [
-            "GT04"
-          ],
+          "selectedIds": ["GT04"],
           "archives": {
             "input": {
               "url": "https://tucloud.tuwien.ac.at/index.php/s/kbv8ZxuqehNk9vy/download?files=input_training_lowres.zip&path=%2FDatasets",
@@ -8907,10 +8843,7 @@
             "preconditioner": "ic0",
             "solver": "closed-form",
             "radius": 10,
-            "smoothness": [
-              0,
-              10
-            ],
+            "smoothness": [0, 10],
             "edgeFeather": 0,
             "contrast": 0,
             "shiftEdge": 0,
@@ -8942,7 +8875,7 @@
                 "coarseBlocks": 1029,
                 "coarseBandwidth": 191,
                 "coarseBytes": 6750304,
-                "coarseRidge": 1.9332456036511723e-08,
+                "coarseRidge": 1.9332456036511723e-8,
                 "iterationBackend": "javascript",
                 "iterationBytes": 0
               },
@@ -8987,23 +8920,11 @@
     "comparisons": [
       {
         "id": "GT04-Trimap2",
-        "eligibleRepeats": [
-          2,
-          3,
-          4
-        ],
+        "eligibleRepeats": [2, 3, 4],
         "sameIterations": true,
         "allNeutralAndDefaultBytesIdentical": true,
-        "baselineSolveMs": [
-          8164.805548999999,
-          8127.452101,
-          8622.575738
-        ],
-        "candidateSolveMs": [
-          5979.704195,
-          6001.232023,
-          5835.8955209999995
-        ],
+        "baselineSolveMs": [8164.805548999999, 8127.452101, 8622.575738],
+        "candidateSolveMs": [5979.704195, 6001.232023, 5835.8955209999995],
         "baselineMedianSolveMs": 8164.805548999999,
         "candidateMedianSolveMs": 5979.704195,
         "baselineMedianPipelineMs": 9580.334439,
@@ -9011,23 +8932,11 @@
       },
       {
         "id": "GT13-Trimap2",
-        "eligibleRepeats": [
-          1,
-          2,
-          3
-        ],
+        "eligibleRepeats": [1, 2, 3],
         "sameIterations": true,
         "allNeutralAndDefaultBytesIdentical": true,
-        "baselineSolveMs": [
-          51866.765960000004,
-          53105.079614,
-          52614.5252
-        ],
-        "candidateSolveMs": [
-          32594.041903,
-          32323.04949,
-          32680.31512
-        ],
+        "baselineSolveMs": [51866.765960000004, 53105.079614, 52614.5252],
+        "candidateSolveMs": [32594.041903, 32323.04949, 32680.31512],
         "baselineMedianSolveMs": 52614.5252,
         "candidateMedianSolveMs": 32594.041903,
         "baselineMedianPipelineMs": 53753.754708,

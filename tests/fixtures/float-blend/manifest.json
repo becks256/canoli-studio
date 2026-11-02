@@ -16,12 +16,7 @@
       "kind": "raster",
       "opacity": 0.625,
       "mask": {
-        "rect": [
-          2000,
-          0,
-          7000,
-          5000
-        ],
+        "rect": [2000, 0, 7000, 5000],
         "density": 0.5
       }
     },
@@ -31,12 +26,7 @@
       "opacity": 0.75,
       "fillOpacity": 0.625,
       "mask": {
-        "rect": [
-          1500,
-          0,
-          8000,
-          5000
-        ],
+        "rect": [1500, 0, 8000, 5000],
         "density": 0.5
       },
       "children": [
@@ -52,12 +42,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              3500,
-              0,
-              6500,
-              5000
-            ],
+            "rect": [3500, 0, 6500, 5000],
             "density": 0.625
           }
         },
@@ -80,12 +65,7 @@
       "opacity": 0.375,
       "fillOpacity": 0.625,
       "mask": {
-        "rect": [
-          1000,
-          0,
-          8000,
-          5000
-        ],
+        "rect": [1000, 0, 8000, 5000],
         "density": 0.5
       },
       "tone": {
@@ -95,7 +75,7 @@
     }
   ],
   "largeColorTolerance": {
-    "float32": 9.5367431640625e-07,
+    "float32": 9.5367431640625e-7,
     "uint16": 1
   },
   "largeAlphaTolerance": 0,
@@ -136,12 +116,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -156,12 +131,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "normal"
@@ -178,12 +148,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -197,12 +162,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "normal"
@@ -219,12 +179,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -234,12 +189,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -254,12 +204,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -273,12 +218,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -297,12 +237,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -311,12 +246,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -331,12 +261,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "normal"
@@ -351,12 +276,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -378,12 +298,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "normal",
@@ -400,12 +315,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -421,12 +331,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -450,12 +355,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -463,12 +363,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -482,12 +377,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -504,12 +394,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -527,12 +412,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -547,12 +427,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "multiply"
@@ -569,12 +444,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -588,12 +458,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "multiply"
@@ -610,12 +475,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -625,12 +485,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -645,12 +500,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -664,12 +514,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -688,12 +533,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -702,12 +542,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -722,12 +557,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "multiply"
@@ -742,12 +572,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -769,12 +594,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "multiply",
@@ -791,12 +611,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -812,12 +627,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -841,12 +651,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -854,12 +659,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -873,12 +673,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -895,12 +690,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -918,12 +708,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -938,12 +723,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "screen"
@@ -960,12 +740,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -979,12 +754,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "screen"
@@ -1001,12 +771,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1016,12 +781,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1036,12 +796,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -1055,12 +810,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -1079,12 +829,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1093,12 +838,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1113,12 +853,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "screen"
@@ -1133,12 +868,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -1160,12 +890,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "screen",
@@ -1182,12 +907,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -1203,12 +923,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -1232,12 +947,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1245,12 +955,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -1264,12 +969,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -1286,12 +986,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -1309,12 +1004,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1329,12 +1019,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "overlay"
@@ -1351,12 +1036,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1370,12 +1050,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "overlay"
@@ -1392,12 +1067,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1407,12 +1077,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1427,12 +1092,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -1446,12 +1106,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -1470,12 +1125,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1484,12 +1134,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1504,12 +1149,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "overlay"
@@ -1524,12 +1164,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -1551,12 +1186,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "overlay",
@@ -1573,12 +1203,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -1594,12 +1219,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -1623,12 +1243,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1636,12 +1251,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -1655,12 +1265,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -1677,12 +1282,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -1700,12 +1300,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1720,12 +1315,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "darken"
@@ -1742,12 +1332,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1761,12 +1346,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "darken"
@@ -1783,12 +1363,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1798,12 +1373,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1818,12 +1388,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -1837,12 +1402,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -1861,12 +1421,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -1875,12 +1430,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -1895,12 +1445,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "darken"
@@ -1915,12 +1460,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -1942,12 +1482,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "darken",
@@ -1964,12 +1499,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -1985,12 +1515,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -2014,12 +1539,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2027,12 +1547,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -2046,12 +1561,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -2068,12 +1578,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -2091,12 +1596,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2111,12 +1611,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "lighten"
@@ -2133,12 +1628,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2152,12 +1642,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "lighten"
@@ -2174,12 +1659,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2189,12 +1669,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2209,12 +1684,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -2228,12 +1698,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -2252,12 +1717,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2266,12 +1726,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2286,12 +1741,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "lighten"
@@ -2306,12 +1756,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -2333,12 +1778,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "lighten",
@@ -2355,12 +1795,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -2376,12 +1811,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -2405,12 +1835,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2418,12 +1843,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -2437,12 +1857,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -2459,12 +1874,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -2482,12 +1892,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2502,12 +1907,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "color-dodge"
@@ -2524,12 +1924,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2543,12 +1938,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "color-dodge"
@@ -2565,12 +1955,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2580,12 +1965,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2600,12 +1980,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -2619,12 +1994,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -2643,12 +2013,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2657,12 +2022,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2677,12 +2037,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "color-dodge"
@@ -2697,12 +2052,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -2724,12 +2074,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "color-dodge",
@@ -2746,12 +2091,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -2767,12 +2107,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -2796,12 +2131,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2809,12 +2139,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -2828,12 +2153,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -2850,12 +2170,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -2873,12 +2188,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2893,12 +2203,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "color-burn"
@@ -2915,12 +2220,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2934,12 +2234,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "color-burn"
@@ -2956,12 +2251,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -2971,12 +2261,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -2991,12 +2276,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -3010,12 +2290,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -3034,12 +2309,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3048,12 +2318,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3068,12 +2333,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "color-burn"
@@ -3088,12 +2348,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -3115,12 +2370,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "color-burn",
@@ -3137,12 +2387,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -3158,12 +2403,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -3187,12 +2427,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3200,12 +2435,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -3219,12 +2449,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -3241,12 +2466,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -3264,12 +2484,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3284,12 +2499,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "hard-light"
@@ -3306,12 +2516,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3325,12 +2530,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "hard-light"
@@ -3347,12 +2547,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3362,12 +2557,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3382,12 +2572,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -3401,12 +2586,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -3425,12 +2605,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3439,12 +2614,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3459,12 +2629,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "hard-light"
@@ -3479,12 +2644,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -3506,12 +2666,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "hard-light",
@@ -3528,12 +2683,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -3549,12 +2699,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -3578,12 +2723,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3591,12 +2731,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -3610,12 +2745,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -3632,12 +2762,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -3655,12 +2780,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3675,12 +2795,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "soft-light"
@@ -3697,12 +2812,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3716,12 +2826,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "soft-light"
@@ -3738,12 +2843,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3753,12 +2853,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3773,12 +2868,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -3792,12 +2882,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -3816,12 +2901,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -3830,12 +2910,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3850,12 +2925,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "soft-light"
@@ -3870,12 +2940,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -3897,12 +2962,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "soft-light",
@@ -3919,12 +2979,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -3940,12 +2995,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -3969,12 +3019,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -3982,12 +3027,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -4001,12 +3041,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -4023,12 +3058,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -4046,12 +3076,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4066,12 +3091,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "difference"
@@ -4088,12 +3108,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4107,12 +3122,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "difference"
@@ -4129,12 +3139,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4144,12 +3149,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4164,12 +3164,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -4183,12 +3178,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -4207,12 +3197,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4221,12 +3206,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4241,12 +3221,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "difference"
@@ -4261,12 +3236,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -4288,12 +3258,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "difference",
@@ -4310,12 +3275,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -4331,12 +3291,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -4360,12 +3315,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4373,12 +3323,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -4392,12 +3337,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -4414,12 +3354,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -4437,12 +3372,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4457,12 +3387,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "exclusion"
@@ -4479,12 +3404,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4498,12 +3418,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "exclusion"
@@ -4520,12 +3435,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4535,12 +3445,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4555,12 +3460,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -4574,12 +3474,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -4598,12 +3493,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4612,12 +3502,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4632,12 +3517,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "exclusion"
@@ -4652,12 +3532,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -4679,12 +3554,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "exclusion",
@@ -4701,12 +3571,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -4722,12 +3587,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -4751,12 +3611,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4764,12 +3619,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -4783,12 +3633,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -4805,12 +3650,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -4828,12 +3668,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4848,12 +3683,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "hue"
@@ -4870,12 +3700,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4889,12 +3714,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "hue"
@@ -4911,12 +3731,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -4926,12 +3741,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -4946,12 +3756,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -4965,12 +3770,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -4989,12 +3789,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5003,12 +3798,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5023,12 +3813,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "hue"
@@ -5043,12 +3828,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -5070,12 +3850,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "hue",
@@ -5092,12 +3867,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -5113,12 +3883,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -5142,12 +3907,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5155,12 +3915,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -5174,12 +3929,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -5196,12 +3946,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -5219,12 +3964,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5239,12 +3979,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "saturation"
@@ -5261,12 +3996,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5280,12 +4010,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "saturation"
@@ -5302,12 +4027,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5317,12 +4037,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5337,12 +4052,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -5356,12 +4066,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -5380,12 +4085,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5394,12 +4094,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5414,12 +4109,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "saturation"
@@ -5434,12 +4124,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -5461,12 +4146,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "saturation",
@@ -5483,12 +4163,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -5504,12 +4179,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -5533,12 +4203,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5546,12 +4211,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -5565,12 +4225,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -5587,12 +4242,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -5610,12 +4260,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5630,12 +4275,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "color"
@@ -5652,12 +4292,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5671,12 +4306,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "color"
@@ -5693,12 +4323,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5708,12 +4333,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5728,12 +4348,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -5747,12 +4362,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -5771,12 +4381,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -5785,12 +4390,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5805,12 +4405,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "color"
@@ -5825,12 +4420,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -5852,12 +4442,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "color",
@@ -5874,12 +4459,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -5895,12 +4475,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -5924,12 +4499,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -5937,12 +4507,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -5956,12 +4521,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -5978,12 +4538,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -6001,12 +4556,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6021,12 +4571,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "luminosity"
@@ -6043,12 +4588,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6062,12 +4602,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "luminosity"
@@ -6084,12 +4619,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6099,12 +4629,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6119,12 +4644,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -6138,12 +4658,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -6162,12 +4677,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6176,12 +4686,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6196,12 +4701,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "luminosity"
@@ -6216,12 +4716,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -6243,12 +4738,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "luminosity",
@@ -6265,12 +4755,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -6286,12 +4771,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -6315,12 +4795,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6328,12 +4803,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -6347,12 +4817,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -6369,12 +4834,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -6392,12 +4852,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6412,12 +4867,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "linear-light"
@@ -6434,12 +4884,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6453,12 +4898,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "linear-light"
@@ -6475,12 +4915,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6490,12 +4925,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6510,12 +4940,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -6529,12 +4954,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -6553,12 +4973,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6567,12 +4982,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6587,12 +4997,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "linear-light"
@@ -6607,12 +5012,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -6634,12 +5034,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "linear-light",
@@ -6656,12 +5051,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -6677,12 +5067,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -6706,12 +5091,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6719,12 +5099,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -6738,12 +5113,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -6760,12 +5130,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -6783,12 +5148,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6803,12 +5163,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "blendMode": "linear-burn"
@@ -6825,12 +5180,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6844,12 +5194,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "blendMode": "linear-burn"
@@ -6866,12 +5211,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6881,12 +5221,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6901,12 +5236,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               }
             },
@@ -6920,12 +5250,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               },
               "blendMode": "screen"
@@ -6944,12 +5269,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           }
         },
@@ -6958,12 +5278,7 @@
           "blendMode": "pass-through",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -6978,12 +5293,7 @@
                 }
               ],
               "mask": {
-                "rect": [
-                  30,
-                  5,
-                  80,
-                  60
-                ],
+                "rect": [30, 5, 80, 60],
                 "density": 0.625
               },
               "blendMode": "linear-burn"
@@ -6998,12 +5308,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -7025,12 +5330,7 @@
           "kind": "raster",
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              10,
-              90,
-              55
-            ],
+            "rect": [15, 10, 90, 55],
             "density": 0.5
           },
           "blendMode": "linear-burn",
@@ -7047,12 +5347,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -7068,12 +5363,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              5,
-              15,
-              100,
-              50
-            ],
+            "rect": [5, 15, 100, 50],
             "density": 0.5
           },
           "clipped": true,
@@ -7097,12 +5387,7 @@
           "opacity": 0.75,
           "fillOpacity": 0.625,
           "mask": {
-            "rect": [
-              15,
-              5,
-              105,
-              65
-            ],
+            "rect": [15, 5, 105, 65],
             "density": 0.5
           },
           "children": [
@@ -7110,12 +5395,7 @@
               "kind": "raster",
               "opacity": 0.625,
               "mask": {
-                "rect": [
-                  15,
-                  10,
-                  90,
-                  55
-                ],
+                "rect": [15, 10, 90, 55],
                 "density": 0.5
               }
             },
@@ -7129,12 +5409,7 @@
               "opacity": 0.75,
               "fillOpacity": 0.625,
               "mask": {
-                "rect": [
-                  5,
-                  15,
-                  100,
-                  50
-                ],
+                "rect": [5, 15, 100, 50],
                 "density": 0.5
               }
             }
@@ -7151,12 +5426,7 @@
             }
           ],
           "mask": {
-            "rect": [
-              30,
-              5,
-              80,
-              60
-            ],
+            "rect": [30, 5, 80, 60],
             "density": 0.625
           },
           "clipped": true,
@@ -7709,7 +5979,7 @@
       "rawSha256": "cd256c66108fb52c24c71b8d8eea484c9f9a76a987ce8be74523e270fc5778ef"
     }
   },
-  "colorTolerance": 9.5367431640625e-07,
+  "colorTolerance": 9.5367431640625e-7,
   "alphaTolerance": 0,
   "reference": "Independent NumPy float64 W3C blending and source-over; alpha-preserving adjustment interpolation. No editor/canvas/WASM expected samples.",
   "referenceUrl": "https://www.w3.org/TR/2024/CRD-compositing-1-20240321/"

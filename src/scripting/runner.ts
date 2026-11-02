@@ -3,7 +3,7 @@ import runtimeSource from "../generated/script-runtime.js?raw";
 import type { Document } from "../dom";
 import type { EditorCommand } from "../core/commands";
 import { parseCommands } from "../core/validation";
-import {documentFontFiles} from '../core/font-files';
+import { documentFontFiles } from "../core/font-files";
 
 export interface ScriptResult {
   commands: EditorCommand[];
@@ -26,7 +26,12 @@ export class ScriptRunner {
   private cancelCurrent: (() => void) | null = null;
   private cancellation = new Set<() => void>();
   /** Host commit validation can remain cancellable after worker execution. */
-  subscribeCancellation(listener: () => void) { this.cancellation.add(listener); return () => { this.cancellation.delete(listener); }; }
+  subscribeCancellation(listener: () => void) {
+    this.cancellation.add(listener);
+    return () => {
+      this.cancellation.delete(listener);
+    };
+  }
   cancel() {
     for (const listener of this.cancellation) listener();
     this.cancelCurrent?.();
@@ -48,15 +53,35 @@ export class ScriptRunner {
     const snapshot = isImmutable(current) ? current : document.toJSON();
     // Only current declared faces enter this disposable native font set. Raw
     // font payloads are consumed before user code starts, never put in the DOM.
-    let fonts:{family:string;info:import('../fonts/types').FontFaceInfo;descriptors:import('../fonts/types').FontDescriptors[];blob:Blob}[],fontChecks:(()=>void)[];
-    try{
-      fontChecks=[];
-      fonts=documentFontFiles(snapshot).map(file=>{
-        const store=document.assetStore?.fonts;if(!store)throw new Error('The script document is missing an embedded font source.');
-        const check=store.capture(file.id);check();fontChecks.push(check);
-        const resource=store.get(file.id);return{family:resource.cssFamily,info:resource.descriptor.report.faces[0],descriptors:resource.descriptor.report.faces[0].descriptors,blob:resource.renderBlob};
+    let fonts: {
+        family: string;
+        info: import("../fonts/types").FontFaceInfo;
+        descriptors: import("../fonts/types").FontDescriptors[];
+        blob: Blob;
+      }[],
+      fontChecks: (() => void)[];
+    try {
+      fontChecks = [];
+      fonts = documentFontFiles(snapshot).map((file) => {
+        const store = document.assetStore?.fonts;
+        if (!store)
+          throw new Error(
+            "The script document is missing an embedded font source.",
+          );
+        const check = store.capture(file.id);
+        check();
+        fontChecks.push(check);
+        const resource = store.get(file.id);
+        return {
+          family: resource.cssFamily,
+          info: resource.descriptor.report.faces[0],
+          descriptors: resource.descriptor.report.faces[0].descriptors,
+          blob: resource.renderBlob,
+        };
       });
-    }catch(error){return Promise.reject(error);}
+    } catch (error) {
+      return Promise.reject(error);
+    }
     const selectedId = document.selectedLayer?.id ?? null;
     const selectedIds = document.selectedLayers.map((layer) => layer.id);
     const iframe = window.document.createElement("iframe");
@@ -119,20 +144,40 @@ export class ScriptRunner {
         if (finished) return;
         const data = event.data;
         if (data?.type === "ready") {
-          try{
-            if(started)throw new Error("Duplicate script startup message.");started=true;
-            for(const check of fontChecks)check();
-            channel.port1.postMessage({document:snapshot,fonts,selectedId,selectedIds,code});
-          }catch(error){fail(error instanceof Error?error:new Error(String(error)));}
+          try {
+            if (started) throw new Error("Duplicate script startup message.");
+            started = true;
+            for (const check of fontChecks) check();
+            channel.port1.postMessage({
+              document: snapshot,
+              fonts,
+              selectedId,
+              selectedIds,
+              code,
+            });
+          } catch (error) {
+            fail(error instanceof Error ? error : new Error(String(error)));
+          }
           return;
         }
-        fail(new Error(data?.type === "error" && typeof data.error === "string" ? data.error.slice(0,2000) : "Unexpected script startup message."));
+        fail(
+          new Error(
+            data?.type === "error" && typeof data.error === "string"
+              ? data.error.slice(0, 2000)
+              : "Unexpected script startup message.",
+          ),
+        );
       };
-      bootstrap.port1.onmessageerror = () => fail(new Error("Unreadable script startup message."));
-      channel.port1.onmessageerror = () => fail(new Error("Unreadable script result."));
+      bootstrap.port1.onmessageerror = () =>
+        fail(new Error("Unreadable script startup message."));
+      channel.port1.onmessageerror = () =>
+        fail(new Error("Unreadable script result."));
       channel.port1.onmessage = async (event) => {
         if (finished) return;
-        if(!started){fail(new Error("Script result preceded startup."));return;}
+        if (!started) {
+          fail(new Error("Script result preceded startup."));
+          return;
+        }
         const data = event.data;
         if (data?.type === "host:call") {
           const { id, service, method, args } = data;
@@ -197,7 +242,7 @@ export class ScriptRunner {
           )
             throw new Error("Invalid selected layer IDs.");
           const selectedIds = [...new Set<string>(data.selectedIds)];
-          for(const check of fontChecks)check();
+          for (const check of fontChecks) check();
           if ((selectedIds.at(-1) ?? null) !== selectedId)
             throw new Error("Inconsistent active layer.");
           finished = true;
@@ -212,7 +257,10 @@ export class ScriptRunner {
         }
       };
       iframe.onload = () => {
-        iframe.contentWindow?.postMessage({ runtimeSource }, "*", [channel.port2, bootstrap.port2]);
+        iframe.contentWindow?.postMessage({ runtimeSource }, "*", [
+          channel.port2,
+          bootstrap.port2,
+        ]);
       };
       window.document.body.append(iframe);
     });

@@ -223,14 +223,20 @@ test.describe("Professional foundation increments (T16: F06, F07, F08, F11)", ()
 
     // 1. Add a vector layer and paint layer so Export... button is active and mixed content exists
     await page.evaluate(() => {
-      const { editor, VectorLayer, VectorPath, PaintLayer, PaintFill } = window.luma;
+      const { editor, VectorLayer, VectorPath, PaintLayer, PaintFill } =
+        window.luma;
       const vLayer = new VectorLayer({ name: "Branding Shape" });
       vLayer.paths.add(
         VectorPath.rectangle({ x: 50, y: 50, width: 200, height: 100 }),
       );
       editor.document.layers.add(vLayer);
       const pLayer = new PaintLayer({ name: "Paint Art" });
-      pLayer.strokes.add(new PaintFill({bounds:{x:20,y:200,width:100,height:50},color:"#804020"}));
+      pLayer.strokes.add(
+        new PaintFill({
+          bounds: { x: 20, y: 200, width: 100, height: 50 },
+          color: "#804020",
+        }),
+      );
       editor.document.layers.add(pLayer);
       editor.document.selectedLayer = vLayer;
     });

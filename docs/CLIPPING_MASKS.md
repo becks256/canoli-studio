@@ -25,17 +25,26 @@ Default byte clipping uses Canvas fallback. Float32/linear-sRGB documents use or
 Existing document read/write permission suffices. No file, asset, network or account capability is added.
 
 ```javascript
-document.transaction('Clip color to shape', () => {
-  const shape = document.layers.add(new VectorLayer({name:'Clipping base'}));
-  shape.paths.add(VectorPath.ellipse(
-    {x:40,y:40,width:160,height:120},
-    {fill:'#2468ac',stroke:null,strokeWidth:0}
-  ));
-  const color = document.layers.add(new PaintLayer({name:'Clipped color',clipped:true}));
-  color.strokes.add(new PaintFill({bounds:{x:0,y:0,width:320,height:240},color:'#e94730'}));
+document.transaction("Clip color to shape", () => {
+  const shape = document.layers.add(new VectorLayer({ name: "Clipping base" }));
+  shape.paths.add(
+    VectorPath.ellipse(
+      { x: 40, y: 40, width: 160, height: 120 },
+      { fill: "#2468ac", stroke: null, strokeWidth: 0 },
+    ),
+  );
+  const color = document.layers.add(
+    new PaintLayer({ name: "Clipped color", clipped: true }),
+  );
+  color.strokes.add(
+    new PaintFill({
+      bounds: { x: 0, y: 0, width: 320, height: 240 },
+      color: "#e94730",
+    }),
+  );
   document.selectedLayer = color;
 });
-print('Clipping example complete');
+print("Clipping example complete");
 ```
 
 ## REST, replay and persistence
@@ -43,7 +52,16 @@ print('Clipping example complete');
 The independent command endpoint accepts the same strict update using the actual target ID and current revision:
 
 ```json
-{"expectedRevision":3,"commands":[{"type":"layer.update","id":"target-layer-id","patch":{"clipped":true}}]}
+{
+  "expectedRevision": 3,
+  "commands": [
+    {
+      "type": "layer.update",
+      "id": "target-layer-id",
+      "patch": { "clipped": true }
+    }
+  ]
+}
 ```
 
 Malformed values/locked edits return 400; stale revisions return 409. Transactions roll back atomically. REST sessions do not synchronize with browser artwork. Plugin commits still enforce their current grants. Recorded literal layer updates/replay preserve the flag on the receiving sibling stack, without binding an original base ID.

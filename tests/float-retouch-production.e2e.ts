@@ -1,17 +1,195 @@
-import {test,expect} from '@playwright/test';
-import {readFile,writeFile} from 'node:fs/promises';
-import {spawnSync} from 'node:child_process';
-import {historyProject,historyScript} from './helpers/history-inspector';
+import { test, expect } from "@playwright/test";
+import { readFile, writeFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { historyProject, historyScript } from "./helpers/history-inspector";
 
-test('production Patch drag and Spot Healing pointer retain native corrections, one Undo, originals and precise TIFF/project delivery',async({page},info)=>{
- await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);await page.getByTestId('import-input').setInputFiles('tests/fixtures/float-retouch/damaged-original.tif');const tiff=page.getByRole('dialog',{name:'Import TIFF',exact:true});await tiff.getByLabel('TIFF editing precision',{exact:true}).selectOption('float32');await tiff.getByRole('button',{name:'Import TIFF page',exact:true}).click();await expect(tiff).toHaveCount(0);
- await historyScript(page,"document.selection=new MarqueeSelection({shape:'rectangle',x:122,y:90,width:13,height:13});",'Native selection ready');const before=await historyProject(page,info,'before.luma');await page.keyboard.press('Control+1');await page.keyboard.press('j');await expect(page.getByRole('button',{name:'Patch tool (J)',exact:true})).toHaveAttribute('aria-pressed','true');const box=(await page.locator('.canvas-wrap').boundingBox())!;
- const drag=async()=>{await page.mouse.move(box.x+128.5,box.y+96.5);await page.mouse.down();await page.mouse.move(box.x+144.5,box.y+96.5,{steps:4});await expect(page.getByTestId('patch-donor-outline')).toHaveAttribute('transform','translate(16 0)');};
- await drag();await page.keyboard.press('Escape');await page.mouse.up();expect((await historyProject(page,info,'cancelled.luma')).value.document).toEqual(before.value.document);await drag();await page.mouse.up();await expect(page.getByRole('button',{name:'Select Retouch patch',exact:true})).toBeVisible();const patched=await historyProject(page,info,'patched.luma'),correction=patched.value.document.children.find(layer=>layer.kind==='adjustment');if(correction?.kind!=='adjustment'||correction.adjustment.kind!=='patch')throw new Error('No native patch');expect(correction.adjustment.precision).toBe('float32');const correctionAssetId=correction.adjustment.assetId;expect(patched.value.entries.find(entry=>entry.id===correctionAssetId)?.tiff?.editingPrecision).toBe('float32');
- const output=async(name:string)=>{await page.getByRole('button',{name:'Export…',exact:true}).click();const dialog=page.locator('.export-dialog');await dialog.getByLabel('Format',{exact:true}).selectOption('tiff');await dialog.getByLabel('TIFF precision',{exact:true}).selectOption('float32');await dialog.getByLabel('Use output RGB profile for high-precision TIFF',{exact:true}).uncheck();const pending=page.waitForEvent('download');await dialog.getByRole('button',{name:'Export .tif',exact:true}).click();await(await pending).saveAs(info.outputPath(name+'.tif'));await expect(dialog).toHaveCount(0);};
- await output('patched');await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await historyProject(page,info,'undo.luma')).value.document).toEqual(before.value.document);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'redo.luma')).value.document).toEqual(patched.value.document);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();
- await page.keyboard.press('Shift+J');await expect(page.getByRole('button',{name:'Spot Healing (Shift+J)',exact:true})).toHaveAttribute('aria-pressed','true');for(const[name,value]of [['Size value','12'],['Hardness value','100'],['Tool opacity value','100'],['Search radius value','24']]){const field=page.getByRole('spinbutton',{name,exact:true});await field.fill(value);await field.press('Enter');}await page.getByRole('checkbox',{name:'Pressure controls size',exact:true}).uncheck();await page.getByRole('checkbox',{name:'Pressure controls opacity',exact:true}).uncheck();const healBox=(await page.locator('.canvas-wrap').boundingBox())!;await page.mouse.click(healBox.x+128.5,healBox.y+96.5);await expect(page.getByRole('button',{name:'Select Healing stroke',exact:true})).toBeVisible();const healed=await historyProject(page,info,'healed.luma'),heal=healed.value.document.children.find(layer=>layer.name==='Healing stroke');if(heal?.kind!=='adjustment'||heal.adjustment.kind!=='patch')throw new Error('No native Healing');expect(heal.adjustment.precision).toBe('float32');await output('healed');await page.getByTestId('project-input').setInputFiles(healed.path);expect((await historyProject(page,info,'reopened.luma')).value.document).toEqual(healed.value.document);await output('reopened');expect(Buffer.from(await healed.value.entries.find(entry=>entry.id===before.value.entries[0].id)!.blob.arrayBuffer())).toEqual(await readFile('tests/fixtures/float-retouch/damaged-original.tif'));
- const record={width:257,height:193,debugGlobals:false,cancelExact:true,oneUndo:true,native:true,sourceExact:true,reopenExact:true};await writeFile(info.outputPath('float-retouch-production.json'),JSON.stringify(record,null,2));const checked=spawnSync('python3',['scripts/check-float-retouch.py',info.outputDir],{encoding:'utf8',timeout:120000});expect(checked.status,checked.stderr||checked.stdout).toBe(0);await writeFile(info.outputPath('independent-native-retouch.json'),checked.stdout);
+test("production Patch drag and Spot Healing pointer retain native corrections, one Undo, originals and precise TIFF/project delivery", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  expect(await page.evaluate(() => "luma" in window)).toBe(false);
+  await page
+    .getByTestId("import-input")
+    .setInputFiles("tests/fixtures/float-retouch/damaged-original.tif");
+  const tiff = page.getByRole("dialog", { name: "Import TIFF", exact: true });
+  await tiff
+    .getByLabel("TIFF editing precision", { exact: true })
+    .selectOption("float32");
+  await tiff
+    .getByRole("button", { name: "Import TIFF page", exact: true })
+    .click();
+  await expect(tiff).toHaveCount(0);
+  await historyScript(
+    page,
+    "document.selection=new MarqueeSelection({shape:'rectangle',x:122,y:90,width:13,height:13});",
+    "Native selection ready",
+  );
+  const before = await historyProject(page, info, "before.luma");
+  await page.keyboard.press("Control+1");
+  await page.keyboard.press("j");
+  await expect(
+    page.getByRole("button", { name: "Patch tool (J)", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  const box = (await page.locator(".canvas-wrap").boundingBox())!;
+  const drag = async () => {
+    await page.mouse.move(box.x + 128.5, box.y + 96.5);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 144.5, box.y + 96.5, { steps: 4 });
+    await expect(page.getByTestId("patch-donor-outline")).toHaveAttribute(
+      "transform",
+      "translate(16 0)",
+    );
+  };
+  await drag();
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  expect(
+    (await historyProject(page, info, "cancelled.luma")).value.document,
+  ).toEqual(before.value.document);
+  await drag();
+  await page.mouse.up();
+  await expect(
+    page.getByRole("button", { name: "Select Retouch patch", exact: true }),
+  ).toBeVisible();
+  const patched = await historyProject(page, info, "patched.luma"),
+    correction = patched.value.document.children.find(
+      (layer) => layer.kind === "adjustment",
+    );
+  if (
+    correction?.kind !== "adjustment" ||
+    correction.adjustment.kind !== "patch"
+  )
+    throw new Error("No native patch");
+  expect(correction.adjustment.precision).toBe("float32");
+  const correctionAssetId = correction.adjustment.assetId;
+  expect(
+    patched.value.entries.find((entry) => entry.id === correctionAssetId)?.tiff
+      ?.editingPrecision,
+  ).toBe("float32");
+  const output = async (name: string) => {
+    await page.getByRole("button", { name: "Export…", exact: true }).click();
+    const dialog = page.locator(".export-dialog");
+    await dialog.getByLabel("Format", { exact: true }).selectOption("tiff");
+    await dialog
+      .getByLabel("TIFF precision", { exact: true })
+      .selectOption("float32");
+    await dialog
+      .getByLabel("Use output RGB profile for high-precision TIFF", {
+        exact: true,
+      })
+      .uncheck();
+    const pending = page.waitForEvent("download");
+    await dialog
+      .getByRole("button", { name: "Export .tif", exact: true })
+      .click();
+    await (await pending).saveAs(info.outputPath(name + ".tif"));
+    await expect(dialog).toHaveCount(0);
+  };
+  await output("patched");
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  expect(
+    (await historyProject(page, info, "undo.luma")).value.document,
+  ).toEqual(before.value.document);
+  await page
+    .getByRole("button", { name: "Redo (Mod+Shift+Z)", exact: true })
+    .click();
+  expect(
+    (await historyProject(page, info, "redo.luma")).value.document,
+  ).toEqual(patched.value.document);
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  await page.keyboard.press("Shift+J");
+  await expect(
+    page.getByRole("button", { name: "Spot Healing (Shift+J)", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  for (const [name, value] of [
+    ["Size value", "12"],
+    ["Hardness value", "100"],
+    ["Tool opacity value", "100"],
+    ["Search radius value", "24"],
+  ]) {
+    const field = page.getByRole("spinbutton", { name, exact: true });
+    await field.fill(value);
+    await field.press("Enter");
+  }
+  await page
+    .getByRole("checkbox", { name: "Pressure controls size", exact: true })
+    .uncheck();
+  await page
+    .getByRole("checkbox", { name: "Pressure controls opacity", exact: true })
+    .uncheck();
+  const healBox = (await page.locator(".canvas-wrap").boundingBox())!;
+  await page.mouse.click(healBox.x + 128.5, healBox.y + 96.5);
+  await expect(
+    page.getByRole("button", { name: "Select Healing stroke", exact: true }),
+  ).toBeVisible();
+  const healed = await historyProject(page, info, "healed.luma"),
+    heal = healed.value.document.children.find(
+      (layer) => layer.name === "Healing stroke",
+    );
+  if (heal?.kind !== "adjustment" || heal.adjustment.kind !== "patch")
+    throw new Error("No native Healing");
+  expect(heal.adjustment.precision).toBe("float32");
+  await output("healed");
+  await page.getByTestId("project-input").setInputFiles(healed.path);
+  expect(
+    (await historyProject(page, info, "reopened.luma")).value.document,
+  ).toEqual(healed.value.document);
+  await output("reopened");
+  expect(
+    Buffer.from(
+      await healed.value.entries
+        .find((entry) => entry.id === before.value.entries[0].id)!
+        .blob.arrayBuffer(),
+    ),
+  ).toEqual(
+    await readFile("tests/fixtures/float-retouch/damaged-original.tif"),
+  );
+  const record = {
+    width: 257,
+    height: 193,
+    debugGlobals: false,
+    cancelExact: true,
+    oneUndo: true,
+    native: true,
+    sourceExact: true,
+    reopenExact: true,
+  };
+  await writeFile(
+    info.outputPath("float-retouch-production.json"),
+    JSON.stringify(record, null, 2),
+  );
+  const checked = spawnSync(
+    "python3",
+    ["scripts/check-float-retouch.py", info.outputDir],
+    { encoding: "utf8", timeout: 120000 },
+  );
+  expect(checked.status, checked.stderr || checked.stdout).toBe(0);
+  await writeFile(
+    info.outputPath("independent-native-retouch.json"),
+    checked.stdout,
+  );
 });
 
-test.describe('native retouch guide',()=>{test.use({javaScriptEnabled:false,viewport:{width:390,height:844}});test('documents native numerical units and coverage without JavaScript',async({page})=>{await page.goto('/developer/float-retouch.html');await expect(page.getByRole('heading',{name:'Native linear Patch and Spot Healing',exact:true})).toBeVisible();await expect(page.locator('main')).toContainText('schema 59');await expect(page.locator('main')).toContainText('source alpha is correction coverage');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);});});
+test.describe("native retouch guide", () => {
+  test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  test("documents native numerical units and coverage without JavaScript", async ({
+    page,
+  }) => {
+    await page.goto("/developer/float-retouch.html");
+    await expect(
+      page.getByRole("heading", {
+        name: "Native linear Patch and Spot Healing",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(page.locator("main")).toContainText("schema 59");
+    await expect(page.locator("main")).toContainText(
+      "source alpha is correction coverage",
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  });
+});

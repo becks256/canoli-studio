@@ -1,305 +1,1161 @@
-import {AffineTransform} from '../core/affine';
-import type {FloatGlyph} from './float-glyph';
-import {snapshotGlyphPath} from './native-glyph-path';
-import type {NativeGlyphRunInput,NativeGlyphMatch} from './native-glyph-match';
-import type {NativeSvgGlyphMatch} from './native-svg-glyph';
-import type {FloatSourceWindow} from '../core/float-source/types';
-import type {PixelProcessor} from './processor';
-import type {NativeGlyphFont,NativeGlyphFontControl} from './native-glyph-font';
-import {captureLinearTextColors,type LinearTextColor} from './float-text-color';
-import {textWritingSchema,verticalWriting,applyNativeTextWriting,type TextWriting} from '../core/text-writing';
-import {z} from 'zod';
-import {PATH_POINT_LIMIT} from '../core/drawing';
-import {textPathSchema,normalizeTextPath,textPathData,type TextPathGeometry} from '../core/text-path';
-import {characterFormatSchema,characterFormatPatchSchema as formatPatchSchema,DEFAULT_CHARACTER_FORMAT,definedCharacterFormat,type CharacterFormat} from '../core/character-format';
-import {applyNativeCharacterStyle} from '../core/character-layout';
-import {fontFamilyNames} from '../core/font-families';
-import {parseFontVariations,assertFontVariationRanges} from '../core/font-variations';
-import {documentFontFiles} from '../core/font-files';
-import type {DocumentData} from '../core/model';
-import type {AssetStore} from '../core/assets';
-import type {Rect} from '../core/drawing';
-import {applyTextStyle,nativeTextFont} from '../core/text-style';
-import {captureOwnedExportFonts,captureExportFonts,type FontSourceCapture} from './export-fonts';
-import {captureSvgFonts} from './svg-fonts';
-import {yieldTask} from './task-yield';
+import { AffineTransform } from "../core/affine";
+import type { FloatGlyph } from "./float-glyph";
+import { snapshotGlyphPath } from "./native-glyph-path";
+import type {
+  NativeGlyphRunInput,
+  NativeGlyphMatch,
+} from "./native-glyph-match";
+import type { NativeSvgGlyphMatch } from "./native-svg-glyph";
+import type { FloatSourceWindow } from "../core/float-source/types";
+import type { PixelProcessor } from "./processor";
+import type {
+  NativeGlyphFont,
+  NativeGlyphFontControl,
+} from "./native-glyph-font";
+import {
+  captureLinearTextColors,
+  type LinearTextColor,
+} from "./float-text-color";
+import {
+  textWritingSchema,
+  verticalWriting,
+  applyNativeTextWriting,
+  type TextWriting,
+} from "../core/text-writing";
+import { z } from "zod";
+import { PATH_POINT_LIMIT } from "../core/drawing";
+import {
+  textPathSchema,
+  normalizeTextPath,
+  textPathData,
+  type TextPathGeometry,
+} from "../core/text-path";
+import {
+  characterFormatSchema,
+  characterFormatPatchSchema as formatPatchSchema,
+  DEFAULT_CHARACTER_FORMAT,
+  definedCharacterFormat,
+  type CharacterFormat,
+} from "../core/character-format";
+import { applyNativeCharacterStyle } from "../core/character-layout";
+import { fontFamilyNames } from "../core/font-families";
+import {
+  parseFontVariations,
+  assertFontVariationRanges,
+} from "../core/font-variations";
+import { documentFontFiles } from "../core/font-files";
+import type { DocumentData } from "../core/model";
+import type { AssetStore } from "../core/assets";
+import type { Rect } from "../core/drawing";
+import { applyTextStyle, nativeTextFont } from "../core/text-style";
+import {
+  captureOwnedExportFonts,
+  captureExportFonts,
+  type FontSourceCapture,
+} from "./export-fonts";
+import { captureSvgFonts } from "./svg-fonts";
+import { yieldTask } from "./task-yield";
 
-const SVG_NS='http://www.w3.org/2000/svg';
-const coordinate=z.number().finite().min(-Number.MAX_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER);
-const sceneSchema=z.object({
-  width:z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
-  transform:z.tuple([coordinate,coordinate,coordinate,coordinate,coordinate,coordinate]).optional(),
-  style:formatPatchSchema.optional(),
-  lines:z.array(z.object({x:coordinate.default(0),y:coordinate.default(0),wordSpacingDelta:coordinate.default(0),
-    align:z.enum(['left','center','right']).default('left'),direction:z.enum(['ltr','rtl']).default('ltr'),
-    path:textPathSchema.optional(),writing:textWritingSchema.optional(),
-    spans:z.array(z.object({text:z.string().max(10000),style:formatPatchSchema.optional()}).strict()).max(10000),
-  }).strict()).max(10000),
-}).strict().superRefine((scene,context)=>{
-  const anchors=scene.lines.reduce((count,line)=>count+(line.path?.points.length??0),0);
-  if(anchors>PATH_POINT_LIMIT)context.addIssue({code:'custom',message:'Styled text baselines exceed the existing 20000-anchor vector budget.'});
-  const characters=scene.lines.reduce((count,line)=>count+line.spans.reduce((size,span)=>size+span.text.length,0),Math.max(0,scene.lines.length-1));
-  if(characters>10000)context.addIssue({code:'custom',message:'Styled text exceeds the existing 10000-character text budget.'});
-  for(const line of scene.lines){
-    let previous='';
-    for(const span of line.spans){
-      if(/[\n\u2028\u2029]/u.test(span.text))context.addIssue({code:'custom',message:'Supply explicit visual lines for styled text.'});
-      for(const character of span.text){const point=character.codePointAt(0)!;if(point<32&&![9,12,13].includes(point)||point>=0xd800&&point<=0xdfff||point===0xfffe||point===0xffff)context.addIssue({code:'custom',message:'Native SVG styled text cannot represent XML controls or unpaired surrogates.'});}
-      if(!span.text)continue;
-      if(/[\ud800-\udbff]$/.test(previous)&&/^[\udc00-\udfff]/.test(span.text))context.addIssue({code:'custom',message:'A style boundary cannot split a Unicode surrogate pair.'});
-      previous=span.text;
+const SVG_NS = "http://www.w3.org/2000/svg";
+const coordinate = z
+  .number()
+  .finite()
+  .min(-Number.MAX_SAFE_INTEGER)
+  .max(Number.MAX_SAFE_INTEGER);
+const sceneSchema = z
+  .object({
+    width: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+    height: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+    transform: z
+      .tuple([
+        coordinate,
+        coordinate,
+        coordinate,
+        coordinate,
+        coordinate,
+        coordinate,
+      ])
+      .optional(),
+    style: formatPatchSchema.optional(),
+    lines: z
+      .array(
+        z
+          .object({
+            x: coordinate.default(0),
+            y: coordinate.default(0),
+            wordSpacingDelta: coordinate.default(0),
+            align: z.enum(["left", "center", "right"]).default("left"),
+            direction: z.enum(["ltr", "rtl"]).default("ltr"),
+            path: textPathSchema.optional(),
+            writing: textWritingSchema.optional(),
+            spans: z
+              .array(
+                z
+                  .object({
+                    text: z.string().max(10000),
+                    style: formatPatchSchema.optional(),
+                  })
+                  .strict(),
+              )
+              .max(10000),
+          })
+          .strict(),
+      )
+      .max(10000),
+  })
+  .strict()
+  .superRefine((scene, context) => {
+    const anchors = scene.lines.reduce(
+      (count, line) => count + (line.path?.points.length ?? 0),
+      0,
+    );
+    if (anchors > PATH_POINT_LIMIT)
+      context.addIssue({
+        code: "custom",
+        message:
+          "Styled text baselines exceed the existing 20000-anchor vector budget.",
+      });
+    const characters = scene.lines.reduce(
+      (count, line) =>
+        count + line.spans.reduce((size, span) => size + span.text.length, 0),
+      Math.max(0, scene.lines.length - 1),
+    );
+    if (characters > 10000)
+      context.addIssue({
+        code: "custom",
+        message:
+          "Styled text exceeds the existing 10000-character text budget.",
+      });
+    for (const line of scene.lines) {
+      let previous = "";
+      for (const span of line.spans) {
+        if (/[\n\u2028\u2029]/u.test(span.text))
+          context.addIssue({
+            code: "custom",
+            message: "Supply explicit visual lines for styled text.",
+          });
+        for (const character of span.text) {
+          const point = character.codePointAt(0)!;
+          if (
+            (point < 32 && ![9, 12, 13].includes(point)) ||
+            (point >= 0xd800 && point <= 0xdfff) ||
+            point === 0xfffe ||
+            point === 0xffff
+          )
+            context.addIssue({
+              code: "custom",
+              message:
+                "Native SVG styled text cannot represent XML controls or unpaired surrogates.",
+            });
+        }
+        if (!span.text) continue;
+        if (
+          /[\ud800-\udbff]$/.test(previous) &&
+          /^[\udc00-\udfff]/.test(span.text)
+        )
+          context.addIssue({
+            code: "custom",
+            message: "A style boundary cannot split a Unicode surrogate pair.",
+          });
+        previous = span.text;
+      }
     }
-  }
-});
+  });
 
 /** Internal render DTOs; these are not a second public document mutation API. */
-export type StyledTextSceneInput=z.input<typeof sceneSchema>;
-export interface StyledTextSpan {readonly text:string;readonly style:Readonly<CharacterFormat>}
-export interface StyledTextLine {readonly x:number;readonly y:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly path?:TextPathGeometry;readonly writing?:Readonly<TextWriting>;readonly spans:readonly StyledTextSpan[]}
-export interface StyledTextScene {readonly width:number;readonly height:number;readonly transform:readonly number[];readonly lines:readonly StyledTextLine[]}
-export interface StyledTextLineMetrics {readonly advance:number;readonly ink:Readonly<Rect>;readonly pathLength?:number}
-export interface StyledTextControl {signal?:AbortSignal;isCancelled?:()=>boolean}
+export type StyledTextSceneInput = z.input<typeof sceneSchema>;
+export interface StyledTextSpan {
+  readonly text: string;
+  readonly style: Readonly<CharacterFormat>;
+}
+export interface StyledTextLine {
+  readonly x: number;
+  readonly y: number;
+  readonly wordSpacingDelta: number;
+  readonly align: "left" | "center" | "right";
+  readonly direction: "ltr" | "rtl";
+  readonly path?: TextPathGeometry;
+  readonly writing?: Readonly<TextWriting>;
+  readonly spans: readonly StyledTextSpan[];
+}
+export interface StyledTextScene {
+  readonly width: number;
+  readonly height: number;
+  readonly transform: readonly number[];
+  readonly lines: readonly StyledTextLine[];
+}
+export interface StyledTextLineMetrics {
+  readonly advance: number;
+  readonly ink: Readonly<Rect>;
+  readonly pathLength?: number;
+}
+export interface StyledTextControl {
+  signal?: AbortSignal;
+  isCancelled?: () => boolean;
+}
 export interface StyledTextSurface {
-  readonly bitmap:ImageBitmap;
-  readonly metrics:readonly StyledTextLineMetrics[];
-  check():void;
-  release():void;
+  readonly bitmap: ImageBitmap;
+  readonly metrics: readonly StyledTextLineMetrics[];
+  check(): void;
+  release(): void;
 }
 
 /** Native addressable-character metadata is not a glyph ID or a paint primitive.
  * Coordinates remain in the original SVG text element's local coordinate space. */
 export interface StyledTextCharacterGeometry {
-  readonly index:number;
-  readonly start:Readonly<{x:number;y:number}>;
-  readonly end:Readonly<{x:number;y:number}>;
-  readonly extent:Readonly<Rect>;
-  readonly rotation:number;
+  readonly index: number;
+  readonly start: Readonly<{ x: number; y: number }>;
+  readonly end: Readonly<{ x: number; y: number }>;
+  readonly extent: Readonly<Rect>;
+  readonly rotation: number;
 }
 export interface StyledTextNativePaint {
   /** Whole-source nonnegative-spacing probe: only visual order and direction,
    * never authored glyph poses, IDs, colors or actual coverage. */
-  readonly visual?:readonly (readonly NativeTextVisualPosition[]|null)[];
-  readonly pathCharacters:readonly (readonly StyledTextCharacterGeometry[]|null)[];
+  readonly visual?: readonly (readonly NativeTextVisualPosition[] | null)[];
+  readonly pathCharacters: readonly (
+    readonly StyledTextCharacterGeometry[] | null
+  )[];
   /** Additional original-source geometry for signed path allocations. The
    * legacy unfolded baseline remains separate for existing projections. */
-  readonly inlineAllocation?:readonly (Readonly<import('./native-svg-inline').NativeSvgInlineAllocation>|null)[];
-  readonly colors:readonly (readonly LinearTextColor[])[];
-  readonly characters:readonly (readonly StyledTextCharacterGeometry[])[];
+  readonly inlineAllocation?: readonly (Readonly<
+    import("./native-svg-inline").NativeSvgInlineAllocation
+  > | null)[];
+  readonly colors: readonly (readonly LinearTextColor[])[];
+  readonly characters: readonly (readonly StyledTextCharacterGeometry[])[];
 }
-export interface NativeTextVisualPosition {readonly order:number;readonly direction:'ltr'|'rtl'|null;readonly rotation?:number}
+export interface NativeTextVisualPosition {
+  readonly order: number;
+  readonly direction: "ltr" | "rtl" | null;
+  readonly rotation?: number;
+}
 export interface StyledTextPlan {
-  readonly scene:StyledTextScene;
-  readonly metrics:readonly StyledTextLineMetrics[];
-  readonly paint?:StyledTextNativePaint;
+  readonly scene: StyledTextScene;
+  readonly metrics: readonly StyledTextLineMetrics[];
+  readonly paint?: StyledTextNativePaint;
   /** Constructed markup with captured original font definitions; check ownership
    * before every use. Retired plans no longer expose an executable source. */
-  readonly markup:string;
+  readonly markup: string;
   /** End native measurement after its consumer finishes preparation. The source
    * font lease and immutable metadata remain valid until release. */
-  retireMeasurement():void;
-  captureGlyphFont(id:string,settings?:string,control?:NativeGlyphFontControl):Promise<NativeGlyphFont>;
-  matchGlyphRun(font:NativeGlyphFont,input:NativeGlyphRunInput,control?:NativeGlyphFontControl):Promise<NativeGlyphMatch>;
-  matchGlyphLine(font:NativeGlyphFont,lineIndex:number,control?:NativeGlyphFontControl):Promise<NativeSvgGlyphMatch>;
-  matchStyledGlyphLine(lineIndex:number,control?:NativeGlyphFontControl):Promise<NativeSvgGlyphMatch>;
-  renderGlyphs(glyphs:readonly FloatGlyph[],area:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,check?:()=>void):Promise<Float32Array>;
-  check():void;
-  release():void;
+  retireMeasurement(): void;
+  captureGlyphFont(
+    id: string,
+    settings?: string,
+    control?: NativeGlyphFontControl,
+  ): Promise<NativeGlyphFont>;
+  matchGlyphRun(
+    font: NativeGlyphFont,
+    input: NativeGlyphRunInput,
+    control?: NativeGlyphFontControl,
+  ): Promise<NativeGlyphMatch>;
+  matchGlyphLine(
+    font: NativeGlyphFont,
+    lineIndex: number,
+    control?: NativeGlyphFontControl,
+  ): Promise<NativeSvgGlyphMatch>;
+  matchStyledGlyphLine(
+    lineIndex: number,
+    control?: NativeGlyphFontControl,
+  ): Promise<NativeSvgGlyphMatch>;
+  renderGlyphs(
+    glyphs: readonly FloatGlyph[],
+    area: FloatSourceWindow,
+    processor: Pick<PixelProcessor, "floatComposite">,
+    check?: () => void,
+  ): Promise<Float32Array>;
+  check(): void;
+  release(): void;
 }
 export interface StyledTextPlanControl extends StyledTextControl {
   /** Capture source-linear colors and native addressable-character metadata.
    * The ordinary byte renderer does not request this additional work. */
-  captureLinearPaint?:boolean;
+  captureLinearPaint?: boolean;
 }
 
 /** Snapshot before any await; parser budgets apply to text metadata, not fonts
  * or document geometry. Width/height describe a caller-selected work window. */
-export function normalizeStyledTextScene(input:StyledTextSceneInput):StyledTextScene{
-  const value=sceneSchema.parse(input),base={...DEFAULT_CHARACTER_FORMAT,...definedCharacterFormat(value.style)};
-  const lines=value.lines.map(line=>{
-    const spans:{text:string;style:Readonly<CharacterFormat>}[]=[];
-    for(const span of line.spans){
-      if(!span.text)continue;
-      const style=Object.freeze(characterFormatSchema.parse({...base,...definedCharacterFormat(span.style)})),text=span.text.replace(/[\t\r\f]/g,' '),previous=spans.at(-1);
-      if(previous&&Object.keys(characterFormatSchema.shape).every(key=>previous.style[key as keyof CharacterFormat]===style[key as keyof CharacterFormat]))previous.text+=text;
-      else spans.push({text,style});
+export function normalizeStyledTextScene(
+  input: StyledTextSceneInput,
+): StyledTextScene {
+  const value = sceneSchema.parse(input),
+    base = {
+      ...DEFAULT_CHARACTER_FORMAT,
+      ...definedCharacterFormat(value.style),
+    };
+  const lines = value.lines.map((line) => {
+    const spans: { text: string; style: Readonly<CharacterFormat> }[] = [];
+    for (const span of line.spans) {
+      if (!span.text) continue;
+      const style = Object.freeze(
+          characterFormatSchema.parse({
+            ...base,
+            ...definedCharacterFormat(span.style),
+          }),
+        ),
+        text = span.text.replace(/[\t\r\f]/g, " "),
+        previous = spans.at(-1);
+      if (
+        previous &&
+        Object.keys(characterFormatSchema.shape).every(
+          (key) =>
+            previous.style[key as keyof CharacterFormat] ===
+            style[key as keyof CharacterFormat],
+        )
+      )
+        previous.text += text;
+      else spans.push({ text, style });
     }
-    return Object.freeze({...line,...(line.path?{path:normalizeTextPath(line.path)}:{}),...(line.writing?{writing:Object.freeze(line.writing)}:{}),spans:Object.freeze(spans.map(span=>Object.freeze(span)))});
+    return Object.freeze({
+      ...line,
+      ...(line.path ? { path: normalizeTextPath(line.path) } : {}),
+      ...(line.writing ? { writing: Object.freeze(line.writing) } : {}),
+      spans: Object.freeze(spans.map((span) => Object.freeze(span))),
+    });
   });
-  return Object.freeze({width:value.width,height:value.height,transform:Object.freeze(value.transform??[1,0,0,1,0,0]),
-    lines:Object.freeze(lines),
+  return Object.freeze({
+    width: value.width,
+    height: value.height,
+    transform: Object.freeze(value.transform ?? [1, 0, 0, 1, 0, 0]),
+    lines: Object.freeze(lines),
   });
 }
 
 /** Private shared ownership for native measurement and raster preparation. */
-export function captureStyledTextFonts(styles:readonly Readonly<CharacterFormat>[],document:DocumentData,assets:AssetStore){
-  if(typeof globalThis.document==='undefined')throw new Error('Native styled text preparation requires a browser SVG host.');
-  const families=[...new Set(styles.map(style=>style.fontFamily))],requested=new Set(families.flatMap(fontFamilyNames));
-  const files=documentFontFiles(document).filter(file=>requested.has(file.resource.report.faces[0].cssFamily.toLowerCase())).map(file=>structuredClone(file));
-  const fontDocument={...document,children:[],components:[],fontFiles:files};
-  const ownedFamilies=new Set(files.map(file=>file.resource.report.faces[0].cssFamily.toLowerCase()));
+export function captureStyledTextFonts(
+  styles: readonly Readonly<CharacterFormat>[],
+  document: DocumentData,
+  assets: AssetStore,
+) {
+  if (typeof globalThis.document === "undefined")
+    throw new Error(
+      "Native styled text preparation requires a browser SVG host.",
+    );
+  const families = [...new Set(styles.map((style) => style.fontFamily))],
+    requested = new Set(families.flatMap(fontFamilyNames));
+  const files = documentFontFiles(document)
+    .filter((file) =>
+      requested.has(file.resource.report.faces[0].cssFamily.toLowerCase()),
+    )
+    .map((file) => structuredClone(file));
+  const fontDocument = {
+    ...document,
+    children: [],
+    components: [],
+    fontFiles: files,
+  };
+  const ownedFamilies = new Set(
+    files.map((file) => file.resource.report.faces[0].cssFamily.toLowerCase()),
+  );
   // An installed web face cannot be recovered from FontFace's public API. Do
   // not let its SVG-image copy silently select a different platform fallback.
-  for(const face of globalThis.document.fonts)if(fontFamilyNames(face.family).some(name=>requested.has(name)&&!ownedFamilies.has(name)))throw new Error('Styled text requires an owned source for installed web fonts. Embed the requested font first.');
-  for(const file of files)if(!assets.fonts.nativeAvailable||!assets.fonts.isActive(file.id))throw new Error('An owned styled-text font is not active on this native host.');
-  for(const style of styles){
-    const settings=style.fontVariationSettings??'normal';
-    if(parseFontVariations(settings).length){
-      if(typeof FontFace==='undefined'||!('variationSettings'in FontFace.prototype))throw new Error('This browser cannot render native font variations.');
-      const primary=fontFamilyNames(style.fontFamily).map(name=>files.find(file=>file.resource.report.faces[0].cssFamily.toLowerCase()===name)).find(Boolean);
-      if(!primary)throw new Error('Styled font variations require an owned embedded source.');
-      assertFontVariationRanges(settings,primary.resource.report.faces[0].axes);
+  for (const face of globalThis.document.fonts)
+    if (
+      fontFamilyNames(face.family).some(
+        (name) => requested.has(name) && !ownedFamilies.has(name),
+      )
+    )
+      throw new Error(
+        "Styled text requires an owned source for installed web fonts. Embed the requested font first.",
+      );
+  for (const file of files)
+    if (!assets.fonts.nativeAvailable || !assets.fonts.isActive(file.id))
+      throw new Error(
+        "An owned styled-text font is not active on this native host.",
+      );
+  for (const style of styles) {
+    const settings = style.fontVariationSettings ?? "normal";
+    if (parseFontVariations(settings).length) {
+      if (
+        typeof FontFace === "undefined" ||
+        !("variationSettings" in FontFace.prototype)
+      )
+        throw new Error("This browser cannot render native font variations.");
+      const primary = fontFamilyNames(style.fontFamily)
+        .map((name) =>
+          files.find(
+            (file) =>
+              file.resource.report.faces[0].cssFamily.toLowerCase() === name,
+          ),
+        )
+        .find(Boolean);
+      if (!primary)
+        throw new Error(
+          "Styled font variations require an owned embedded source.",
+        );
+      assertFontVariationRanges(
+        settings,
+        primary.resource.report.faces[0].axes,
+      );
     }
   }
-  let lease:FontSourceCapture|undefined;
-  try{
-    lease=captureOwnedExportFonts([fontDocument],families,assets);const native=captureExportFonts(families,'styled text preparation'),fonts=captureSvgFonts(fontDocument,assets,families);let released=false;
-    const check=()=>{if(released)throw new Error('The styled text font capture was released.');lease!();native();fonts.check();};check();
-    return{check,document:fontDocument,definitions:fonts.definitions,release:()=>{if(released)return;released=true;lease!.release();}};
-  }catch(error){lease?.release();throw error;}
+  let lease: FontSourceCapture | undefined;
+  try {
+    lease = captureOwnedExportFonts([fontDocument], families, assets);
+    const native = captureExportFonts(families, "styled text preparation"),
+      fonts = captureSvgFonts(fontDocument, assets, families);
+    let released = false;
+    const check = () => {
+      if (released)
+        throw new Error("The styled text font capture was released.");
+      lease!();
+      native();
+      fonts.check();
+    };
+    check();
+    return {
+      check,
+      document: fontDocument,
+      definitions: fonts.definitions,
+      release: () => {
+        if (released) return;
+        released = true;
+        lease!.release();
+      },
+    };
+  } catch (error) {
+    lease?.release();
+    throw error;
+  }
 }
 
-export function applyStyledSpanStyle(node:SVGTSpanElement,style:Readonly<CharacterFormat>,wordSpacingDelta=0){
-  applyNativeCharacterStyle(node,style,wordSpacingDelta);
+export function applyStyledSpanStyle(
+  node: SVGTSpanElement,
+  style: Readonly<CharacterFormat>,
+  wordSpacingDelta = 0,
+) {
+  applyNativeCharacterStyle(node, style, wordSpacingDelta);
 }
 
 /** Capture whole native shaping chunks, original sources and their lifecycle.
  * No character spans are introduced and no pixel colors enter the native plan.
  * Paint metadata does not establish glyph/cluster paint decomposition. */
-export async function captureStyledTextPlan(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextPlanControl={}):Promise<StyledTextPlan>{
-  control={...control};
-  const alive=assets.captureLifetime();
-  const cancelled=()=>{control.signal?.throwIfAborted();if(control.isCancelled?.())throw new DOMException('Styled text preparation superseded.','AbortError');alive();};cancelled();
-  const scene=normalizeStyledTextScene(input);cancelled();
-  if(typeof globalThis.document==='undefined')throw new Error('Native styled text preparation requires a browser SVG host.');
-  let fonts:ReturnType<typeof captureStyledTextFonts>|undefined;
-  let host:HTMLDivElement|undefined,markup:string|undefined,released=false,handedOff=false;
-  const glyphs=new Set<NativeGlyphFont>(),abort=new AbortController(),lifetime=AbortSignal.any([abort.signal,...(control.signal?[control.signal]:[])]);
-  const retireMeasurement=()=>{host?.remove();host=undefined;};
-  const release=()=>{if(released)return;released=true;abort.abort(new Error('The styled text plan was released.'));markup=undefined;retireMeasurement();for(const glyph of glyphs)glyph.release();glyphs.clear();fonts?.release();fonts=undefined;};
-  const check=()=>{if(released)throw new Error('The styled text plan was released.');cancelled();fonts?.check();if(host&&!host.isConnected)throw new Error('The styled text measurement host was removed.');};
-  const captureGlyphFont=async(id:string,settings='normal',input:NativeGlyphFontControl={}):Promise<NativeGlyphFont>=>{
-    const child={...input};check();if(!fonts!.document.fontFiles?.some(file=>file.id===id))throw new Error('The glyph font is outside this captured text source.');
-    const {captureNativeGlyphFont}=await import('./native-glyph-font');check();
-    const value=await captureNativeGlyphFont(assets,id,settings,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
-    try{check();glyphs.add(value);return value;}catch(error){value.release();throw error;}
+export async function captureStyledTextPlan(
+  input: StyledTextSceneInput,
+  document: DocumentData,
+  assets: AssetStore,
+  control: StyledTextPlanControl = {},
+): Promise<StyledTextPlan> {
+  control = { ...control };
+  const alive = assets.captureLifetime();
+  const cancelled = () => {
+    control.signal?.throwIfAborted();
+    if (control.isCancelled?.())
+      throw new DOMException(
+        "Styled text preparation superseded.",
+        "AbortError",
+      );
+    alive();
   };
-  const matchGlyphRun=async(font:NativeGlyphFont,input:NativeGlyphRunInput,control:NativeGlyphFontControl={}):Promise<NativeGlyphMatch>=>{
-    const request=structuredClone(input),child={...control};check();if(!glyphs.has(font))throw new Error('The glyph run is outside this captured text source.');
-    const {matchNativeGlyphRun}=await import('./native-glyph-match');check();return matchNativeGlyphRun(font,request,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
+  cancelled();
+  const scene = normalizeStyledTextScene(input);
+  cancelled();
+  if (typeof globalThis.document === "undefined")
+    throw new Error(
+      "Native styled text preparation requires a browser SVG host.",
+    );
+  let fonts: ReturnType<typeof captureStyledTextFonts> | undefined;
+  let host: HTMLDivElement | undefined,
+    markup: string | undefined,
+    released = false,
+    handedOff = false;
+  const glyphs = new Set<NativeGlyphFont>(),
+    abort = new AbortController(),
+    lifetime = AbortSignal.any([
+      abort.signal,
+      ...(control.signal ? [control.signal] : []),
+    ]);
+  const retireMeasurement = () => {
+    host?.remove();
+    host = undefined;
   };
-  const matchGlyphLine=async(font:NativeGlyphFont,index:number,control:NativeGlyphFontControl={}):Promise<NativeSvgGlyphMatch>=>{
-    const child={...control};check();if(!glyphs.has(font))throw new Error('The SVG glyph line is outside this captured text source.');const {matchNativeSvgGlyphLine}=await import('./native-svg-glyph');check();return matchNativeSvgGlyphLine(plan,font,index,{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
+  const release = () => {
+    if (released) return;
+    released = true;
+    abort.abort(new Error("The styled text plan was released."));
+    markup = undefined;
+    retireMeasurement();
+    for (const glyph of glyphs) glyph.release();
+    glyphs.clear();
+    fonts?.release();
+    fonts = undefined;
   };
-  const matchStyledGlyphLine=async(index:number,control:NativeGlyphFontControl={}):Promise<NativeSvgGlyphMatch>=>{
-    const child={...control};check();const {matchNativeStyledSvgLine}=await import('./native-svg-styled');check();return matchNativeStyledSvgLine(plan,index,fonts!.document.fontFiles??[],{...child,signal:AbortSignal.any([lifetime,...(child.signal?[child.signal]:[])]),check(){check();child.check?.();check();}});
+  const check = () => {
+    if (released) throw new Error("The styled text plan was released.");
+    cancelled();
+    fonts?.check();
+    if (host && !host.isConnected)
+      throw new Error("The styled text measurement host was removed.");
   };
-  let plan:StyledTextPlan;
-  const renderGlyphs=async(input:readonly FloatGlyph[],window:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,current:()=>void=()=>{}):Promise<Float32Array>=>{
-    const primitives=input.map(glyph=>({...glyph,...(glyph.writing?{writing:Object.freeze(textWritingSchema.parse(glyph.writing))}:{}),...(glyph.path?{path:snapshotGlyphPath(glyph.path)}:{}),...(glyph.origin?{origin:Object.freeze({...glyph.origin})}:{}),style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
-    const active=()=>{check();current();check();};active();if(primitives.some(glyph=>!glyphs.has(glyph.font)))throw new Error('The glyph primitive is outside this captured text source.');
-    const {renderFloatGlyphs}=await import('./float-glyph');active();return renderFloatGlyphs(primitives,area,processor,active);
-  };
-  try{
-    fonts=captureStyledTextFonts(scene.lines.flatMap(line=>line.spans.map(span=>span.style)),document,assets);
-    const linear=control.captureLinearPaint?await captureLinearTextColors(scene.lines.flatMap(line=>line.spans.map(span=>span.style.color)),{signal:control.signal,check}):undefined;
-    check();const context=globalThis.document.createElement('canvas').getContext('2d')!;
-    host=globalThis.document.createElement('div');host.setAttribute('data-canoli-styled-text-probe','');host.setAttribute('aria-hidden','true');host.setAttribute('inert','');host.style.cssText='position:fixed;left:-100000px;top:0;width:1px;height:1px;visibility:hidden;pointer-events:none;contain:strict';
-    const shadow=host.attachShadow({mode:'closed'}),svg=globalThis.document.createElementNS(SVG_NS,'svg');
-    svg.setAttribute('width',String(scene.width));svg.setAttribute('height',String(scene.height));svg.style.fontWeight='normal';svg.style.fontStyle='normal';
-    const group=globalThis.document.createElementNS(SVG_NS,'g');group.setAttribute('transform',`matrix(${scene.transform.join(' ')})`);svg.append(group);shadow.append(svg);globalThis.document.body.append(host);
-    const elements:{text:SVGTextElement;line:StyledTextLine;path?:SVGPathElement}[]=[];let visited=0,deadline=performance.now()+8;
-    for(const line of scene.lines){
-      const text=globalThis.document.createElementNS(SVG_NS,'text');text.setAttribute('x',String(line.x));text.setAttribute('y',String(line.y));text.setAttribute('direction',line.direction);text.setAttribute('text-anchor',line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end');text.style.whiteSpace='pre';applyNativeTextWriting(text,line.writing);
-      let parent:SVGTextElement|SVGTextPathElement=text,path:SVGPathElement|undefined;
-      if(line.path){
-        const defs=globalThis.document.createElementNS(SVG_NS,'defs');path=globalThis.document.createElementNS(SVG_NS,'path');
-        // Local fragments never accept author-supplied IDs, URLs or SVG markup.
-        const id='canoli-text-baseline-'+elements.length;path.setAttribute('id',id);path.setAttribute('d',textPathData(line.path));defs.append(path);svg.prepend(defs);
-        parent=globalThis.document.createElementNS(SVG_NS,'textPath');if(typeof SVGTextPathElement==='undefined'||!(parent instanceof SVGTextPathElement)||typeof path.getTotalLength!=='function')throw new Error('Native text on a path is unavailable.');parent.setAttribute('href','#'+id);parent.setAttribute('startOffset',String(line.path.startOffset));parent.setAttribute('method','align');parent.setAttribute('spacing','exact');
-        text.setAttribute('x','0');text.setAttribute('y','0');text.setAttribute(verticalWriting(line.writing)?'dx':'dy',String(line.path.baselineOffset));text.setAttribute('transform',`translate(${line.x} ${line.y})`);text.append(parent);
-      }
-      for(const span of line.spans){
-        const style=span.style,ordinary={...style,fontVariationSettings:'normal'};
-        applyTextStyle(context,ordinary);const request=nativeTextFont(ordinary);context.font='10px serif';context.font=request;
-        if(context.font==='10px serif'){context.font='11px monospace';context.font=request;if(context.font==='11px monospace')throw new Error('Cannot prepare an invalid styled-text font request.');}
-        if(!globalThis.document.fonts.check(request,span.text))throw new Error('A styled-text font is not loaded.');
-        context.fillStyle='#010203';context.fillStyle=style.color;
-        if(context.fillStyle==='#010203'){context.fillStyle='#040506';context.fillStyle=style.color;if(context.fillStyle==='#040506')throw new Error('Cannot prepare an invalid styled-text color.');}
-        const node=globalThis.document.createElementNS(SVG_NS,'tspan');node.textContent=span.text;node.setAttribute('fill',String(context.fillStyle));
-        applyStyledSpanStyle(node,style,line.wordSpacingDelta);
-        parent.append(node);
-        if(++visited%32===0||performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
-      }
-      group.append(text);elements.push({text,line,...(path?{path}:{})});
+  const captureGlyphFont = async (
+    id: string,
+    settings = "normal",
+    input: NativeGlyphFontControl = {},
+  ): Promise<NativeGlyphFont> => {
+    const child = { ...input };
+    check();
+    if (!fonts!.document.fontFiles?.some((file) => file.id === id))
+      throw new Error("The glyph font is outside this captured text source.");
+    const { captureNativeGlyphFont } = await import("./native-glyph-font");
+    check();
+    const value = await captureNativeGlyphFont(assets, id, settings, {
+      ...child,
+      signal: AbortSignal.any([
+        lifetime,
+        ...(child.signal ? [child.signal] : []),
+      ]),
+      check() {
+        check();
+        child.check?.();
+        check();
+      },
+    });
+    try {
+      check();
+      glyphs.add(value);
+      return value;
+    } catch (error) {
+      value.release();
+      throw error;
     }
-    const metrics=Object.freeze(elements.map(({text,line,path})=>{const box=text.getBBox(),advance=text.getComputedTextLength(),pathLength=path?.getTotalLength();if(![box.x,box.y,box.width,box.height,advance].every(Number.isFinite))throw new Error('The native styled-text geometry is not finite.');if(pathLength!==undefined&&(!Number.isFinite(pathLength)||pathLength<=0))throw new Error('Native text requires a finite, positive baseline length.');return Object.freeze({advance,ink:Object.freeze({x:box.x+(path?line.x:0),y:box.y+(path?line.y:0),width:box.width,height:box.height}),...(pathLength===undefined?{}:{pathLength})});}));
-    let paint:StyledTextNativePaint|undefined;
-    if(linear){
-      const characters:(readonly StyledTextCharacterGeometry[])[]=[],pathCharacters:(readonly StyledTextCharacterGeometry[]|null)[]=[],colors:(readonly LinearTextColor[])[]=[],visual:(readonly NativeTextVisualPosition[]|null)[]=[],inlineAllocation:(Readonly<import('./native-svg-inline').NativeSvgInlineAllocation>|null)[]=[];let offset=0;
-      for(const {text,line} of elements){
-        colors.push(Object.freeze(linear.slice(offset,offset+line.spans.length)));offset+=line.spans.length;
-        if(['getNumberOfChars','getStartPositionOfChar','getEndPositionOfChar','getExtentOfChar','getRotationOfChar'].some(name=>typeof (text as unknown as Record<string,unknown>)[name]!=='function'))throw new Error('Native text character geometry is unavailable.');
-        const count=text.getNumberOfChars();check();if(!Number.isInteger(count)||count<0||count>10000)throw new Error('The native text character count is invalid.');
-        const current:StyledTextCharacterGeometry[]=[];
-        for(let index=0;index<count;index++){
-          check();const a=text.getStartPositionOfChar(index);check();const b=text.getEndPositionOfChar(index);check();const box=text.getExtentOfChar(index);check();const rotation=text.getRotationOfChar(index);check();
-          if(![a.x,a.y,b.x,b.y,box.x,box.y,box.width,box.height,rotation].every(Number.isFinite)||box.width<0||box.height<0)throw new Error('The native text character geometry is invalid.');
-          current.push(Object.freeze({index,start:Object.freeze({x:a.x,y:a.y}),end:Object.freeze({x:b.x,y:b.y}),extent:Object.freeze({x:box.x,y:box.y,width:box.width,height:box.height}),rotation}));
-          if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
+  };
+  const matchGlyphRun = async (
+    font: NativeGlyphFont,
+    input: NativeGlyphRunInput,
+    control: NativeGlyphFontControl = {},
+  ): Promise<NativeGlyphMatch> => {
+    const request = structuredClone(input),
+      child = { ...control };
+    check();
+    if (!glyphs.has(font))
+      throw new Error("The glyph run is outside this captured text source.");
+    const { matchNativeGlyphRun } = await import("./native-glyph-match");
+    check();
+    return matchNativeGlyphRun(font, request, {
+      ...child,
+      signal: AbortSignal.any([
+        lifetime,
+        ...(child.signal ? [child.signal] : []),
+      ]),
+      check() {
+        check();
+        child.check?.();
+        check();
+      },
+    });
+  };
+  const matchGlyphLine = async (
+    font: NativeGlyphFont,
+    index: number,
+    control: NativeGlyphFontControl = {},
+  ): Promise<NativeSvgGlyphMatch> => {
+    const child = { ...control };
+    check();
+    if (!glyphs.has(font))
+      throw new Error(
+        "The SVG glyph line is outside this captured text source.",
+      );
+    const { matchNativeSvgGlyphLine } = await import("./native-svg-glyph");
+    check();
+    return matchNativeSvgGlyphLine(plan, font, index, {
+      ...child,
+      signal: AbortSignal.any([
+        lifetime,
+        ...(child.signal ? [child.signal] : []),
+      ]),
+      check() {
+        check();
+        child.check?.();
+        check();
+      },
+    });
+  };
+  const matchStyledGlyphLine = async (
+    index: number,
+    control: NativeGlyphFontControl = {},
+  ): Promise<NativeSvgGlyphMatch> => {
+    const child = { ...control };
+    check();
+    const { matchNativeStyledSvgLine } = await import("./native-svg-styled");
+    check();
+    return matchNativeStyledSvgLine(
+      plan,
+      index,
+      fonts!.document.fontFiles ?? [],
+      {
+        ...child,
+        signal: AbortSignal.any([
+          lifetime,
+          ...(child.signal ? [child.signal] : []),
+        ]),
+        check() {
+          check();
+          child.check?.();
+          check();
+        },
+      },
+    );
+  };
+  let plan: StyledTextPlan;
+  const renderGlyphs = async (
+    input: readonly FloatGlyph[],
+    window: FloatSourceWindow,
+    processor: Pick<PixelProcessor, "floatComposite">,
+    current: () => void = () => {},
+  ): Promise<Float32Array> => {
+    const primitives = input.map((glyph) => ({
+        ...glyph,
+        ...(glyph.writing
+          ? { writing: Object.freeze(textWritingSchema.parse(glyph.writing)) }
+          : {}),
+        ...(glyph.path ? { path: snapshotGlyphPath(glyph.path) } : {}),
+        ...(glyph.origin ? { origin: Object.freeze({ ...glyph.origin }) } : {}),
+        style: { ...glyph.style },
+        color: [...glyph.color] as unknown as FloatGlyph["color"],
+        transform: AffineTransform.fromJSON(glyph.transform),
+      })),
+      area = { ...window };
+    const active = () => {
+      check();
+      current();
+      check();
+    };
+    active();
+    if (primitives.some((glyph) => !glyphs.has(glyph.font)))
+      throw new Error(
+        "The glyph primitive is outside this captured text source.",
+      );
+    const { renderFloatGlyphs } = await import("./float-glyph");
+    active();
+    return renderFloatGlyphs(primitives, area, processor, active);
+  };
+  try {
+    fonts = captureStyledTextFonts(
+      scene.lines.flatMap((line) => line.spans.map((span) => span.style)),
+      document,
+      assets,
+    );
+    const linear = control.captureLinearPaint
+      ? await captureLinearTextColors(
+          scene.lines.flatMap((line) =>
+            line.spans.map((span) => span.style.color),
+          ),
+          { signal: control.signal, check },
+        )
+      : undefined;
+    check();
+    const context = globalThis.document
+      .createElement("canvas")
+      .getContext("2d")!;
+    host = globalThis.document.createElement("div");
+    host.setAttribute("data-canoli-styled-text-probe", "");
+    host.setAttribute("aria-hidden", "true");
+    host.setAttribute("inert", "");
+    host.style.cssText =
+      "position:fixed;left:-100000px;top:0;width:1px;height:1px;visibility:hidden;pointer-events:none;contain:strict";
+    const shadow = host.attachShadow({ mode: "closed" }),
+      svg = globalThis.document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("width", String(scene.width));
+    svg.setAttribute("height", String(scene.height));
+    svg.style.fontWeight = "normal";
+    svg.style.fontStyle = "normal";
+    const group = globalThis.document.createElementNS(SVG_NS, "g");
+    group.setAttribute("transform", `matrix(${scene.transform.join(" ")})`);
+    svg.append(group);
+    shadow.append(svg);
+    globalThis.document.body.append(host);
+    const elements: {
+      text: SVGTextElement;
+      line: StyledTextLine;
+      path?: SVGPathElement;
+    }[] = [];
+    let visited = 0,
+      deadline = performance.now() + 8;
+    for (const line of scene.lines) {
+      const text = globalThis.document.createElementNS(SVG_NS, "text");
+      text.setAttribute("x", String(line.x));
+      text.setAttribute("y", String(line.y));
+      text.setAttribute("direction", line.direction);
+      text.setAttribute(
+        "text-anchor",
+        line.align === "center"
+          ? "middle"
+          : (line.align === "left") === (line.direction === "ltr")
+            ? "start"
+            : "end",
+      );
+      text.style.whiteSpace = "pre";
+      applyNativeTextWriting(text, line.writing);
+      let parent: SVGTextElement | SVGTextPathElement = text,
+        path: SVGPathElement | undefined;
+      if (line.path) {
+        const defs = globalThis.document.createElementNS(SVG_NS, "defs");
+        path = globalThis.document.createElementNS(SVG_NS, "path");
+        // Local fragments never accept author-supplied IDs, URLs or SVG markup.
+        const id = "canoli-text-baseline-" + elements.length;
+        path.setAttribute("id", id);
+        path.setAttribute("d", textPathData(line.path));
+        defs.append(path);
+        svg.prepend(defs);
+        parent = globalThis.document.createElementNS(SVG_NS, "textPath");
+        if (
+          typeof SVGTextPathElement === "undefined" ||
+          !(parent instanceof SVGTextPathElement) ||
+          typeof path.getTotalLength !== "function"
+        )
+          throw new Error("Native text on a path is unavailable.");
+        parent.setAttribute("href", "#" + id);
+        parent.setAttribute("startOffset", String(line.path.startOffset));
+        parent.setAttribute("method", "align");
+        parent.setAttribute("spacing", "exact");
+        text.setAttribute("x", "0");
+        text.setAttribute("y", "0");
+        text.setAttribute(
+          verticalWriting(line.writing) ? "dx" : "dy",
+          String(line.path.baselineOffset),
+        );
+        text.setAttribute("transform", `translate(${line.x} ${line.y})`);
+        text.append(parent);
+      }
+      for (const span of line.spans) {
+        const style = span.style,
+          ordinary = { ...style, fontVariationSettings: "normal" };
+        applyTextStyle(context, ordinary);
+        const request = nativeTextFont(ordinary);
+        context.font = "10px serif";
+        context.font = request;
+        if (context.font === "10px serif") {
+          context.font = "11px monospace";
+          context.font = request;
+          if (context.font === "11px monospace")
+            throw new Error(
+              "Cannot prepare an invalid styled-text font request.",
+            );
+        }
+        if (!globalThis.document.fonts.check(request, span.text))
+          throw new Error("A styled-text font is not loaded.");
+        context.fillStyle = "#010203";
+        context.fillStyle = style.color;
+        if (context.fillStyle === "#010203") {
+          context.fillStyle = "#040506";
+          context.fillStyle = style.color;
+          if (context.fillStyle === "#040506")
+            throw new Error("Cannot prepare an invalid styled-text color.");
+        }
+        const node = globalThis.document.createElementNS(SVG_NS, "tspan");
+        node.textContent = span.text;
+        node.setAttribute("fill", String(context.fillStyle));
+        applyStyledSpanStyle(node, style, line.wordSpacingDelta);
+        parent.append(node);
+        if (++visited % 32 === 0 || performance.now() >= deadline) {
+          await yieldTask();
+          check();
+          deadline = performance.now() + 8;
+        }
+      }
+      group.append(text);
+      elements.push({ text, line, ...(path ? { path } : {}) });
+    }
+    const metrics = Object.freeze(
+      elements.map(({ text, line, path }) => {
+        const box = text.getBBox(),
+          advance = text.getComputedTextLength(),
+          pathLength = path?.getTotalLength();
+        if (
+          ![box.x, box.y, box.width, box.height, advance].every(Number.isFinite)
+        )
+          throw new Error("The native styled-text geometry is not finite.");
+        if (
+          pathLength !== undefined &&
+          (!Number.isFinite(pathLength) || pathLength <= 0)
+        )
+          throw new Error(
+            "Native text requires a finite, positive baseline length.",
+          );
+        return Object.freeze({
+          advance,
+          ink: Object.freeze({
+            x: box.x + (path ? line.x : 0),
+            y: box.y + (path ? line.y : 0),
+            width: box.width,
+            height: box.height,
+          }),
+          ...(pathLength === undefined ? {} : { pathLength }),
+        });
+      }),
+    );
+    let paint: StyledTextNativePaint | undefined;
+    if (linear) {
+      const characters: (readonly StyledTextCharacterGeometry[])[] = [],
+        pathCharacters: (readonly StyledTextCharacterGeometry[] | null)[] = [],
+        colors: (readonly LinearTextColor[])[] = [],
+        visual: (readonly NativeTextVisualPosition[] | null)[] = [],
+        inlineAllocation: (Readonly<
+          import("./native-svg-inline").NativeSvgInlineAllocation
+        > | null)[] = [];
+      let offset = 0;
+      for (const { text, line } of elements) {
+        colors.push(
+          Object.freeze(linear.slice(offset, offset + line.spans.length)),
+        );
+        offset += line.spans.length;
+        if (
+          [
+            "getNumberOfChars",
+            "getStartPositionOfChar",
+            "getEndPositionOfChar",
+            "getExtentOfChar",
+            "getRotationOfChar",
+          ].some(
+            (name) =>
+              typeof (text as unknown as Record<string, unknown>)[name] !==
+              "function",
+          )
+        )
+          throw new Error("Native text character geometry is unavailable.");
+        const count = text.getNumberOfChars();
+        check();
+        if (!Number.isInteger(count) || count < 0 || count > 10000)
+          throw new Error("The native text character count is invalid.");
+        const current: StyledTextCharacterGeometry[] = [];
+        for (let index = 0; index < count; index++) {
+          check();
+          const a = text.getStartPositionOfChar(index);
+          check();
+          const b = text.getEndPositionOfChar(index);
+          check();
+          const box = text.getExtentOfChar(index);
+          check();
+          const rotation = text.getRotationOfChar(index);
+          check();
+          if (
+            ![
+              a.x,
+              a.y,
+              b.x,
+              b.y,
+              box.x,
+              box.y,
+              box.width,
+              box.height,
+              rotation,
+            ].every(Number.isFinite) ||
+            box.width < 0 ||
+            box.height < 0
+          )
+            throw new Error("The native text character geometry is invalid.");
+          current.push(
+            Object.freeze({
+              index,
+              start: Object.freeze({ x: a.x, y: a.y }),
+              end: Object.freeze({ x: b.x, y: b.y }),
+              extent: Object.freeze({
+                x: box.x,
+                y: box.y,
+                width: box.width,
+                height: box.height,
+              }),
+              rotation,
+            }),
+          );
+          if (performance.now() >= deadline) {
+            await yieldTask();
+            check();
+            deadline = performance.now() + 8;
+          }
         }
         characters.push(Object.freeze(current));
         {
           // Spacing and path placement do not choose bidi embedding levels.
           // Recover the native visual order with positive advances so negative
           // tracked/clamped rectangles cannot erase that ordering information.
-          const probe=text.cloneNode(true)as SVGTextElement;
-          for(const content of probe.querySelectorAll('textPath'))content.replaceWith(...content.childNodes);
-          probe.removeAttribute('transform');probe.removeAttribute('dx');probe.removeAttribute('dy');probe.setAttribute('x','0');probe.setAttribute('y','0');probe.setAttribute('text-anchor',line.direction==='ltr'?'start':'end');
-          for(const node of [probe,...probe.querySelectorAll('tspan')]){node.style.letterSpacing='0px';node.style.wordSpacing='0px';node.style.fontKerning='none';}
+          const probe = text.cloneNode(true) as SVGTextElement;
+          for (const content of probe.querySelectorAll("textPath"))
+            content.replaceWith(...content.childNodes);
+          probe.removeAttribute("transform");
+          probe.removeAttribute("dx");
+          probe.removeAttribute("dy");
+          probe.setAttribute("x", "0");
+          probe.setAttribute("y", "0");
+          probe.setAttribute(
+            "text-anchor",
+            line.direction === "ltr" ? "start" : "end",
+          );
+          for (const node of [probe, ...probe.querySelectorAll("tspan")]) {
+            node.style.letterSpacing = "0px";
+            node.style.wordSpacing = "0px";
+            node.style.fontKerning = "none";
+          }
           group.append(probe);
-          try{const size=probe.getNumberOfChars();check();if(size!==count)throw new Error('Native visual text addressing differs from its source.');const positions:NativeTextVisualPosition[]=[];
-            for(let index=0;index<size;index++){check();const a=probe.getStartPositionOfChar(index);check();const b=probe.getEndPositionOfChar(index);check();if(![a.x,a.y,b.x,b.y].every(Number.isFinite))throw new Error('Native visual text geometry is invalid.');const vertical=verticalWriting(line.writing),advance=vertical?b.y-a.y:b.x-a.x,rotation=vertical?probe.getRotationOfChar(index):undefined;check();if(rotation!==undefined&&!Number.isFinite(rotation))throw new Error('Native visual text orientation is invalid.');positions.push(Object.freeze({order:vertical?Math.min(a.y,b.y):Math.min(a.x,b.x),direction:advance<0?'rtl':advance>0?'ltr':null,...(rotation===undefined?{}:{rotation})}));if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}}
+          try {
+            const size = probe.getNumberOfChars();
+            check();
+            if (size !== count)
+              throw new Error(
+                "Native visual text addressing differs from its source.",
+              );
+            const positions: NativeTextVisualPosition[] = [];
+            for (let index = 0; index < size; index++) {
+              check();
+              const a = probe.getStartPositionOfChar(index);
+              check();
+              const b = probe.getEndPositionOfChar(index);
+              check();
+              if (![a.x, a.y, b.x, b.y].every(Number.isFinite))
+                throw new Error("Native visual text geometry is invalid.");
+              const vertical = verticalWriting(line.writing),
+                advance = vertical ? b.y - a.y : b.x - a.x,
+                rotation = vertical
+                  ? probe.getRotationOfChar(index)
+                  : undefined;
+              check();
+              if (rotation !== undefined && !Number.isFinite(rotation))
+                throw new Error("Native visual text orientation is invalid.");
+              positions.push(
+                Object.freeze({
+                  order: vertical ? Math.min(a.y, b.y) : Math.min(a.x, b.x),
+                  direction: advance < 0 ? "rtl" : advance > 0 ? "ltr" : null,
+                  ...(rotation === undefined ? {} : { rotation }),
+                }),
+              );
+              if (performance.now() >= deadline) {
+                await yieldTask();
+                check();
+                deadline = performance.now() + 8;
+              }
+            }
             visual.push(Object.freeze(positions));
-          }finally{probe.remove();}
+          } finally {
+            probe.remove();
+          }
         }
-        if(line.path){
-          const flat=text.cloneNode(true)as SVGTextElement,content=flat.querySelector('textPath')!,defs=globalThis.document.createElementNS(SVG_NS,'defs'),path=globalThis.document.createElementNS(SVG_NS,'path'),id='canoli-unfolded-path-'+pathCharacters.length;path.setAttribute('id',id);path.setAttribute('d',`M0 0${verticalWriting(line.writing)?'V':'H'}${Math.max(64,text.getComputedTextLength()+64)}`);defs.append(path);svg.prepend(defs);content.setAttribute('href','#'+id);content.setAttribute('startOffset','0');flat.setAttribute('text-anchor',verticalWriting(line.writing)&&line.writing?.orientation==='upright'?'start':line.direction==='ltr'?'start':'end');flat.removeAttribute('transform');flat.removeAttribute('dx');flat.removeAttribute('dy');flat.setAttribute('x','0');flat.setAttribute('y','0');group.append(flat);
-          try{const count=flat.getNumberOfChars();check();if(count!==current.length)throw new Error('Unfolded native path addressing differs from its source.');const unfolded:StyledTextCharacterGeometry[]=[];for(let index=0;index<count;index++){check();const a=flat.getStartPositionOfChar(index);check();const b=flat.getEndPositionOfChar(index);check();const box=flat.getExtentOfChar(index);check();const rotation=flat.getRotationOfChar(index);check();if(![a.x,a.y,b.x,b.y,box.x,box.y,box.width,box.height,rotation].every(Number.isFinite)||box.width<0||box.height<0)throw new Error('Unfolded native path geometry is invalid.');unfolded.push(Object.freeze({index,start:Object.freeze({x:a.x,y:a.y}),end:Object.freeze({x:b.x,y:b.y}),extent:Object.freeze({x:box.x,y:box.y,width:box.width,height:box.height}),rotation}));if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}}pathCharacters.push(Object.freeze(unfolded));}finally{flat.remove();defs.remove();}
-        }else pathCharacters.push(null);
-        if(line.path&&line.spans.some(span=>span.style.letterSpacing<0||span.style.wordSpacing+line.wordSpacingDelta<0)){
-          const {captureNativeSvgInlineAllocation}=await import('./native-svg-inline');check();inlineAllocation.push(await captureNativeSvgInlineAllocation(text,svg,group,line,check)??null);
-        }else inlineAllocation.push(null);
+        if (line.path) {
+          const flat = text.cloneNode(true) as SVGTextElement,
+            content = flat.querySelector("textPath")!,
+            defs = globalThis.document.createElementNS(SVG_NS, "defs"),
+            path = globalThis.document.createElementNS(SVG_NS, "path"),
+            id = "canoli-unfolded-path-" + pathCharacters.length;
+          path.setAttribute("id", id);
+          path.setAttribute(
+            "d",
+            `M0 0${verticalWriting(line.writing) ? "V" : "H"}${Math.max(64, text.getComputedTextLength() + 64)}`,
+          );
+          defs.append(path);
+          svg.prepend(defs);
+          content.setAttribute("href", "#" + id);
+          content.setAttribute("startOffset", "0");
+          flat.setAttribute(
+            "text-anchor",
+            verticalWriting(line.writing) &&
+              line.writing?.orientation === "upright"
+              ? "start"
+              : line.direction === "ltr"
+                ? "start"
+                : "end",
+          );
+          flat.removeAttribute("transform");
+          flat.removeAttribute("dx");
+          flat.removeAttribute("dy");
+          flat.setAttribute("x", "0");
+          flat.setAttribute("y", "0");
+          group.append(flat);
+          try {
+            const count = flat.getNumberOfChars();
+            check();
+            if (count !== current.length)
+              throw new Error(
+                "Unfolded native path addressing differs from its source.",
+              );
+            const unfolded: StyledTextCharacterGeometry[] = [];
+            for (let index = 0; index < count; index++) {
+              check();
+              const a = flat.getStartPositionOfChar(index);
+              check();
+              const b = flat.getEndPositionOfChar(index);
+              check();
+              const box = flat.getExtentOfChar(index);
+              check();
+              const rotation = flat.getRotationOfChar(index);
+              check();
+              if (
+                ![
+                  a.x,
+                  a.y,
+                  b.x,
+                  b.y,
+                  box.x,
+                  box.y,
+                  box.width,
+                  box.height,
+                  rotation,
+                ].every(Number.isFinite) ||
+                box.width < 0 ||
+                box.height < 0
+              )
+                throw new Error("Unfolded native path geometry is invalid.");
+              unfolded.push(
+                Object.freeze({
+                  index,
+                  start: Object.freeze({ x: a.x, y: a.y }),
+                  end: Object.freeze({ x: b.x, y: b.y }),
+                  extent: Object.freeze({
+                    x: box.x,
+                    y: box.y,
+                    width: box.width,
+                    height: box.height,
+                  }),
+                  rotation,
+                }),
+              );
+              if (performance.now() >= deadline) {
+                await yieldTask();
+                check();
+                deadline = performance.now() + 8;
+              }
+            }
+            pathCharacters.push(Object.freeze(unfolded));
+          } finally {
+            flat.remove();
+            defs.remove();
+          }
+        } else pathCharacters.push(null);
+        if (
+          line.path &&
+          line.spans.some(
+            (span) =>
+              span.style.letterSpacing < 0 ||
+              span.style.wordSpacing + line.wordSpacingDelta < 0,
+          )
+        ) {
+          const { captureNativeSvgInlineAllocation } =
+            await import("./native-svg-inline");
+          check();
+          inlineAllocation.push(
+            (await captureNativeSvgInlineAllocation(
+              text,
+              svg,
+              group,
+              line,
+              check,
+            )) ?? null,
+          );
+        } else inlineAllocation.push(null);
       }
-      paint=Object.freeze({visual:Object.freeze(visual),inlineAllocation:Object.freeze(inlineAllocation),pathCharacters:Object.freeze(pathCharacters),colors:Object.freeze(colors),characters:Object.freeze(characters)});
+      paint = Object.freeze({
+        visual: Object.freeze(visual),
+        inlineAllocation: Object.freeze(inlineAllocation),
+        pathCharacters: Object.freeze(pathCharacters),
+        colors: Object.freeze(colors),
+        characters: Object.freeze(characters),
+      });
     }
-    const definitions=await fonts.definitions(check);check();
-    markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
-    check();plan=Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,captureGlyphFont,matchGlyphRun,matchGlyphLine,matchStyledGlyphLine,renderGlyphs,check,release});handedOff=true;return plan;
-  }finally{if(!handedOff)release();}
+    const definitions = await fonts.definitions(check);
+    check();
+    markup = new XMLSerializer()
+      .serializeToString(svg)
+      .replace(/(<svg\b[^>]*>)/, `$1${definitions}`);
+    check();
+    plan = Object.freeze({
+      scene,
+      metrics,
+      ...(paint ? { paint } : {}),
+      get markup() {
+        check();
+        return markup!;
+      },
+      retireMeasurement,
+      captureGlyphFont,
+      matchGlyphRun,
+      matchGlyphLine,
+      matchStyledGlyphLine,
+      renderGlyphs,
+      check,
+      release,
+    });
+    handedOff = true;
+    return plan;
+  } finally {
+    if (!handedOff) release();
+  }
 }
 
 /** Rasterize a source-owned native plan in the caller's pixel work window.
  * The byte renderer requests no extra linear-color or character-geometry work. */
-export async function prepareStyledTextSurface(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}):Promise<StyledTextSurface>{
-  control={...control};
-  let plan:StyledTextPlan|undefined,image:HTMLImageElement|undefined,url:string|undefined,bitmap:ImageBitmap|undefined,released=false,handedOff=false;
-  const release=()=>{if(released)return;released=true;bitmap?.close();plan?.release();};
-  const check=()=>{if(released)throw new Error('The styled text surface was released.');plan?.check();if(bitmap&&(bitmap.width!==plan!.scene.width||bitmap.height!==plan!.scene.height))throw new Error('The styled text bitmap was closed or changed.');};
-  try{
-    plan=await captureStyledTextPlan(input,document,assets,control);check();
-    if(typeof Image==='undefined'||typeof createImageBitmap!=='function')throw new Error('Native styled text preparation requires a browser SVG host.');
-    const markup=plan.markup;
-    url=URL.createObjectURL(new Blob([markup],{type:'image/svg+xml'}));image=new Image();
+export async function prepareStyledTextSurface(
+  input: StyledTextSceneInput,
+  document: DocumentData,
+  assets: AssetStore,
+  control: StyledTextControl = {},
+): Promise<StyledTextSurface> {
+  control = { ...control };
+  let plan: StyledTextPlan | undefined,
+    image: HTMLImageElement | undefined,
+    url: string | undefined,
+    bitmap: ImageBitmap | undefined,
+    released = false,
+    handedOff = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    bitmap?.close();
+    plan?.release();
+  };
+  const check = () => {
+    if (released) throw new Error("The styled text surface was released.");
+    plan?.check();
+    if (
+      bitmap &&
+      (bitmap.width !== plan!.scene.width ||
+        bitmap.height !== plan!.scene.height)
+    )
+      throw new Error("The styled text bitmap was closed or changed.");
+  };
+  try {
+    plan = await captureStyledTextPlan(input, document, assets, control);
+    check();
+    if (typeof Image === "undefined" || typeof createImageBitmap !== "function")
+      throw new Error(
+        "Native styled text preparation requires a browser SVG host.",
+      );
+    const markup = plan.markup;
+    url = URL.createObjectURL(new Blob([markup], { type: "image/svg+xml" }));
+    image = new Image();
     // decode() alone can resolve before SVG fallback-font resources finish
     // loading. Wait for the actual load event before decoding/capturing; an
     // arbitrary delay or animation frame is not a readiness contract.
-    await new Promise<void>((resolve,reject)=>{
-      const finish=(error?:unknown)=>{image!.onload=null;image!.onerror=null;control.signal?.removeEventListener('abort',abort);if(error)reject(error);else resolve();};
-      const abort=()=>{image!.src='';finish(control.signal?.reason??new DOMException('Styled text preparation aborted.','AbortError'));};
-      image!.onload=()=>finish();image!.onerror=()=>finish(new Error('Cannot load the styled text SVG image.'));
-      control.signal?.addEventListener('abort',abort,{once:true});image!.src=url!;if(control.signal?.aborted)abort();
+    await new Promise<void>((resolve, reject) => {
+      const finish = (error?: unknown) => {
+        image!.onload = null;
+        image!.onerror = null;
+        control.signal?.removeEventListener("abort", abort);
+        if (error) reject(error);
+        else resolve();
+      };
+      const abort = () => {
+        image!.src = "";
+        finish(
+          control.signal?.reason ??
+            new DOMException("Styled text preparation aborted.", "AbortError"),
+        );
+      };
+      image!.onload = () => finish();
+      image!.onerror = () =>
+        finish(new Error("Cannot load the styled text SVG image."));
+      control.signal?.addEventListener("abort", abort, { once: true });
+      image!.src = url!;
+      if (control.signal?.aborted) abort();
     });
-    check();await image.decode();check();bitmap=await createImageBitmap(image);check();
-    handedOff=true;return Object.freeze({bitmap,metrics:plan.metrics,check,release});
-  }finally{plan?.retireMeasurement();if(image)image.src='';if(url)URL.revokeObjectURL(url);if(!handedOff)release();}
+    check();
+    await image.decode();
+    check();
+    bitmap = await createImageBitmap(image);
+    check();
+    handedOff = true;
+    return Object.freeze({ bitmap, metrics: plan.metrics, check, release });
+  } finally {
+    plan?.retireMeasurement();
+    if (image) image.src = "";
+    if (url) URL.revokeObjectURL(url);
+    if (!handedOff) release();
+  }
 }

@@ -2985,18 +2985,13 @@
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
               "testIgnore": [],
-              "testMatch": [
-                "**/production.e2e.ts"
-              ],
+              "testMatch": ["**/production.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
           "reporter": [
-            [
-              "line",
-              null
-            ],
+            ["line", null],
             [
               "json",
               {
@@ -5161,21 +5156,14 @@
                 "id": "",
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
-                "testIgnore": [
-                  "**/production.e2e.ts"
-                ],
-                "testMatch": [
-                  "**/frequency-separation.e2e.ts"
-                ],
+                "testIgnore": ["**/production.e2e.ts"],
+                "testMatch": ["**/frequency-separation.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -5640,18 +5628,13 @@
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
                 "testIgnore": [],
-                "testMatch": [
-                  "**/production.e2e.ts"
-                ],
+                "testMatch": ["**/production.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -5784,18 +5767,13 @@
                 "name": "",
                 "testDir": "/tmp/canoli-frequency-doc-tests",
                 "testIgnore": [],
-                "testMatch": [
-                  "canoli-frequency-release-doc.e2e.ts"
-                ],
+                "testMatch": ["canoli-frequency-release-doc.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -5926,9 +5904,7 @@
                 "id": "",
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
-                "testIgnore": [
-                  "**/production.e2e.ts"
-                ],
+                "testIgnore": ["**/production.e2e.ts"],
                 "testMatch": [
                   "**/frequency-separation.e2e.ts",
                   "**/frequency-blend-gpu.e2e.ts",
@@ -5952,10 +5928,7 @@
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -11610,18 +11583,13 @@
                 "name": "",
                 "testDir": "/home/kestrel/projects/luma-editor/tests",
                 "testIgnore": [],
-                "testMatch": [
-                  "**/production.e2e.ts"
-                ],
+                "testMatch": ["**/production.e2e.ts"],
                 "timeout": 120000
               }
             ],
             "quiet": false,
             "reporter": [
-              [
-                "line",
-                null
-              ],
+              ["line", null],
               [
                 "json",
                 {
@@ -15991,9 +15959,7 @@
         "dist/wasm/pixels.wasm": "24b3a07d968829f68cf16ccfbb8f445b5a4daa3c5b2b361ac079f54fb04f97ea"
       }
     },
-    "finalReleaseDelta": [
-      "dist/developer/requirements.html"
-    ],
+    "finalReleaseDelta": ["dist/developer/requirements.html"],
     "releaseCorrespondence": "All53 non-requirements release files remain byte-identical to the pinned production runtime. Only the final verification counts in the published requirements page changed; its final JavaScript-disabled narrow-viewport check passes."
   },
   "method": "Authoritative worktree compared to a copied frozen red-eye baseline. All prior32 evidence artifacts retained byte-identically. Pixel checks use actual WASM/WGSL, independent source-over math, exact RGB8 native reconstruction, real browser UI and source hashes. Software WebGPU is correctness evidence, not physical-GPU performance. Full roadmap remains active."

@@ -227,7 +227,6 @@ validation and retained original samples apply before publication.
 `engine/float-patch.ts` supplies their affine native replay. Shared prepared-asset
 validation retains host, isolated, REST and persistence publication boundaries.
 
-
 ## Editable native float vectors
 
 Existing VectorLayer/VectorPath commands now support linear solid and continuous
@@ -245,7 +244,6 @@ plugin/independent REST commits and source-bearing persistence. Trusted Clone ge
 native previews, and stage linear TIFF tiles before one-Undo publication.
 [Signatures, defaults, errors, coordinates and limits](FLOAT_CLONE.md).
 
-
 ## Editable native float paint
 
 Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
@@ -257,7 +255,6 @@ Prepared HDR wet strokes now join dry paint on the content-local native grid
 before current affine placement; inert wet records retain the dry rendering
 path. Explicit native clone source values use schema 58; byte clone values reject.
 [Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
-
 
 ## Prepared HDR wet document replay (schema 57)
 
@@ -316,7 +313,6 @@ Shared OO commands, independent REST sessions and existing isolated/plugin
 authority remain. Verified tool/export/production behavior and remaining broader acceptance are
 recorded in [the current contract and verification boundary](MASK_PLANES.md). Earlier
 scalar-dependency/reset limitations below describe the prior accepted baseline.
-
 
 ## Retained scalar-field mappings
 
@@ -383,7 +379,6 @@ normal admission. Public commands, schema, prepared PNGs and grants are unchange
 Production timing and exact before/after output verification are tracked in the
 roadmap; the full sustained all-tool/device performance gate remains open.
 
-
 ## Captured projected wet fields (schema 55)
 
 `wet-authoring.ts` captures original image/master dimensions, perspective and
@@ -405,7 +400,6 @@ Raster conversion with extended intrinsic wet support uses the existing
 containing-master conversion, retaining its masks, originals and halos.
 [Exact contract and current limits](PERSPECTIVE_ENGINE.md#captured-projected-wet-editing-schema-55).
 
-
 ## Native Node worker startup
 
 Trusted REST native workers share `server/typescript-worker.mjs`. It rejects
@@ -424,7 +418,6 @@ host module loading; third-party scripts/plugins keep their separate isolated
 execution boundary and grants. This bootstrap adds no loader to the API parent;
 the host keeps its existing TypeScript entrypoint setup.
 
-
 ## Independent masks inside smart masters
 
 Smart conversion rebases unlinked ordinary/filter masks into the containing
@@ -438,7 +431,6 @@ whose complete intrinsic support is contained; out-of-artboard perspective or
 prepared wet support keeps the clip. Sources, shared commands/history, schema,
 isolation and separate REST sessions retain their existing boundaries.
 
-
 ## Placed coverage back to original pixels
 
 Private scalar-field sampling now supports both quad-to-source and source-to-
@@ -450,7 +442,6 @@ feathering and working budgets. This is the native dependency for complete
 clipped/symmetric brush coverage on projected originals. Public controller and
 history integration remain required; document schema and grants stay unchanged.
 [Contract](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
-
 
 ## Schema-50 image perspective placement
 
@@ -469,7 +460,6 @@ selection, revision, tool/modal, pointer and blur cancellation discard the draft
 keyboard nudges use the same constructor/setter. The overlay owns fixed screen
 hit areas and scoped keys, not document data. Numeric controls remain available.
 [Current contract and required follow-up](PERSPECTIVE_ENGINE.md).
-
 
 ## Native float tonal strokes
 
@@ -657,13 +647,11 @@ Design checks now accept optional explicit alignment rules against a canvas or i
 
 Omitted alignment policies retain strict version-1 reports; explicit policies use version 2 with measured evidence and complete matched/mismatched/unavailable/excluded coverage. The custom dialog exposes reviewable rules, stale-result protection, download/navigation and document-instance binding. Document schema 47 and existing native project/workspace/permission contracts are unchanged. Inferred alignment intent, bleed, rendered visibility, contrast/legibility and broader A12/roadmap gates remain required. See [DESIGN_CHECKS.md](DESIGN_CHECKS.md) for signatures, defaults, errors, limits and the dated verification boundary.
 
-
 ## Public vertical text (F08)
 
 Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
 
 The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
-
 
 ## Native vertical preparation boundary
 
@@ -804,7 +792,6 @@ The pure immutable `LensProfile` constructor and its `correction()` value retain
 Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.
 
 The internal checked decoder produces owned linear RGB16/grayscale16; explicit conversion consent is required before the private worker returns an sRGB RGBA8 working PNG. The build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Reported metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. The connected host workflow now retains original/accepted assets, editable master commands, persistence and review/development controls; automated acceptance and remaining gates are recorded in the dated implementation roadmap. See the connected RAW source-ownership section below. Isolated Scripts/plugins develop only installed RAW sources through current document/assets grants; file opening stays a trusted host service. Separate headless REST file transport/operations are explicit and do not synchronize browser sessions.
-
 
 ## Recovery persistence failure boundary
 
@@ -962,7 +949,6 @@ Schema34 extends mask stroke records with `{mode:"wet",stroke:WetPaintStrokeData
 
 The trusted retained job accepts layer/mask/filter-mask targets, captures a neutral native source, and keeps original source leases and prepared prefixes private. Filter targets include master-to-instance scale; mask x/y/basis/linking remain independent. nativeWetMask reconstructs ordered raw coverage in bounded native ROIs with interpolation halos and integer output clips before affine sampling. Shared nativeRenderTiles anchors complete sampling cells to document coordinates, so differently cropped viewport/export regions retain the same native source footprints. Infinite paint-base coverage is retained. Mask-wide feather/inversion/density apply afterward. Inert wet metadata bypasses this routing and keeps vector SVG geometry. Current raw reconstruction may replay existing operations; sustained performance/memory/device gates remain open. UI selection effects preserve a current newly begun wet gesture rather than applying an older pending preference reset. Pointer release drains samples that arrived during an awaited append before committing the gesture.
 
-
 ## Retained wet gesture publication — in verification
 
 `EditorApplication._beginWetPaint` is an internal trusted adapter, not an isolated-script binding. `createPreparedWetPaintJob` shares immutable original asset leases into a private base, captures the target's neutral native source plane, and serializes append / prefix encoding / commit. A synchronous brush builder can lease an original texture into this private view without inserting unused host assets. `applyWetPaint` uses this same publication path with its existing public signature.
@@ -970,7 +956,6 @@ The trusted retained job accepts layer/mask/filter-mask targets, captures a neut
 `WetPaintPreview` owns a frozen candidate document and private decoded prefix assets. The tool retires its creator reference when replacing a prefix; viewport preparation takes an independent lease before queueing and releases overwritten/obsolete/finished jobs. Presentation checks the owner, host asset store, base revision, view, font and backend. Earlier completed prefixes may display only within the same current gesture/view. The document/global asset set is unchanged until final native alpha validation, numeric-store cleanup and one synchronous OO transaction. Only referenced, collision-checked assets are shared into the host; failed publication removes exact newly installed records only when current/past/future states do not reference them.
 
 ToolController buffers every accepted coalesced sample, shares the retained engine with trusted one-shot authoring, and commits once on release. Its asynchronous cleanup is token guarded so cancelled older work cannot clear a newer gesture. Smudge/Mixer currently target paint/raster layer pixels. The mask replacement extension is described above; sustained performance and physical-device gates remain open. Prefix output encoding/copying is still work dependent; this is not a universal 60fps claim.
-
 
 ### Retained wet-stroke workspaces (internal, verification in progress)
 
@@ -1775,7 +1760,6 @@ Font-load completion/failure clears CanvasRenderer's epoch-guarded caches; Adapt
 
 Live paint previews published by ToolController are already coalesced once per animation frame. The viewport hook begins those jobs without another animation-frame wait; other document/view updates retain frame coalescing. Rendering remains serialized, and revision/view/stroke guards still reject stale frames. This removes a scheduling delay, not the rendering cost of complex compositions.
 
-
 Live stroke continuation now subscribes directly to ToolController inside the viewport hook. Captured document identity, preview command, layer, mask mode and stroke ID must still match; structural/document/view changes enter through the React layout effect and existing stale-frame guards. The editor shell uses `getUiSnapshot`, which remains stable for paint-preview-only updates; pixel consumers use the full `getSnapshot`. Cursor position has an overlay-local external store so pointer movement does not rerender the shell. Rendering status is not toggled for every live-stroke frame. New gestures, settings and stroke finalization retain normal UI/command updates.
 
 ### Native raster workflows
@@ -1970,9 +1954,7 @@ DOM transactions freeze each validated intermediate snapshot with the store’s 
 
 Vector path bounds scan anchors and both Bezier handles directly without constructing a flattened temporary array; the control-hull and stroke-width extent are unchanged. Raw vector cache lookup is skipped when the path array is not store-immutable: such previews cannot populate the retained raw cache, and serializing their full geometry for a lookup is unnecessary. Immutable committed paths and style-only previews sharing immutable paths retain normal cache behavior.
 
-
 Viewport preparation carries an internal, nonserialized `RenderOptions.isCancelled` predicate. The canvas hook uses the same eligibility rules for cancellation and presentation: superseded revisions, documents, assets, views and ended gestures are obsolete, while a prefix of the same live stroke or an ongoing transform remains useful. Source-document and asset changes are checked directly before React queues the next frame. Cold paint checks the predicate at stroke boundaries and after cooperative stamp yields; Canvas checks layer boundaries and final output, and suppresses obsolete cache writes. Nested smart-document reference renders and GPU reference uploads inherit the predicate. Cancellation raises `AbortError`, unwinds temporary surfaces through existing `finally` blocks, and is suppressed only for obsolete UI work. Adaptive rendering does not retry canceled work as a GPU failure. Direct/export/reference renders without a predicate retain their independent lifetime. Native canvas calls and already-running worker/GPU operations are not preempted; cancellation is cooperative at the next checked boundary.
-
 
 Vector `path.add` and `path.remove` join the immutable targeted-copy command path: copy the document root and ancestors/target layer, copy the path array for append, and retain untouched immutable siblings and geometry. Full document validation, duplicate IDs, inherited locks and limits remain enforced; arbitrary mutable documents still use defensive full copying. Detached VectorLayer drawing commands build a privately owned immutable snapshot by copying mutable fields and reusing only values recognized by the internal recursive-freeze registry. Successful results are frozen before their fields are assigned to the existing mutable layer shell, preserving references held by detached parent groups and path handles. Rejected commands leave the shell and ownership unchanged. Public snapshots/point getters stay defensive copies, and attachment still goes through the ordinary command/history boundary. REST/sandbox payload complexity and path-count limits are unchanged.
 
@@ -2082,16 +2064,13 @@ MaskRetention can disable the finished raw-mask surface write while retaining pr
 
 Smart filter-mask retention also requests readback-oriented output canvases on prefix cache hits, since coverage immediately feeds CPU pixel reads for worker blending. This uses the existing `willReadFrequently` canvas hint and allocation checks; prefix replay misses and uncached coverage retain their existing allocation path. Ordinary mask callers default to drawing-oriented output. Native mask geometry, cache ownership, budgets and blend math remain unchanged.
 
-
 ### Direct retained mask-stroke composition (2026-10-12)
 
 When an active mask stroke has no selection clip and its coverage fits ActiveStrokeRaster's existing retention budget, drawMaskStroke composites the retained coverage directly onto mask output using the stroke's opacity and hide/reveal operation. The retained coverage remains unmodified. This removes a temporary full-tile canvas and intermediate drawImage copy. Clipped strokes keep a separate surface for destructive clipping, and oversized strokes keep isolated coverage so opacity is applied once rather than per stamp. The existing 16 MiB limit is centralized in ActiveStrokeRaster.canRetain; it is a working-surface budget, not an image limit.
 
-
 ### Compact retained text surfaces (2026-10-12)
 
 Text draws on the original output pixel grid. When retaining immutable text content, drawText measures actual glyph ink bounds with the same canvas font, baseline, alignment, direction and spacing used for drawing. Per-draw repeated lines share metrics. The renderer transforms those local bounds to output pixels and retains only their outward-rounded rectangle plus the existing two-pixel margin. It does not crop drawing geometry or use authored text width/height as a glyph clipping box. Missing/nonfinite ink metrics fall back to full-surface retention. Spaces/empty lines have no ink. Existing font-load invalidation, source ownership, cache bypass, and 64 MiB shared cache budget remain unchanged. This prevents many small text layers from evicting each other merely because they were drawn on large document-sized surfaces.
-
 
 ### Compact finished text effects (2026-10-12)
 
@@ -2121,13 +2100,11 @@ The loopback REST endpoint uses a dedicated Node worker that imports the same en
 
 `ChromaticAdjustmentControls` uses shared paired sliders and a local tonal-range selector. Inspector reset/type changes, command search and context-menu creation use typed neutral defaults and the same constructor API. Range-selector state is local UI state; actual nine-channel parameter records remain document data. Raster interchange exports keep existing capability warnings rather than claiming editable adjustment support in external formats.
 
-
 ### Gradient map processing (schema 18)
 
 `core/gradient-map.ts` owns strict stop validation and a portable gradient DTO; `AdjustmentLayer` exposes it through existing constructor/setter/command boundaries. Canvas composition processes at most 1024×1024 pixels per worker request with the actual WASM `adjustGradientMap` export. Stops are packed as float64 position/encoded-RGB tuples. A separate WGSL pipeline uses 32 uniform stop slots, retaining the small existing uniforms for ordinary paint/composite passes. Float32-collapsed stop positions fall back to Canvas/WASM. Alpha, masks, source assets and adjustment composition retain existing invariants. The JS loop in `engine/gradient-map.ts` is a conformance reference, not the production rendering path. Schema 18 is required for these new records; project/workspace outer versions remain unchanged.
 
 The common isolated-script commit boundary rechecks plugin installation and current document-write grants after worker completion, before asset installation, command dispatch and active-layer selection. Initial permission snapshots alone are insufficient for delayed commands. Removed/revoked plugins cannot commit staged edits; existing in-band host operations have their own lifecycle and are not retroactively undone by this staged-command check.
-
 
 ### Rendered PSD boundary — 2026-10-15
 
@@ -2137,20 +2114,17 @@ PSD records include a negative layer count to identify merged transparency, Unic
 
 Host ExportOptions retains `psdMode` (layers by default or explicit flatten), progress and cancellation. The per-export worker validates four-channel artwork, seven-channel shared artwork/preview or one-channel mask replies. Temporary surfaces release and workers terminate on success/error/cancel. Preflight describes actual folder/mask retention, scoped merges and baked controls. Native Photoshop text/adjustments/effects/smart-filter links remain unsupported. See SCRIPTING_API.md for the normative hierarchy/mask/fill/empty-folder contract. Primary references are [Adobe's format specification](https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/) and [group opacity guidance](https://helpx.adobe.com/photoshop/desktop/create-manage-layers/apply-layer-effects/set-layer-opacity-and-blending-modes.html).
 
-
 ### White Balance processing (schema 19)
 
 `core/white-balance.ts` owns strict temperature/tint validation, defaults, the D65-relative Planckian/tint model and the linear-sRGB Bradford matrix. Independent Colour Science fixtures verify whitepoints/matrices using a numerical tangent rather than the production analytic derivative. The WASM ABI packs nine float64 coefficients plus a 256-entry decode table; memory grows before acquiring views. The worker owns input/settings snapshots and the pixel loop preserves straight alpha. Canvas reference/export requests remain at most 1024 square; the supported GPU viewport uses mode 11 with the same matrix, transfer functions and byte boundary. Neutral defaults bypass both transforms exactly. Existing color/precision/mask/fallback gates remain intact; no camera RAW, automatic white estimation or hardware-performance claim is implied.
 
 White Balance uses the existing AdjustmentLayer constructor/setter, command schemas, history, locks, isolated script/plugin commit validation and separate REST surfaces. Schema 19 requires this new kind; older valid roots migrate without changing their content. Outer project/workspace formats and sandbox globals remain unchanged. Inspector sliders preview before one shared commit, with typed defaults for reset/type changes and palette/context-menu discovery.
 
-
 ### Portable LUT processing (schema 20)
 
 `core/lut.ts` owns strict Cube 1.0 parsing, domain validation, red-fastest little-endian float32/base64 serialization, typed defaults and a bounded decoded-table cache. Packed strings avoid creating hundreds of thousands of document/command nodes for standard tables; ordinary command complexity, script and REST body limits still apply. `AdjustmentLayer.setLut` parses a table and invokes its validated attached setter. UI file work uses a terminable module worker. Imported bytes are independently validated in cancellable main-thread chunks to prime the bounded cache before the synchronous shared command; cancellation and stale/locked-target checks precede commit. Tables persist in document/history/recipes without external URLs or a new image-asset type. Schema 20 requires the new kind; earlier valid roots migrate. Outer project/workspace and plugin formats remain unchanged.
 
 `assembly/lookup.ts` implements domain clamping, independent linear 1D and tetrahedral/trilinear 3D interpolation with float32 tables/float64 math and unchanged alpha. Native Canvas/export tiles use the existing image worker. A separate WGSL pipeline reads packed float32 values from a storage buffer, with a bounded buffer cache released on clear/device loss/disposal. Precision-unsafe domains/extreme values or excessive GPU storage use the reference fallback with parameters intact. Cache budgets do not limit image/document geometry. The JavaScript pixel implementation is a conformance oracle; independent Colour Science files and outputs validate ordering/domains/interpolation. Hardware/color/HDR/print/performance claims require their own gates.
-
 
 ### Native Color Range preparation — 2026-10-15
 
@@ -2159,7 +2133,6 @@ White Balance uses the existing AdjustmentLayer constructor/setter, command sche
 Document.selectColorRange delegates preparation to a host, validates results/revision and commits normal selection commands in one transaction. Scripts prepare against their captured revision plus validated staged commands, with current plugin grants enforced before/during preparation and before final staged commit. Scripts retain existing time/command and shared 32-selection-preparation budgets. Source asset reads require apiVersion-2 assets:read, without exposing pixel buffers or adding a permission. Metadata-only selection operations still need no image permission. Existing selection data (current document model 21), project 3 and workspace 2 are unchanged; recipes retain final coverage for offline replay.
 
 The separate REST endpoint requires an explicit asset source. `server/png-rows.ts` validates and streams a published noninterlaced 8-bit plain-sRGB PNG subset; `server/color-range-worker.mjs` clips native decoded strips and invokes the same WASM kernel. It retains scanlines/a bounded RGBA strip, never a full decoded image, and terminates on request/session/revision cancellation. Unsupported formats/color declarations reject. This is source-pixel analysis, not a Node scene renderer, browser synchronization or ICC/EXIF orientation support. Both surfaces preserve original assets. Dense RLE, extreme row widths, browser decoding and process memory remain real limits; no arbitrary image resolution cap was introduced.
-
 
 ### Saved alpha channels (schema 21)
 
@@ -2170,7 +2143,6 @@ AlphaChannel.load delegates native preparation through Document._prepareChannelL
 The Inspector owns a bounded grayscale preview and local selection controls, not document rendering state. Loaded coverage records as an offline selection recipe; channel management remains explicitly unsupported in recipes. PSD capability reporting identifies omitted saved channels rather than implying interchange support. RGB/CMYK component channels, spot colors and direct grayscale channel painting remain future work; current refinement loads into ordinary selection tools and updates the saved channel.
 
 Crop frame/active changes explicitly invalidate the tools' retained UI snapshot before publishing. Those properties live on CropController rather than ToolState; otherwise cancelling an idle frame could leave its old overlay visible when every compared ToolState field stayed equal. Pointer movement retains the controller's existing frame pacing; paint preview subscription filtering is unchanged.
-
 
 ### Native Quick Selection
 
@@ -2198,9 +2170,7 @@ The synchronous subject reference/helpers retain actual byte masks and return em
 
 The isolated retouch host prepares against validated staged commands and owns output assets until final script commit, sharing its 32-owned-asset budget (two for corrected output). Current document/asset read/write grants are checked both during preparation and final commit. No raw RGB or trusted controls enter sandbox globals. Separate REST sessions use private Node PNG-decoder workers and the same tile/output mathematics, shared four-worker capacity, revision/disconnect/deletion cancellation and staged asset commit. Node retains full source and optional bitmap-mask decode planes; browser decoding and automatic Subject still have genuine native memory costs. No import cap, browser scene renderer or server/tab synchronization is added. Exact defaults, format limits, source precedence and resampling caveats are in SCRIPTING_API.md/API.md.
 
-
 The global worker session has assembly, solve and output phases. Disjoint row-major native cores are validated; covariances use stable Cholesky factors, and final PCG residual is recomputed before certification. Private processor disposal terminates the graph and pending work. Display proxies run their own global solve and never supply final coverage. Node uses the identical global workflow in its existing private PNG worker. Global graph memory is an operation budget proportional to unknown coverage, separate from original geometry, browser decode, automatic Subject and compressed/output allocations. Independent NumPy/SciPy direct solves and global-seam/native browser checks establish the numerical subset; real hair/glass semantic quality is not established.
-
 
 Photographed-reference evaluation exposed incomplete Jacobi convergence and overstrong low Smooth values. Matting now builds a stencil-preserving IC(0) factor with predecessors sorted by actual unknown insertion order, including capture seams. Geometric stencil intersections avoid dense factors; upper entries cache the factor transpose for triangular applications. Adaptive diagonal shifts affect only this preconditioner. Original Laplacian, constraints and true residual remain authoritative; insufficient factor memory or failed factorization uses global Jacobi rather than a different matte method. Base graph capacity is retained within the same 192 MiB estimate; IC(0) adds up to 200 bytes per reserved row to the former 444-byte base estimate when it fits. Native smoothing blends the bilateral result proportionately, retaining zero identity and hard labels.
 
@@ -2212,7 +2182,6 @@ RGB24 and the genuine initial-alpha byte share one exact 33-bit integer (`RGB24*
 
 External research images stay outside the repository. The pinned local evaluation/preparation/direct-reference/scoring tools and explicit Playwright configuration separate development from a reserved image-ID holdout, record failures, and compare real browser source/output bytes to the same numerical pipeline. Their gradient/connectivity definitions are local metrics; no official hidden-test ranking is claimed. Existing script wall-time and plugin/asset isolation budgets remain unchanged.
 
-
 ### Optional WASM sparse matting iterations
 
 After component classification, coarse preparation, IC(0) and row packing, `engine/matting-iterations.ts` can migrate matrix/neighbor/factor buffers to a private instance of the already compiled pixel module. `assembly/matting.ts` applies the same packed sparse matrix and forward/back IC(0) substitutions in float64 and the same reduction order. PCG control, true-residual recomputation, global RGB coarse correction and final clipping stay in the existing solver. The worker and separate headless REST matting worker supply this backend; it is not a new public `refineEdge` option.
@@ -2222,7 +2191,6 @@ The private instance has its own linear memory, so interleaved ordinary pixel re
 The optional estimate charges three float64 vectors, three copied metadata bytes per reserved row, 512 bookkeeping bytes per chunk, module prefix, page rounding and a transient source matrix/factor chunk. It fits only in spare capacity **after** the existing base, eligible IC(0) and coarse stage; no previous graph capacity is reduced. Fewer than 4,096 unknowns or unavailable extra capacity retains JavaScript. Diagnostics report `iterationBackend` and `iterationBytes`, included in `estimatedGraphBytes` and validated before encoding/commit. These remain logical working-set estimates: garbage-collection timing, retired WASM buffers, decoder/source allocations and whole-process peak memory require real device measurements. JS fallback loops cache chunk arrays and use packed entry bounds without changing arithmetic or storage.
 
 The Node worker imports its kernel factory and matting runtime through a single `tsx` entry module. Separate `tsImport` calls create distinct module namespaces and private WeakMaps; a kernel created in one namespace cannot be cloned through another cache. A real REST test uses the multi-chunk, 5,355-unknown independent fixture to cover this boundary and native output/undo.
-
 
 ### Read-only design checks
 
@@ -2234,7 +2202,6 @@ Isolated scripts run the same core inspection in their existing worker after rea
 
 `core/preflight-view.ts` creates private compact worker metadata, excluding document selections/channels, masks, effects/LUT tables, ordinary raster erasures and clone pixels. Active wet-replacement extents retain only geometry and asset-reference metadata. Vector/brush geometry is included when bounds checks are enabled or when a declared alignment needs that target, key or group descendant. This avoids serializing unrelated large editor data on the UI thread and never becomes a render tree or public mutation API.
 
-
 ### Hierarchical vector SVG extraction (2026-10-16)
 
 `core/svg-path.ts` owns the pure, full-precision SVG path formatter and literal-color encoder, re-exported by `core/shapes.ts` for existing callers. `core/svg-export.ts` recursively emits the vector/group tree with native local matrices, sibling order, ancestor visibility, isolated layer/group opacity and fill opacity, and CSS mix-blend-mode. Isolation mirrors the native compositor's separate layer surfaces; see the [SVG rendering model](https://www.w3.org/TR/SVG2/render.html) and [compositing/isolation rules](https://www.w3.org/TR/compositing-1/). Generated XML-safe group IDs carry escaped authored identifiers in data-layer-id; XML 1.0-invalid characters reject the format operation, without changing the model. Numbers retain round-trip JavaScript precision rather than rounding to hundredths.
@@ -2243,7 +2210,6 @@ The synchronous VectorLayer.toSvg wrapper extracts only that layer in its immedi
 
 Capability reporting distinguishes editable vector masks from rasterized native mask coverage, native adjustment/Blend If backdrop prefixes and saved-channel omissions. Later supported content remains independently editable; CSS-supporting viewers preserve remaining hierarchy blending. This is a repaired extraction subset, not complete SVG import/export or universal renderer parity. Native Canvas and SVG antialiasing may differ on transformed edges. REST rendering remains separate and is not added by this change.
 
-
 ### SVG mask coverage (2026-10-16, F02/F07/F11 partial)
 
 `core/svg-masks.ts` plans masks only for visible extracted artwork. Unfeathered vector masks without corrective strokes serialize as compound paths with explicit fill rule. Density and inversion operate on alpha independently of color: normal coverage adds a transparent white baseline; inverted coverage uses a bounded feComponentTransfer alpha function. Mask units/content units are explicit user-space coordinates and regions cover the export canvas in each referencing layer's local plane. Full world inverses rebase unlinked coverage without changing the document. See [SVG mask coordinate systems](https://www.w3.org/TR/css-masking-1/#MaskElement) and [alpha component transfer](https://www.w3.org/TR/filter-effects-1/#feComponentTransferElement).
@@ -2251,7 +2217,6 @@ Capability reporting distinguishes editable vector masks from rasterized native 
 `engine/svg-masks.ts` prepares all other masks through the existing native renderMaskCoverage service, including sampled/bitmap/painted coverage, correction strokes, linked/unlinked bases and finite-support WASM feathering. `engine/masks.ts` shares final inversion/density compositing with the native renderer. At most one 1024×1024 coverage tile plus existing feather/stroke working buffers is rendered/encoded at a time; canvases release in finally blocks. Encoded PNG tiles retain only white RGB and coverage alpha. The SVG serializer emits tiled image references under the inverse layer-world matrix, maintaining the vector/group hierarchy and editable artwork. It retains compressed/base64 output; browser image decoding and output size still have memory costs. It does not create a document-size canvas/RGBA plane or change import/source geometry.
 
 Preparation pins bitmap asset identities and repository lifetime, checks them and cancellation around each await/tile, and reports rendering fractions before indeterminate vector encoding. Missing sources, replacement/removal, disposal or cancellation reject without partial download/model mutation. Individual mask jobs/native PNG encoding are cooperative rather than preemptible. The renderer interface optionally exposes its existing mask-coverage service; custom renderers without it reject native-mask SVG requests while pure vector masks remain independent. Standalone VectorLayer.toSvg remains synchronous: it handles pure vector masks, rebases attached unlinked masks into the immediate parent plane, and rejects active masks requiring native preparation. Scripts gain neither asset bytes nor a host download capability. Editable raster-mask geometry, Native-rendered adjustment/backdrop editability, viewer fidelity and wider interchange gates remain open.
-
 
 ### SVG overlays and shadows (2026-10-16, F07/F11 partial)
 
@@ -2285,7 +2250,6 @@ The plan collects reachable visible native-filter dependencies (raster sources, 
 
 Native-filter source dependencies are captured together with ordinary SVG sources before progress callbacks, and filtered text fonts share readiness/lifetime checks with editable SVG text. Checks span native rendering, mask preparation and final encoding; cancellation/stale dependencies release current surfaces and publish no partial result. Registered graph validation and existing 4,096-node/64-depth expansion budgets still apply to hidden/filtered logical subgraphs. These are render-work budgets, not import-resolution limits. Source bytes, authored masters, schemas, shared commands/history, plugin isolation and separate REST sessions remain unchanged. Editable adjustment/Blend If graphs, general SVG import, shared SVG symbol/master identity and wider viewer/fidelity/performance gates remain open.
 
-
 ### Editable SVG paint (2026-10-16, F06/F11 partial)
 
 `core/paint-stamps.ts` owns the pure replay grid shared by native Canvas/WGSL preparation and SVG. It clips segment parameter intervals before enumerating the original stamp indices, preserving the existing grid, pressure interpolation, spacing and minimum pressure/flow rules. A visible index beyond safe integer precision rejects explicitly, preventing `step++` from ceasing to advance. Geometry/source resolution remains unchanged. GPU stamp uniforms release in `finally` on replay rejection as well as success, and a later valid frame remains available. `engine/drawing.ts` retains native Canvas stamping and cooperative replay; the GPU adapter still consumes its visitor.
@@ -2296,7 +2260,6 @@ Clone tiles use collision-free private image keys in `core/svg-images.ts`, reusi
 
 Paint shares the existing affine hierarchy, layer/group masks, overlay/shadow graphs, fill/layer opacity, CSS blending and unfiltered smart-master expansion. Bounded fragments yield through definitions and artwork encoding. Missing/changed clone dependencies, missing native coverage, invalid literal colors and numeric replay errors return no partial result. No new public mutation/API/schema, history behavior, source-byte change, script/plugin permission or REST renderer is introduced. Editable adjustment/Blend If graphs, general SVG import and complete F06/F11 fidelity/performance gates remain open.
 
-
 ### Native SVG backdrop prefixes (2026-10-16, F04/F11 partial)
 
 Pure core/svg-composition.ts runs after validated smart expansion. Each visible isolated sibling list replaces only its prefix through the last visible adjustment/enabled Blend If with an internal raster placeholder keyed by the existing ending-layer ID. Later siblings and parent wrappers remain in the SVG hierarchy. A private read-only map retains original prefix nodes; it is never model/project/command data. The original conservative effect-support rectangle remains shared after baking internal shadow styles. Native-prefix contents lose SVG editability and off-support pixels; the report lists affected stack endings and keeps this distinct from omitted content or editable adjustment filters.
@@ -2305,16 +2268,13 @@ Native image planning marks these placeholders explicitly rather than looking up
 
 All eleven native adjustment kernels and source/underlying/channel Blend If use native compositor ordering, alpha and precision rules. Hidden/zero-opacity dependencies trigger no prefix. Synchronous standalone VectorLayer.toSvg rejects enabled Blend If rather than claiming native backdrop preparation. Public constructors/commands, source geometry/bytes, history, schemas, isolated privileges and separate REST sessions remain unchanged. Editable adjustment graphs, general SVG import, viewer/device/precision/heap and broader F11 gates remain open.
 
-
 Native SVG backdrop frame rebasing can quantize transformed source edges differently from the direct PNG working origin; retained SVG master clips and outer mask/filter rasterization add their own edge differences. Pixel residuals remain reported alongside exact interior colors, transformed contour/shadow-support coverage, area and centroid checks. Native PNG remains the flattened reference; editable parent geometry is retained. Source/font guards now also run around each cooperative encoding-progress callback, so a stale callback stops further encoding and returns no file.
-
 
 ### Local SVG import (2026-10-16, F07/F11 partial)
 
 `core/svg-path-import.ts` owns strict contour parsing, quadratic/cubic/arc conversion and SVG affine/viewBox math. The public single-path factory and legacy `parseSvgPath` helper reuse it, rejecting compound input. `core/svg-import.ts` is worker-side inert XML admission and OO construction through Document/LayerGroup/VectorLayer/VectorPath/LayerMask/RasterLayer. Its DTOs/Blobs are private worker transport. Pinned xmldom does not enter the main scripting runtime; there is no live SVG markup insertion. XML warnings/errors and executable/dynamic/external content reject before either import mode.
 
 `engine/svg-import.worker.ts` decodes XML text (including UTF-16 BOMs) and inspects/converts off-thread. `engine/svg-import.ts` validates the result before asset admission, decodes original embedded image Blobs, resolves intrinsic placement/aspect/crop through normal OO commands and returns a clean baseline. Explicit flatten mode uses only browser image decoding plus the existing native streamed PNG renderer, releasing temporary surfaces/assets before final PNG admission. No source-size cutoff or public DTO mutation path is introduced. Worker termination, abort/progress errors, provisional-store disposal, image/tile cleanup and editor generation/revision/identity/lifetime guards prevent partial publication. `EditorApplication.openSvg` alone publishes a new tab while retaining prior edited sessions. The imported baseline is revision zero; future edits use existing history. `SvgImportDialog` owns cancellable preflight and explicit editable/flatten/cancel choices for picker/drop input. Unsupported graphs/styles/type and native editing budgets remain reported limitations, rather than general SVG round-trip claims. Embedded originals retain compressed bytes; original SVG XML/DOM/master identity is not archived.
-
 
 ### Native vector stroke styles (2026-10-16, F07/F11 partial)
 
@@ -2326,7 +2286,6 @@ The existing PathProperties inspector hosts `VectorStrokeControls`: cap/join sel
 
 Zero-length explicit segment/close strokes bypass Canvas pruning with one local circle/square cap, evaluated against the dash phase. Move-only contours and butt caps remain empty. Degenerate dash phases use native half-open intervals; positive-pattern closed zero contours remain empty as in the verified browser SVG path. Faint SVG epsilon/edge coverage remains an explicit viewer difference. Actual cubic loops and unused open-end handles are distinguished through segment geometry. Native bounds, affine transforms, masks, layer opacity, SVG output and GPU reference uploads retain the same geometry/settings.
 
-
 ### Native vector gradient fills (2026-10-16, F07/F11 partial)
 
 `core/vector-gradient.ts` owns strict linear/radial paint value schemas and defensive explicit-field copying. Optional nullable `fillGradient` overrides retained solid fill on closed paths. Shared path schemas/commands, OO constructor/factories/setters, isolated runtime and REST reuse the same contract. Schema 23 admits the field; pre-23 labels reject it outside the frozen validation cache. Valid old roots/history migrate without injecting it; project/workspace containers remain 3/2.
@@ -2335,13 +2294,11 @@ Native Canvas fills the already-traced path while the complete paint transform i
 
 `VectorGradientControls` uses native controls for kind, stop color/position/opacity, geometry, affine paint matrix, insertion/removal and reversal; attached edits/undo/locks stay on shared commands. No source-byte mutation, arbitrary import resolution cutoff, new plugin privilege or REST/browser synchronization is introduced.
 
-
 ### Native compound paths (schema 24)
 
 `core/drawing.ts` adds optional fill rule and closed subpath records with unique scoped contour IDs, at most 128 total boundaries and 20,000 total anchors. The refined path schema validates the complete geometry; partial command schemas use its unrefined field shape, and final document validation applies the cross-field invariants. The immutable-anchor validation schema uses safeExtend so refinements remain active. Feature-version gates run outside cached drawing proofs. Migration changes old root/history labels without inserting fields; project 3/workspace 2 and source bytes remain unchanged.
 
 `VectorContour` and `SubpathCollection` are owner-backed OO geometry handles. Constructors and getters copy nested values; attached edits replace validated parent subpaths through path.update. Removed handles fail until undo restores their IDs. Duplicates allocate independent contour IDs. The Pen controller previews only the active boundary while retaining parent style/identity; overlays expose all anchors. Renderer culling includes all boundaries, traces once and fills using the shared rule/gradient, then strokes every contour with independent dash starts and degenerate-cap handling. SVG emits one compound d; inert SVG import now builds native contours instead of cover rectangles with masks. Opaque closed fill/stroke paints share the native contour graph; open/translucent paints retain separate layers and a reported geometry-editing limitation so their independent paint alpha composes before element opacity. Mask capture copies all boundaries in the source/target affine planes, preserving a common explicit/compound fill rule and the old implicit even-odd default for legacy simple sources; mixed rules reject. Boolean calculation/worker scheduling and cross-layer operation semantics use the boundary described below.
-
 
 ### Asynchronous curve Boolean boundary (F07)
 
@@ -2353,7 +2310,6 @@ A browser module worker or Node worker-thread owns one operation and is terminat
 
 `Document.combinePaths` and `VectorLayer.combinePaths` await private host preparation outside synchronous transactions and commit validated geometry once after snapshot revision/signal checks. Script calls send staged commands plus operand references, not a live scene or source images; the host validates/replays staged commands then captures geometry from that staged snapshot. Current plugin document-read/write permissions are checked during preparation and final commit. Native preparation remains sequential and shares the existing 32-operation script budget. Separate REST sessions expose a revision-checked endpoint using the existing four-worker native budget. No image-read, network/file privilege or install-time execution is added. Schema 25/project 3/workspace 2, normal history and project persistence retain the final result.
 
-
 ## Pen overlay translation and geometry
 
 Long paths divide their React anchor controls into memoized blocks of 64. Editing one anchor recreates controls only in its changed block; unchanged blocks compare their basis, zoom, active anchor and complete point/handle coordinates. Short paths keep the direct rendering path. Each block retains only its own at-most-64 point references, avoiding retention of complete prior path arrays across independent block updates. Blocks introduce no SVG wrappers or geometry reduction: every line, circle and anchor remains in its original drawing order. Length changes, block boundaries, contour selection, affine/zoom changes and the existing translation precision fallback still invalidate the affected controls. This reduces reconciliation work without changing model hit testing, staged previews or the shared final command/undo boundary.
@@ -2362,9 +2318,7 @@ For precision-safe frames, `CanvasOverlays` applies the selected artwork or mask
 
 `scripts/benchmark-vector-input.mjs` imports constructor-built native projects and follows a distinct vector point through Canvas copies into the connected viewport. Pen runs additionally require the displayed anchor center at the matching document position. The external harness records all observed task intervals, overlap-filtered long tasks, a real native positive control, per-key/round timings and exact undo. Its optional three rounds revisit cached positions across 60 keyboard edits. It requires the actually displayed Canvas2D backend; hardware WebGPU/display, initial large-handle construction, sustained use and complete F14 acceptance remain separate gates.
 
-
 Pen translation shares the SVG group only when its conservative float-precision error bound stays below 1/1024 of a CSS pixel (`max(abs(e),abs(f)) * zoom * 2^-23`). Otherwise controls retain the earlier JavaScript-computed absolute coordinates and a zero group translation. This preserves cancellation between large local coordinates and opposing translation; it neither rejects geometry nor caps document coordinates/zoom. Crossing the precision boundary refreshes geometry and group placement atomically. The native browser test includes 1e10 local coordinates and a zoom-driven boundary transition.
-
 
 ## Paragraph text layout
 
@@ -2374,7 +2328,6 @@ core/text-layout.ts owns pure visual-line layout from authored text, width, para
 
 Schema-27 optional paragraphJustify is an authored enum on TextLayer. Shared pure layout keeps base wrapping, measures the whole line response to a one-pixel native word-spacing increment, then verifies/corrects derived spacing for soft lines only. Private visual-line wordSpacing never rewrites public text or authored wordSpacing. The bounded invocation-local measurement memo keys derived spacing too. Canvas drawing/ink caches and GPU native textures use complete per-line native state; SVG preparation carries validated finite per-line spacing and keys boundary probes by line and derived spacing. Fitting prefers a native advance within the exact authored frame, with a documented 1/64-pixel per-response-unit rounding allowance and bounded lower-root probe for plateaus. NativeJustificationError propagates from native measurement instead of silently substituting headless estimates. Final/forced/overflow/no-gap lines keep base state. Point defaults and source/image allocation boundaries remain intact. Missing native wordSpacing rejects nondefault justification; Reset paragraph restores none atomically. See SCRIPTING_API.md for separator and precision policy. Full paragraph/language/interchange/device gates remain open.
 
-
 ## Native TIFF export boundary
 
 `core/tiff.ts` owns pure classic/BigTIFF layout and exact address validation. `engine/tiff.ts` compresses native RGBA8 tiles into Blob parts, then appends the sorted directory and embedded output sRGB profile. `engine/raster-export-grid.ts` supplies the same native sampling grid to PNG and TIFF; TIFF crops canonical rendered frames into format-compliant padded tiles only after native rendering. This avoids frame-origin rounding differences without changing source or document geometry. No whole-document export canvas or RGBA array is allocated. Compressed output, tables/directory and resident decoded sources still consume output/source-dependent memory.
@@ -2382,7 +2335,6 @@ Schema-27 optional paragraphJustify is an authored enum on TextLayer. Shared pur
 `raster-export-source.ts` captures visible source/clone/patch/bitmap-mask/reachable-master dependencies before callbacks. Shared `export-fonts.ts` pins referenced registered family identities/status/descriptors for SVG and TIFF. TIFF additionally rejects pending referenced fonts. Immutable document snapshots, source lifetime checks, abort/progress checks and finally-based canvas release span all native rendering/compression/encoding. Later host commands retain normal undo behavior; they cannot alter the captured output. OS font resources outside FontFaceSet cannot be pinned.
 
 The existing trusted export/UI boundary exposes `tiffVariant` auto/classic/big, with flattening, 72 DPI and compatibility disclosures. Output is single-image, lossless RGBA8 sRGB TIFF, not editable TIFF/CMYK/HDR/multipage or TIFF input. Neither isolated scripts/plugins nor independent headless REST sessions gain a file/export service. Model 27/project 3/workspace 2 and command/history contracts remain unchanged.
-
 
 ### PSB output and source-independent Photoshop staging
 
@@ -2392,13 +2344,11 @@ Shared raster dependency capture accepts the actual planned documents before cal
 
 `openPsd` validates PSB header/length addressing and uses version-specific RLE tables. Decoded planes are staged through `PngRowEncoder` chunks into a private AssetStore without a source-sized canvas. I/O generation, owner/revision/session and source lifetime guard asynchronous publication; stale work disposes private bitmaps. The parser still reads complete input and materializes planes synchronously. PNG layer sources persist, not the complete original Photoshop container. No document/project/workspace schema, new dependency, isolated host privilege, REST/browser synchronization or public OO mutation bypass is introduced. The scripting guide defines signatures, defaults, supported RGB8 fidelity and current memory/reader limits.
 
-
 ### Private Photoshop encoding worker
 
 PSD/PSB keep native rendering and snapshot/source/font validation on the host. `PhotoshopEncoder` owns one lazy module worker per export; only a fresh, bounded captured RGBA strip transfers to it. Original asset bitmaps/Blob bytes never transfer. `photoshop-strip.ts` deinterleaves channels, applies the existing merged-preview white matte and PackBits-encodes rows into reused private scratch. One owned Blob per channel/strip replaces per-row allocations/Blob parts. The host validates request identity, channel count, typed row tables, positive bounded lengths and exact Blob extents before using results, then rechecks captured sources/fonts. Worker replies provide task boundaries without a clamped timer after every strip. Rendering uses the same native sampling grid; output semantics and bytes remain unchanged.
 
 Abort terminates pending private encoding, while native canvas calls remain non-preemptible. Success, worker error/messageerror, invalid results, source/font failure and callback exceptions all terminate the worker and release native surfaces. Use `addEventListener` for worker messageerror because the Chromium handler property is unavailable in the measured build. No source-sized allocation, public mutation/command/schema, shared pixel-worker queue, dependency, isolated extension privilege or REST/browser synchronization is introduced. Scratch/output/source/reader memory remains data dependent; this is not whole-process peak-memory or complete F14 acceptance.
-
 
 ### Photoshop input worker and private publication
 
@@ -2406,16 +2356,13 @@ Abort terminates pending private encoding, while native canvas calls remain non-
 
 EditorApplication tracks active Photoshop jobs for disposal and import commits for revision/session/tab guards. Per-owner subscriptions abort stale work. Private AssetStore decoding and exact dimensions precede OO Document publication; failures close staged bitmaps. The publishing operation removes its own cancellation registration before activating the new document. Inspection remains independent of document edits. `PhotoshopImportDialog` owns file-request cancellation/retry, while the existing preflight view receives metadata only, pages records/messages and keeps Cancel active. Report text identifies current ICC/mask/CMYK/group limitations rather than claiming full fidelity. Public constructors/commands/history, document 27/project 3/workspace 2 and isolated/REST boundaries remain unchanged.
 
-
 Photoshop Raw/RLE validates 8-bit payload/row extents and complete PackBits output; ByteReader rejects negative/fractional byte addressing. Channel mask geometry determines its row shape. Grayscale composite/layer samples expand to neutral RGB, with mode-specific alpha positions. One internal generator owns binary parsing and yields ZIP channel requests. The synchronous driver resumes without decoded ZIP planes and preserves explicit unsupported-codec fallback; `parsePsdAsync` awaits native zlib Deflate and reverses 8-bit per-row prediction before resuming the same parser. `psdToDocumentAsync` shares bridge conversion, and import/inspection workers use these async drivers. ZIP output must exactly match declared channel geometry, including the merged planar channels; corrupt/checksum-invalid/truncated/excess streams reject. A per-operation worker remains terminable during native inflation or prediction. Higher-precision ZIP remains explicitly unsupported, and color management/full per-pixel mask/group reconstruction remain prototype limits. Full input/plane allocations remain data dependent; this is not streamed-file or metadata-only parsing.
-
 
 ### Photoshop native raster-mask conversion
 
 The parser retains basic user-mask bounds, coordinate/default/inversion/disabled flags and user density/feather parameters. Mask channels decode using mask geometry, not artwork geometry. Invalid bounds/defaults/truncated fields reject. `psdMaskIssue` shares supported-mask policy between reports and the bridge: non-raster/non-group masks, nonzero Photoshop feather, rendered/extended/combined semantics and higher precision keep the layered path unavailable unless masks are explicitly omitted. Standalone `vmsk`/`vsms` tags also mark vector-mask semantics unsupported, even when no basic user-mask record exists. No rectangular surrogate is created.
 
 Private bridge conversion normalizes owned decoded mask pixels in place into white RGB plus coverage alpha, installs an independent bitmap-mask source and references it in the existing native model. White backgrounds use complemented alpha plus inversion to preserve infinite outside coverage without a padded document-sized bitmap. Coordinate bit 0 maps to the linked local plane; absolute positions map to unlinked document space. Disabled state, inversion effect and density are retained; zero-area masks use constant paint coverage. Existing worker source-set/PNG/host lifetime checks and AssetStore/project/workspace ownership apply to both sources. Pixel mask import uses schema 27/project 3/workspace 2 and shared OO editing/undo; complete Photoshop linkage/vector/feather/color/precision/container retention and memory/device acceptance remain separate gates.
-
 
 ## Photoshop hierarchy and native pass-through composition — introduced in schema 28
 
@@ -2431,7 +2378,6 @@ Photoshop host export retains supported nested folder and separate pixel-mask re
 
 Tool settings validate/copy a curve before changing state; a changed curve cancels an active gesture. The custom dialog edits only a local draft until Apply. App modal state preserves shortcut isolation and focus. Explicit curves retain finite zero/low browser pen pressure before existing smoothing; legacy normalization and mouse behavior stay unchanged. The isolated runtime registers only the pure constructor; existing host validation/grants/undo remain authoritative. See SCRIPTING_API.md for exact defaults, aliases, null-versus-DTO behavior, zero/spacing semantics, examples and limits. Physical tablet, richer dynamics and sustained/device F06/F14 acceptance remain open.
 
-
 ### Saved brush preference library
 
 `brushes/presets.ts` owns immutable strict BrushPreset values, curated defaults and data-only portable packs. `brushes/library.ts` owns local IndexedDB transactions, record revisions, all-or-nothing imports, validated reloads and backup-checked recovery reset. EditorApplication owns/disposes the library; ToolController.applyBrushPreset validates before cancelling and configuring future gestures. The custom dialog selects tools through the normal UI path, preserving per-tool size memory and document paint targets. Preset state is outside document history; authored strokes still capture complete ordinary command data. Broadcast messages are reload hints, never data. No document/project/workspace version or isolated/REST privilege changes. See [BRUSH_PRESETS.md](BRUSH_PRESETS.md) for signatures, bounds, conflicts, recovery and limits.
@@ -2441,7 +2387,6 @@ Tool settings validate/copy a curve before changing state; a changed curve cance
 `core/brush-tip.ts` owns strict tip/point schemas, pen sensor projection, inverse-linear orientation mapping and shortest-arc interpolation. `core/paint-stamps.ts` shares ellipse/rotated-pencil geometry and support/spacing across Canvas, SVG, WGSL and tool previews. Absent tips preserve the legacy native branch. Explicit zero response is skipped before pencil minimum-size rounding. Tiny/precision-sensitive GPU tips use whole-composition Canvas fallback. Cursor axes reuse the active or prospective stroke plane without commands, history or React pointer updates. Healing overlays show shaped endpoint support plus a centerline instead of claiming circular coverage.
 
 Schema 30 admits authored tip and spherical point metadata; every brush-bearing context and embedded master checks field age outside immutable validation proofs. Valid old roots and retained history migrate without inserted tip fields; project 3/workspace 2 remain unchanged. Immutable BrushTip values participate in existing OO constructors, tonal options, script whitelist, strict REST DTOs, locks, transactions and undo. Preset/pack version 2 carries tips while legacy version 1 keeps default shape. No device verification, new script privilege, REST/browser synchronization or source-image cap is implied. See SCRIPTING_API.md for exact geometry, units, defaults, boundaries and errors.
-
 
 ## Self-contained affine brush symmetry
 
@@ -2459,16 +2404,13 @@ The custom local-draft dialog exposes supported factory modes and preserves arbi
 
 Read-only image views for isolated script repair and matting previews now take explicit leases rather than adopting borrowed source records. Script preparation shares promoted output into the document before disposing its private view; failures release staged/view references without closing live document sources. Matting preview owns/disposes both original-source leases and its private proxy bitmaps on success and validation/cancellation failure. These changes preserve existing isolated permissions and do not expose source pixels or host asset services. Recapturing an identical original source preserves the preference and existing per-document IDs instead of retaining redundant references.
 
-
 ## Texture tool controls and gesture capture — 2026-10-18
 
 The custom BrushTextureDialog owns a private source draft until Apply. Owner-to-owner capture shares originals without inserting an unused document asset; Cancel, failed decode and late completion preserve the active preference. TIFF file selection inspects native pages and requires explicit precision-loss consent before decoding. Document sources retain their original TIFF choices. Coverage previews use the native worker through a private leased view, at 128 by 128 pixels only. Cursor image transforms follow the existing brush plane, tip/tilt and symmetry bases, with no React pointer updates; they show coverage proxies, not pressure/hardness/flow predictions.
 
 ToolController captures a collision-safe document reference at the start of each brush, pencil, eraser, clone, dodge, burn, healing or painted-mask/filter-mask gesture. The captured DTO survives later preference changes. Cancellation/failure releases a newly created lease only if its exact record remains installed and current/past/future document snapshots do not reference it. Healing also releases its transient source after the native repair settles. Existing retained references survive undo/redo and project/workspace persistence. Combined dynamic preferences validate before cancelling a live gesture. Metadata-only BrushPreset capture explicitly rejects enabled texture, and legacy preset application resets texture to null. Source-bearing presets remain the next required slice; this is not complete F06/F14 acceptance.
 
-
 Texture gesture continuation, queued previews and final commit also validate the captured store/record/bitmap identity. Removing or replacing the asset under the same ID cancels/rejects the stale gesture without document/history edits or deletion of the foreign replacement. This guard supplements document revision checks; asset IDs alone are not an ownership proof.
-
 
 ## Source-bearing brush presets — 2026-10-18, in verification
 
@@ -2478,7 +2420,6 @@ The library verifies actual stored source contents before writes and retains las
 
 The custom preset dialog connects source-aware save/update/rename/duplicate/delete/import/export/download/recovery and shows source name/dimensions/coverage. Applying privately verifies/decodes an original, guards abort/supersession/document/tool/source changes, then uses normal tool selection/configuration; errors retain prior ready preferences and newer human edits. Preferences stay outside document undo; actual strokes still use shared OO commands/history and collision-safe document leases. Original images stay independent of viewport/cursor proxies, library deletion and closed source documents. This adds no isolated script/plugin file privilege, paid provider, upload, REST/browser sync or document schema bump. See [BRUSH_PRESETS.md](BRUSH_PRESETS.md) for signatures, binary contract, errors and limits. Complete native/production verification and wider F06/F14/device gates remain open.
 
-
 ### Bounded texture batches and partial readback
 
 `BrushTextureSampler.prepareAffineBatch` validates and owns up to 64 affine samples with at most 1,000,000 total full-projection pixels. It batches actual WASM channel conversion while preserving individual native rasterization. Its optional fifth argument supplies one integer, positive, in-bounds readback rectangle per sample. These rectangles reduce captured/transferred bytes only: each original bitmap still projects onto the unchanged full canvas before readback. A bounded private canvas pool is reused synchronously after each owned ImageData capture and released before worker waits. Cache keys include complete projection settings and the readback rectangle. Caller outputs stay independent; any failed conversion releases every unpublished output. Original image dimensions and bytes are not constrained by these working budgets.
@@ -2487,11 +2428,9 @@ Raw texture replay may omit unchanged pixels only under the proven full-flow, bi
 
 Canonical integer-native frequency compositions recognized by `frequencyIdentitySource` may use 512-pixel composition cores. Eligibility includes the inner Gaussian sampling halo in the existing 4 MP/8192-edge working budget. Affine/fractional placements, altered compositions and unsafe halos retain the established 256-pixel grid. Exact-pixel equivalence and responsive export remain distinct verification gates.
 
-
 ### Literal native raster frequency-band sampling
 
 `nativeFrequencyRasterSource` recognizes a single full-frame raster at native bitmap dimensions, with neutral placement/opacity/blending and no source mask, effects or erasures. This is an internal read-only eligibility query. An integer unit-native frequency-band instance over that source, without a filter mask, may use a 1024-pixel sampling core to absorb composition overscan. Both1024 and512 preferences include the actual Gaussian halo plus four overscan pixels in the existing4MP/8192-edge working budget; unsafe halos retain the established512/256 fallbacks. Source appearance, multiple/non-raster children, resampling, affine/fractional instance placement and filter masks retain their current sampling grid. Canonical composition cores remain512. No public model/API/schema, original-source or history/isolation change is introduced. This reduces sampling requests; it does not imply instant full-frame export or complete F14 performance.
-
 
 ### Complete native footprints and canonical Canvas cells
 
@@ -2501,18 +2440,15 @@ Resampled smart instances prepare complete document-aligned output cells and pro
 
 Resolved vector tangents are memoized separately per contour and direction for one footprint query. Coincident-segment chains share the nearest resolved tangent; empty cycles and uncertain tangents are cached too. Each segment is inspected at most once in each direction, retaining linear coordinate work and temporary storage through the existing20,000-anchor path budget. The same tangent arithmetic, conservative uncertainty fallback and authored geometry remain authoritative. No cache persists across snapshots.
 
-
 ### Native spatial-filter transparent support
 
 `assembly/spatial-filter.ts` trims only zero-alpha leading/trailing samples from each horizontal row and globally empty source rows from the vertical pass. Horizontal filtering cannot move coverage between rows. Every skipped contribution is positive zero; retained taps keep their original order, normalized Float64 weights, premultiplication, Float64 scratch, rounding and output traversal. Hidden transparent RGB does not become visible. Unsharp still preserves source alpha/hidden RGB, while frequency planes retain their opaque low/high/correction rules. Dense inputs keep full support. The function signature, scratch layout, worker ownership/result validation and4MP/8192-edge native job budgets are unchanged; no new allocation, source resize or import limit is introduced. This removes wasted convolution over transparent margins, not the general cost of a large dense Gaussian.
-
 
 ### Adjacent native spatial outputs
 
 The scalar spatial kernel processes horizontal and vertical output pixels in pairs. Horizontal neighboring support intervals differ by at most one sample at each edge: the leading tap belongs to the first output, common source RGBA/alpha normalization serves both independent weighted accumulators, and the trailing tap belongs to the second. Each output retains ascending tap order and its original Float64 multiplications/additions. The vertical pass shares weight/address preparation and reads adjacent scratch pixels together. A scalar tail handles every odd final column, including one-pixel rows. The inline pixel writer retains existing Gaussian/unsharp/frequency rounding, alpha, hidden-RGB and threshold rules; returning from an invisible unsharp pixel never skips its neighbor.
 
 The scratch layout remains four Float64 channels per pixel, with no new memory, module feature, worker/ABI, public constructor, format or mutation/history contract. No SIMD variant is shipped: isolated SIMD experiments did not produce a useful dense-kernel gain. Source geometry, all taps and original blobs remain intact; this is exact sample/load reuse, not approximate convolution or source downsampling.
-
 
 ### Native pointwise tone sampling
 
@@ -2528,7 +2464,6 @@ The deterministic compiler keeps style-output bindings separate from layer-outpu
 
 Schema-41 style records retain a complete resolved format plus optional basedOn {id, overrides}. Strict admission validates an acyclic same-document graph and exact derived formats; older labels cannot carry inheritance. Shared paragraphStyle.set resolves all descendants before checking affected text locks/reflow and publishing one atomic history revision. Deleting a base detaches immediate child styles and direct text, preserving appearance and deeper links. OO handles expose basedOn/setBase/overrides/resetOverrides; child capture records all fourteen explicit fields. Copy collects/remaps the complete ancestor closure before child commands. Embedded masters retain independent libraries. Recorder dependencies and recipe references preserve the graph through JSON/packages/batch snapshots; layer/style output namespaces stay separate. Renderer fields remain concrete and SVG reports relationship loss. Original assets, project/workspace/plugin/recipe versions and isolated/REST boundaries remain unchanged.
 
-
 ### Connected RAW source ownership and host editing — 2026-10-22, in implementation
 
 The ready ImageAsset remains a real accepted PNG/bitmap. An immutable optional `raw` record owns its complete original Blob plus original/output hashes, consent and normalized native development settings, accepted report and decoder WASM identity. Sensor bytes never use a dummy bitmap. Original ownership follows every shared/copied accepted asset, including textures. Trusted `openRaw` stages a clean native-resolution Document/SmartObjectLayer privately. `RawDevelopment` and attached `developRaw` prepare native output before one shared master command; all dependent locks, revision/session/lifetime/abort checks remain required. Accepted old/new pixel assets provide ordinary offline undo/redo, preserving instance placement/extent/effects.
@@ -2536,7 +2471,6 @@ The ready ImageAsset remains a real accepted PNG/bitmap. An immutable optional `
 RAW-bearing native projects use checksummed container v4 with deduplicated original payloads; no-RAW output stays v3, and v1–3 readers remain. Document schema 41 and workspace schema 2 are unchanged. Recovery fingerprints include complete RAW metadata and both content identities; originals verify before restoration. Workspace workers, source transfer, recipe package v2 and brush pack/preset v6 retain original/accepted bytes and settings. Ordinary saved-project reopening uses accepted PNG without sensor re-development. This is corruption validation, not a source-authentication or camera-fidelity claim.
 
 The custom import/development dialog supports sensor inspection, explicit sRGB8 consent, native previews, WB/custom multipliers, demosaicing, exposure/highlight parameters and cancel/retry; the inspector and command registry expose Develop RAW without a new key binding. Source bytes stay local. The dated implementation roadmap records build/unit/browser evidence and unresolved gates. Isolated Scripts/plugin development, independent native REST operations and semantic receiving-original RAW recipes are connected under the contracts below. Physical camera/color quality, broader RAW formats, merges, high-precision composition and full F12/F14 acceptance remain required. Do not infer full RAW or roadmap completion from this implementation increment.
-
 
 ### RAW isolated and headless automation
 
@@ -2564,11 +2498,9 @@ Optional version-1 LensCorrection settings flow through immutable RawDevelopment
 
 The custom RAW dialog exposes manual exact controls and rejects invalid geometry before Preview/Apply/Queue. Original sensor bytes/settings and accepted output remain separately preserved through existing project/workspace/recovery/copy/recipe/brush/batch transports; undo/redo and prepared-scene retry do not re-develop pixels. Older strict readers reject unsupported settings. Model equations, defaults/ranges, errors and limitations are in SCRIPTING_API.md. Calibration/profile matching/import, broader lens models and physical camera/color/quality evaluation, merges, F10 precision, F14/device and all other original-roadmap gates remain open. No paid operation, cloud upload, new isolated file privilege or arbitrary original-image cap is added.
 
-
 ## Recorded RAW shooting declarations
 
 Native wire protocol 2 adds bounded recorded lens maker/model and positive finite focal length, 35 mm-equivalent focal length, aperture, exposure seconds and ISO to the existing RAW report flow. Missing or invalid native declarations are unknown; public report version 1 keeps the shooting object optional so old accepted files remain unchanged. Reports preserve native float32 precision and deep immutability. Native processing, original pixel geometry, accepted history/assets and all host/script/REST/batch/recovery transport and permission boundaries remain authoritative. No serial/location/time fields are added to the report; originals retain their complete bytes. The custom review disclosure formats declarations without treating them as calibrated measurements or selecting a profile. Precise fields, defaults/unknowns, error behavior and the executable isolated example are in SCRIPTING_API.md. This supplies required source context for the unfinished calibrated lens workflow; it does not implement profile matching/interpolation/databases or complete F12/F10/F14.
-
 
 ## Pen overlay presentation bounds (F14, in verification)
 
@@ -2599,7 +2531,6 @@ This reduces invisible browser paint chunks, without a compositor-hint dependenc
 Dated performance, pixel and interaction acceptance belongs in the roadmap;
 this contract alone does not establish sustained 60fps or full F14/device quality.
 
-
 ## Float viewport batching and idle native display ownership (F14)
 
 FloatSceneRenderer batches display windows within the existing 65,536-output-pixel
@@ -2617,7 +2548,6 @@ IccSession.dispose still terminates immediately. Model, schema, public commands,
 Undo, source resolution, file contracts and isolated/REST grants are unchanged.
 See ICC_ENGINE.md and FLOAT_DOCUMENTS.md for scope and remaining F14 gates.
 
-
 ## Cooperative byte-compositor layer boundaries (F14)
 
 The existing eight-millisecond native-tile task budget is shared by ordinary
@@ -2631,7 +2561,6 @@ Canvas calls, graph/setup work and final copies remain non-preemptible; this is
 cooperative scheduling, not an eight-millisecond or 60fps guarantee. Dated
 correctness and performance acceptance is recorded in the roadmap.
 
-
 Development dependency scanning explicitly includes paper/dist/paper-core.js,
 which the SVG/Boolean boundary first reaches after startup. A fresh-cache server
 otherwise discovers this CommonJS entry during the font/plugin/SVG workflow and
@@ -2639,7 +2568,6 @@ its optimizer sends full-reload, interrupting the running page. Pre-optimization
 keeps that development session intact. This changes no runtime geometry kernel,
 production permission or artifact contract; fresh-cache verification and exact
 built resource identities are recorded with the F14 evidence.
-
 
 ## Committed viewport updates (F14)
 
@@ -2691,11 +2619,9 @@ Filter-region uniform-coverage detection and culling use the captured pullback s
 
 Large/feathered placed-mask surfaces retain existing canvas budgets while scalar reads split into at most 512-square output windows with one shared input frame. This preserves crop parity without treating the scalar working limit as a mask/image size limit.
 
-
 ## Perspective mask path editing
 
 `core/mask-path.ts` keeps world translation outside native-mask projective arithmetic and supplies positional inverses. `core/projective-bezier.ts` uses homogeneous rational subdivision, viewport half-space hull culling and exact native parameter hit candidates. `ui/ProjectivePenControls.tsx` presents bounded rational outlines/handles; legacy affine Pen presentation stays on its existing path. ToolController captures mapping/grab offsets and projected path/draft authority, then commits ordinary native mask updates. No renderer/schema/worker or grant boundary changes.
-
 
 ## Mask placement and canvas translation
 
@@ -2708,7 +2634,6 @@ the containing instance includes the artboard and extended content. This differs
 from the compact original-image conversion, which retains an outer mask on the
 instance. It prevents trimming off-image paint while preserving source metadata,
 independent mask planes and Undo. Native projects retain both forms.
-
 
 ## Native linear float wet-paint dependency (F03/F10)
 
@@ -2727,7 +2652,6 @@ These private primitives add no document schema, public mutation API, script
 service, REST route or plugin authority. Float wet-paint authoring remains
 rejected until those connected boundaries retain actual HDR samples.
 
-
 ## Retained native float wet sessions
 
 `wet-session.ts` shares one typed lifecycle across byte and float formats.
@@ -2745,7 +2669,6 @@ when capture/storage initialization fails.
 Job databases and read-only native source replay are not a public HDR wet edit
 format. Float tools still require assets/replay/projection, persistence and
 guarded authoring integration through shared document commands.
-
 
 ## Prepared HDR wet asset/field dependency
 

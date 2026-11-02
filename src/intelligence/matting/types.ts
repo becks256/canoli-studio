@@ -101,11 +101,18 @@ export interface EdgeRefinementKernel {
   regularizationEpsilon?: number;
 }
 
-export type { SelectSubjectOptions, SelectSubjectControl } from '../../core/subject-selection';
+export type {
+  SelectSubjectOptions,
+  SelectSubjectControl,
+} from "../../core/subject-selection";
 
 export type RefineEdgePreviewMode =
   "marching-ants" | "overlay" | "on-black" | "on-white" | "on-transparency";
 
 export type MattingViewMode = RefineEdgePreviewMode;
 
-export type {RefineEdgeOptions,RefineEdgeControl,TrimapStroke} from '../../core/matting';
+export type {
+  RefineEdgeOptions,
+  RefineEdgeControl,
+  TrimapStroke,
+} from "../../core/matting";

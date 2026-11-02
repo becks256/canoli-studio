@@ -296,7 +296,16 @@ export class AnalysisService {
                 new VectorPath({
                   closed: path.closed,
                   fillRule: path.fillRule,
-                  subpaths: [...path.subpaths].map(contour => new VectorContour({ points: contour.points.map(p => ({ ...point(p), in: point(p.in), out: point(p.out) })) })),
+                  subpaths: [...path.subpaths].map(
+                    (contour) =>
+                      new VectorContour({
+                        points: contour.points.map((p) => ({
+                          ...point(p),
+                          in: point(p.in),
+                          out: point(p.out),
+                        })),
+                      }),
+                  ),
                   points: path.points.map((p) => ({
                     ...point(p),
                     in: point(p.in),

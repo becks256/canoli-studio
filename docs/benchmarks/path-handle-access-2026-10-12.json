@@ -10,9 +10,7 @@
           "anchors": 20000,
           "accessMs": 63,
           "maxFrameGapMs": 74.40000000596046,
-          "longTasks": [
-            63
-          ],
+          "longTasks": [63],
           "count": 1,
           "identity": true,
           "owned": true
@@ -25,9 +23,7 @@
           "anchors": 1000,
           "accessMs": 151.2000000178814,
           "maxFrameGapMs": 155.19999998807907,
-          "longTasks": [
-            151
-          ],
+          "longTasks": [151],
           "count": 64,
           "identity": true,
           "owned": true

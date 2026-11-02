@@ -1,1 +1,3 @@
-declare module 'fontkit' {export function create(bytes:Uint8Array):unknown;}
+declare module "fontkit" {
+  export function create(bytes: Uint8Array): unknown;
+}

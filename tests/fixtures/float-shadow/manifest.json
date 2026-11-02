@@ -210,18 +210,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -243,12 +233,7 @@
           "kind": "raster",
           "fillOpacity": 0,
           "mask": {
-            "rect": [
-              18,
-              13,
-              67,
-              37
-            ]
+            "rect": [18, 13, 67, 37]
           },
           "styles": {
             "colorOverlay": {
@@ -259,18 +244,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -293,12 +268,7 @@
           "fillOpacity": 0.375,
           "opacity": 0.625,
           "mask": {
-            "rect": [
-              24,
-              19,
-              43,
-              29
-            ],
+            "rect": [24, 19, 43, 29],
             "density": 0.625,
             "inverted": true
           },
@@ -311,18 +281,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -352,18 +312,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -402,18 +352,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -435,12 +375,7 @@
           "kind": "raster",
           "fillOpacity": 0,
           "mask": {
-            "rect": [
-              12,
-              9,
-              89,
-              51
-            ]
+            "rect": [12, 9, 89, 51]
           },
           "styles": {
             "colorOverlay": {
@@ -451,18 +386,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -499,18 +424,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -522,12 +437,7 @@
             }
           },
           "mask": {
-            "rect": [
-              5,
-              7,
-              103,
-              61
-            ]
+            "rect": [5, 7, 103, 61]
           },
           "children": [
             {
@@ -555,18 +465,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -592,18 +492,8 @@
                 "blendIf": {
                   "enabled": false,
                   "channel": "luminance",
-                  "source": [
-                    0,
-                    0,
-                    255,
-                    255
-                  ],
-                  "underlying": [
-                    0,
-                    0,
-                    255,
-                    255
-                  ]
+                  "source": [0, 0, 255, 255],
+                  "underlying": [0, 0, 255, 255]
                 },
                 "dropShadow": {
                   "enabled": true,
@@ -640,18 +530,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": false,
@@ -680,18 +560,8 @@
             "blendIf": {
               "enabled": false,
               "channel": "luminance",
-              "source": [
-                0,
-                0,
-                255,
-                255
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [0, 0, 255, 255],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -725,18 +595,8 @@
             "blendIf": {
               "enabled": true,
               "channel": "red",
-              "source": [
-                12.25,
-                67.5,
-                193.75,
-                246.5
-              ],
-              "underlying": [
-                0,
-                0,
-                255,
-                255
-              ]
+              "source": [12.25, 67.5, 193.75, 246.5],
+              "underlying": [0, 0, 255, 255]
             },
             "dropShadow": {
               "enabled": true,
@@ -752,6 +612,6 @@
       "reference": "completed-appearance-gate.gz"
     }
   ],
-  "colorTolerance": 2.384185791015625e-07,
+  "colorTolerance": 2.384185791015625e-7,
   "alphaTolerance": 0
 }

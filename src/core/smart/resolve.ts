@@ -1,7 +1,7 @@
-import {localBounds} from '../spatial';
+import { localBounds } from "../spatial";
 import { AffineTransform } from "../affine";
-import { isActiveSmartFilter } from './filters';
-import {activePerspective} from '../perspective';
+import { isActiveSmartFilter } from "./filters";
+import { activePerspective } from "../perspective";
 import { rebaseUnlinkedMask } from "../masks";
 import {
   base,
@@ -23,7 +23,7 @@ export interface ComponentExpansionBudget {
   /** @internal Identify generated SVG boundaries without relying on names/IDs. */
   onVectorCanvasClip?: (layerId: string) => void;
   /** @internal Reference-frame adapter for renderer root/document transforms. */
-  maskFrame?:AffineTransform;
+  maskFrame?: AffineTransform;
 }
 /** Ephemeral render tree only. Never replace authored definitions with this expansion. */
 export function resolveSmartDocument(
@@ -39,8 +39,14 @@ export function resolveSmartDocument(
     )
   )
     throw new Error("Invalid component expansion budget.");
-  if(budget.maskFrame!==undefined&&!(budget.maskFrame instanceof AffineTransform))throw new Error('Use an affine component mask frame.');
-  const document = budget.retainImmutable ? registry.validatedView(input) : registry.validatePlacements(input);
+  if (
+    budget.maskFrame !== undefined &&
+    !(budget.maskFrame instanceof AffineTransform)
+  )
+    throw new Error("Use an affine component mask frame.");
+  const document = budget.retainImmutable
+    ? registry.validatedView(input)
+    : registry.validatePlacements(input);
   const used = new Set<string>();
   const reserve = (layers: SmartLayerData[]) => {
     for (const layer of layers) {
@@ -79,7 +85,7 @@ export function resolveSmartDocument(
       );
     }
   }
-  const basis = (layer: Pick<LayerBaseData, 'x' | 'y' | 'transform'>) =>
+  const basis = (layer: Pick<LayerBaseData, "x" | "y" | "transform">) =>
     AffineTransform.translation(layer.x, layer.y).multiply(
       layer.transform
         ? AffineTransform.fromJSON(layer.transform)
@@ -88,7 +94,7 @@ export function resolveSmartDocument(
   function expand(
     layer: SmartLayerData,
     parent: AffineTransform,
-    documentFrame:AffineTransform,
+    documentFrame: AffineTransform,
     scoped: boolean,
     path: string[],
     depth: number,
@@ -102,26 +108,53 @@ export function resolveSmartDocument(
     };
     // Flattened render/export nodes retain resolved typography, not links into
     // an embedded document's independent style-library namespace.
-    if(scoped&&layer.kind==='text')delete (properties as import('../model').TextLayerData).paragraphStyle;
-    if (layer.kind === 'smart-object' && frequencyRadius !== undefined && layer.smartFilters?.some(filter => filter.kind === 'frequency-band' && filter.sigma !== frequencyRadius)) {
-      (properties as typeof layer).smartFilters = layer.smartFilters.map(filter => filter.kind === 'frequency-band' ? {...filter,sigma:frequencyRadius} : filter);
+    if (scoped && layer.kind === "text")
+      delete (properties as import("../model").TextLayerData).paragraphStyle;
+    if (
+      layer.kind === "smart-object" &&
+      frequencyRadius !== undefined &&
+      layer.smartFilters?.some(
+        (filter) =>
+          filter.kind === "frequency-band" && filter.sigma !== frequencyRadius,
+      )
+    ) {
+      (properties as typeof layer).smartFilters = layer.smartFilters.map(
+        (filter) =>
+          filter.kind === "frequency-band"
+            ? { ...filter, sigma: frequencyRadius }
+            : filter,
+      );
     }
     if (scoped && properties.mask?.linked === false) {
-      properties.mask = rebaseUnlinkedMask(properties.mask,documentFrame);
+      properties.mask = rebaseUnlinkedMask(properties.mask, documentFrame);
     }
     if (layer.kind === "group")
       return {
         ...properties,
         kind: "group",
         children: layer.children.map((child) =>
-            expand(child, world, documentFrame,scoped, [...path, layer.id], depth + 1, layer.frequencyRadius ?? frequencyRadius),
+          expand(
+            child,
+            world,
+            documentFrame,
+            scoped,
+            [...path, layer.id],
+            depth + 1,
+            layer.frequencyRadius ?? frequencyRadius,
+          ),
         ),
       };
     if (layer.kind !== "smart-object") return properties as LayerData;
     if (scoped && layer.filterMask?.linked === false) {
-      (properties as typeof layer).filterMask = rebaseUnlinkedMask(layer.filterMask,documentFrame);
+      (properties as typeof layer).filterMask = rebaseUnlinkedMask(
+        layer.filterMask,
+        documentFrame,
+      );
     }
-    if (activePerspective(layer.perspective)||layer.smartFilters?.some(isActiveSmartFilter)) {
+    if (
+      activePerspective(layer.perspective) ||
+      layer.smartFilters?.some(isActiveSmartFilter)
+    ) {
       if (!budget.preserveFiltered)
         throw new Error(
           "Filtered smart objects require the native-plane renderer.",
@@ -150,7 +183,8 @@ export function resolveSmartDocument(
     const sole = master.children.length === 1 ? master.children[0] : undefined;
     // A full-frame raster already supplies the artboard boundary. Applying a second
     // transformed clip multiplies edge antialiasing and changes converted pixels.
-    const ordinaryRaster = sole?.kind === "raster" &&
+    const ordinaryRaster =
+      sole?.kind === "raster" &&
       !sole.clipped &&
       sole.visible &&
       sole.x === 0 &&
@@ -163,9 +197,18 @@ export function resolveSmartDocument(
       !sole.transform &&
       !sole.mask &&
       !sole.styles;
-    const footprint=ordinaryRaster?localBounds(sole):undefined;
-    const containsFootprint=!!footprint&&footprint.x>=0&&footprint.y>=0&&footprint.x+footprint.width<=master.width&&footprint.y+footprint.height<=master.height;
-    if (ordinaryRaster&&containsFootprint&&!activePerspective(sole.perspective)) {
+    const footprint = ordinaryRaster ? localBounds(sole) : undefined;
+    const containsFootprint =
+      !!footprint &&
+      footprint.x >= 0 &&
+      footprint.y >= 0 &&
+      footprint.x + footprint.width <= master.width &&
+      footprint.y + footprint.height <= master.height;
+    if (
+      ordinaryRaster &&
+      containsFootprint &&
+      !activePerspective(sole.perspective)
+    ) {
       return {
         ...instance,
         kind: "raster",
@@ -177,8 +220,11 @@ export function resolveSmartDocument(
       };
     }
     const scope = [...path, layer.id, layer.componentId];
-    const contentScale=AffineTransform.scale(layer.width/master.width,layer.height/master.height);
-    const contentFrame=documentFrame.multiply(world).multiply(contentScale);
+    const contentScale = AffineTransform.scale(
+      layer.width / master.width,
+      layer.height / master.height,
+    );
+    const contentFrame = documentFrame.multiply(world).multiply(contentScale);
     // Separate placement from source scaling so instance masks use instance-pixel coordinates.
     enter(depth + 1);
     const content: LayerData = {
@@ -186,40 +232,78 @@ export function resolveSmartDocument(
       id: allocate([...scope, "contents"]),
       kind: "group",
       transform: contentScale.toJSON(),
-      mask: ordinaryRaster&&containsFootprint?null:budget.vectorCanvasClips ? {
-        kind:'vector',enabled:true,inverted:false,density:1,linked:true,fillRule:'nonzero',
-        paths:[{points:[{x:0,y:0},{x:master.width,y:0},{x:master.width,y:master.height},{x:0,y:master.height}].map(point=>({...point,in:{...point},out:{...point}}))}],
-      } : {
-        kind: "selection",
-        enabled: true,
-        inverted: false,
-        density: 1,
-        linked: true,
-        selection: {
-          regions: [
-            {
-              shape: "rectangle",
-              operation: "add",
-              x: 0,
-              y: 0,
-              width: master.width,
-              height: master.height,
-            },
-          ],
-        },
-      },
+      mask:
+        ordinaryRaster && containsFootprint
+          ? null
+          : budget.vectorCanvasClips
+            ? {
+                kind: "vector",
+                enabled: true,
+                inverted: false,
+                density: 1,
+                linked: true,
+                fillRule: "nonzero",
+                paths: [
+                  {
+                    points: [
+                      { x: 0, y: 0 },
+                      { x: master.width, y: 0 },
+                      { x: master.width, y: master.height },
+                      { x: 0, y: master.height },
+                    ].map((point) => ({
+                      ...point,
+                      in: { ...point },
+                      out: { ...point },
+                    })),
+                  },
+                ],
+              }
+            : {
+                kind: "selection",
+                enabled: true,
+                inverted: false,
+                density: 1,
+                linked: true,
+                selection: {
+                  regions: [
+                    {
+                      shape: "rectangle",
+                      operation: "add",
+                      x: 0,
+                      y: 0,
+                      width: master.width,
+                      height: master.height,
+                    },
+                  ],
+                },
+              },
       children: master.children.map((child) =>
-        expand(child, new AffineTransform(),contentFrame, true, scope, depth + 2),
+        expand(
+          child,
+          new AffineTransform(),
+          contentFrame,
+          true,
+          scope,
+          depth + 2,
+        ),
       ),
     };
-    if (budget.vectorCanvasClips&&content.mask) budget.onVectorCanvasClip?.(content.id);
+    if (budget.vectorCanvasClips && content.mask)
+      budget.onVectorCanvasClip?.(content.id);
     return { ...instance, kind: "group", children: [content] };
   }
   const { components: _definitions, ...ordinary } = document;
   return {
     ...ordinary,
     children: document.children.map((layer) =>
-      expand(layer, new AffineTransform(),budget.maskFrame??new AffineTransform(), false, [], 0),
+      expand(
+        layer,
+        new AffineTransform(),
+        budget.maskFrame ?? new AffineTransform(),
+        false,
+        [],
+        0,
+      ),
     ),
   };
 }

@@ -22,7 +22,9 @@ test("panel resizing supports pointer, keyboard, cancellation, reload and reset 
   await expect
     .poll(() =>
       page.evaluate(
-        () => JSON.parse(localStorage.getItem("luma.workspace-layout.v1")!).current.widths.layers,
+        () =>
+          JSON.parse(localStorage.getItem("luma.workspace-layout.v1")!).current
+            .widths.layers,
       ),
     )
     .toBe(initial + 70);
@@ -74,7 +76,11 @@ test("panel constraints retain canvas space and a failed save restores prior wid
   const bounds = await page.locator(".canvas-column").boundingBox();
   expect(bounds!.width).toBeGreaterThanOrEqual(200);
   await page.setViewportSize({ width: 760, height: 900 });
-  await expect.poll(async () => (await page.locator(".canvas-column").boundingBox())!.width).toBeGreaterThanOrEqual(200);
+  await expect
+    .poll(
+      async () => (await page.locator(".canvas-column").boundingBox())!.width,
+    )
+    .toBeGreaterThanOrEqual(200);
   const before = await handle.getAttribute("aria-valuenow");
   await page.evaluate(() => {
     const original = Storage.prototype.setItem;

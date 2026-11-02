@@ -13,7 +13,7 @@
     "height": 127
   },
   "sourceSha256": "32ac957acb435ec6293fbe808910d4361cae37f45ebed43c4564af57ecdf154f",
-  "absoluteError": 4.76837158203125e-07,
+  "absoluteError": 4.76837158203125e-7,
   "numpy": "1.26.4",
   "scipy": "1.13.0",
   "reference": "SciPy float64 separable fractional box convolution, float32 after each of six passes.",

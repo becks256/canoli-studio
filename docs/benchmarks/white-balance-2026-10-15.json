@@ -50,7 +50,13 @@
     "tint": 12,
     "initialElapsedMs": 8651.5,
     "repeatElapsedMs": 9484.2,
-    "sampleCoordinates": [[0, 0], [1023, 1023], [1024, 1024], [2048, 2048], [9999, 4999]],
+    "sampleCoordinates": [
+      [0, 0],
+      [1023, 1023],
+      [1024, 1024],
+      [2048, 2048],
+      [9999, 4999]
+    ],
     "rgbaAtEachSample": [91, 119, 134, 255],
     "dimensionsAndSamplesPassed": true,
     "notes": "Individual container runs; repeat overlapped production browser checks. Not input-latency percentiles or a controlled performance comparison."

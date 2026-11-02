@@ -1,13 +1,28 @@
-import {ownRawSource,rawSourceMetadata,verifyRawSource,type RawImageSource} from "./interchange/raw/source";
-import { persistRecovery, listRecoverySummaries, restoreRecovery } from "./recovery-persistence";
+import {
+  ownRawSource,
+  rawSourceMetadata,
+  verifyRawSource,
+  type RawImageSource,
+} from "./interchange/raw/source";
+import {
+  persistRecovery,
+  listRecoverySummaries,
+  restoreRecovery,
+} from "./recovery-persistence";
 import { encodeJsonData } from "./json-encoding";
 import { isImmutable } from "./immutable";
 import type { ProjectAssetSource } from "./project";
 import { referencedAssets, validateDocument } from "./model";
 import type { DocumentData } from "./model";
 import { serializeProject } from "./project";
-import {avifDecodeOptionsSchema,type AvifDecodeSettings} from "./interchange/avif/types";
-import { tiffDecodeOptionsSchema, type TiffDecodeSettings } from "./interchange/tiff/types";
+import {
+  avifDecodeOptionsSchema,
+  type AvifDecodeSettings,
+} from "./interchange/avif/types";
+import {
+  tiffDecodeOptionsSchema,
+  type TiffDecodeSettings,
+} from "./interchange/tiff/types";
 
 export interface RecoveryEntry {
   version?: 2;
@@ -18,7 +33,11 @@ export interface RecoveryEntry {
   checksum?: string;
   previous?: RecoveryEntry[];
 }
-export interface RecoveryRestoration { blob: Blob; savedAt: number; skipped: number }
+export interface RecoveryRestoration {
+  blob: Blob;
+  savedAt: number;
+  skipped: number;
+}
 
 export interface RecoverySummary {
   id: string;
@@ -33,7 +52,7 @@ export interface RecoveryAsset {
   blob: Blob;
   tiff?: TiffDecodeSettings;
   avif?: AvifDecodeSettings;
-  raw?:RawImageSource;
+  raw?: RawImageSource;
   checksum?: string;
 }
 const digest = async (bytes: BufferSource) =>
@@ -48,7 +67,8 @@ const checkpointBytes = (entry: RecoveryEntry) =>
     savedAt: entry.savedAt,
     assetKeys: entry.assetKeys,
   });
-const checkpointDigest = async (entry: RecoveryEntry) => digest(await checkpointBytes(entry));
+const checkpointDigest = async (entry: RecoveryEntry) =>
+  digest(await checkpointBytes(entry));
 const blobHashes = new WeakMap<Blob, Promise<string>>();
 function blobDigest(blob: Blob): Promise<string> {
   let hash = blobHashes.get(blob);
@@ -59,7 +79,8 @@ function blobDigest(blob: Blob): Promise<string> {
   return hash;
 }
 async function assetDigest(asset: RecoveryAsset): Promise<string> {
-  if(asset.raw)await verifyRawSource(asset.raw,asset.blob,asset.width,asset.height);
+  if (asset.raw)
+    await verifyRawSource(asset.raw, asset.blob, asset.width, asset.height);
   return digest(
     new TextEncoder().encode(
       JSON.stringify({
@@ -71,7 +92,7 @@ async function assetDigest(asset: RecoveryAsset): Promise<string> {
         bytes: await blobDigest(asset.blob),
         ...(asset.tiff ? { tiff: asset.tiff } : {}),
         ...(asset.avif ? { avif: asset.avif } : {}),
-        ...(asset.raw?{raw:rawSourceMetadata(asset.raw)}:{}),
+        ...(asset.raw ? { raw: rawSourceMetadata(asset.raw) } : {}),
       }),
     ),
   );
@@ -92,7 +113,9 @@ const complete = (transaction: IDBTransaction, cause?: () => unknown) =>
     transaction.oncomplete = () => resolve();
     transaction.onabort = () =>
       reject(
-        cause?.() ?? transaction.error ?? new Error("Recovery checkpoint was interrupted."),
+        cause?.() ??
+          transaction.error ??
+          new Error("Recovery checkpoint was interrupted."),
       );
     transaction.onerror = () => {}; // Abort reports the final failure; never acknowledge a partial write.
   });
@@ -143,7 +166,9 @@ export class RecoveryRepository {
 
   /** Lightweight display data; full documents stay off the UI thread. */
   summaries(): Promise<RecoverySummary[]> {
-    return typeof Worker !== "undefined" ? listRecoverySummaries() : this.readSummaries();
+    return typeof Worker !== "undefined"
+      ? listRecoverySummaries()
+      : this.readSummaries();
   }
 
   /** @internal Cursor bounds retained memory to one checkpoint plus display records. */
@@ -157,9 +182,15 @@ export class RecoveryRepository {
       const row = cursor.result;
       if (!row) return;
       const entry = row.value as RecoveryEntry;
-      summaries.push({ id: entry.id, savedAt: entry.savedAt, document: {
-        name: entry.document.name, width: entry.document.width, height: entry.document.height,
-      } });
+      summaries.push({
+        id: entry.id,
+        savedAt: entry.savedAt,
+        document: {
+          name: entry.document.name,
+          width: entry.document.width,
+          height: entry.document.height,
+        },
+      });
       row.continue();
     };
     await done;
@@ -178,18 +209,27 @@ export class RecoveryRepository {
     // Capture original blobs before yielding: switching documents can dispose the live store.
     const originals = [...referencedAssets(document)].map((assetId) => {
       const asset = assets.get(assetId);
-      if(asset.blob.type==="image/avif"&&!asset.avif)throw new Error("AVIF recovery requires saved precision and color settings.");
+      if (asset.blob.type === "image/avif" && !asset.avif)
+        throw new Error(
+          "AVIF recovery requires saved precision and color settings.",
+        );
       if (asset.blob.type === "image/tiff" && !asset.tiff)
-        throw new Error("TIFF recovery requires saved page and precision settings.");
+        throw new Error(
+          "TIFF recovery requires saved page and precision settings.",
+        );
       return {
         id: asset.id,
         name: asset.name,
         width: asset.width,
         height: asset.height,
         blob: asset.blob,
-        ...(asset.tiff ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) } : {}),
-        ...(asset.avif ? { avif: avifDecodeOptionsSchema.parse(asset.avif) } : {}),
-        ...(asset.raw?{raw:ownRawSource(asset.raw)}:{}),
+        ...(asset.tiff
+          ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) }
+          : {}),
+        ...(asset.avif
+          ? { avif: avifDecodeOptionsSchema.parse(asset.avif) }
+          : {}),
+        ...(asset.raw ? { raw: ownRawSource(asset.raw) } : {}),
       };
     });
     const checked: RecoveryAsset[] = [];
@@ -216,7 +256,10 @@ export class RecoveryRepository {
   }
 
   /** @internal Shared atomic storage path for the UI and persistence worker. */
-  async persist(entry: RecoveryEntry, checked: RecoveryAsset[]): Promise<number> {
+  async persist(
+    entry: RecoveryEntry,
+    checked: RecoveryAsset[],
+  ): Promise<number> {
     const { id, assetKeys, savedAt } = entry;
     const db = await this.open();
     const tx = db.transaction(["checkpoints", "assets"], "readwrite", {
@@ -226,9 +269,19 @@ export class RecoveryRepository {
     const done = complete(tx, () => failure);
     const fail = (error: unknown) => {
       failure ??= error;
-      try { tx.abort(); } catch { /* An existing abort still reports the original cause. */ }
+      try {
+        tx.abort();
+      } catch {
+        /* An existing abort still reports the original cause. */
+      }
     };
-    const guard = (run: () => void) => () => { try { run(); } catch (error) { fail(error); } };
+    const guard = (run: () => void) => () => {
+      try {
+        run();
+      } catch (error) {
+        fail(error);
+      }
+    };
     try {
       const store = tx.objectStore("assets");
       const old = tx.objectStore("checkpoints").get(id);
@@ -255,7 +308,9 @@ export class RecoveryRepository {
           if (existing.result === undefined) store.put(asset, key);
         });
       });
-    } catch (error) { fail(error); }
+    } catch (error) {
+      fail(error);
+    }
     await done;
     return savedAt;
   }
@@ -265,7 +320,9 @@ export class RecoveryRepository {
   }
 
   restore(id: string): Promise<RecoveryRestoration> {
-    return typeof Worker !== "undefined" ? restoreRecovery(id) : this.readRestoration(id);
+    return typeof Worker !== "undefined"
+      ? restoreRecovery(id)
+      : this.readRestoration(id);
   }
 
   /** @internal Integrity checks and project encoding execute within the recovery worker. */
@@ -301,7 +358,8 @@ export class RecoveryRepository {
       keys.map((key, index) => [key, snapshot.assets[index]]),
     );
     const history = checkpoints(snapshot.entry);
-    let missingTiffSettings = false,missingAvifSettings=false;
+    let missingTiffSettings = false,
+      missingAvifSettings = false;
     for (let skipped = 0; skipped < history.length; skipped++) {
       const entry = history[skipped];
       try {
@@ -316,7 +374,10 @@ export class RecoveryRepository {
           const asset = byKey.get(key);
           if (!asset || !(asset.blob instanceof Blob))
             throw new Error("Missing recovery image.");
-          if(asset.blob.type==="image/avif"&&!asset.avif){missingAvifSettings=true;throw new Error("Missing AVIF recovery settings.");}
+          if (asset.blob.type === "image/avif" && !asset.avif) {
+            missingAvifSettings = true;
+            throw new Error("Missing AVIF recovery settings.");
+          }
           if (asset.blob.type === "image/tiff" && !asset.tiff) {
             missingTiffSettings = true;
             throw new Error("Missing TIFF recovery settings.");
@@ -341,8 +402,12 @@ export class RecoveryRepository {
     }
     throw new Error(
       "No intact recovery checkpoint remains. The current document is unchanged." +
-      (missingTiffSettings ? " A TIFF source is missing its saved page and precision settings." : "")+
-      (missingAvifSettings ? " An AVIF source is missing its saved precision and color settings." : ""),
+        (missingTiffSettings
+          ? " A TIFF source is missing its saved page and precision settings."
+          : "") +
+        (missingAvifSettings
+          ? " An AVIF source is missing its saved precision and color settings."
+          : ""),
     );
   }
 

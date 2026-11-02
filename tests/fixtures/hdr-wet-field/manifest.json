@@ -18,17 +18,7 @@
   },
   "mappings": [
     {
-      "matrix": [
-        1,
-        0.125,
-        -0.25,
-        -0.25,
-        1,
-        0.5,
-        0.015625,
-        -0.0078125,
-        1
-      ],
+      "matrix": [1, 0.125, -0.25, -0.25, 1, 0.5, 0.015625, -0.0078125, 1],
       "inputOrigin": {
         "x": 274877907044,
         "y": -274877907144
@@ -39,17 +29,7 @@
       }
     },
     {
-      "matrix": [
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0.125,
-        0,
-        0.0625
-      ],
+      "matrix": [1, 0, 0, 0, 1, 0, 0.125, 0, 0.0625],
       "inputOrigin": {
         "x": 274877907044,
         "y": -274877907144
@@ -67,10 +47,7 @@
       "rawBytes": 131152,
       "rawSha256": "d439de1b0df5a4753d1d370e39a82cbfc8dca6c1764ecbf7ad8a4fa9b46d2ea0",
       "dtype": "<f4",
-      "shape": [
-        8197,
-        4
-      ]
+      "shape": [8197, 4]
     },
     "after": {
       "bytes": 122751,
@@ -78,10 +55,7 @@
       "rawBytes": 131152,
       "rawSha256": "d9f8c09b0b7af73c5ae8bd137f6dc237ac870584b6c419a3d0204841d7b51c47",
       "dtype": "<f4",
-      "shape": [
-        8197,
-        4
-      ]
+      "shape": [8197, 4]
     },
     "coverage": {
       "bytes": 29383,
@@ -89,9 +63,7 @@
       "rawBytes": 32788,
       "rawSha256": "1791bb337901d5d1cc2ebe682ba7ade19c95ec8640f45c7cd133dd48a08c58f3",
       "dtype": "<f4",
-      "shape": [
-        8197
-      ]
+      "shape": [8197]
     },
     "field": {
       "bytes": 265047,
@@ -99,10 +71,7 @@
       "rawBytes": 327880,
       "rawSha256": "7f6eb293a9cf99cef9a33e278a7f364ca8d4e92d61f2c57b34271f7fc4f2c4e4",
       "dtype": "<f8",
-      "shape": [
-        8197,
-        5
-      ]
+      "shape": [8197, 5]
     },
     "full-field": {
       "bytes": 232030,
@@ -110,10 +79,7 @@
       "rawBytes": 327880,
       "rawSha256": "2d786184116246ce41e23eb0018657c0b26ed26a7cde05197ce4d28caabca75b",
       "dtype": "<f8",
-      "shape": [
-        8197,
-        5
-      ]
+      "shape": [8197, 5]
     },
     "composite-zero": {
       "bytes": 121865,
@@ -121,10 +87,7 @@
       "rawBytes": 131152,
       "rawSha256": "d439de1b0df5a4753d1d370e39a82cbfc8dca6c1764ecbf7ad8a4fa9b46d2ea0",
       "dtype": "<f4",
-      "shape": [
-        8197,
-        4
-      ]
+      "shape": [8197, 4]
     },
     "composite-partial": {
       "bytes": 122226,
@@ -132,10 +95,7 @@
       "rawBytes": 131152,
       "rawSha256": "532ea242d2ff75b0ef6062f83c7fd8a03263184b2a728695aefc9e756a3f0642",
       "dtype": "<f4",
-      "shape": [
-        8197,
-        4
-      ]
+      "shape": [8197, 4]
     },
     "composite-covered": {
       "bytes": 122353,
@@ -143,10 +103,7 @@
       "rawBytes": 131152,
       "rawSha256": "8f7aa10e9a787d32c12f919970608481cbd775410d1a57ea50f834ada8d918e2",
       "dtype": "<f4",
-      "shape": [
-        8197,
-        4
-      ]
+      "shape": [8197, 4]
     },
     "composite-full": {
       "bytes": 122741,
@@ -154,10 +111,7 @@
       "rawBytes": 131152,
       "rawSha256": "9d49dc8654d010cec298e8282e9c32b43bed264906e06f5dcc3cf829cc59854e",
       "dtype": "<f4",
-      "shape": [
-        8197,
-        4
-      ]
+      "shape": [8197, 4]
     },
     "spatial-source": {
       "bytes": 12753,
@@ -165,11 +119,7 @@
       "rawBytes": 15640,
       "rawSha256": "8c0a8384f01f1b1d1a20a09cce47998e7c92a8ee41ff3354ad8949fccda125ad",
       "dtype": "<f8",
-      "shape": [
-        17,
-        23,
-        5
-      ]
+      "shape": [17, 23, 5]
     },
     "spatial-0": {
       "bytes": 9441,
@@ -177,11 +127,7 @@
       "rawBytes": 28520,
       "rawSha256": "c35914e0cd7b372fca25f8305b84bd34e8edebe5abd2dfbe20fb11f7360b3de8",
       "dtype": "<f8",
-      "shape": [
-        23,
-        31,
-        5
-      ]
+      "shape": [23, 31, 5]
     },
     "spatial-1": {
       "bytes": 9114,
@@ -189,11 +135,7 @@
       "rawBytes": 28520,
       "rawSha256": "22c3c8cf1f5177d3333e599bcc7c569808ac46d7525f9e363d393c171a7df677",
       "dtype": "<f8",
-      "shape": [
-        23,
-        31,
-        5
-      ]
+      "shape": [23, 31, 5]
     },
     "codec": {
       "bytes": 155035,
@@ -201,11 +143,7 @@
       "rawBytes": 165584,
       "rawSha256": "daab389858514a9f7ead942fa3cab0e590ed36b91455d960606ff049d085db72",
       "dtype": "<f4",
-      "shape": [
-        79,
-        131,
-        4
-      ]
+      "shape": [79, 131, 4]
     }
   }
 }

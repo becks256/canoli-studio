@@ -5,20 +5,20 @@ This records a verified schema-56 implementation increment against baseline
 The [current contract](../MASK_PLANES.md) describes constructors, defaults,
 errors, phase ordering and remaining acceptance.
 
-| Check | Observed result |
-| --- | --- |
-| Complete unit/API/native run | 3,216 passed, 312 files, two workers; unchanged existing timeouts |
-| Complete relevant browser run | 227 passed, 27 files; zero skips, retries, flakes or runner errors; 1,290.2 seconds |
-| Production UI | Relink, Brush, default Mixer, Undo/Redo, PNG and original-bearing project reopening pass without debug globals |
-| Initial wet-grid probes | Ten legacy cases pass; both new high-frequency cases fail all 96 samples |
-| Corrected wet-grid probes | All 12 pass; every prepared value retained on a fresh mask and after a legacy wet prefix |
-| Inert metadata | Zero-opacity mapped Brush/Wet entries leave subsequent legacy reconstruction bit exact |
-| Initial expanded scoped run | 16 pass; three native filter root/document/both cases fail |
-| Corrected scoped probes | All eight retained ordinary/filter frame cases pass; full matrix includes all legacy/retained scoped cases |
-| Actual SVG and layered Photoshop round trips | Zero RGBA differences for ordinary, native-filter and document-filter planes; explicit baked-coverage reports |
-| Geometry-only float source | Byte wet editing and reopening preserve all 190,816 TIFF bytes at 131x79; display-only thumbnail remains 96x58 |
-| Strengthened byte check | Focused rerun verifies equal byte lengths and every original byte |
-| Source stability | Full-run source fingerprints unchanged; kernel and application assets recorded |
+| Check                                        | Observed result                                                                                                |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Complete unit/API/native run                 | 3,216 passed, 312 files, two workers; unchanged existing timeouts                                              |
+| Complete relevant browser run                | 227 passed, 27 files; zero skips, retries, flakes or runner errors; 1,290.2 seconds                            |
+| Production UI                                | Relink, Brush, default Mixer, Undo/Redo, PNG and original-bearing project reopening pass without debug globals |
+| Initial wet-grid probes                      | Ten legacy cases pass; both new high-frequency cases fail all 96 samples                                       |
+| Corrected wet-grid probes                    | All 12 pass; every prepared value retained on a fresh mask and after a legacy wet prefix                       |
+| Inert metadata                               | Zero-opacity mapped Brush/Wet entries leave subsequent legacy reconstruction bit exact                         |
+| Initial expanded scoped run                  | 16 pass; three native filter root/document/both cases fail                                                     |
+| Corrected scoped probes                      | All eight retained ordinary/filter frame cases pass; full matrix includes all legacy/retained scoped cases     |
+| Actual SVG and layered Photoshop round trips | Zero RGBA differences for ordinary, native-filter and document-filter planes; explicit baked-coverage reports  |
+| Geometry-only float source                   | Byte wet editing and reopening preserve all 190,816 TIFF bytes at 131x79; display-only thumbnail remains 96x58 |
+| Strengthened byte check                      | Focused rerun verifies equal byte lengths and every original byte                                              |
+| Source stability                             | Full-run source fingerprints unchanged; kernel and application assets recorded                                 |
 
 The wet defect came from reconstructing finer prepared coverage through a
 logical-size bitmap. A positive mapped entry now starts replay on the retained

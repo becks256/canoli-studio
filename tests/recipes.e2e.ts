@@ -250,38 +250,60 @@ test("failed recording save survives dialog reopening and can be retried durably
 
 test("unreadable recipe library stays intact and exposes recovery controls", async ({
   page,
-},info) => {
-  const diagnostics:{requests:{url:string;error:string|undefined}[];errors:string[];console:string[]}={requests:[],errors:[],console:[]};
-  page.on('requestfailed',request=>{const url=new URL(request.url());diagnostics.requests.push({url:['http:','https:'].includes(url.protocol)?url.origin+url.pathname:url.protocol,error:request.failure()?.errorText});});page.on('pageerror',error=>diagnostics.errors.push(String(error)));page.on('console',message=>{if(message.type()==='error')diagnostics.console.push(message.text());});
-  try{
-  await page.goto("/");
-  await page.evaluate(() =>
-    localStorage.setItem("luma_custom_recipes_v1", "{unreadable-library"),
-  );
-  await page.reload();
-  await page.getByRole("button", { name: "Recipes", exact: true }).click();
-  const dialog = page.locator(".recipe-dialog");
-  await expect(dialog.getByRole("alert")).toContainText(
-    "Saved data was preserved",
-  );
-  const downloadPromise = page.waitForEvent("download");
-  await dialog
-    .getByRole("button", { name: "Export unreadable library" })
-    .click();
-  const download = await downloadPromise;
-  const stream = await download.createReadStream();
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream!) chunks.push(Buffer.from(chunk));
-  expect(Buffer.concat(chunks).toString()).toBe("{unreadable-library");
-  expect(
-    await page.evaluate(() => localStorage.getItem("luma_custom_recipes_v1")),
-  ).toBe("{unreadable-library");
-  await page.evaluate(() =>
-    localStorage.setItem("luma_custom_recipes_v1", "[]"),
-  );
-  await dialog.getByRole("button", { name: "Retry reading recipes" }).click();
-  await expect(dialog.getByRole("alert")).toHaveCount(0);
-  }finally{const{writeFile}=await import('node:fs/promises');await writeFile(info.outputPath('recipe-reload-diagnostics.json'),JSON.stringify(diagnostics,null,2));}
+}, info) => {
+  const diagnostics: {
+    requests: { url: string; error: string | undefined }[];
+    errors: string[];
+    console: string[];
+  } = { requests: [], errors: [], console: [] };
+  page.on("requestfailed", (request) => {
+    const url = new URL(request.url());
+    diagnostics.requests.push({
+      url: ["http:", "https:"].includes(url.protocol)
+        ? url.origin + url.pathname
+        : url.protocol,
+      error: request.failure()?.errorText,
+    });
+  });
+  page.on("pageerror", (error) => diagnostics.errors.push(String(error)));
+  page.on("console", (message) => {
+    if (message.type() === "error") diagnostics.console.push(message.text());
+  });
+  try {
+    await page.goto("/");
+    await page.evaluate(() =>
+      localStorage.setItem("luma_custom_recipes_v1", "{unreadable-library"),
+    );
+    await page.reload();
+    await page.getByRole("button", { name: "Recipes", exact: true }).click();
+    const dialog = page.locator(".recipe-dialog");
+    await expect(dialog.getByRole("alert")).toContainText(
+      "Saved data was preserved",
+    );
+    const downloadPromise = page.waitForEvent("download");
+    await dialog
+      .getByRole("button", { name: "Export unreadable library" })
+      .click();
+    const download = await downloadPromise;
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream!) chunks.push(Buffer.from(chunk));
+    expect(Buffer.concat(chunks).toString()).toBe("{unreadable-library");
+    expect(
+      await page.evaluate(() => localStorage.getItem("luma_custom_recipes_v1")),
+    ).toBe("{unreadable-library");
+    await page.evaluate(() =>
+      localStorage.setItem("luma_custom_recipes_v1", "[]"),
+    );
+    await dialog.getByRole("button", { name: "Retry reading recipes" }).click();
+    await expect(dialog.getByRole("alert")).toHaveCount(0);
+  } finally {
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(
+      info.outputPath("recipe-reload-diagnostics.json"),
+      JSON.stringify(diagnostics, null, 2),
+    );
+  }
 });
 
 test("empty recording reports no recipe and allows a fresh recording", async ({

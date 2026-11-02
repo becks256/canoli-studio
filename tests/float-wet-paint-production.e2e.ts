@@ -1,22 +1,165 @@
-import {SCHEMA_VERSION} from '../src/core/model';
-import {test,expect} from '@playwright/test';
-import {readFile,writeFile} from 'node:fs/promises';
-import {spawnSync} from 'node:child_process';
-import {readProject} from '../src/core/project';
-import {historyProject,historyScript} from './helpers/history-inspector';
+import { SCHEMA_VERSION } from "../src/core/model";
+import { test, expect } from "@playwright/test";
+import { readFile, writeFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { readProject } from "../src/core/project";
+import { historyProject, historyScript } from "./helpers/history-inspector";
 
-test('production isolated mixed HDR paint exports exact native and reflected words through Undo and source-bearing reopen',async({page},info)=>{
- const fixture='tests/fixtures/hdr-wet-document/setup.luma',input=await readProject(new Blob([new Uint8Array(await readFile(fixture))]));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);await page.getByTestId('project-input').setInputFiles(fixture);await expect(page.getByRole('button',{name:'Select HDR target',exact:true})).toBeVisible();
- const code=`const output=[...document.layers].find(layer=>layer.name==='HDR wet output');const coverage=[...document.layers].find(layer=>layer.name==='HDR wet coverage');for(const layer of document.layers)layer.visible=false;const group=document.layers.add(new LayerGroup({name:'Native content',blendMode:'normal'}));const paint=group.layers.add(new PaintLayer({name:'Mixed native paint'}));paint.strokes.add(new PaintFill({bounds:{x:0,y:0,width:16,height:12},color:'#ff0000',opacity:.375}));const tile={x:3,y:4,width:2,height:1,assetId:output.assetId,coverage:{assetId:coverage.assetId}};paint.strokes.add(new WetPaintStroke({precision:'float32',brush:new PencilStroke({points:[{x:3.5,y:4.5}],opacity:.01}),opacity:.64123,tiles:[tile]}));paint.strokes.add(new WetPaintStroke({precision:'float32',brush:new PencilStroke({points:[{x:-2.5,y:4.5}]}),opacity:.375,tiles:[{...tile,x:-3}]}));paint.strokes.add(new PaintFill({bounds:{x:3,y:4,width:1,height:1},erase:true,opacity:.125}));paint.strokes.add(new PaintFill({bounds:{x:4,y:4,width:1,height:1},color:'#0000ff',opacity:.25}));document.selectedLayer=paint;`;
- const tiff=async(name:string)=>{await page.getByRole('button',{name:'Export…',exact:true}).click();const dialog=page.locator('.export-dialog');await dialog.getByLabel('Format',{exact:true}).selectOption('tiff');await dialog.getByLabel('TIFF precision',{exact:true}).selectOption('float32');await dialog.getByLabel('Use output RGB profile for high-precision TIFF',{exact:true}).uncheck();const pending=page.waitForEvent('download');await dialog.getByRole('button',{name:'Export .tif',exact:true}).click();await(await pending).saveAs(info.outputPath(name+'.tif'));await expect(dialog).toHaveCount(0);};
- await historyScript(page,code,'Mixed native paint ready');const native=await historyProject(page,info,'native.luma');await tiff('native');await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await historyProject(page,info,'undo.luma')).value.document).toEqual({...input.document,schemaVersion:SCHEMA_VERSION});await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'redo.luma')).value.document).toEqual(native.value.document);
- await historyScript(page,"const group=[...document.layers].find(layer=>layer.name==='Native content');group.x=55.25;group.y=10.5;group.layers.at(0).transform=AffineTransform.scale(-1.5,.75);",'Reflected native paint ready');const placed=await historyProject(page,info,'placed.luma');await tiff('placed');await page.getByTestId('project-input').setInputFiles(placed.path);expect((await historyProject(page,info,'reopened.luma')).value.document).toEqual(placed.value.document);await tiff('reopened');
- for(const original of input.entries){const entry=placed.value.entries.find(entry=>entry.id===original.id);expect(Buffer.from(await entry!.blob.arrayBuffer())).toEqual(Buffer.from(await original.blob.arrayBuffer()));}
- await writeFile(info.outputPath('float-wet-paint.json'),JSON.stringify({scope:{x:0,y:0,width:input.document.width,height:input.document.height},oneUndo:true,sourceExact:true,debugGlobals:false},null,2));const check=spawnSync('python3',['scripts/check-float-wet-paint.py',info.outputDir,'--tiff'],{encoding:'utf8',timeout:120000});expect(check.status,check.stderr||check.stdout).toBe(0);await writeFile(info.outputPath('independent-native-delivery.json'),check.stdout);
+test("production isolated mixed HDR paint exports exact native and reflected words through Undo and source-bearing reopen", async ({
+  page,
+}, info) => {
+  const fixture = "tests/fixtures/hdr-wet-document/setup.luma",
+    input = await readProject(
+      new Blob([new Uint8Array(await readFile(fixture))]),
+    );
+  await page.goto("/");
+  expect(await page.evaluate(() => "luma" in window)).toBe(false);
+  await page.getByTestId("project-input").setInputFiles(fixture);
+  await expect(
+    page.getByRole("button", { name: "Select HDR target", exact: true }),
+  ).toBeVisible();
+  const code = `const output=[...document.layers].find(layer=>layer.name==='HDR wet output');const coverage=[...document.layers].find(layer=>layer.name==='HDR wet coverage');for(const layer of document.layers)layer.visible=false;const group=document.layers.add(new LayerGroup({name:'Native content',blendMode:'normal'}));const paint=group.layers.add(new PaintLayer({name:'Mixed native paint'}));paint.strokes.add(new PaintFill({bounds:{x:0,y:0,width:16,height:12},color:'#ff0000',opacity:.375}));const tile={x:3,y:4,width:2,height:1,assetId:output.assetId,coverage:{assetId:coverage.assetId}};paint.strokes.add(new WetPaintStroke({precision:'float32',brush:new PencilStroke({points:[{x:3.5,y:4.5}],opacity:.01}),opacity:.64123,tiles:[tile]}));paint.strokes.add(new WetPaintStroke({precision:'float32',brush:new PencilStroke({points:[{x:-2.5,y:4.5}]}),opacity:.375,tiles:[{...tile,x:-3}]}));paint.strokes.add(new PaintFill({bounds:{x:3,y:4,width:1,height:1},erase:true,opacity:.125}));paint.strokes.add(new PaintFill({bounds:{x:4,y:4,width:1,height:1},color:'#0000ff',opacity:.25}));document.selectedLayer=paint;`;
+  const tiff = async (name: string) => {
+    await page.getByRole("button", { name: "Export…", exact: true }).click();
+    const dialog = page.locator(".export-dialog");
+    await dialog.getByLabel("Format", { exact: true }).selectOption("tiff");
+    await dialog
+      .getByLabel("TIFF precision", { exact: true })
+      .selectOption("float32");
+    await dialog
+      .getByLabel("Use output RGB profile for high-precision TIFF", {
+        exact: true,
+      })
+      .uncheck();
+    const pending = page.waitForEvent("download");
+    await dialog
+      .getByRole("button", { name: "Export .tif", exact: true })
+      .click();
+    await (await pending).saveAs(info.outputPath(name + ".tif"));
+    await expect(dialog).toHaveCount(0);
+  };
+  await historyScript(page, code, "Mixed native paint ready");
+  const native = await historyProject(page, info, "native.luma");
+  await tiff("native");
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  expect(
+    (await historyProject(page, info, "undo.luma")).value.document,
+  ).toEqual({ ...input.document, schemaVersion: SCHEMA_VERSION });
+  await page
+    .getByRole("button", { name: "Redo (Mod+Shift+Z)", exact: true })
+    .click();
+  expect(
+    (await historyProject(page, info, "redo.luma")).value.document,
+  ).toEqual(native.value.document);
+  await historyScript(
+    page,
+    "const group=[...document.layers].find(layer=>layer.name==='Native content');group.x=55.25;group.y=10.5;group.layers.at(0).transform=AffineTransform.scale(-1.5,.75);",
+    "Reflected native paint ready",
+  );
+  const placed = await historyProject(page, info, "placed.luma");
+  await tiff("placed");
+  await page.getByTestId("project-input").setInputFiles(placed.path);
+  expect(
+    (await historyProject(page, info, "reopened.luma")).value.document,
+  ).toEqual(placed.value.document);
+  await tiff("reopened");
+  for (const original of input.entries) {
+    const entry = placed.value.entries.find(
+      (entry) => entry.id === original.id,
+    );
+    expect(Buffer.from(await entry!.blob.arrayBuffer())).toEqual(
+      Buffer.from(await original.blob.arrayBuffer()),
+    );
+  }
+  await writeFile(
+    info.outputPath("float-wet-paint.json"),
+    JSON.stringify(
+      {
+        scope: {
+          x: 0,
+          y: 0,
+          width: input.document.width,
+          height: input.document.height,
+        },
+        oneUndo: true,
+        sourceExact: true,
+        debugGlobals: false,
+      },
+      null,
+      2,
+    ),
+  );
+  const check = spawnSync(
+    "python3",
+    ["scripts/check-float-wet-paint.py", info.outputDir, "--tiff"],
+    { encoding: "utf8", timeout: 120000 },
+  );
+  expect(check.status, check.stderr || check.stdout).toBe(0);
+  await writeFile(
+    info.outputPath("independent-native-delivery.json"),
+    check.stdout,
+  );
 });
 
-test('production Mixer creates its first float PaintLayer with native originals and one Undo',async({page},info)=>{
- await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);await page.getByTestId('project-input').setInputFiles('tests/fixtures/hdr-wet-document/setup.luma');await expect(page.getByRole('button',{name:'Select HDR target',exact:true})).toBeVisible();await historyScript(page,'for(const layer of [...document.layers])layer.remove();document.resize(64,48);','Blank native target ready');const before=await historyProject(page,info,'fresh-before.luma');expect(before.value.document.precision).toBe('float32');expect(before.value.document.children).toHaveLength(0);
- await page.getByRole('button',{name:'Mixer brush',exact:true}).click();await page.keyboard.press('Control+1');const box=(await page.locator('.canvas-wrap').boundingBox())!;await page.mouse.click(box.x+20.5,box.y+20.5);await expect(page.getByRole('button',{name:'Select Mixer paint',exact:true})).toBeVisible();const after=await historyProject(page,info,'fresh-after.luma'),paint=after.value.document.children[0];if(paint.kind!=='paint'||paint.strokes[0].kind!=='wet')throw new Error('No native wet PaintLayer');expect(paint.strokes).toHaveLength(1);expect(paint.strokes[0].precision).toBe('float32');expect(after.value.entries.length).toBeGreaterThan(0);expect(after.value.entries.every(entry=>entry.tiff?.editingPrecision==='float32')).toBe(true);
- await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await historyProject(page,info,'fresh-undo.luma')).value.document).toEqual(before.value.document);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'fresh-redo.luma')).value.document).toEqual(after.value.document);await writeFile(info.outputPath('fresh-production-paint.json'),JSON.stringify({oneUndo:true,nativeOriginals:true,precision:'float32',debugGlobals:false},null,2));
+test("production Mixer creates its first float PaintLayer with native originals and one Undo", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  expect(await page.evaluate(() => "luma" in window)).toBe(false);
+  await page
+    .getByTestId("project-input")
+    .setInputFiles("tests/fixtures/hdr-wet-document/setup.luma");
+  await expect(
+    page.getByRole("button", { name: "Select HDR target", exact: true }),
+  ).toBeVisible();
+  await historyScript(
+    page,
+    "for(const layer of [...document.layers])layer.remove();document.resize(64,48);",
+    "Blank native target ready",
+  );
+  const before = await historyProject(page, info, "fresh-before.luma");
+  expect(before.value.document.precision).toBe("float32");
+  expect(before.value.document.children).toHaveLength(0);
+  await page.getByRole("button", { name: "Mixer brush", exact: true }).click();
+  await page.keyboard.press("Control+1");
+  const box = (await page.locator(".canvas-wrap").boundingBox())!;
+  await page.mouse.click(box.x + 20.5, box.y + 20.5);
+  await expect(
+    page.getByRole("button", { name: "Select Mixer paint", exact: true }),
+  ).toBeVisible();
+  const after = await historyProject(page, info, "fresh-after.luma"),
+    paint = after.value.document.children[0];
+  if (paint.kind !== "paint" || paint.strokes[0].kind !== "wet")
+    throw new Error("No native wet PaintLayer");
+  expect(paint.strokes).toHaveLength(1);
+  expect(paint.strokes[0].precision).toBe("float32");
+  expect(after.value.entries.length).toBeGreaterThan(0);
+  expect(
+    after.value.entries.every(
+      (entry) => entry.tiff?.editingPrecision === "float32",
+    ),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Undo (Mod+Z)", exact: true }).click();
+  expect(
+    (await historyProject(page, info, "fresh-undo.luma")).value.document,
+  ).toEqual(before.value.document);
+  await page
+    .getByRole("button", { name: "Redo (Mod+Shift+Z)", exact: true })
+    .click();
+  expect(
+    (await historyProject(page, info, "fresh-redo.luma")).value.document,
+  ).toEqual(after.value.document);
+  await writeFile(
+    info.outputPath("fresh-production-paint.json"),
+    JSON.stringify(
+      {
+        oneUndo: true,
+        nativeOriginals: true,
+        precision: "float32",
+        debugGlobals: false,
+      },
+      null,
+      2,
+    ),
+  );
 });

@@ -45,12 +45,12 @@ Both APIs are trusted `EditorApplication` services. They are not constructors, `
 
 `FontInspection` is an owned recursively frozen version-1 DTO:
 
-| Field | Meaning |
-| --- | --- |
-| `version`, `parser` | `1`, `fontkit-2.0.4`; pinned parser identity. |
-| `format` | `ttf`, `otf`, `woff`, `woff2`, `ttc` or `dfont`, from source bytes. |
-| `byteLength`, `sha256` | Exact complete original source length and lowercase SHA-256. |
-| `faceCount`, `offset`, `faces` | Complete count and the requested consecutive page. |
+| Field                          | Meaning                                                             |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `version`, `parser`            | `1`, `fontkit-2.0.4`; pinned parser identity.                       |
+| `format`                       | `ttf`, `otf`, `woff`, `woff2`, `ttc` or `dfont`, from source bytes. |
+| `byteLength`, `sha256`         | Exact complete original source length and lowercase SHA-256.        |
+| `faceCount`, `offset`, `faces` | Complete count and the requested consecutive page.                  |
 
 Each face contains `index`, `id`, `cssFamily`, nullable `family/subfamily/fullName/postscriptName/copyright`, `unitsPerEm`, `glyphCount`, nullable raw `weightClass/widthClass/embeddingFlags`, `axes` and `descriptors`. Axis records contain a four-ASCII-character `tag`, nullable declared `name` and finite ordered `min/default/max`. Native descriptors contain `style`, `weight` and `stretch`; supported `wght`/`wdth` ranges map to native CSS descriptors, and a variable `ital` axis spanning 0–1 produces normal and italic faces. This does not add arbitrary-axis editing, shaping, script coverage or closest-face guarantees.
 
@@ -58,13 +58,13 @@ The stable face ID is SHA-256 of UTF-8 `canoli-font-face-v1\0` followed by the o
 
 `PreparedFontSource` is a frozen wrapper with:
 
-| Field | Meaning |
-| --- | --- |
-| `original` | The exact caller-owned original Blob, unchanged. |
-| `report`, `faceIndex` | Frozen selected-face metadata and source index. |
-| `renderBlob`, `renderSha256`, `renderFormat` | Complete browser-loadable face bytes, independently hashed; native MIME/format is `font/ttf`, `font/otf`, `font/woff` or `font/woff2`. |
-| `extracted`, `repacked`, `omittedTables` | Explicit source transformations described below. |
-| `fontFaces` | Frozen array of caller-owned, mutable native `FontFace` handles with status `loaded`. They have **not** been registered in the editor's or any other font set. |
+| Field                                        | Meaning                                                                                                                                                        |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `original`                                   | The exact caller-owned original Blob, unchanged.                                                                                                               |
+| `report`, `faceIndex`                        | Frozen selected-face metadata and source index.                                                                                                                |
+| `renderBlob`, `renderSha256`, `renderFormat` | Complete browser-loadable face bytes, independently hashed; native MIME/format is `font/ttf`, `font/otf`, `font/woff` or `font/woff2`.                         |
+| `extracted`, `repacked`, `omittedTables`     | Explicit source transformations described below.                                                                                                               |
+| `fontFaces`                                  | Frozen array of caller-owned, mutable native `FontFace` handles with status `loaded`. They have **not** been registered in the editor's or any other font set. |
 
 The host validates strict response metadata, source and derived lengths/digests, face identities, selected page/index, native signature/MIME and transformation consistency before returning. These hashes describe integrity and identity, not trusted provenance. No result enters the image AssetStore, document model, history or persistent library.
 
@@ -76,17 +76,25 @@ This is trusted application integration code, outside the isolated Scripts panel
 
 ```ts
 const abort = new AbortController();
-const page = await editor.inspectFont(source, { offset: 0, limit: 16 }, {
-  signal: abort.signal,
-});
+const page = await editor.inspectFont(
+  source,
+  { offset: 0, limit: 16 },
+  {
+    signal: abort.signal,
+  },
+);
 // Present page.faces and require an explicit selection for multi-face files.
 const selectedIndex = page.faces[0].index;
-const prepared = await editor.prepareFontSource(source, {
-  faceIndex: selectedIndex,
-}, { signal: abort.signal });
+const prepared = await editor.prepareFontSource(
+  source,
+  {
+    faceIndex: selectedIndex,
+  },
+  { signal: abort.signal },
+);
 console.log(prepared.original === source); // true
-console.log(prepared.fontFaces.every(face => face.status === 'loaded')); // true
-console.log(prepared.fontFaces.every(face => !document.fonts.has(face))); // true
+console.log(prepared.fontFaces.every((face) => face.status === "loaded")); // true
+console.log(prepared.fontFaces.every((face) => !document.fonts.has(face))); // true
 ```
 
 The example's index is illustrative: the product explicitly asks the user to choose a collection face. The DOM `document` here is the browser document, not Canoli's public OO `Document`. Trusted consumers choose where to register returned handles and must remove their own registrations. The built-in preview uses only its private, script-disabled iframe's `FontFaceSet`, blits its pixels to the visible parent canvas and removes registrations on replacement/unmount; it never installs globally. Script-disabled iframe canvas fallback content is not used as the visible preview.

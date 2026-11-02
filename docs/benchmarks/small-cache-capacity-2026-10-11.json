@@ -318,10 +318,7 @@
           "presentMs": 51.400000005960464
         }
       ],
-      "longTasks": [
-        50,
-        54
-      ],
+      "longTasks": [50, 54],
       "restored": true,
       "layers": 64
     }
@@ -637,9 +634,7 @@
           "presentMs": 18.5
         }
       ],
-      "longTasks": [
-        71
-      ],
+      "longTasks": [71],
       "restored": true,
       "layers": 64
     }

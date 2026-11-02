@@ -7,42 +7,60 @@ describe("SEO metadata and discoverability", () => {
     const html = await readFile("index.html", "utf8");
 
     // Title & description
-    expect(html.match(/<title>([\s\S]*?)<\/title>/)?.[1].trim()).toBe("Canoli Studio — Free In-Browser Image Editor &amp; Layer Studio");
+    expect(html.match(/<title>([\s\S]*?)<\/title>/)?.[1].trim()).toBe(
+      "Canoli Studio — Free In-Browser Image Editor &amp; Layer Studio",
+    );
     expect(html).toMatch(/<meta\s+name="description"\s+content="[^"]+"/);
     expect(html).toMatch(/<meta\s+name="keywords"\s+content="[^"]+"/);
     expect(html).toMatch(/<meta\s+name="author"\s+content="Canoli Studio"/);
     expect(html).toMatch(/<meta\s+name="robots"\s+content="index,\s*follow/);
 
     // Canonical link
-    expect(html).toMatch(/<link\s+rel="canonical"\s+href="https:\/\/canoli\.studio\/"/);
+    expect(html).toMatch(
+      /<link\s+rel="canonical"\s+href="https:\/\/canoli\.studio\/"/,
+    );
 
     // Open Graph protocol
     expect(html).toMatch(/<meta\s+property="og:type"\s+content="website"/);
     expect(html).toMatch(/<meta\s+property="og:title"\s+content="[^"]+"/);
     expect(html).toMatch(/<meta\s+property="og:description"\s+content="[^"]+"/);
-    expect(html).toMatch(/<meta\s+property="og:image"\s+content="\/og-image\.png"/);
+    expect(html).toMatch(
+      /<meta\s+property="og:image"\s+content="\/og-image\.png"/,
+    );
     expect(html).toMatch(/<meta\s+property="og:image:width"\s+content="1200"/);
     expect(html).toMatch(/<meta\s+property="og:image:height"\s+content="630"/);
 
     // Twitter Card
-    expect(html).toMatch(/<meta\s+name="twitter:card"\s+content="summary_large_image"/);
-    expect(html).toMatch(/<meta\s+name="twitter:image"\s+content="\/og-image\.png"/);
+    expect(html).toMatch(
+      /<meta\s+name="twitter:card"\s+content="summary_large_image"/,
+    );
+    expect(html).toMatch(
+      /<meta\s+name="twitter:image"\s+content="\/og-image\.png"/,
+    );
 
     // Icons & manifest
-    expect(html).toMatch(/<link\s+rel="icon"\s+type="image\/svg\+xml"\s+href="\/favicon\.svg"/);
+    expect(html).toMatch(
+      /<link\s+rel="icon"\s+type="image\/svg\+xml"\s+href="\/favicon\.svg"/,
+    );
     expect(html).toMatch(/<link\s+rel="apple-touch-icon"/);
-    expect(html).toMatch(/<link\s+rel="manifest"\s+href="\/manifest\.webmanifest"/);
+    expect(html).toMatch(
+      /<link\s+rel="manifest"\s+href="\/manifest\.webmanifest"/,
+    );
 
     // Structured data (Schema.org JSON-LD)
-    expect(html).toContain('application/ld+json');
-    const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    expect(html).toContain("application/ld+json");
+    const jsonLdMatch = html.match(
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+    );
     expect(jsonLdMatch).toBeTruthy();
     const structuredData = JSON.parse(jsonLdMatch![1]);
     expect(structuredData["@context"]).toBe("https://schema.org");
     const graph = structuredData["@graph"];
     expect(Array.isArray(graph)).toBe(true);
 
-    const webApp = graph.find((item: any) => item["@type"] === "WebApplication");
+    const webApp = graph.find(
+      (item: any) => item["@type"] === "WebApplication",
+    );
     expect(webApp).toBeDefined();
     expect(webApp.name).toBe("Canoli Studio");
     expect(webApp.applicationCategory).toBe("DesignApplication");
@@ -64,9 +82,13 @@ describe("SEO metadata and discoverability", () => {
     const sitemap = await readFile("public/sitemap.xml", "utf8");
     expect(sitemap).toContain("<urlset");
     expect(sitemap).toContain("https://canoli.studio/</loc>");
-    expect(sitemap).toContain("https://canoli.studio/developer/scripting-api.html</loc>");
+    expect(sitemap).toContain(
+      "https://canoli.studio/developer/scripting-api.html</loc>",
+    );
     expect(sitemap).toContain("https://canoli.studio/developer/api.html</loc>");
-    expect(sitemap).toContain("https://canoli.studio/developer/plugins.html</loc>");
+    expect(sitemap).toContain(
+      "https://canoli.studio/developer/plugins.html</loc>",
+    );
   });
 
   it("provides valid web application manifest", async () => {
@@ -92,18 +114,28 @@ describe("SEO metadata and discoverability", () => {
   });
 
   it("includes SEO metadata in generated developer docs", async () => {
-    for (const doc of ["api", "scripting-api", "plugins", "requirements", "architecture", "product-brief", "design-system", "system-design", "tools-milestone"]) {
+    for (const doc of [
+      "api",
+      "scripting-api",
+      "plugins",
+      "requirements",
+      "architecture",
+      "product-brief",
+      "design-system",
+      "system-design",
+      "tools-milestone",
+    ]) {
       const path = `public/developer/${doc}.html`;
       expect(existsSync(path)).toBe(true);
       const content = await readFile(path, "utf8");
       expect(content).toContain(`· Canoli Studio developer docs</title>`);
       expect(content).toContain('content="Canoli Studio"');
-      expect(content).toContain('>Canoli Studio<span>DEVELOPER DOCS</span>');
-      expect(content).toContain("<meta name=\"description\"");
-      expect(content).toContain("<meta name=\"robots\"");
-      expect(content).toContain("<meta property=\"og:title\"");
-      expect(content).toContain("<meta name=\"twitter:card\"");
-      expect(content).toContain("<link rel=\"icon\"");
+      expect(content).toContain(">Canoli Studio<span>DEVELOPER DOCS</span>");
+      expect(content).toContain('<meta name="description"');
+      expect(content).toContain('<meta name="robots"');
+      expect(content).toContain('<meta property="og:title"');
+      expect(content).toContain('<meta name="twitter:card"');
+      expect(content).toContain('<link rel="icon"');
     }
   });
 });

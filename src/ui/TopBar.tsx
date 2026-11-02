@@ -12,7 +12,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { Button, IconButton } from "./controls";
-import type {ReactNode} from 'react';
+import type { ReactNode } from "react";
 
 export interface TopBarProps {
   documentId: string;
@@ -25,9 +25,9 @@ export interface TopBarProps {
   onUndo(): void;
   onRedo(): void;
   onOpen(): void;
-  recentFilesControl?:ReactNode;
-  chatGptControl?:ReactNode;
-  accountControl?:ReactNode;
+  recentFilesControl?: ReactNode;
+  chatGptControl?: ReactNode;
+  accountControl?: ReactNode;
   onSave(): void;
   onExport(): void;
   onExportDialog?(): void;
@@ -119,43 +119,85 @@ export function TopBar({
           <Redo2 size={16} />
         </IconButton>
         <span className="separator" />
-        <Button variant="subtle" aria-label="Open" title="Open" onClick={onOpen} disabled={busy}>
+        <Button
+          variant="subtle"
+          aria-label="Open"
+          title="Open"
+          onClick={onOpen}
+          disabled={busy}
+        >
           <FolderOpen size={15} />
           <span>Open</span>
         </Button>
         {recentFilesControl}
         {chatGptControl}
         {accountControl}
-        <Button variant="subtle" aria-label="Save project" title="Save project" onClick={onSave} disabled={busy}>
+        <Button
+          variant="subtle"
+          aria-label="Save project"
+          title="Save project"
+          onClick={onSave}
+          disabled={busy}
+        >
           <Save size={15} />
           <span>Save project</span>
         </Button>
         {onPsdImport && (
-          <Button variant="subtle" aria-label="PSD" title="PSD" onClick={onPsdImport} disabled={busy}>
+          <Button
+            variant="subtle"
+            aria-label="PSD"
+            title="PSD"
+            onClick={onPsdImport}
+            disabled={busy}
+          >
             <FileCode size={15} />
             <span>PSD</span>
           </Button>
         )}
         {onColorProfile && (
-          <Button variant="subtle" aria-label="Color" title="Color" onClick={onColorProfile} disabled={busy}>
+          <Button
+            variant="subtle"
+            aria-label="Color"
+            title="Color"
+            onClick={onColorProfile}
+            disabled={busy}
+          >
             <Palette size={15} />
             <span>Color</span>
           </Button>
         )}
         {onGenerate && (
-          <Button variant="subtle" aria-label="Generate" title="Generate" onClick={onGenerate} disabled={busy}>
+          <Button
+            variant="subtle"
+            aria-label="Generate"
+            title="Generate"
+            onClick={onGenerate}
+            disabled={busy}
+          >
             <Sparkles size={15} />
             <span>Generate</span>
           </Button>
         )}
         {onRecipes && (
-          <Button variant="subtle" aria-label="Recipes" title="Recipes" onClick={onRecipes} disabled={busy}>
+          <Button
+            variant="subtle"
+            aria-label="Recipes"
+            title="Recipes"
+            onClick={onRecipes}
+            disabled={busy}
+          >
             <Workflow size={15} />
             <span>Recipes</span>
           </Button>
         )}
         {onBatch && (
-          <Button variant="subtle" aria-label="Batch" title="Batch" onClick={onBatch} disabled={busy}>
+          <Button
+            variant="subtle"
+            aria-label="Batch"
+            title="Batch"
+            onClick={onBatch}
+            disabled={busy}
+          >
             <Boxes size={15} />
             <span>Batch</span>
           </Button>

@@ -1,4 +1,4 @@
-import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
+import { SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA } from "../src/core/model";
 import { expect, it } from "vitest";
 import {
   Document,
@@ -346,7 +346,9 @@ it("stores independent constructor filter stacks with atomic undo, strict valida
   legacy.schemaVersion = 10;
   expect(() => validateDocument(legacy)).toThrow(/schema version 11/);
   delete (legacy.children[0] as any).smartFilters;
-  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
+  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(
+    CURRENT_DOCUMENT_SCHEMA,
+  );
   const restored = Document.fromJSON(stable).getLayer(
     first.id,
   ) as SmartObjectLayer;
@@ -426,7 +428,9 @@ it("smart-filter masks share constructor validation, locks, undo, asset tracking
   legacy.schemaVersion = 11;
   expect(() => validateDocument(legacy)).toThrow("schema version 12");
   delete (legacy.children[0] as any).filterMask;
-  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
+  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(
+    CURRENT_DOCUMENT_SCHEMA,
+  );
   const command = parseCommands([
     {
       type: "smartObject.filterMask",

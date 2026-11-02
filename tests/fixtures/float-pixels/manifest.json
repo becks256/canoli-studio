@@ -23,18 +23,7 @@
   ],
   "opacity": 0.71321,
   "matrix": [
-    1.7,
-    0.05,
-    -0.2,
-    -0.4,
-    0.1,
-    0.7,
-    0.11,
-    0.01,
-    -0.13,
-    0.08,
-    2.1,
-    0.25
+    1.7, 0.05, -0.2, -0.4, 0.1, 0.7, 0.11, 0.01, -0.13, 0.08, 2.1, 0.25
   ],
   "files": {
     "source.f32le.gz": {
@@ -68,13 +57,9 @@
       "decodedSha256": "acc77d65b5a7a2df90d6f387ccd98b46f98aa21735ae03ee6b13c6fcc1f0fe4a"
     }
   },
-  "sourceChannelLevels": [
-    8075,
-    8073,
-    8074
-  ],
+  "sourceChannelLevels": [8075, 8073, 8074],
   "generatorSha256": "460bdcdc066636e9a482f21d7de6de91720006163e429d72e8fdcb401b3c4b3a",
   "reference": "Independent NumPy float64 W3C compositing, source-over with float mask and opacity; straight float32 output.",
   "referenceUrl": "https://www.w3.org/TR/2024/CRD-compositing-1-20240321/",
-  "tolerance": 2.384185791015625e-07
+  "tolerance": 2.384185791015625e-7
 }

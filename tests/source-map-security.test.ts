@@ -1,5 +1,5 @@
-import { spawnSync } from 'node:child_process';
-import { describe, expect, it } from 'vitest';
+import { spawnSync } from "node:child_process";
+import { describe, expect, it } from "vitest";
 
 // Keep hostile maps in a bounded child: a regressed dependency must not hang
 // Vitest's event loop or allocate an unbounded array in the main test process.
@@ -38,13 +38,25 @@ function probe(mode: string) {
       console.log(JSON.stringify({mode,passed:true}));
     })().catch(error=>{console.error(error);process.exitCode=1;});
   `;
-  return spawnSync(process.execPath, ['--max-old-space-size=128', '-e', script, mode], {
-    cwd: process.cwd(), timeout: 3000, encoding: 'utf8', maxBuffer: 128 * 1024,
-  });
+  return spawnSync(
+    process.execPath,
+    ["--max-old-space-size=128", "-e", script, mode],
+    {
+      cwd: process.cwd(),
+      timeout: 3000,
+      encoding: "utf8",
+      maxBuffer: 128 * 1024,
+    },
+  );
 }
 
-describe('build source-map security boundary', () => {
-  for (const mode of ['huge-offset', 'nested-offset', 'bounded-copy', 'postcss-roundtrip']) {
+describe("build source-map security boundary", () => {
+  for (const mode of [
+    "huge-offset",
+    "nested-offset",
+    "bounded-copy",
+    "postcss-roundtrip",
+  ]) {
     it(`preserves bounded processing and source provenance: ${mode}`, () => {
       const result = probe(mode);
       expect(result.error, result.stderr).toBeUndefined();

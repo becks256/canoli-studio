@@ -1,7 +1,7 @@
-import {PaletteColorInput} from "./PaletteColorControl";
-import type {VectorGradientData} from '../core/vector-gradient';
-import {VectorGradientControls} from './VectorGradientControls';
-import {VectorStrokeControls} from './VectorStrokeControls';
+import { PaletteColorInput } from "./PaletteColorControl";
+import type { VectorGradientData } from "../core/vector-gradient";
+import { VectorGradientControls } from "./VectorGradientControls";
+import { VectorStrokeControls } from "./VectorStrokeControls";
 import type { Tool, ToolController, ToolSettings } from "../tools";
 import type { VectorLayer, VectorPath } from "../dom";
 import type { EditorCommand } from "../core/commands";
@@ -21,7 +21,10 @@ export function ToolOptions({
   onSnapEnabled,
   snapArtwork = false,
   onSnapArtwork,
-  spacingHints=false,onSpacingHints,snapSpacing=false,onSnapSpacing,
+  spacingHints = false,
+  onSpacingHints,
+  snapSpacing = false,
+  onSnapSpacing,
   controller,
   settings,
   hasSelection,
@@ -48,8 +51,10 @@ export function ToolOptions({
   hasFilterMask?: boolean;
   hasVectorMask: boolean;
   hasTextPath?: boolean;
-  spacingHints?:boolean;onSpacingHints?(enabled:boolean):void;
-  snapSpacing?:boolean;onSnapSpacing?(enabled:boolean):void;
+  spacingHints?: boolean;
+  onSpacingHints?(enabled: boolean): void;
+  snapSpacing?: boolean;
+  onSnapSpacing?(enabled: boolean): void;
   snapArtwork?: boolean;
   onSnapArtwork?(enabled: boolean): void;
   snapEnabled?: boolean;
@@ -72,10 +77,11 @@ export function ToolOptions({
   onBrushSymmetry?(): void;
   onBrushPresets?(): void;
 }) {
-  const wet=tool==="smudge"||tool==="mixer";
+  const wet = tool === "smudge" || tool === "mixer";
   const tonal = tool === "dodge" || tool === "burn";
   const brush =
-    wet || tonal ||
+    wet ||
+    tonal ||
     tool === "heal" ||
     tool === "brush" ||
     tool === "pencil" ||
@@ -87,7 +93,7 @@ export function ToolOptions({
         {
           {
             wand: "Magic wand",
-            'quick-select':'Quick selection',
+            "quick-select": "Quick selection",
             move: "Move",
             hand: "Hand",
             artboard: "Artboard",
@@ -101,7 +107,10 @@ export function ToolOptions({
             eraser: "Eraser",
             pen: "Pen",
             marquee: "Marquee",
-            lasso: settings.lassoMode === "polygon" ? "Polygonal lasso" : "Freeform lasso",
+            lasso:
+              settings.lassoMode === "polygon"
+                ? "Polygonal lasso"
+                : "Freeform lasso",
             clone: "Clone",
             patch: "Patch",
             heal: "Spot Healing",
@@ -224,8 +233,35 @@ export function ToolOptions({
               Include artwork
             </label>
           )}
-          {moveTarget==='layer'&&snapEnabled&&snapArtwork&&onSnapSpacing&&<label className="tool-snap-toggle" title="Repeat neighboring gaps or center between neighbors; Alt bypasses attraction"><input type="checkbox" checked={snapSpacing} onChange={event=>onSnapSpacing(event.target.checked)}/>Equal spacing</label>}
-          {moveTarget==='layer'&&onSpacingHints&&<label className="tool-snap-toggle" title="Show document-pixel gaps to neighboring authored bounds while dragging"><input type="checkbox" checked={spacingHints} onChange={event=>onSpacingHints(event.target.checked)}/>Spacing guides</label>}
+          {moveTarget === "layer" &&
+            snapEnabled &&
+            snapArtwork &&
+            onSnapSpacing && (
+              <label
+                className="tool-snap-toggle"
+                title="Repeat neighboring gaps or center between neighbors; Alt bypasses attraction"
+              >
+                <input
+                  type="checkbox"
+                  checked={snapSpacing}
+                  onChange={(event) => onSnapSpacing(event.target.checked)}
+                />
+                Equal spacing
+              </label>
+            )}
+          {moveTarget === "layer" && onSpacingHints && (
+            <label
+              className="tool-snap-toggle"
+              title="Show document-pixel gaps to neighboring authored bounds while dragging"
+            >
+              <input
+                type="checkbox"
+                checked={spacingHints}
+                onChange={(event) => onSpacingHints(event.target.checked)}
+              />
+              Spacing guides
+            </label>
+          )}
           {moveTarget === "mask" && (
             <span className="section-caption">
               Drag to move the selected mask · Arrow keys to nudge
@@ -233,8 +269,14 @@ export function ToolOptions({
           )}
         </>
       )}
-      {((brush && !tonal && tool !== "eraser" && tool !== "heal" && (!wet || settings.paintTarget==='layer')) ||
-        (tool === "pen" && settings.penEditTarget === "layer" && !hasTextPath) ||
+      {((brush &&
+        !tonal &&
+        tool !== "eraser" &&
+        tool !== "heal" &&
+        (!wet || settings.paintTarget === "layer")) ||
+        (tool === "pen" &&
+          settings.penEditTarget === "layer" &&
+          !hasTextPath) ||
         tool === "marquee" ||
         tool === "fill") && (
         <label className="tool-color">
@@ -278,7 +320,44 @@ export function ToolOptions({
             }
           />
         )}
-      {wet && <><span className="section-caption">{settings.paintTarget==='layer'?'Edits layer pixels.':'Edits raw mask coverage; color is ignored. Hide/Reveal sets the initial foreground coverage.'}</span>{(["load","wetness","pickup"] as const).map(key=><Slider key={key} label={key==="load"?(settings.paintTarget==='layer'?"Initial foreground load":"Initial coverage load"):key==="wetness"?"Wetness":"Pickup"} suffix="%" value={settings[tool][key]*100} min={0} max={100} disabled={disabled||documentBusy} onPreview={value=>controller.configure({[tool]:{...settings[tool],[key]:value/100}})} onCommit={value=>controller.configure({[tool]:{...settings[tool],[key]:value/100}})}/>)}</>}
+      {wet && (
+        <>
+          <span className="section-caption">
+            {settings.paintTarget === "layer"
+              ? "Edits layer pixels."
+              : "Edits raw mask coverage; color is ignored. Hide/Reveal sets the initial foreground coverage."}
+          </span>
+          {(["load", "wetness", "pickup"] as const).map((key) => (
+            <Slider
+              key={key}
+              label={
+                key === "load"
+                  ? settings.paintTarget === "layer"
+                    ? "Initial foreground load"
+                    : "Initial coverage load"
+                  : key === "wetness"
+                    ? "Wetness"
+                    : "Pickup"
+              }
+              suffix="%"
+              value={settings[tool][key] * 100}
+              min={0}
+              max={100}
+              disabled={disabled || documentBusy}
+              onPreview={(value) =>
+                controller.configure({
+                  [tool]: { ...settings[tool], [key]: value / 100 },
+                })
+              }
+              onCommit={(value) =>
+                controller.configure({
+                  [tool]: { ...settings[tool], [key]: value / 100 },
+                })
+              }
+            />
+          ))}
+        </>
+      )}
       {tonal && (
         <>
           <Select
@@ -310,11 +389,22 @@ export function ToolOptions({
               controller.configure({ tonalExposure: value / 100 })
             }
           />
-          <label className="check-field" title={floatEditing?'Limit newly brightened positive peaks to reference white. Turn off to brighten HDR colors. Existing HDR values and signed colors are retained.':undefined}>
+          <label
+            className="check-field"
+            title={
+              floatEditing
+                ? "Limit newly brightened positive peaks to reference white. Turn off to brighten HDR colors. Existing HDR values and signed colors are retained."
+                : undefined
+            }
+          >
             <input
               type="checkbox"
               checked={settings.protectTones}
-              aria-description={floatEditing?'Linear exposure. Protection limits new highlights; turn off to brighten HDR colors.':undefined}
+              aria-description={
+                floatEditing
+                  ? "Linear exposure. Protection limits new highlights; turn off to brighten HDR colors."
+                  : undefined
+              }
               disabled={disabled}
               onChange={(event) =>
                 controller.configure({ protectTones: event.target.checked })
@@ -392,11 +482,31 @@ export function ToolOptions({
             onPreview={(v) => controller.configure({ smoothing: v / 100 })}
             onCommit={(v) => controller.configure({ smoothing: v / 100 })}
           />
-          {onBrushPresets&&<Button disabled={documentBusy} onClick={onBrushPresets}>Brush presets…</Button>}
-          {onBrushSymmetry&&<Button disabled={documentBusy} onClick={onBrushSymmetry}>Symmetry…</Button>}
-          {onBrushTip&&<Button disabled={documentBusy} onClick={onBrushTip}>Brush tip…</Button>}
-          {onBrushTexture&&<Button disabled={documentBusy} onClick={onBrushTexture}>{settings.texture?'Texture on…':'Texture…'}</Button>}
-          {onPressureCurve&&<Button disabled={disabled} onClick={onPressureCurve}>Pressure response…</Button>}
+          {onBrushPresets && (
+            <Button disabled={documentBusy} onClick={onBrushPresets}>
+              Brush presets…
+            </Button>
+          )}
+          {onBrushSymmetry && (
+            <Button disabled={documentBusy} onClick={onBrushSymmetry}>
+              Symmetry…
+            </Button>
+          )}
+          {onBrushTip && (
+            <Button disabled={documentBusy} onClick={onBrushTip}>
+              Brush tip…
+            </Button>
+          )}
+          {onBrushTexture && (
+            <Button disabled={documentBusy} onClick={onBrushTexture}>
+              {settings.texture ? "Texture on…" : "Texture…"}
+            </Button>
+          )}
+          {onPressureCurve && (
+            <Button disabled={disabled} onClick={onPressureCurve}>
+              Pressure response…
+            </Button>
+          )}
           <label className="check-field">
             <input
               type="checkbox"
@@ -452,7 +562,10 @@ export function ToolOptions({
           value={settings.penEditTarget}
           disabled={disabled}
           options={[
-            { value: "layer", label: hasTextPath ? 'Text baseline' : "Layer paths" },
+            {
+              value: "layer",
+              label: hasTextPath ? "Text baseline" : "Layer paths",
+            },
             { value: "mask", label: "Mask paths" },
           ]}
           onChange={(value) =>
@@ -498,10 +611,26 @@ export function ToolOptions({
           )}
         </div>
       )}
-      {tool === 'pen' && settings.penEditTarget === 'layer' && hasTextPath && <div className="text-baseline-actions">
-        <Button disabled={disabled || !controller.selectedTextPathAnchor?.canSplit} onClick={()=>onAction(()=>controller.insertTextPathAnchor())}>Insert baseline midpoint</Button>
-        <Button disabled={disabled || !controller.selectedTextPathAnchor?.canRemove} onClick={()=>onAction(()=>{controller.removeLastAnchor();})}>Remove baseline anchor</Button>
-      </div>}
+      {tool === "pen" && settings.penEditTarget === "layer" && hasTextPath && (
+        <div className="text-baseline-actions">
+          <Button
+            disabled={disabled || !controller.selectedTextPathAnchor?.canSplit}
+            onClick={() => onAction(() => controller.insertTextPathAnchor())}
+          >
+            Insert baseline midpoint
+          </Button>
+          <Button
+            disabled={disabled || !controller.selectedTextPathAnchor?.canRemove}
+            onClick={() =>
+              onAction(() => {
+                controller.removeLastAnchor();
+              })
+            }
+          >
+            Remove baseline anchor
+          </Button>
+        </div>
+      )}
       {tool === "pen" && settings.penEditTarget === "layer" && !hasTextPath && (
         <>
           <Slider
@@ -556,55 +685,168 @@ export function ToolOptions({
           </button>
         </>
       )}
-      {tool==='quick-select'&&<>
-        <Slider label="Quick selection diameter" value={settings.quickSize} min={.5} max={512} step={.5} suffix="px" disabled={documentBusy} onPreview={value=>controller.configure({quickSize:value})} onCommit={value=>controller.configure({quickSize:value})}/>
-        <Slider label="Color tolerance" value={settings.quickTolerance} min={0} max={255} step={1} disabled={documentBusy} onPreview={value=>controller.configure({quickTolerance:value})} onCommit={value=>controller.configure({quickTolerance:value})}/>
-        <Slider label="Edge threshold" value={settings.quickEdgeThreshold} min={0} max={255} step={1} disabled={documentBusy} onPreview={value=>controller.configure({quickEdgeThreshold:value})} onCommit={value=>controller.configure({quickEdgeThreshold:value})}/>
-        <Select label="Quick selection source" value={settings.quickSampling} disabled={documentBusy} options={[{value:'merged',label:'Visible composite'},{value:'layer',label:'Selected layer'}]} onChange={value=>controller.configure({quickSampling:value as ToolSettings['quickSampling']})}/>
-        <Select label="Quick selection operation" value={settings.quickSelectionMode} disabled={documentBusy} options={['replace','add','subtract','intersect']} onChange={value=>controller.configure({quickSelectionMode:value as ToolSettings['quickSelectionMode']})}/>
-        {controller.getSnapshot().quickSelectionProgress&&<>
-          <progress aria-label="Quick Selection progress" max={controller.getSnapshot().quickSelectionProgress!.total} value={controller.getSnapshot().quickSelectionProgress!.completed}/>
-          <button type="button" className="button subtle compact" onClick={()=>controller.cancel()}>Cancel Quick Selection</button>
-        </>}
-      </>}
-      {tool === "wand" && <>
-        <Slider label="Wand tolerance" value={settings.wandTolerance} min={0} max={255} step={1}
-          onPreview={value => controller.configure({ wandTolerance: value })} onCommit={value => controller.configure({ wandTolerance: value })} />
-        <label><input type="checkbox" checked={settings.wandContiguous} onChange={event => controller.configure({ wandContiguous: event.target.checked })} /> Contiguous</label>
-      <span className="tool-hint">Sample selected image · Shift adds · Alt subtracts</span>
-      </>}
-      {(tool === "marquee" || tool === "wand" || tool === "lasso") && (
+      {tool === "quick-select" && (
         <>
-          {tool === "lasso" && <>
-            <select
-              aria-label="Lasso mode"
-              value={settings.lassoMode}
-              disabled={documentBusy}
-              onChange={event => controller.configure({ lassoMode: event.target.value as ToolSettings["lassoMode"] })}
-            >
-              <option value="freeform">Freeform</option>
-              <option value="polygon">Polygonal</option>
-            </select>
-            {settings.lassoMode === "polygon" && <button
-              type="button"
-              className="button subtle compact"
-              disabled={documentBusy || controller.polygonLassoPointCount < 3}
-              onClick={() => onAction(() => controller.finishPolygonLasso())}
-            >Finish selection</button>}
-          </>}
-          {tool === "marquee" && <select
-            aria-label="Marquee shape"
-            value={settings.selectionShape}
-            onChange={(e) =>
+          <Slider
+            label="Quick selection diameter"
+            value={settings.quickSize}
+            min={0.5}
+            max={512}
+            step={0.5}
+            suffix="px"
+            disabled={documentBusy}
+            onPreview={(value) => controller.configure({ quickSize: value })}
+            onCommit={(value) => controller.configure({ quickSize: value })}
+          />
+          <Slider
+            label="Color tolerance"
+            value={settings.quickTolerance}
+            min={0}
+            max={255}
+            step={1}
+            disabled={documentBusy}
+            onPreview={(value) =>
+              controller.configure({ quickTolerance: value })
+            }
+            onCommit={(value) =>
+              controller.configure({ quickTolerance: value })
+            }
+          />
+          <Slider
+            label="Edge threshold"
+            value={settings.quickEdgeThreshold}
+            min={0}
+            max={255}
+            step={1}
+            disabled={documentBusy}
+            onPreview={(value) =>
+              controller.configure({ quickEdgeThreshold: value })
+            }
+            onCommit={(value) =>
+              controller.configure({ quickEdgeThreshold: value })
+            }
+          />
+          <Select
+            label="Quick selection source"
+            value={settings.quickSampling}
+            disabled={documentBusy}
+            options={[
+              { value: "merged", label: "Visible composite" },
+              { value: "layer", label: "Selected layer" },
+            ]}
+            onChange={(value) =>
               controller.configure({
-                selectionShape: e.target
-                  .value as ToolSettings["selectionShape"],
+                quickSampling: value as ToolSettings["quickSampling"],
               })
             }
-          >
-            <option value="rectangle">Rectangle</option>
-            <option value="ellipse">Ellipse</option>
-          </select>}
+          />
+          <Select
+            label="Quick selection operation"
+            value={settings.quickSelectionMode}
+            disabled={documentBusy}
+            options={["replace", "add", "subtract", "intersect"]}
+            onChange={(value) =>
+              controller.configure({
+                quickSelectionMode: value as ToolSettings["quickSelectionMode"],
+              })
+            }
+          />
+          {controller.getSnapshot().quickSelectionProgress && (
+            <>
+              <progress
+                aria-label="Quick Selection progress"
+                max={controller.getSnapshot().quickSelectionProgress!.total}
+                value={
+                  controller.getSnapshot().quickSelectionProgress!.completed
+                }
+              />
+              <button
+                type="button"
+                className="button subtle compact"
+                onClick={() => controller.cancel()}
+              >
+                Cancel Quick Selection
+              </button>
+            </>
+          )}
+        </>
+      )}
+      {tool === "wand" && (
+        <>
+          <Slider
+            label="Wand tolerance"
+            value={settings.wandTolerance}
+            min={0}
+            max={255}
+            step={1}
+            onPreview={(value) =>
+              controller.configure({ wandTolerance: value })
+            }
+            onCommit={(value) => controller.configure({ wandTolerance: value })}
+          />
+          <label>
+            <input
+              type="checkbox"
+              checked={settings.wandContiguous}
+              onChange={(event) =>
+                controller.configure({ wandContiguous: event.target.checked })
+              }
+            />{" "}
+            Contiguous
+          </label>
+          <span className="tool-hint">
+            Sample selected image · Shift adds · Alt subtracts
+          </span>
+        </>
+      )}
+      {(tool === "marquee" || tool === "wand" || tool === "lasso") && (
+        <>
+          {tool === "lasso" && (
+            <>
+              <select
+                aria-label="Lasso mode"
+                value={settings.lassoMode}
+                disabled={documentBusy}
+                onChange={(event) =>
+                  controller.configure({
+                    lassoMode: event.target.value as ToolSettings["lassoMode"],
+                  })
+                }
+              >
+                <option value="freeform">Freeform</option>
+                <option value="polygon">Polygonal</option>
+              </select>
+              {settings.lassoMode === "polygon" && (
+                <button
+                  type="button"
+                  className="button subtle compact"
+                  disabled={
+                    documentBusy || controller.polygonLassoPointCount < 3
+                  }
+                  onClick={() =>
+                    onAction(() => controller.finishPolygonLasso())
+                  }
+                >
+                  Finish selection
+                </button>
+              )}
+            </>
+          )}
+          {tool === "marquee" && (
+            <select
+              aria-label="Marquee shape"
+              value={settings.selectionShape}
+              onChange={(e) =>
+                controller.configure({
+                  selectionShape: e.target
+                    .value as ToolSettings["selectionShape"],
+                })
+              }
+            >
+              <option value="rectangle">Rectangle</option>
+              <option value="ellipse">Ellipse</option>
+            </select>
+          )}
           <select
             aria-label="Selection operation"
             value={settings.selectionMode}
@@ -621,9 +863,25 @@ export function ToolOptions({
           </select>
         </>
       )}
-      {onColorRange&&['move','marquee','lasso','wand'].includes(tool)&&<button type="button" className="button subtle compact" disabled={documentBusy} onClick={onColorRange}>Color Range…</button>}
+      {onColorRange && ["move", "marquee", "lasso", "wand"].includes(tool) && (
+        <button
+          type="button"
+          className="button subtle compact"
+          disabled={documentBusy}
+          onClick={onColorRange}
+        >
+          Color Range…
+        </button>
+      )}
       {hasSelection && tool !== "crop" && (
-        <button type="button" className="button subtle compact" disabled={documentBusy} onClick={onModifySelection}>Modify selection…</button>
+        <button
+          type="button"
+          className="button subtle compact"
+          disabled={documentBusy}
+          onClick={onModifySelection}
+        >
+          Modify selection…
+        </button>
       )}
       {hasSelection && tool !== "crop" && (
         <button
@@ -676,34 +934,48 @@ export function ToolOptions({
           Resize artboard...
         </button>
       )}
-        {onOpenImageSize && <button type="button" className="button subtle compact" disabled={documentBusy} onClick={onOpenImageSize}>Image size…</button>}
+      {onOpenImageSize && (
+        <button
+          type="button"
+          className="button subtle compact"
+          disabled={documentBusy}
+          onClick={onOpenImageSize}
+        >
+          Image size…
+        </button>
+      )}
       <span className="tool-hint">
-        {tool==='quick-select'?'Paint inside the region · Release to grow along colors/edges · Alt subtracts · Esc cancels':tool === "lasso" ? settings.lassoMode === "polygon"
-          ? "Click corners · Click the first corner or Enter to finish · Backspace removes a corner · Esc cancels"
-          : "Drag to select · Shift adds · Alt subtracts · Shift+Alt intersects · Esc cancels" : tool === "crop"
-          ? "Drag a frame or its handles · Enter applies · Esc cancels · Shift constrains corners"
-          : tool === "artboard"
-            ? "Change canvas bounds without scaling artwork"
-            : tool === "text"
-              ? "Click on the canvas to place a text layer"
-              : tool === "move"
-                ? "Drag artwork or layer rows"
-                : tool === "hand"
-                  ? "Drag to pan · Scroll to zoom"
-                  : tool === "clone"
-                    ? "Alt/Option-click to sample"
-                    : tool === "pen"
-                      ? settings.penEditTarget === "mask"
-                        ? controller.drawingMaskContour
-                          ? "Click/drag anchors · Enter or first anchor closes · Esc cancels"
-                          : "Click curve to add · Alt frees handles · Arrows nudge"
-                        : hasTextPath ? 'Drag anchors/handles · Click curve to split · Alt frees handles · Arrows nudge · Esc cancels'
-                        : "Click anchors · Drag curves · Click start to close"
-                      : tool === "marquee"
-                        ? "Shift adds · Alt subtracts"
-                        : tool === "fill"
-                          ? "Click to fill canvas or active selection"
-                          : "Drag to draw · [ ] size"}
+        {tool === "quick-select"
+          ? "Paint inside the region · Release to grow along colors/edges · Alt subtracts · Esc cancels"
+          : tool === "lasso"
+            ? settings.lassoMode === "polygon"
+              ? "Click corners · Click the first corner or Enter to finish · Backspace removes a corner · Esc cancels"
+              : "Drag to select · Shift adds · Alt subtracts · Shift+Alt intersects · Esc cancels"
+            : tool === "crop"
+              ? "Drag a frame or its handles · Enter applies · Esc cancels · Shift constrains corners"
+              : tool === "artboard"
+                ? "Change canvas bounds without scaling artwork"
+                : tool === "text"
+                  ? "Click on the canvas to place a text layer"
+                  : tool === "move"
+                    ? "Drag artwork or layer rows"
+                    : tool === "hand"
+                      ? "Drag to pan · Scroll to zoom"
+                      : tool === "clone"
+                        ? "Alt/Option-click to sample"
+                        : tool === "pen"
+                          ? settings.penEditTarget === "mask"
+                            ? controller.drawingMaskContour
+                              ? "Click/drag anchors · Enter or first anchor closes · Esc cancels"
+                              : "Click curve to add · Alt frees handles · Arrows nudge"
+                            : hasTextPath
+                              ? "Drag anchors/handles · Click curve to split · Alt frees handles · Arrows nudge · Esc cancels"
+                              : "Click anchors · Drag curves · Click start to close"
+                          : tool === "marquee"
+                            ? "Shift adds · Alt subtracts"
+                            : tool === "fill"
+                              ? "Click to fill canvas or active selection"
+                              : "Drag to draw · [ ] size"}
       </span>
     </div>
   );
@@ -725,7 +997,7 @@ export function PathProperties({
   onAction(action: () => void): void;
   onPreview(command: EditorCommand): void;
   previewStrokeWidth?: number;
-  previewGradient?:VectorGradientData|null;
+  previewGradient?: VectorGradientData | null;
 }) {
   if (!path)
     return (
@@ -756,21 +1028,50 @@ export function PathProperties({
         />
         Closed path
       </label>
-      <Select label="Path fill rule" value={path.fillRule} options={["nonzero", "evenodd"]} disabled={disabled} onChange={value => onAction(() => { path.fillRule = value as "nonzero" | "evenodd"; })} />
-      {path.subpaths.length > 0 && <details><summary>{path.subpaths.length + 1} editable contours</summary>
-        <p className="section-description">Use the Pen tool to move any contour's anchors and handles. All contours share this path's paint.</p>
-        {[...path.subpaths].map((contour, index) => <Button key={contour.id} variant="subtle" size="sm" disabled={disabled} onClick={() => onAction(() => contour.remove())}>Remove contour {index + 2}</Button>)}
-      </details>}
+      <Select
+        label="Path fill rule"
+        value={path.fillRule}
+        options={["nonzero", "evenodd"]}
+        disabled={disabled}
+        onChange={(value) =>
+          onAction(() => {
+            path.fillRule = value as "nonzero" | "evenodd";
+          })
+        }
+      />
+      {path.subpaths.length > 0 && (
+        <details>
+          <summary>{path.subpaths.length + 1} editable contours</summary>
+          <p className="section-description">
+            Use the Pen tool to move any contour's anchors and handles. All
+            contours share this path's paint.
+          </p>
+          {[...path.subpaths].map((contour, index) => (
+            <Button
+              key={contour.id}
+              variant="subtle"
+              size="sm"
+              disabled={disabled}
+              onClick={() => onAction(() => contour.remove())}
+            >
+              Remove contour {index + 2}
+            </Button>
+          ))}
+        </details>
+      )}
       <div className="style-color-row">
         <label className="check-field">
           <input
             type="checkbox"
             aria-label="Path fill enabled"
-            checked={!!(path.fill||path.fillGradient)}
+            checked={!!(path.fill || path.fillGradient)}
             disabled={disabled}
             onChange={(e) =>
               onAction(() => {
-                path.update({fill:e.target.checked?"#d5e79b":null,fillGradient:null});
+                path.update({
+                  fill: e.target.checked ? "#d5e79b" : null,
+                  fillGradient: null,
+                });
               })
             }
           />
@@ -787,7 +1088,21 @@ export function PathProperties({
           }
         />
       </div>
-      <VectorGradientControls key={`gradient:${path.id}`} path={path} disabled={disabled} onAction={onAction} previewGradient={previewGradient} onPreview={fillGradient=>onPreview({type:"path.update",id:layer.id,pathId:path.id,patch:{fillGradient}})}/>
+      <VectorGradientControls
+        key={`gradient:${path.id}`}
+        path={path}
+        disabled={disabled}
+        onAction={onAction}
+        previewGradient={previewGradient}
+        onPreview={(fillGradient) =>
+          onPreview({
+            type: "path.update",
+            id: layer.id,
+            pathId: path.id,
+            patch: { fillGradient },
+          })
+        }
+      />
       <div className="style-color-row">
         <label className="check-field">
           <input
@@ -838,10 +1153,15 @@ export function PathProperties({
           })
         }
       />
-      <VectorStrokeControls key={`stroke:${path.id}`} path={path} disabled={disabled} onAction={onAction}/>
+      <VectorStrokeControls
+        key={`stroke:${path.id}`}
+        path={path}
+        disabled={disabled}
+        onAction={onAction}
+      />
       <p className="section-description">
-        {anchorCount} anchors · Pen tool moves anchors and handles.
-        Alt/Option moves one handle independently.
+        {anchorCount} anchors · Pen tool moves anchors and handles. Alt/Option
+        moves one handle independently.
       </p>
       <button
         className="button subtle compact"

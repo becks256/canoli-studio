@@ -69,25 +69,25 @@ open, including slower observations below.
 
 ### Pair 1 — baseline then candidate
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 74.3 → 76.2 ms | 101.1 → 102.1 ms |
-| Affine ordinary mask | 76.8 → 80.0 ms | 118.8 → 107.0 ms |
-| Affine filter mask | 95.7 → 84.7 ms | 122.0 → 120.2 ms |
-| Projected raster | 104.5 → 117.5 ms | 149.2 → 146.4 ms |
-| Projected ordinary mask | 129.8 → 116.4 ms | 179.5 → 179.3 ms |
-| Projected filter mask | 133.2 → 131.1 ms | 216.1 → 233.1 ms |
+| Target                  | Median before → after | P95 before → after |
+| ----------------------- | --------------------: | -----------------: |
+| Affine raster           |        74.3 → 76.2 ms |   101.1 → 102.1 ms |
+| Affine ordinary mask    |        76.8 → 80.0 ms |   118.8 → 107.0 ms |
+| Affine filter mask      |        95.7 → 84.7 ms |   122.0 → 120.2 ms |
+| Projected raster        |      104.5 → 117.5 ms |   149.2 → 146.4 ms |
+| Projected ordinary mask |      129.8 → 116.4 ms |   179.5 → 179.3 ms |
+| Projected filter mask   |      133.2 → 131.1 ms |   216.1 → 233.1 ms |
 
 ### Pair 2 — candidate then baseline
 
-| Target | Median before → after | P95 before → after |
-| --- | ---: | ---: |
-| Affine raster | 82.0 → 70.9 ms | 96.2 → 90.4 ms |
-| Affine ordinary mask | 90.5 → 75.7 ms | 129.8 → 101.8 ms |
-| Affine filter mask | 87.5 → 91.2 ms | 116.5 → 126.1 ms |
-| Projected raster | 100.1 → 138.5 ms | 149.0 → 183.4 ms |
-| Projected ordinary mask | 117.2 → 121.9 ms | 161.8 → 180.0 ms |
-| Projected filter mask | 134.4 → 134.4 ms | 229.4 → 231.1 ms |
+| Target                  | Median before → after | P95 before → after |
+| ----------------------- | --------------------: | -----------------: |
+| Affine raster           |        82.0 → 70.9 ms |     96.2 → 90.4 ms |
+| Affine ordinary mask    |        90.5 → 75.7 ms |   129.8 → 101.8 ms |
+| Affine filter mask      |        87.5 → 91.2 ms |   116.5 → 126.1 ms |
+| Projected raster        |      100.1 → 138.5 ms |   149.0 → 183.4 ms |
+| Projected ordinary mask |      117.2 → 121.9 ms |   161.8 → 180.0 ms |
+| Projected filter mask   |      134.4 → 134.4 ms |   229.4 → 231.1 ms |
 
 Projected-raster medians worsen in both ordinary pairs (104.5→117.5 ms and
 100.1→138.5 ms); other controls vary. A separate matched CPU-profile pair has

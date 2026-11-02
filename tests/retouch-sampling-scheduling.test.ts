@@ -4,9 +4,14 @@ import { sampleRetouchRegion } from "../src/engine/retouch-sampling";
 import type { AssetStore } from "../src/core/assets";
 import type { DocumentRenderer } from "../src/engine/renderer";
 
-const pause = vi.hoisted(() => ({ resume: undefined as undefined | (() => void) }));
+const pause = vi.hoisted(() => ({
+  resume: undefined as undefined | (() => void),
+}));
 vi.mock("../src/engine/task-yield", () => ({
-  yieldTask: () => new Promise<void>(resolve => { pause.resume = resolve; }),
+  yieldTask: () =>
+    new Promise<void>((resolve) => {
+      pause.resume = resolve;
+    }),
 }));
 
 it("releases capture surfaces and honors cancellation between expensive tiles", async () => {
@@ -15,14 +20,24 @@ it("releases capture surfaces and honors cancellation between expensive tiles", 
   let now = 0;
   const clock = vi.spyOn(performance, "now").mockImplementation(() => now);
   const canvas = {
-    width: 1024, height: 1,
-    getContext: () => ({ getImageData: () => ({ data: new Uint8ClampedArray(4096) }) }),
+    width: 1024,
+    height: 1,
+    getContext: () => ({
+      getImageData: () => ({ data: new Uint8ClampedArray(4096) }),
+    }),
   };
-  const render = vi.fn(async () => { now += 10; return canvas; });
+  const render = vi.fn(async () => {
+    now += 10;
+    return canvas;
+  });
   try {
-    const capture = sampleRetouchRegion(document, {} as AssetStore,
+    const capture = sampleRetouchRegion(
+      document,
+      {} as AssetStore,
       { render } as unknown as DocumentRenderer,
-      { x: 0, y: 0, width: 1025, height: 1 }, controller.signal);
+      { x: 0, y: 0, width: 1025, height: 1 },
+      controller.signal,
+    );
     await Promise.resolve();
     expect(pause.resume).toBeTypeOf("function");
     expect(canvas.width).toBe(0);

@@ -1357,24 +1357,13 @@
             "id": "",
             "name": "",
             "testDir": "/home/kestrel/projects/luma-editor/tests",
-            "testIgnore": [
-              "**/production.e2e.ts"
-            ],
-            "testMatch": [
-              "**/*.e2e.ts"
-            ],
+            "testIgnore": ["**/production.e2e.ts"],
+            "testMatch": ["**/*.e2e.ts"],
             "timeout": 120000
           }
         ],
         "quiet": false,
-        "reporter": [
-          [
-            "line"
-          ],
-          [
-            "json"
-          ]
-        ],
+        "reporter": [["line"], ["json"]],
         "reportSlowTests": {
           "max": 5,
           "threshold": 300000
@@ -15612,133 +15601,33 @@
           "channel": "alpha",
           "invert": false,
           "expected": [
-            [
-              255,
-              0,
-              0,
-              255
-            ],
-            [
-              255,
-              0,
-              0,
-              255
-            ],
-            [
-              255,
-              0,
-              0,
-              128
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ]
+            [255, 0, 0, 255],
+            [255, 0, 0, 255],
+            [255, 0, 0, 128],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
           ],
           "result": {
             "native": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                128
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [255, 0, 0, 255],
+              [255, 0, 0, 128],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "svg": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                128
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [255, 0, 0, 255],
+              [255, 0, 0, 128],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "reopened": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                128
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [255, 0, 0, 255],
+              [255, 0, 0, 128],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "sameSource": true,
             "sameModel": true,
@@ -15759,133 +15648,33 @@
           "channel": "alpha",
           "invert": true,
           "expected": [
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              255,
-              0,
-              0,
-              127
-            ],
-            [
-              255,
-              0,
-              0,
-              255
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ]
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [255, 0, 0, 127],
+            [255, 0, 0, 255],
+            [0, 0, 0, 0]
           ],
           "result": {
             "native": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                127
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [255, 0, 0, 127],
+              [255, 0, 0, 255],
+              [0, 0, 0, 0]
             ],
             "svg": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                127
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [255, 0, 0, 127],
+              [255, 0, 0, 255],
+              [0, 0, 0, 0]
             ],
             "reopened": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                127
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [255, 0, 0, 127],
+              [255, 0, 0, 255],
+              [0, 0, 0, 0]
             ],
             "sameSource": true,
             "sameModel": true,
@@ -15906,133 +15695,33 @@
           "channel": "luminance",
           "invert": false,
           "expected": [
-            [
-              255,
-              0,
-              0,
-              255
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              255,
-              0,
-              0,
-              101
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ]
+            [255, 0, 0, 255],
+            [0, 0, 0, 0],
+            [255, 0, 0, 101],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
           ],
           "result": {
             "native": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                101
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [0, 0, 0, 0],
+              [255, 0, 0, 101],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "svg": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                101
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [0, 0, 0, 0],
+              [255, 0, 0, 101],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "reopened": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                101
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [0, 0, 0, 0],
+              [255, 0, 0, 101],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "sameSource": true,
             "sameModel": true,
@@ -16053,133 +15742,33 @@
           "channel": "luminance",
           "invert": true,
           "expected": [
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              255,
-              0,
-              0,
-              255
-            ],
-            [
-              255,
-              0,
-              0,
-              27
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ],
-            [
-              0,
-              0,
-              0,
-              0
-            ]
+            [0, 0, 0, 0],
+            [255, 0, 0, 255],
+            [255, 0, 0, 27],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
           ],
           "result": {
             "native": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                27
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [255, 0, 0, 255],
+              [255, 0, 0, 27],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "svg": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                27
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [255, 0, 0, 255],
+              [255, 0, 0, 27],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "reopened": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                27
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [255, 0, 0, 255],
+              [255, 0, 0, 27],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "sameSource": true,
             "sameModel": true,
@@ -16203,14 +15792,8 @@
           "undoPixels": true,
           "sourceHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
           "reopenedHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
-          "sourceSize": [
-            10000,
-            5000
-          ],
-          "documentSize": [
-            10000,
-            5000
-          ],
+          "sourceSize": [10000, 5000],
+          "documentSize": [10000, 5000],
           "projectModel": true,
           "projectPixels": true
         }
@@ -16419,10 +16002,7 @@
           "cases": [
             {
               "sha256": "e5ae72385d314ef371b058c5b897ea20b8ad65890f36f582e74001bea31230c5",
-              "size": [
-                96,
-                64
-              ],
+              "size": [96, 64],
               "preview": {
                 "maxPremultipliedRgbError": 0.9960784313725526,
                 "maxAlphaError": 0.0
@@ -16434,36 +16014,21 @@
               "layers": [
                 {
                   "name": "Merged through Gradient",
-                  "bbox": [
-                    0,
-                    0,
-                    96,
-                    64
-                  ],
+                  "bbox": [0, 0, 96, 64],
                   "visible": true,
                   "opacity": 255,
                   "blendMode": "norm"
                 },
                 {
                   "name": "Top pixel layer",
-                  "bbox": [
-                    0,
-                    0,
-                    96,
-                    64
-                  ],
+                  "bbox": [0, 0, 96, 64],
                   "visible": true,
                   "opacity": 153,
                   "blendMode": "mul "
                 },
                 {
                   "name": "Hidden work",
-                  "bbox": [
-                    0,
-                    0,
-                    96,
-                    64
-                  ],
+                  "bbox": [0, 0, 96, 64],
                   "visible": false,
                   "opacity": 255,
                   "blendMode": "norm"
@@ -16472,10 +16037,7 @@
             },
             {
               "sha256": "2657fde8054bb5fa0dac91de1019d14cc3523d7cc9f1d0e8e2aa97d226762160",
-              "size": [
-                96,
-                64
-              ],
+              "size": [96, 64],
               "preview": {
                 "maxPremultipliedRgbError": 0.9960784313725526,
                 "maxAlphaError": 0.0
@@ -16487,12 +16049,7 @@
               "layers": [
                 {
                   "name": "Untitled",
-                  "bbox": [
-                    0,
-                    0,
-                    96,
-                    64
-                  ],
+                  "bbox": [0, 0, 96, 64],
                   "visible": true,
                   "opacity": 255,
                   "blendMode": "norm"
@@ -16705,14 +16262,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -16758,14 +16309,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -16811,14 +16356,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -16864,14 +16403,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -16917,14 +16450,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -16970,14 +16497,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17023,14 +16544,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17076,14 +16591,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17130,14 +16639,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17184,14 +16687,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17237,14 +16734,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17290,14 +16781,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17343,14 +16828,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17396,14 +16875,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            173,
-            211
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [173, 211],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17449,14 +16922,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            173,
-            211
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [173, 211],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17502,14 +16969,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            173,
-            211
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [173, 211],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17555,14 +17016,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            173,
-            211
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [173, 211],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17608,14 +17063,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17661,14 +17110,8 @@
         "data": {
           "alpha": 0,
           "premult": 0,
-          "size": [
-            211,
-            173
-          ],
-          "rawSize": [
-            211,
-            173
-          ],
+          "size": [211, 173],
+          "rawSize": [211, 173],
           "sourceUnchanged": true,
           "sourceType": "image/tiff",
           "modelRestored": true,
@@ -17742,72 +17185,14 @@
               "allowPrecisionLoss": false
             },
             "png": [
-              125,
-              62,
-              126,
-              114,
-              20,
-              26,
-              70,
-              188,
-              138,
-              49,
-              205,
-              80,
-              190,
-              119,
-              157,
-              219,
-              1,
-              85,
-              65,
-              39,
-              21,
-              183,
-              206,
-              241,
-              223,
-              53,
-              229,
-              249,
-              49,
-              81,
-              20,
-              96
+              125, 62, 126, 114, 20, 26, 70, 188, 138, 49, 205, 80, 190, 119,
+              157, 219, 1, 85, 65, 39, 21, 183, 206, 241, 223, 53, 229, 249, 49,
+              81, 20, 96
             ],
             "source": [
-              204,
-              248,
-              157,
-              79,
-              102,
-              24,
-              122,
-              91,
-              6,
-              204,
-              17,
-              31,
-              55,
-              107,
-              158,
-              33,
-              63,
-              66,
-              176,
-              178,
-              218,
-              121,
-              50,
-              139,
-              163,
-              112,
-              129,
-              34,
-              65,
-              39,
-              21,
-              249
+              204, 248, 157, 79, 102, 24, 122, 91, 6, 204, 17, 31, 55, 107, 158,
+              33, 63, 66, 176, 178, 218, 121, 50, 139, 163, 112, 129, 34, 65,
+              39, 21, 249
             ]
           },
           "integrity": {
@@ -17831,14 +17216,8 @@
             "importMs": 4318.799999982119,
             "frames": 256,
             "lastProgress": 1,
-            "size": [
-              10000,
-              5000
-            ],
-            "sourceSize": [
-              10000,
-              5000
-            ],
+            "size": [10000, 5000],
+            "sourceSize": [10000, 5000],
             "originalHash": "[233,40,241,171,160,66,110,145,190,111,1,231,34,165,200,247,104,144,2,93,225,129,215,70,47,116,232,188,143,136,62,212]",
             "restoredHash": "[233,40,241,171,160,66,110,145,190,111,1,231,34,165,200,247,104,144,2,93,225,129,215,70,47,116,232,188,143,136,62,212]",
             "modelRestored": true
@@ -18006,21 +17385,12 @@
             "name": "",
             "testDir": "/home/kestrel/projects/luma-editor/tests",
             "testIgnore": [],
-            "testMatch": [
-              "**/production.e2e.ts"
-            ],
+            "testMatch": ["**/production.e2e.ts"],
             "timeout": 120000
           }
         ],
         "quiet": false,
-        "reporter": [
-          [
-            "line"
-          ],
-          [
-            "json"
-          ]
-        ],
+        "reporter": [["line"], ["json"]],
         "reportSlowTests": {
           "max": 5,
           "threshold": 300000
@@ -21281,18 +20651,8 @@
             "patchMode": "source"
           },
           "nativeAlphaReference": {
-            "flow": [
-              255,
-              0,
-              0,
-              77
-            ],
-            "output": [
-              255,
-              0,
-              0,
-              30
-            ]
+            "flow": [255, 0, 0, 77],
+            "output": [255, 0, 0, 30]
           },
           "sourceIndependentProject": true,
           "exactUndo": true,
@@ -21445,17 +20805,9 @@
                 "masks": [
                   {
                     "name": "Outer \u03a9",
-                    "bounds": [
-                      0,
-                      0,
-                      32,
-                      24
-                    ],
+                    "bounds": [0, 0, 32, 24],
                     "disabled": false,
-                    "extrema": [
-                      0,
-                      255
-                    ]
+                    "extrema": [0, 255]
                   }
                 ],
                 "sha256": "34138b2fbde0524b80176c9612b5e82a8d25ec74858ef36223146991ecf01c76"
@@ -21578,17 +20930,9 @@
                 "masks": [
                   {
                     "name": "Outer \u03a9",
-                    "bounds": [
-                      0,
-                      0,
-                      32,
-                      24
-                    ],
+                    "bounds": [0, 0, 32, 24],
                     "disabled": false,
-                    "extrema": [
-                      0,
-                      255
-                    ]
+                    "extrema": [0, 255]
                   }
                 ],
                 "sha256": "5602c094c987a8443d0fe8dbab883ab4c9a404c1e2a361e94e7769bfdbcbfc76"
@@ -21674,17 +21018,9 @@
                 "masks": [
                   {
                     "name": "Native folder",
-                    "bounds": [
-                      0,
-                      0,
-                      32,
-                      24
-                    ],
+                    "bounds": [0, 0, 32, 24],
                     "disabled": false,
-                    "extrema": [
-                      0,
-                      255
-                    ]
+                    "extrema": [0, 255]
                   }
                 ],
                 "sha256": "a41ce1ef7a131966c7f83833c7e4595dd302d40016172646d1c890a3990e7f0b"
@@ -21750,17 +21086,9 @@
                 "masks": [
                   {
                     "name": "Native folder",
-                    "bounds": [
-                      0,
-                      0,
-                      32,
-                      24
-                    ],
+                    "bounds": [0, 0, 32, 24],
                     "disabled": false,
-                    "extrema": [
-                      0,
-                      255
-                    ]
+                    "extrema": [0, 255]
                   }
                 ],
                 "sha256": "d1cde45e2156ac2d46f007dccb9090df6c7f90800e2fc31307798c224340e40b"
@@ -22216,24 +21544,14 @@
               "layers": [
                 {
                   "name": "PSB artwork",
-                  "bbox": [
-                    0,
-                    0,
-                    38417,
-                    160
-                  ],
+                  "bbox": [0, 0, 38417, 160],
                   "visible": true,
                   "opacity": 255,
                   "blendMode": "norm"
                 },
                 {
                   "name": "PSB caption",
-                  "bbox": [
-                    0,
-                    0,
-                    38417,
-                    160
-                  ],
+                  "bbox": [0, 0, 38417, 160],
                   "visible": true,
                   "opacity": 255,
                   "blendMode": "norm"
@@ -22256,12 +21574,7 @@
               "layers": [
                 {
                   "name": "Untitled",
-                  "bbox": [
-                    0,
-                    0,
-                    38417,
-                    160
-                  ],
+                  "bbox": [0, 0, 38417, 160],
                   "visible": true,
                   "opacity": 255,
                   "blendMode": "norm"
@@ -22296,10 +21609,7 @@
             "width": 2081,
             "height": 160,
             "dpi": 72,
-            "pagePoints": [
-              2081,
-              160
-            ],
+            "pagePoints": [2081, 160],
             "tiles": 1,
             "storedRgbaExact": true,
             "renderAlphaError": 1,
@@ -22313,10 +21623,7 @@
             "width": 2081,
             "height": 160,
             "dpi": 300,
-            "pagePoints": [
-              499.44000244140625,
-              38.400001525878906
-            ],
+            "pagePoints": [499.44000244140625, 38.400001525878906],
             "tiles": 1,
             "storedRgbaExact": true,
             "renderAlphaError": 1,
@@ -22340,18 +21647,13 @@
             {
               "path": "/tmp/canoli-brush-texture-authoring-production-accepted-results/production.e2e.ts-producti-ab04d--after-save-undo-and-reopen/auto.tif",
               "sha256": "da73881c516b6bd15ca13ed0ff4b79071f4666d4798f9a87ccd9f652f11baadc",
-              "size": [
-                2081,
-                160
-              ],
+              "size": [2081, 160],
               "magic": 42,
               "tileWidth": 2048,
               "tileHeight": 64,
               "tiles": 6,
               "compression": 8,
-              "extraSamples": [
-                2
-              ],
+              "extraSamples": [2],
               "profileName": "sRGB IEC61966-2.1",
               "profileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
               "maxRgbaError": 0,
@@ -22361,18 +21663,13 @@
             {
               "path": "/tmp/canoli-brush-texture-authoring-production-accepted-results/production.e2e.ts-producti-ab04d--after-save-undo-and-reopen/classic.tif",
               "sha256": "da73881c516b6bd15ca13ed0ff4b79071f4666d4798f9a87ccd9f652f11baadc",
-              "size": [
-                2081,
-                160
-              ],
+              "size": [2081, 160],
               "magic": 42,
               "tileWidth": 2048,
               "tileHeight": 64,
               "tiles": 6,
               "compression": 8,
-              "extraSamples": [
-                2
-              ],
+              "extraSamples": [2],
               "profileName": "sRGB IEC61966-2.1",
               "profileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
               "maxRgbaError": 0,
@@ -22382,18 +21679,13 @@
             {
               "path": "/tmp/canoli-brush-texture-authoring-production-accepted-results/production.e2e.ts-producti-ab04d--after-save-undo-and-reopen/big.tif",
               "sha256": "5e7de4bff89278d2887202d5738dcfea5036adbd68ca1a82f6e70d0012b63fcc",
-              "size": [
-                2081,
-                160
-              ],
+              "size": [2081, 160],
               "magic": 43,
               "tileWidth": 2048,
               "tileHeight": 64,
               "tiles": 6,
               "compression": 8,
-              "extraSamples": [
-                2
-              ],
+              "extraSamples": [2],
               "profileName": "sRGB IEC61966-2.1",
               "profileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
               "maxRgbaError": 0,
@@ -22605,24 +21897,13 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
-              "testMatch": [
-                "**/*.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
+              "testMatch": ["**/*.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -31509,133 +30790,33 @@
             "channel": "alpha",
             "invert": false,
             "expected": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                128
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [255, 0, 0, 255],
+              [255, 0, 0, 128],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -31656,133 +30837,33 @@
             "channel": "alpha",
             "invert": true,
             "expected": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                127
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [255, 0, 0, 127],
+              [255, 0, 0, 255],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -31803,133 +30884,33 @@
             "channel": "luminance",
             "invert": false,
             "expected": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                101
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [0, 0, 0, 0],
+              [255, 0, 0, 101],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -31950,133 +30931,33 @@
             "channel": "luminance",
             "invert": true,
             "expected": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                27
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [255, 0, 0, 255],
+              [255, 0, 0, 27],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -32100,14 +30981,8 @@
             "undoPixels": true,
             "sourceHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
             "reopenedHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
-            "sourceSize": [
-              10000,
-              5000
-            ],
-            "documentSize": [
-              10000,
-              5000
-            ],
+            "sourceSize": [10000, 5000],
+            "documentSize": [10000, 5000],
             "projectModel": true,
             "projectPixels": true
           }
@@ -32361,24 +31236,13 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
-              "testMatch": [
-                "**/*.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
+              "testMatch": ["**/*.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -32559,24 +31423,13 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
-              "testMatch": [
-                "**/*.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
+              "testMatch": ["**/*.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -34139,133 +32992,33 @@
             "channel": "alpha",
             "invert": false,
             "expected": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                128
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [255, 0, 0, 255],
+              [255, 0, 0, 128],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -34286,133 +33039,33 @@
             "channel": "alpha",
             "invert": true,
             "expected": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                127
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [255, 0, 0, 127],
+              [255, 0, 0, 255],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -34433,133 +33086,33 @@
             "channel": "luminance",
             "invert": false,
             "expected": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                101
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [0, 0, 0, 0],
+              [255, 0, 0, 101],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -34580,133 +33133,33 @@
             "channel": "luminance",
             "invert": true,
             "expected": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                27
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [255, 0, 0, 255],
+              [255, 0, 0, 27],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -35113,24 +33566,13 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
-              "testMatch": [
-                "**/*.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
+              "testMatch": ["**/*.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -35972,24 +34414,13 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
-              "testMatch": [
-                "**/*.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
+              "testMatch": ["**/*.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -36172,21 +34603,12 @@
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
               "testIgnore": [],
-              "testMatch": [
-                "**/production.e2e.ts"
-              ],
+              "testMatch": ["**/production.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -36321,21 +34743,12 @@
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
               "testIgnore": [],
-              "testMatch": [
-                "**/production.e2e.ts"
-              ],
+              "testMatch": ["**/production.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -39214,18 +37627,8 @@
               "patchMode": "source"
             },
             "nativeAlphaReference": {
-              "flow": [
-                255,
-                0,
-                0,
-                77
-              ],
-              "output": [
-                255,
-                0,
-                0,
-                30
-              ]
+              "flow": [255, 0, 0, 77],
+              "output": [255, 0, 0, 30]
             },
             "sourceIndependentProject": true,
             "exactUndo": true,
@@ -39378,17 +37781,9 @@
                   "masks": [
                     {
                       "name": "Outer \u03a9",
-                      "bounds": [
-                        0,
-                        0,
-                        32,
-                        24
-                      ],
+                      "bounds": [0, 0, 32, 24],
                       "disabled": false,
-                      "extrema": [
-                        0,
-                        255
-                      ]
+                      "extrema": [0, 255]
                     }
                   ],
                   "sha256": "34138b2fbde0524b80176c9612b5e82a8d25ec74858ef36223146991ecf01c76"
@@ -39511,17 +37906,9 @@
                   "masks": [
                     {
                       "name": "Outer \u03a9",
-                      "bounds": [
-                        0,
-                        0,
-                        32,
-                        24
-                      ],
+                      "bounds": [0, 0, 32, 24],
                       "disabled": false,
-                      "extrema": [
-                        0,
-                        255
-                      ]
+                      "extrema": [0, 255]
                     }
                   ],
                   "sha256": "5602c094c987a8443d0fe8dbab883ab4c9a404c1e2a361e94e7769bfdbcbfc76"
@@ -39607,17 +37994,9 @@
                   "masks": [
                     {
                       "name": "Native folder",
-                      "bounds": [
-                        0,
-                        0,
-                        32,
-                        24
-                      ],
+                      "bounds": [0, 0, 32, 24],
                       "disabled": false,
-                      "extrema": [
-                        0,
-                        255
-                      ]
+                      "extrema": [0, 255]
                     }
                   ],
                   "sha256": "a41ce1ef7a131966c7f83833c7e4595dd302d40016172646d1c890a3990e7f0b"
@@ -39683,17 +38062,9 @@
                   "masks": [
                     {
                       "name": "Native folder",
-                      "bounds": [
-                        0,
-                        0,
-                        32,
-                        24
-                      ],
+                      "bounds": [0, 0, 32, 24],
                       "disabled": false,
-                      "extrema": [
-                        0,
-                        255
-                      ]
+                      "extrema": [0, 255]
                     }
                   ],
                   "sha256": "d1cde45e2156ac2d46f007dccb9090df6c7f90800e2fc31307798c224340e40b"
@@ -40149,24 +38520,14 @@
                 "layers": [
                   {
                     "name": "PSB artwork",
-                    "bbox": [
-                      0,
-                      0,
-                      38417,
-                      160
-                    ],
+                    "bbox": [0, 0, 38417, 160],
                     "visible": true,
                     "opacity": 255,
                     "blendMode": "norm"
                   },
                   {
                     "name": "PSB caption",
-                    "bbox": [
-                      0,
-                      0,
-                      38417,
-                      160
-                    ],
+                    "bbox": [0, 0, 38417, 160],
                     "visible": true,
                     "opacity": 255,
                     "blendMode": "norm"
@@ -40189,12 +38550,7 @@
                 "layers": [
                   {
                     "name": "Untitled",
-                    "bbox": [
-                      0,
-                      0,
-                      38417,
-                      160
-                    ],
+                    "bbox": [0, 0, 38417, 160],
                     "visible": true,
                     "opacity": 255,
                     "blendMode": "norm"
@@ -40229,10 +38585,7 @@
               "width": 2081,
               "height": 160,
               "dpi": 72,
-              "pagePoints": [
-                2081,
-                160
-              ],
+              "pagePoints": [2081, 160],
               "tiles": 1,
               "storedRgbaExact": true,
               "renderAlphaError": 1,
@@ -40246,10 +38599,7 @@
               "width": 2081,
               "height": 160,
               "dpi": 300,
-              "pagePoints": [
-                499.44000244140625,
-                38.400001525878906
-              ],
+              "pagePoints": [499.44000244140625, 38.400001525878906],
               "tiles": 1,
               "storedRgbaExact": true,
               "renderAlphaError": 1,
@@ -40273,18 +38623,13 @@
               {
                 "path": "/tmp/canoli-brush-texture-authoring-production-results/production.e2e.ts-producti-ab04d--after-save-undo-and-reopen/auto.tif",
                 "sha256": "da73881c516b6bd15ca13ed0ff4b79071f4666d4798f9a87ccd9f652f11baadc",
-                "size": [
-                  2081,
-                  160
-                ],
+                "size": [2081, 160],
                 "magic": 42,
                 "tileWidth": 2048,
                 "tileHeight": 64,
                 "tiles": 6,
                 "compression": 8,
-                "extraSamples": [
-                  2
-                ],
+                "extraSamples": [2],
                 "profileName": "sRGB IEC61966-2.1",
                 "profileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
                 "maxRgbaError": 0,
@@ -40294,18 +38639,13 @@
               {
                 "path": "/tmp/canoli-brush-texture-authoring-production-results/production.e2e.ts-producti-ab04d--after-save-undo-and-reopen/classic.tif",
                 "sha256": "da73881c516b6bd15ca13ed0ff4b79071f4666d4798f9a87ccd9f652f11baadc",
-                "size": [
-                  2081,
-                  160
-                ],
+                "size": [2081, 160],
                 "magic": 42,
                 "tileWidth": 2048,
                 "tileHeight": 64,
                 "tiles": 6,
                 "compression": 8,
-                "extraSamples": [
-                  2
-                ],
+                "extraSamples": [2],
                 "profileName": "sRGB IEC61966-2.1",
                 "profileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
                 "maxRgbaError": 0,
@@ -40315,18 +38655,13 @@
               {
                 "path": "/tmp/canoli-brush-texture-authoring-production-results/production.e2e.ts-producti-ab04d--after-save-undo-and-reopen/big.tif",
                 "sha256": "5e7de4bff89278d2887202d5738dcfea5036adbd68ca1a82f6e70d0012b63fcc",
-                "size": [
-                  2081,
-                  160
-                ],
+                "size": [2081, 160],
                 "magic": 43,
                 "tileWidth": 2048,
                 "tileHeight": 64,
                 "tiles": 6,
                 "compression": 8,
-                "extraSamples": [
-                  2
-                ],
+                "extraSamples": [2],
                 "profileName": "sRGB IEC61966-2.1",
                 "profileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
                 "maxRgbaError": 0,
@@ -40510,24 +38845,13 @@
               "id": "",
               "name": "",
               "testDir": "/home/kestrel/projects/luma-editor/tests",
-              "testIgnore": [
-                "**/production.e2e.ts"
-              ],
-              "testMatch": [
-                "**/*.e2e.ts"
-              ],
+              "testIgnore": ["**/production.e2e.ts"],
+              "testMatch": ["**/*.e2e.ts"],
               "timeout": 120000
             }
           ],
           "quiet": false,
-          "reporter": [
-            [
-              "line"
-            ],
-            [
-              "json"
-            ]
-          ],
+          "reporter": [["line"], ["json"]],
           "reportSlowTests": {
             "max": 5,
             "threshold": 300000
@@ -41515,133 +39839,33 @@
             "channel": "alpha",
             "invert": false,
             "expected": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                128
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [255, 0, 0, 255],
+              [255, 0, 0, 128],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  128
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [255, 0, 0, 255],
+                [255, 0, 0, 128],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -41662,133 +39886,33 @@
             "channel": "alpha",
             "invert": true,
             "expected": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                127
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+              [255, 0, 0, 127],
+              [255, 0, 0, 255],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  127
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [255, 0, 0, 127],
+                [255, 0, 0, 255],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -41809,133 +39933,33 @@
             "channel": "luminance",
             "invert": false,
             "expected": [
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                101
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [255, 0, 0, 255],
+              [0, 0, 0, 0],
+              [255, 0, 0, 101],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  101
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [255, 0, 0, 255],
+                [0, 0, 0, 0],
+                [255, 0, 0, 101],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -41956,133 +39980,33 @@
             "channel": "luminance",
             "invert": true,
             "expected": [
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                255,
-                0,
-                0,
-                255
-              ],
-              [
-                255,
-                0,
-                0,
-                27
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ],
-              [
-                0,
-                0,
-                0,
-                0
-              ]
+              [0, 0, 0, 0],
+              [255, 0, 0, 255],
+              [255, 0, 0, 27],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0]
             ],
             "result": {
               "native": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "svg": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "reopened": [
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  255
-                ],
-                [
-                  255,
-                  0,
-                  0,
-                  27
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ],
-                [
-                  0,
-                  0,
-                  0,
-                  0
-                ]
+                [0, 0, 0, 0],
+                [255, 0, 0, 255],
+                [255, 0, 0, 27],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
               ],
               "sameSource": true,
               "sameModel": true,
@@ -42122,14 +40046,8 @@
             "undoPixels": true,
             "sourceHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
             "reopenedHash": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
-            "sourceSize": [
-              10000,
-              5000
-            ],
-            "documentSize": [
-              10000,
-              5000
-            ],
+            "sourceSize": [10000, 5000],
+            "documentSize": [10000, 5000],
             "projectModel": true,
             "projectPixels": true
           }

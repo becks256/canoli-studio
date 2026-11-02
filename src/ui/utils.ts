@@ -1,11 +1,14 @@
-import {isVerticalText,type TextWritingProperties} from '../core/text-writing';
-import {pointerPenTilt,type PenTiltData} from '../core/brush-tip';
+import {
+  isVerticalText,
+  type TextWritingProperties,
+} from "../core/text-writing";
+import { pointerPenTilt, type PenTiltData } from "../core/brush-tip";
 import type { AffineTransform } from "../core/affine";
 import type { LayerPatch } from "../core/commands";
 import type { Point, Rect } from "../core/drawing";
 import { measureTextBounds } from "../core/model";
-import type {TextStyle} from '../core/text-style';
-import type {CharacterRangeData} from '../core/text-ranges';
+import type { TextStyle } from "../core/text-style";
+import type { CharacterRangeData } from "../core/text-ranges";
 
 /**
  * Triggers a browser file download using an ephemeral object URL anchor.
@@ -36,7 +39,15 @@ export interface ResizeDragState {
   layerText?: string;
   layerFontFamily?: string;
   layerLineHeight?: number;
-  layerTextStyle?: TextStyle&TextWritingProperties&{textFrameOrigin?:{x:number;y:number};textPath?:import('../core/text-path').TextPathData|null;textPathOrigin?:{x:number;y:number};characterRanges?:readonly CharacterRangeData[];color?:string;align?:'left'|'center'|'right'};
+  layerTextStyle?: TextStyle &
+    TextWritingProperties & {
+      textFrameOrigin?: { x: number; y: number };
+      textPath?: import("../core/text-path").TextPathData | null;
+      textPathOrigin?: { x: number; y: number };
+      characterRanges?: readonly CharacterRangeData[];
+      color?: string;
+      align?: "left" | "center" | "right";
+    };
   layerKind: "raster" | "text";
   /** Expanded ink bounds; logical image geometry still addresses its source. */
   layerContentBounds?: Rect;
@@ -74,14 +85,31 @@ export function computeResizePatch(
         transforms.local.d * offsetY,
     };
   }
-  if (drag.layerKind === 'raster' && drag.layerContentBounds) {
+  if (drag.layerKind === "raster" && drag.layerContentBounds) {
     const bounds = drag.layerContentBounds;
-    const frame = computeResizePatch({ ...drag, layerContentBounds: undefined, layerWidth: bounds.width, layerHeight: bounds.height }, dx, dy, shiftKey);
+    const frame = computeResizePatch(
+      {
+        ...drag,
+        layerContentBounds: undefined,
+        layerWidth: bounds.width,
+        layerHeight: bounds.height,
+      },
+      dx,
+      dy,
+      shiftKey,
+    );
     const minimum = Math.max(1 / drag.layerWidth, 1 / drag.layerHeight);
-    let sx = Math.max(1 / drag.layerWidth, frame.width! / bounds.width), sy = Math.max(1 / drag.layerHeight, frame.height! / bounds.height);
+    let sx = Math.max(1 / drag.layerWidth, frame.width! / bounds.width),
+      sy = Math.max(1 / drag.layerHeight, frame.height! / bounds.height);
     if (shiftKey) sx = sy = Math.max(minimum, sx, sy);
-    const anchorX = bounds.x + (drag.handle.includes('w') ? bounds.width : 0), anchorY = bounds.y + (drag.handle.includes('n') ? bounds.height : 0);
-    return { width: drag.layerWidth * sx, height: drag.layerHeight * sy, x: drag.layerX + anchorX * (1 - sx), y: drag.layerY + anchorY * (1 - sy) };
+    const anchorX = bounds.x + (drag.handle.includes("w") ? bounds.width : 0),
+      anchorY = bounds.y + (drag.handle.includes("n") ? bounds.height : 0);
+    return {
+      width: drag.layerWidth * sx,
+      height: drag.layerHeight * sy,
+      x: drag.layerX + anchorX * (1 - sx),
+      y: drag.layerY + anchorY * (1 - sy),
+    };
   }
   const {
     handle,
@@ -149,14 +177,55 @@ export function computeResizePatch(
   newWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newWidth));
   newHeight = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newHeight));
 
-  if (layerKind === "text" && layerFontSize && (layerText || drag.layerTextStyle?.wrapWidth != null||drag.layerTextStyle?.textPath||isVerticalText(drag.layerTextStyle??{}))) {
+  if (
+    layerKind === "text" &&
+    layerFontSize &&
+    (layerText ||
+      drag.layerTextStyle?.wrapWidth != null ||
+      drag.layerTextStyle?.textPath ||
+      isVerticalText(drag.layerTextStyle ?? {}))
+  ) {
     if (drag.layerTextStyle?.wrapWidth != null) {
-      const vertical=isVerticalText(drag.layerTextStyle),wrapWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, vertical?drag.layerTextStyle.wrapWidth+effectiveDy:layerWidth+effectiveDx));
-      const bounds = measureTextBounds(layerText??'', layerFontSize, layerFontFamily??'sans-serif', layerLineHeight??1.2, {...drag.layerTextStyle, wrapWidth});
-      const before=drag.layerTextStyle.textFrameOrigin??{x:0,y:0},after=bounds.origin??{x:0,y:0};
-      return {wrapWidth,
-        x: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='sw'?layerX+layerWidth-bounds.width+before.x-after.x:layerX+before.x-after.x)),
-        y: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='ne'?layerY+layerHeight-bounds.height+before.y-after.y:layerY+before.y-after.y))};
+      const vertical = isVerticalText(drag.layerTextStyle),
+        wrapWidth = Math.max(
+          1,
+          Math.min(
+            Number.MAX_SAFE_INTEGER,
+            vertical
+              ? drag.layerTextStyle.wrapWidth + effectiveDy
+              : layerWidth + effectiveDx,
+          ),
+        );
+      const bounds = measureTextBounds(
+        layerText ?? "",
+        layerFontSize,
+        layerFontFamily ?? "sans-serif",
+        layerLineHeight ?? 1.2,
+        { ...drag.layerTextStyle, wrapWidth },
+      );
+      const before = drag.layerTextStyle.textFrameOrigin ?? { x: 0, y: 0 },
+        after = bounds.origin ?? { x: 0, y: 0 };
+      return {
+        wrapWidth,
+        x: Math.max(
+          -Number.MAX_SAFE_INTEGER,
+          Math.min(
+            Number.MAX_SAFE_INTEGER,
+            handle === "nw" || handle === "sw"
+              ? layerX + layerWidth - bounds.width + before.x - after.x
+              : layerX + before.x - after.x,
+          ),
+        ),
+        y: Math.max(
+          -Number.MAX_SAFE_INTEGER,
+          Math.min(
+            Number.MAX_SAFE_INTEGER,
+            handle === "nw" || handle === "ne"
+              ? layerY + layerHeight - bounds.height + before.y - after.y
+              : layerY + before.y - after.y,
+          ),
+        ),
+      };
     }
     const scale =
       Math.abs(effectiveDx) > Math.abs(effectiveDy)
@@ -170,14 +239,50 @@ export function computeResizePatch(
         Math.round(layerFontSize * clampedScale),
       ),
     );
-    const characterRanges=drag.layerTextStyle?.characterRanges?.map(range=>({...range,format:{...range.format,...(range.format.fontSize===undefined?{}:{fontSize:Math.max(1,Math.min(Number.MAX_SAFE_INTEGER,range.format.fontSize*newFontSize/layerFontSize))})}}));
-    const originalPath=drag.layerTextStyle?.textPath,ratio=newFontSize/layerFontSize,textPath=originalPath?{...originalPath,startOffset:originalPath.startOffset*ratio,baselineOffset:originalPath.baselineOffset*ratio,points:originalPath.points.map(p=>({x:p.x*ratio,y:p.y*ratio,in:{x:p.in.x*ratio,y:p.in.y*ratio},out:{x:p.out.x*ratio,y:p.out.y*ratio}}))}:undefined;
+    const characterRanges = drag.layerTextStyle?.characterRanges?.map(
+      (range) => ({
+        ...range,
+        format: {
+          ...range.format,
+          ...(range.format.fontSize === undefined
+            ? {}
+            : {
+                fontSize: Math.max(
+                  1,
+                  Math.min(
+                    Number.MAX_SAFE_INTEGER,
+                    (range.format.fontSize * newFontSize) / layerFontSize,
+                  ),
+                ),
+              }),
+        },
+      }),
+    );
+    const originalPath = drag.layerTextStyle?.textPath,
+      ratio = newFontSize / layerFontSize,
+      textPath = originalPath
+        ? {
+            ...originalPath,
+            startOffset: originalPath.startOffset * ratio,
+            baselineOffset: originalPath.baselineOffset * ratio,
+            points: originalPath.points.map((p) => ({
+              x: p.x * ratio,
+              y: p.y * ratio,
+              in: { x: p.in.x * ratio, y: p.in.y * ratio },
+              out: { x: p.out.x * ratio, y: p.out.y * ratio },
+            })),
+          }
+        : undefined;
     const newBounds = measureTextBounds(
-      layerText??'',
+      layerText ?? "",
       newFontSize,
       layerFontFamily ?? "sans-serif",
       layerLineHeight ?? 1.2,
-      {...drag.layerTextStyle,...(textPath?{textPath}:{}),...(characterRanges===undefined?{}:{characterRanges})},
+      {
+        ...drag.layerTextStyle,
+        ...(textPath ? { textPath } : {}),
+        ...(characterRanges === undefined ? {} : { characterRanges }),
+      },
     );
     let textX = layerX;
     let textY = layerY;
@@ -187,19 +292,35 @@ export function computeResizePatch(
     if (handle === "nw" || handle === "ne") {
       textY = layerY + layerHeight - newBounds.height;
     }
-    if(textPath||isVerticalText(drag.layerTextStyle??{})){const before=drag.layerTextStyle?.textPathOrigin??drag.layerTextStyle?.textFrameOrigin??{x:0,y:0},after=newBounds.origin??{x:0,y:0};textX+=before.x-after.x;textY+=before.y-after.y;}
+    if (textPath || isVerticalText(drag.layerTextStyle ?? {})) {
+      const before = drag.layerTextStyle?.textPathOrigin ??
+          drag.layerTextStyle?.textFrameOrigin ?? { x: 0, y: 0 },
+        after = newBounds.origin ?? { x: 0, y: 0 };
+      textX += before.x - after.x;
+      textY += before.y - after.y;
+    }
     return {
-      ...(textPath?{textPath}:{}),
+      ...(textPath ? { textPath } : {}),
       x: Math.max(
         -Number.MAX_SAFE_INTEGER,
-        Math.min(Number.MAX_SAFE_INTEGER, (textPath||isVerticalText(drag.layerTextStyle??{})?textX:Math.round(textX))),
+        Math.min(
+          Number.MAX_SAFE_INTEGER,
+          textPath || isVerticalText(drag.layerTextStyle ?? {})
+            ? textX
+            : Math.round(textX),
+        ),
       ),
       y: Math.max(
         -Number.MAX_SAFE_INTEGER,
-        Math.min(Number.MAX_SAFE_INTEGER, (textPath||isVerticalText(drag.layerTextStyle??{})?textY:Math.round(textY))),
+        Math.min(
+          Number.MAX_SAFE_INTEGER,
+          textPath || isVerticalText(drag.layerTextStyle ?? {})
+            ? textY
+            : Math.round(textY),
+        ),
       ),
       fontSize: newFontSize,
-      ...(characterRanges===undefined?{}:{characterRanges}),
+      ...(characterRanges === undefined ? {} : { characterRanges }),
     };
   }
 
@@ -226,7 +347,7 @@ export function canvasPoint(
 }
 
 export interface ToolModifier {
-  tilt?:PenTiltData;
+  tilt?: PenTiltData;
   alt: boolean;
   shift: boolean;
   pressure: number;
@@ -235,22 +356,34 @@ export interface ToolModifier {
 /**
  * Extracts modifier keys and pressure from pointer/mouse events.
  */
-export function modifiers(event: {
-  altKey: boolean;
-  shiftKey: boolean;
-  pointerType?: string;
-  pressure?: number;
-  tiltX?:number;tiltY?:number;altitudeAngle?:number;azimuthAngle?:number;
-},preservePenPressure=false,captureTilt=false): ToolModifier {
+export function modifiers(
+  event: {
+    altKey: boolean;
+    shiftKey: boolean;
+    pointerType?: string;
+    pressure?: number;
+    tiltX?: number;
+    tiltY?: number;
+    altitudeAngle?: number;
+    azimuthAngle?: number;
+  },
+  preservePenPressure = false,
+  captureTilt = false,
+): ToolModifier {
   return {
-    ...(captureTilt&&event.pointerType==='pen'?{tilt:pointerPenTilt(event)}:{}),
+    ...(captureTilt && event.pointerType === "pen"
+      ? { tilt: pointerPenTilt(event) }
+      : {}),
     alt: event.altKey,
     shift: event.shiftKey,
-    pressure: event.pointerType === "pen"
-      ? preservePenPressure
-        ? Number.isFinite(event.pressure)?Math.max(0,Math.min(1,event.pressure!)):.05
-        : event.pressure || 0.05
-      : 1,
+    pressure:
+      event.pointerType === "pen"
+        ? preservePenPressure
+          ? Number.isFinite(event.pressure)
+            ? Math.max(0, Math.min(1, event.pressure!))
+            : 0.05
+          : event.pressure || 0.05
+        : 1,
   };
 }
 
@@ -311,19 +444,48 @@ export function computeVisibleRegion(
  * SVG coordinate rounding can differ from double-precision geometry: retain
  * complete presentation when uncertainty exceeds 1/1024 of a screen pixel. */
 export function computePenOverlayWindow(
-  documentSize: {width:number;height:number},
-  viewportSize: {width:number;height:number},
-  pan: {x:number;y:number},
+  documentSize: { width: number; height: number },
+  viewportSize: { width: number; height: number },
+  pan: { x: number; y: number },
   zoom: number,
-): Region|null {
-  if(![documentSize.width,documentSize.height,viewportSize.width,viewportSize.height,pan.x,pan.y,zoom].every(Number.isFinite)||
-    documentSize.width<=0||documentSize.height<=0||viewportSize.width<=0||viewportSize.height<=0||zoom<=0)return null;
-  const margin=32/zoom,width=viewportSize.width/zoom+2*margin,height=viewportSize.height/zoom+2*margin,
-    x=documentSize.width/2-(viewportSize.width/2+pan.x)/zoom-margin,
-    y=documentSize.height/2-(viewportSize.height/2+pan.y)/zoom-margin;
-  const values=[x,y,width,height,x+width,y+height];
-  if(!values.every(value=>Number.isFinite(value)&&Number.isFinite(Math.fround(value))&&Math.abs(value-Math.fround(value))*zoom<=1/1024))return null;
-  return{x,y,width,height};
+): Region | null {
+  if (
+    ![
+      documentSize.width,
+      documentSize.height,
+      viewportSize.width,
+      viewportSize.height,
+      pan.x,
+      pan.y,
+      zoom,
+    ].every(Number.isFinite) ||
+    documentSize.width <= 0 ||
+    documentSize.height <= 0 ||
+    viewportSize.width <= 0 ||
+    viewportSize.height <= 0 ||
+    zoom <= 0
+  )
+    return null;
+  const margin = 32 / zoom,
+    width = viewportSize.width / zoom + 2 * margin,
+    height = viewportSize.height / zoom + 2 * margin,
+    x =
+      documentSize.width / 2 - (viewportSize.width / 2 + pan.x) / zoom - margin,
+    y =
+      documentSize.height / 2 -
+      (viewportSize.height / 2 + pan.y) / zoom -
+      margin;
+  const values = [x, y, width, height, x + width, y + height];
+  if (
+    !values.every(
+      (value) =>
+        Number.isFinite(value) &&
+        Number.isFinite(Math.fround(value)) &&
+        Math.abs(value - Math.fround(value)) * zoom <= 1 / 1024,
+    )
+  )
+    return null;
+  return { x, y, width, height };
 }
 
 /**

@@ -1,4 +1,4 @@
-import{compileFloatCurve,sampleFloatCurve}from'../core/float-transfer';
+import { compileFloatCurve, sampleFloatCurve } from "../core/float-transfer";
 import { useState, useRef, useCallback } from "react";
 import type { CurvePoint, CurvesAdjustmentData } from "../core/adjustments";
 import {
@@ -6,13 +6,13 @@ import {
   defaultCurvePoints,
 } from "../core/adjustments";
 import type { HistogramData } from "../core/histogram";
-import { HistogramView,HistogramRangeNote } from "./HistogramView";
+import { HistogramView, HistogramRangeNote } from "./HistogramView";
 import { NumberField, IconButton } from "./controls";
 import { RotateCcw, Trash2 } from "lucide-react";
 
 export interface CurvesEditorProps {
   value: CurvesAdjustmentData;
-  linear?:boolean;
+  linear?: boolean;
   histogram?: HistogramData | null;
   disabled?: boolean;
   onPreview?(value: CurvesAdjustmentData): void;
@@ -23,7 +23,7 @@ type CurveChannel = "rgb" | "red" | "green" | "blue";
 
 export function CurvesEditor({
   value,
-  linear=false,
+  linear = false,
   histogram,
   disabled = false,
   onPreview,
@@ -68,8 +68,13 @@ export function CurvesEditor({
   );
 
   // Compute LUT for the active channel to draw the curve path
-  const table=linear?compileFloatCurve(currentPoints):null;
-  const lut=table?Array.from({length:256},(_,x)=>sampleFloatCurve(table,x/255)*255):evaluateMonotoneCubicSpline(currentPoints);
+  const table = linear ? compileFloatCurve(currentPoints) : null;
+  const lut = table
+    ? Array.from(
+        { length: 256 },
+        (_, x) => sampleFloatCurve(table, x / 255) * 255,
+      )
+    : evaluateMonotoneCubicSpline(currentPoints);
 
   // Build SVG path
   let pathD = `M 0,${255 - lut[0]}`;
@@ -207,7 +212,7 @@ export function CurvesEditor({
 
   return (
     <div className="curves-editor">
-      <HistogramRangeNote histogram={histogram??null}/>
+      <HistogramRangeNote histogram={histogram ?? null} />
       <div className="curves-header">
         <div
           className="curves-channel-selector"

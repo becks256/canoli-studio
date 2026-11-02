@@ -22,12 +22,12 @@ Independent file checks exposed an existing misleading high-precision TIFF label
 - Actual queue saturation, queued cancellation, renderer disposal and healthy retry pass. An injected failure after real native processing hides stale artwork, reports failure and accepts an identical-settings retry without changing the document.
 - The genuine 50 MP proof fixture keeps its 10000×5000 original and uses a 500×250 display allocation. Full-resolution PNGs with proof on/off are byte-identical. An independent reader compares all 200,000,000 channels with zero differences and checks the embedded profile. Other native precision/edit/reopen/interchange cases also pass. The proof-specific case takes 315.457 seconds and the original edit/reopen case takes 333.468 seconds on this host. These full-resolution workflows remain slow; they do not establish interactive 60fps or an editor-wide memory budget.
 
-| Device | Gamut alarms | Frames | Compared channels | Differences |
-| --- | --- | ---: | ---: | ---: |
-| synthetic-cmyk | True | 21 | 1,321,776 | 0 |
-| synthetic-cmyk | False | 21 | 1,321,776 | 0 |
-| narrow-rgb | True | 21 | 1,321,776 | 0 |
-| narrow-rgb | False | 21 | 1,321,776 | 0 |
+| Device         | Gamut alarms | Frames | Compared channels | Differences |
+| -------------- | ------------ | -----: | ----------------: | ----------: |
+| synthetic-cmyk | True         |     21 |         1,321,776 |           0 |
+| synthetic-cmyk | False        |     21 |         1,321,776 |           0 |
+| narrow-rgb     | True         |     21 |         1,321,776 |           0 |
+| narrow-rgb     | False        |     21 |         1,321,776 |           0 |
 
 ## Source and release identity
 
@@ -39,26 +39,26 @@ The native ICC codec is actually rebuilt with protocol 3 against Little CMS 2.19
 
 The following p95 observations exceed 33 ms in the full editor sweep. They span different workloads and include setup/task observations; they are not a uniform control-latency SLO or proof of attribution. Every extracted metric remains in the audit.
 
-| Case | Record / metric | p95 ms |
-| --- | --- | ---: |
-| scripts on a stroke-heavy document record snapshot transport latency | script-transport-latency / [].ms | 234.0 |
-| fresh isolated script workers report initialization, document and command costs | script-runtime-phases / [].totalMs | 187.9 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / longTasks | 184.0 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / taskDetails[].duration | 184.0 |
-| crop resize and isolated scripts with 64 layers record presentation latency | document-operations-latency / samples[].presentMs | 168.1 |
-| crop resize and isolated scripts with 64 layers record presentation latency | document-operations-latency / samples[].commitMs | 165.4 |
-| spot-heal repeated gestures record completion and main-thread stalls | retouch-latency / samples | 163.8 |
-| crop resize and isolated scripts with 64 layers record presentation latency | document-operations-latency / samples[].scriptRuntimeMs | 155.9 |
-| crop resize and isolated scripts with 5 layers record presentation latency | document-operations-latency / samples[].presentMs | 140.5 |
-| crop resize and isolated scripts with 5 layers record presentation latency | document-operations-latency / samples[].commitMs | 139.3 |
-| crop resize and isolated scripts with 5 layers record presentation latency | document-operations-latency / samples[].scriptRuntimeMs | 134.8 |
-| scripts on a stroke-heavy document record snapshot transport latency | document-reconstruction-latency / [].ms | 121.4 |
-| pixel operations 2000x1500 record completion and frame gaps | pixel-operation-latency / samples[].ms | 112.4 |
-| spot-heal repeated gestures record completion and main-thread stalls | retouch-latency / phases[].ms | 101.8 |
-| 50 MP diagonal clone stroke records live feedback and commit | large-clone-latency / longTasks | 93.0 |
-| 50 MP diagonal clone stroke records live feedback and commit | large-clone-latency / longTaskDetails[].ms | 93.0 |
-| font replacement 64 text layers records matching canvas presentation and long tasks | font-replacement-latency / samples[].presentMs | 86.2 |
-| float gradient-map controls record matching model and independently checked canvas pixels | float-control-latency / samples[].verifiedReadbackMs | 80.8 |
+| Case                                                                                      | Record / metric                                         | p95 ms |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------- | -----: |
+| scripts on a stroke-heavy document record snapshot transport latency                      | script-transport-latency / [].ms                        |  234.0 |
+| fresh isolated script workers report initialization, document and command costs           | script-runtime-phases / [].totalMs                      |  187.9 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / longTasks                    |  184.0 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / taskDetails[].duration       |  184.0 |
+| crop resize and isolated scripts with 64 layers record presentation latency               | document-operations-latency / samples[].presentMs       |  168.1 |
+| crop resize and isolated scripts with 64 layers record presentation latency               | document-operations-latency / samples[].commitMs        |  165.4 |
+| spot-heal repeated gestures record completion and main-thread stalls                      | retouch-latency / samples                               |  163.8 |
+| crop resize and isolated scripts with 64 layers record presentation latency               | document-operations-latency / samples[].scriptRuntimeMs |  155.9 |
+| crop resize and isolated scripts with 5 layers record presentation latency                | document-operations-latency / samples[].presentMs       |  140.5 |
+| crop resize and isolated scripts with 5 layers record presentation latency                | document-operations-latency / samples[].commitMs        |  139.3 |
+| crop resize and isolated scripts with 5 layers record presentation latency                | document-operations-latency / samples[].scriptRuntimeMs |  134.8 |
+| scripts on a stroke-heavy document record snapshot transport latency                      | document-reconstruction-latency / [].ms                 |  121.4 |
+| pixel operations 2000x1500 record completion and frame gaps                               | pixel-operation-latency / samples[].ms                  |  112.4 |
+| spot-heal repeated gestures record completion and main-thread stalls                      | retouch-latency / phases[].ms                           |  101.8 |
+| 50 MP diagonal clone stroke records live feedback and commit                              | large-clone-latency / longTasks                         |   93.0 |
+| 50 MP diagonal clone stroke records live feedback and commit                              | large-clone-latency / longTaskDetails[].ms              |   93.0 |
+| font replacement 64 text layers records matching canvas presentation and long tasks       | font-replacement-latency / samples[].presentMs          |   86.2 |
+| float gradient-map controls record matching model and independently checked canvas pixels | float-control-latency / samples[].verifiedReadbackMs    |   80.8 |
 
 ## Evidence and limitations
 

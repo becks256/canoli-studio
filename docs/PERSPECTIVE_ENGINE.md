@@ -8,7 +8,6 @@ relinking and document selection/path capture use retained planes. Original
 mask geometry and native/document filter phase remain. Broader acceptance remains
 open; [current contract and verification](MASK_PLANES.md).
 
-
 ## Retained scalar pull maps
 
 The private `FieldMapping` transport retains exact homogeneous coefficients plus
@@ -66,7 +65,6 @@ support stays within the artboard. Child movement leaves its unlinked mask
 fixed in master coordinates. Existing native geometry/settings, commands,
 Undo, original sources and persistence remain authoritative; no schema or
 public projective-relink capability is added.
-
 
 Raster and smart-object instances now carry optional schema-50 normalized
 perspective corners through `PerspectiveTransform`, shared commands and Undo.
@@ -331,7 +329,6 @@ Private forward scalar sampling precomposes a strict affine mapping after subtra
 
 Captures pin byte mask/texture sources, own copied metadata and release request/scene resources on cancellation/disposal. Mask-wide feather/inversion/density follow complete ordered composition. Preview and commit share placement; actual revision/ordered-selection changes retire mask gestures synchronously, with equivalent selection allowed. Schema 53 gates placement on Hide/Reveal brush/pencil entries in all mask/history/embedded contexts. Public constructors, existing commands/Undo, project/workspace formats and plugin grants remain. No pixel WASM ABI or REST route is added. Projected Wet input, mask Pen/preserving-position relinking, general warp and full photographic/performance/device acceptance remain required.
 
-
 ## Perspective Bézier mask paths
 
 Pen → Mask paths now edits linked vector masks through the complete mask basis,
@@ -363,7 +360,6 @@ locks, native project/workspace/history, originals, isolation and REST contracts
 No schema, public constructor signature, worker ABI or plugin grant is added.
 Wet input, preserving-position mask relinking, document-selection/path capture, general warp
 and full photographic/performance/device acceptance remain required.
-
 
 ## Ordinary mask movement after perspective (schema 54)
 

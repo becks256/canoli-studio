@@ -24,14 +24,14 @@ The order was before/after, after/before, before/after. Actual reported renderin
 backends were Canvas2D. No other heavy verification ran during these comparisons
 or the full performance sweeps.
 
-| Fixture | Pair | Canvas-copy p95 before / after, ms | Long-task count before / after | Worst task before / after, ms |
-| --- | --- | --- | --- | --- |
-| 1 path, 8,000 anchors | 1 | 61.7 / 46.4 | 33 / 2 | 685 / 61 |
-| 1 path, 8,000 anchors | 2 | 52.5 / 44.3 | 34 / 2 | 663 / 53 |
-| 1 path, 8,000 anchors | 3 | 63.5 / 51.3 | 34 / 5 | 669 / 66 |
-| 2,000 paths, 4 anchors each | 1 | 65.3 / 74.7 | 34 / 30 | 210 / 102 |
-| 2,000 paths, 4 anchors each | 2 | 70.7 / 62.3 | 35 / 28 | 212 / 108 |
-| 2,000 paths, 4 anchors each | 3 | 59.0 / 67.4 | 33 / 30 | 241 / 97 |
+| Fixture                     | Pair | Canvas-copy p95 before / after, ms | Long-task count before / after | Worst task before / after, ms |
+| --------------------------- | ---- | ---------------------------------- | ------------------------------ | ----------------------------- |
+| 1 path, 8,000 anchors       | 1    | 61.7 / 46.4                        | 33 / 2                         | 685 / 61                      |
+| 1 path, 8,000 anchors       | 2    | 52.5 / 44.3                        | 34 / 2                         | 663 / 53                      |
+| 1 path, 8,000 anchors       | 3    | 63.5 / 51.3                        | 34 / 5                         | 669 / 66                      |
+| 2,000 paths, 4 anchors each | 1    | 65.3 / 74.7                        | 34 / 30                        | 210 / 102                     |
+| 2,000 paths, 4 anchors each | 2    | 70.7 / 62.3                        | 35 / 28                        | 212 / 108                     |
+| 2,000 paths, 4 anchors each | 3    | 59.0 / 67.4                        | 33 / 30                        | 241 / 97                      |
 
 The existing dense fixtures place many controls outside the viewport. Fully
 visible high-density controls remain a separate stress case. Canvas-copy p95

@@ -17,6 +17,7 @@ Groups and `use` instances receive their masks directly. Other graphics use a na
 Select the masked layer/group to use the existing Mask controls or Pen workflow. Masks are immutable values: assign `mask.with(...)` through the layer to create one ordinary undoable edit. Locks, current plugin grants and strict layer validation still apply. This example operates on an already imported clipping document and moves only its first mask:
 
 <!-- example: edit-imported-svg-clip -->
+
 ```js
 function findMasked(layers) {
   for (const layer of layers) {
@@ -29,10 +30,11 @@ function findMasked(layers) {
   return null;
 }
 const clipped = findMasked(document.layers);
-if (!clipped || !clipped.mask) throw new Error('Import a geometric SVG clip first');
+if (!clipped || !clipped.mask)
+  throw new Error("Import a geometric SVG clip first");
 document.selectedLayer = clipped;
 clipped.mask = clipped.mask.with({ x: clipped.mask.x + 8 });
-print('SVG clipping moved');
+print("SVG clipping moved");
 ```
 
 ## Output and limits

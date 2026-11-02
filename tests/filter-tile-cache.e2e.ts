@@ -153,12 +153,10 @@ test("mask edits reuse native filter pixels while source/filter edits and cache 
     revealedExact: true,
     extendedExact: true,
   });
-  await test
-    .info()
-    .attach("native-filter-cache-timing", {
-      body: JSON.stringify(result, null, 2),
-      contentType: "application/json",
-    });
+  await test.info().attach("native-filter-cache-timing", {
+    body: JSON.stringify(result, null, 2),
+    contentType: "application/json",
+  });
 });
 
 test("clearing retained tiles during worker processing prevents stale cache publication", async ({

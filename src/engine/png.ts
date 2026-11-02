@@ -1,16 +1,19 @@
-import {prepareIccOutput,type IccOutput} from './icc-output';
-import{isFloatDocument}from'../core/float-document';
-import{exportFloatPng}from'./float-delivery';
-import {normalizeColorOutput,type ColorOutput} from '../core/color/color-settings';
-import {captureRasterExportSources} from './raster-export-source';
-import {freeze,isImmutable} from '../core/immutable';
-import {validateDocument} from '../core/model';
-import {RASTER_EXPORT_COLUMNS,rasterExportRows} from './raster-export-grid';
+import { prepareIccOutput, type IccOutput } from "./icc-output";
+import { isFloatDocument } from "../core/float-document";
+import { exportFloatPng } from "./float-delivery";
+import {
+  normalizeColorOutput,
+  type ColorOutput,
+} from "../core/color/color-settings";
+import { captureRasterExportSources } from "./raster-export-source";
+import { freeze, isImmutable } from "../core/immutable";
+import { validateDocument } from "../core/model";
+import { RASTER_EXPORT_COLUMNS, rasterExportRows } from "./raster-export-grid";
 import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
 import type { DocumentRenderer } from "./renderer";
-import {yieldTask} from './task-yield';
+import { yieldTask } from "./task-yield";
 
 const crcTable = Uint32Array.from({ length: 256 }, (_, index) => {
   let value = index;
@@ -31,7 +34,7 @@ function chunk(type: string, bytes: Uint8Array): Uint8Array<ArrayBuffer> {
   return result;
 }
 
-export {PngRowEncoder} from '../core/png-stream';
+export { PngRowEncoder } from "../core/png-stream";
 
 /** PNG is streamed through a deflater, without a document-sized canvas or RGBA
  * buffer. Retained output is compressed; source decoding remains browser-managed.
@@ -44,100 +47,135 @@ export async function exportPng(
   color?: ColorOutput,
 ): Promise<Blob> {
   checkExport(control);
-  if(isFloatDocument(document))return exportFloatPng(document,assets,renderer,control,color);
-  document=isImmutable(document)?document:freeze(structuredClone(document));validateDocument(document);
-  color=color?normalizeColorOutput(color):undefined;
-  let output:IccOutput|null=null;
-  const current=captureRasterExportSources(document,assets,control,'PNG export');
-  try{
-  output=await prepareIccOutput(color,control);current();
-  current();control?.onProgress?.({phase:"rendering",fraction:0});current();
-  const { width, height } = document;
-  // This is the PNG format's dimension boundary, not an image import restriction.
-  if (width > 0x7fffffff || height > 0x7fffffff)
-    throw new Error("These dimensions exceed the PNG file format.");
-  const header = new Uint8Array(13);
-  const view = new DataView(header.buffer);
-  view.setUint32(0, width);
-  view.setUint32(4, height);
-  header[8] = 8;
-  header[9] = 6;
-  const parts: BlobPart[] = [
-    new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
-    chunk("IHDR", header),
-    ...(output?[]:[chunk("sRGB", new Uint8Array([0]))]),
-  ];
-  if(output){
-    const compressed=await new Response(new Blob([output.profile]).stream().pipeThrough(new CompressionStream("deflate"))).arrayBuffer();current();
-    const name=new TextEncoder().encode("Canoli output\0\0"),data=new Uint8Array(name.length+compressed.byteLength);data.set(name);data.set(new Uint8Array(compressed),name.length);parts.push(chunk("iCCP",data));
-  }
-  const compression = new CompressionStream("deflate");
-  const writer = compression.writable.getWriter();
-  const reader = compression.readable.getReader();
-  const collect = (async () => {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      parts.push(chunk("IDAT", value));
-    }
-  })();
-  // Attach rejection handling before the first await in the producer.
-  void collect.catch(() => {});
+  if (isFloatDocument(document))
+    return exportFloatPng(document, assets, renderer, control, color);
+  document = isImmutable(document)
+    ? document
+    : freeze(structuredClone(document));
+  validateDocument(document);
+  color = color ? normalizeColorOutput(color) : undefined;
+  let output: IccOutput | null = null;
+  const current = captureRasterExportSources(
+    document,
+    assets,
+    control,
+    "PNG export",
+  );
   try {
-    const rowBytes = width * 4 + 1;
-    const rowsPerStrip = rasterExportRows(width);
-    for (let y = 0; y < height; y += rowsPerStrip) {
+    output = await prepareIccOutput(color, control);
+    current();
+    current();
+    control?.onProgress?.({ phase: "rendering", fraction: 0 });
+    current();
+    const { width, height } = document;
+    // This is the PNG format's dimension boundary, not an image import restriction.
+    if (width > 0x7fffffff || height > 0x7fffffff)
+      throw new Error("These dimensions exceed the PNG file format.");
+    const header = new Uint8Array(13);
+    const view = new DataView(header.buffer);
+    view.setUint32(0, width);
+    view.setUint32(4, height);
+    header[8] = 8;
+    header[9] = 6;
+    const parts: BlobPart[] = [
+      new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
+      chunk("IHDR", header),
+      ...(output ? [] : [chunk("sRGB", new Uint8Array([0]))]),
+    ];
+    if (output) {
+      const compressed = await new Response(
+        new Blob([output.profile])
+          .stream()
+          .pipeThrough(new CompressionStream("deflate")),
+      ).arrayBuffer();
       current();
-      const rows = Math.min(rowsPerStrip, height - y);
-      const strip = new Uint8Array(rowBytes * rows); // filter byte 0 for each row
-      let deadline=performance.now()+8;
-      for (let x = 0; x < width; x += RASTER_EXPORT_COLUMNS) {
-        current();
-        const tileWidth = Math.min(RASTER_EXPORT_COLUMNS, width - x);
-        const tile = await renderer.render(document, assets, {
-          region: { x, y, width: tileWidth, height: rows },
-          cache: false,
-          readback: true,
-          isCancelled:()=>!!control?.signal?.aborted,
-        });
-        try {
-          current();
-          let pixels = tile
-            .getContext("2d")!
-            .getImageData(0, 0, tileWidth, rows).data;
-          if(output){pixels=await output.apply(pixels);current();}
-          for (let row = 0; row < rows; row++)
-            strip.set(
-              pixels.subarray(row * tileWidth * 4, (row + 1) * tileWidth * 4),
-              row * rowBytes + 1 + x * 4,
-            );
-        } finally {
-          tile.width = tile.height = 0;
-        }
-        if(performance.now()>=deadline){
-          await yieldTask();
-          current();
-          deadline=performance.now()+8;
-        }
-      }
-      current();await writer.write(strip);current();
-      control?.onProgress?.({phase:"rendering",fraction:(y+rows)/height});current();
-      // Let input, status messages, and cancellation by navigation proceed.
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      const name = new TextEncoder().encode("Canoli output\0\0"),
+        data = new Uint8Array(name.length + compressed.byteLength);
+      data.set(name);
+      data.set(new Uint8Array(compressed), name.length);
+      parts.push(chunk("iCCP", data));
     }
+    const compression = new CompressionStream("deflate");
+    const writer = compression.writable.getWriter();
+    const reader = compression.readable.getReader();
+    const collect = (async () => {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        parts.push(chunk("IDAT", value));
+      }
+    })();
+    // Attach rejection handling before the first await in the producer.
+    void collect.catch(() => {});
+    try {
+      const rowBytes = width * 4 + 1;
+      const rowsPerStrip = rasterExportRows(width);
+      for (let y = 0; y < height; y += rowsPerStrip) {
+        current();
+        const rows = Math.min(rowsPerStrip, height - y);
+        const strip = new Uint8Array(rowBytes * rows); // filter byte 0 for each row
+        let deadline = performance.now() + 8;
+        for (let x = 0; x < width; x += RASTER_EXPORT_COLUMNS) {
+          current();
+          const tileWidth = Math.min(RASTER_EXPORT_COLUMNS, width - x);
+          const tile = await renderer.render(document, assets, {
+            region: { x, y, width: tileWidth, height: rows },
+            cache: false,
+            readback: true,
+            isCancelled: () => !!control?.signal?.aborted,
+          });
+          try {
+            current();
+            let pixels = tile
+              .getContext("2d")!
+              .getImageData(0, 0, tileWidth, rows).data;
+            if (output) {
+              pixels = await output.apply(pixels);
+              current();
+            }
+            for (let row = 0; row < rows; row++)
+              strip.set(
+                pixels.subarray(row * tileWidth * 4, (row + 1) * tileWidth * 4),
+                row * rowBytes + 1 + x * 4,
+              );
+          } finally {
+            tile.width = tile.height = 0;
+          }
+          if (performance.now() >= deadline) {
+            await yieldTask();
+            current();
+            deadline = performance.now() + 8;
+          }
+        }
+        current();
+        await writer.write(strip);
+        current();
+        control?.onProgress?.({
+          phase: "rendering",
+          fraction: (y + rows) / height,
+        });
+        current();
+        // Let input, status messages, and cancellation by navigation proceed.
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      }
+      current();
+      control?.onProgress?.({ phase: "encoding", fraction: null });
+      current();
+      await writer.close();
+      await collect;
+      current();
+    } catch (error) {
+      await writer.abort(error).catch(() => {});
+      await reader.cancel().catch(() => {});
+      throw error;
+    }
+    parts.push(chunk("IEND", new Uint8Array()));
     current();
-    control?.onProgress?.({phase:"encoding",fraction:null});current();
-    await writer.close();
-    await collect;
-    current();
-  } catch (error) {
-    await writer.abort(error).catch(() => {});
-    await reader.cancel().catch(() => {});
-    throw error;
+    return new Blob(parts, { type: "image/png" });
+  } finally {
+    output?.dispose();
+    current.release();
   }
-  parts.push(chunk("IEND", new Uint8Array()));
-  current();return new Blob(parts, { type: "image/png" });
-  }finally{output?.dispose();current.release();}
 }
 
 /**
@@ -199,20 +237,42 @@ export async function encodeRgbaPng(
   return new Blob(parts, { type: "image/png" });
 }
 
-
 /** Worker-side native encoding of canvas-captured RGBA; direct PNG fallback. */
-export async function encodeCapturedPng(pixels: Uint8ClampedArray, width: number, height: number): Promise<Blob> {
-  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0 || pixels.length !== width * height * 4)
+export async function encodeCapturedPng(
+  pixels: Uint8ClampedArray,
+  width: number,
+  height: number,
+): Promise<Blob> {
+  if (
+    !Number.isSafeInteger(width) ||
+    !Number.isSafeInteger(height) ||
+    width <= 0 ||
+    height <= 0 ||
+    pixels.length !== width * height * 4
+  )
     throw new Error("PNG encoding requires matching RGBA dimensions.");
   let png: Blob | undefined;
   if (typeof OffscreenCanvas !== "undefined") {
     const canvas = new OffscreenCanvas(width, height);
     try {
-      canvas.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(pixels), width, height), 0, 0);
+      canvas
+        .getContext("2d")!
+        .putImageData(
+          new ImageData(new Uint8ClampedArray(pixels), width, height),
+          0,
+          0,
+        );
       png = await canvas.convertToBlob({ type: "image/png" });
-    } catch { /* Native encoding is optional; retain the direct encoder. */ }
-    finally { canvas.width = canvas.height = 1; }
+    } catch {
+      /* Native encoding is optional; retain the direct encoder. */
+    } finally {
+      canvas.width = canvas.height = 1;
+    }
   }
-  png ??= await encodeRgbaPng(new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength), width, height);
+  png ??= await encodeRgbaPng(
+    new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength),
+    width,
+    height,
+  );
   return png;
 }

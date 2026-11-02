@@ -1,23 +1,63 @@
-import {assertWetPaintVersion} from './wet-operation';
-import {maskPlaneSchema} from './mask-plane';
-import {mappedMaskPlacementSchema,type MappedMaskPlacementData} from './mask-plane-brush';
+import { assertWetPaintVersion } from "./wet-operation";
+import { maskPlaneSchema } from "./mask-plane";
+import {
+  mappedMaskPlacementSchema,
+  type MappedMaskPlacementData,
+} from "./mask-plane-brush";
 import { z } from "zod";
 import { affineSchema } from "./transform-schema";
 import { AffineTransform } from "./affine";
-import {perspectiveSchema,perspectiveLocalQuad} from './perspective';
-import { assertRasterErasureVersion,rasterErasureSchema, paintOperationSchema, pathSchema, selectionSchema } from "./drawing";
+import { perspectiveSchema, perspectiveLocalQuad } from "./perspective";
+import {
+  assertRasterErasureVersion,
+  rasterErasureSchema,
+  paintOperationSchema,
+  pathSchema,
+  selectionSchema,
+} from "./drawing";
 
 import type { WetPaintStrokeData } from "./wet-operation";
 import type { BrushStrokeData } from "./drawing";
 
-export interface MaskPerspectivePlacementData {width:number;height:number;perspective:import('./perspective').PerspectiveData;basis:import('./affine').AffineData}
-export type MaskPlacementData=MaskPerspectivePlacementData|MappedMaskPlacementData;
-const perspectiveMaskPlacementSchema:z.ZodType<MaskPerspectivePlacementData>=z.object({width:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),height:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),perspective:perspectiveSchema,basis:affineSchema}).strict().superRefine((value,context)=>{try{perspectiveLocalQuad(Math.ceil(value.width),Math.ceil(value.height),value.perspective);}catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}});
-export const maskPlacementSchema:z.ZodType<MaskPlacementData>=z.union([perspectiveMaskPlacementSchema,mappedMaskPlacementSchema]);
+export interface MaskPerspectivePlacementData {
+  width: number;
+  height: number;
+  perspective: import("./perspective").PerspectiveData;
+  basis: import("./affine").AffineData;
+}
+export type MaskPlacementData =
+  MaskPerspectivePlacementData | MappedMaskPlacementData;
+const perspectiveMaskPlacementSchema: z.ZodType<MaskPerspectivePlacementData> =
+  z
+    .object({
+      width: z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),
+      height: z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),
+      perspective: perspectiveSchema,
+      basis: affineSchema,
+    })
+    .strict()
+    .superRefine((value, context) => {
+      try {
+        perspectiveLocalQuad(
+          Math.ceil(value.width),
+          Math.ceil(value.height),
+          value.perspective,
+        );
+      } catch (error) {
+        context.addIssue({
+          code: "custom",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
+export const maskPlacementSchema: z.ZodType<MaskPlacementData> = z.union([
+  perspectiveMaskPlacementSchema,
+  mappedMaskPlacementSchema,
+]);
 export const maskStrokeSchema = z
   .object({
     mode: z.enum(["hide", "reveal"]),
-    placement:maskPlacementSchema.optional(),
+    placement: maskPlacementSchema.optional(),
     stroke: paintOperationSchema.refine(
       (value) =>
         (value.kind === "brush" || value.kind === "pencil") &&
@@ -26,17 +66,74 @@ export const maskStrokeSchema = z
     ) as z.ZodType<BrushStrokeData>,
   })
   .strict();
-export const wetMaskStrokeSchema=z.object({mode:z.literal('wet'),stroke:paintOperationSchema.refine(value=>value.kind==='wet'&&value.precision!=='float32','Wet mask operations require prepared byte native pixels; HDR color strokes are artwork only.') as z.ZodType<WetPaintStrokeData>}).strict();
-export const maskOperationSchema=z.discriminatedUnion('mode',[maskStrokeSchema,wetMaskStrokeSchema]);
-export type MaskOperationData=z.infer<typeof maskOperationSchema>;
+export const wetMaskStrokeSchema = z
+  .object({
+    mode: z.literal("wet"),
+    stroke: paintOperationSchema.refine(
+      (value) => value.kind === "wet" && value.precision !== "float32",
+      "Wet mask operations require prepared byte native pixels; HDR color strokes are artwork only.",
+    ) as z.ZodType<WetPaintStrokeData>,
+  })
+  .strict();
+export const maskOperationSchema = z.discriminatedUnion("mode", [
+  maskStrokeSchema,
+  wetMaskStrokeSchema,
+]);
+export type MaskOperationData = z.infer<typeof maskOperationSchema>;
 /** A captured mapped edit starts native-grid replay. Preserve any preceding
  * legacy wet composition on its original logical grid, then replay new edits
  * on the retained rasterization grid without another logical bitmap. */
-export function maskNativeEditIndex(mask:LayerMaskData):number {
- return(mask.strokes??[]).findIndex(entry=>{const placement=entry.mode==='wet'?entry.stroke.placement:entry.placement;return entry.stroke.opacity>0&&!!placement&&'geometry'in placement;});
+export function maskNativeEditIndex(mask: LayerMaskData): number {
+  return (mask.strokes ?? []).findIndex((entry) => {
+    const placement =
+      entry.mode === "wet" ? entry.stroke.placement : entry.placement;
+    return entry.stroke.opacity > 0 && !!placement && "geometry" in placement;
+  });
 }
-export const maskStrokePointCount=(entry:MaskOperationData)=>entry.stroke.kind==='wet'?entry.stroke.brush.points.length:entry.stroke.points.length;
-export function assertMaskOperationVersion(mask:LayerMaskData,version:number){if(version<56&&(mask.plane!==undefined||(mask.strokes??[]).some(entry=>entry.mode!=='wet'&&entry.placement&&'geometry'in entry.placement)))throw new Error('Retained mask planes require schema version 56.');for(const entry of mask.strokes??[])if(entry.mode==='wet')assertWetPaintVersion(entry.stroke,version);if(version<54&&(mask.placedX!==undefined||mask.placedY!==undefined))throw new Error('Placed mask offsets require schema version 54.');if(mask.kind==='raster-erasures'&&version<36)throw new Error('Raster erasure masks require schema version 36.');if(mask.kind==='raster-erasures')for(const entry of mask.erasures)assertRasterErasureVersion(entry,version);if(version<53&&(mask.strokes??[]).some(entry=>'placement'in entry&&entry.placement))throw new Error('Placed mask strokes require schema version 53.');if(version<34&&(mask.strokes??[]).some(entry=>entry.mode==='wet'))throw new Error('Wet mask coverage requires schema version 34.');}
+export const maskStrokePointCount = (entry: MaskOperationData) =>
+  entry.stroke.kind === "wet"
+    ? entry.stroke.brush.points.length
+    : entry.stroke.points.length;
+export function assertMaskOperationVersion(
+  mask: LayerMaskData,
+  version: number,
+) {
+  if (
+    version < 56 &&
+    (mask.plane !== undefined ||
+      (mask.strokes ?? []).some(
+        (entry) =>
+          entry.mode !== "wet" &&
+          entry.placement &&
+          "geometry" in entry.placement,
+      ))
+  )
+    throw new Error("Retained mask planes require schema version 56.");
+  for (const entry of mask.strokes ?? [])
+    if (entry.mode === "wet") assertWetPaintVersion(entry.stroke, version);
+  if (
+    version < 54 &&
+    (mask.placedX !== undefined || mask.placedY !== undefined)
+  )
+    throw new Error("Placed mask offsets require schema version 54.");
+  if (mask.kind === "raster-erasures" && version < 36)
+    throw new Error("Raster erasure masks require schema version 36.");
+  if (mask.kind === "raster-erasures")
+    for (const entry of mask.erasures)
+      assertRasterErasureVersion(entry, version);
+  if (
+    version < 53 &&
+    (mask.strokes ?? []).some(
+      (entry) => "placement" in entry && entry.placement,
+    )
+  )
+    throw new Error("Placed mask strokes require schema version 53.");
+  if (
+    version < 34 &&
+    (mask.strokes ?? []).some((entry) => entry.mode === "wet")
+  )
+    throw new Error("Wet mask coverage requires schema version 34.");
+}
 export const maskStrokesSchema = z
   .array(maskOperationSchema)
   .max(2048)
@@ -52,9 +149,9 @@ const position = z
   .min(-Number.MAX_SAFE_INTEGER)
   .max(Number.MAX_SAFE_INTEGER);
 const settings = {
-  plane:maskPlaneSchema.optional(),
-  placedX:position.optional(),
-  placedY:position.optional(),
+  plane: maskPlaneSchema.optional(),
+  placedX: position.optional(),
+  placedY: position.optional(),
   basis: affineSchema
     .refine(
       (value) => value.e === 0 && value.f === 0,
@@ -73,8 +170,22 @@ const settings = {
 const maskPath = z.object({ points: pathSchema.shape.points }).strict();
 /** Geometry uses document-pixel units in a linked layer or unlinked document coordinate plane, before layer styles. */
 export const layerMaskSchema = z.discriminatedUnion("kind", [
-  z.object({kind:z.literal("raster-erasures"),width:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),height:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),
-    erasures:z.array(rasterErasureSchema.refine(entry=>entry.stroke.kind!=="wet","Raster erasure coverage accepts only eraser and clear operations.")).max(2048),...settings}).strict(),
+  z
+    .object({
+      kind: z.literal("raster-erasures"),
+      width: z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),
+      height: z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),
+      erasures: z
+        .array(
+          rasterErasureSchema.refine(
+            (entry) => entry.stroke.kind !== "wet",
+            "Raster erasure coverage accepts only eraser and clear operations.",
+          ),
+        )
+        .max(2048),
+      ...settings,
+    })
+    .strict(),
   z
     .object({
       kind: z.literal("paint"),
@@ -113,51 +224,96 @@ export const layerMaskSchema = z.discriminatedUnion("kind", [
 ]);
 export type LayerMaskData = z.infer<typeof layerMaskSchema>;
 /** Inert prepared records retain metadata/assets without changing geometry routing. */
-export const hasMaskRefinements=(mask:LayerMaskData)=>!!mask.strokes?.some(entry=>entry.mode!=='wet'||entry.stroke.opacity>0);
+export const hasMaskRefinements = (mask: LayerMaskData) =>
+  !!mask.strokes?.some(
+    (entry) => entry.mode !== "wet" || entry.stroke.opacity > 0,
+  );
 
 /** Linked offsets are local to the layer; unlinked offsets are document-space. */
 export function maskTransform(
   mask: LayerMaskData,
   layer: AffineTransform,
-  includePlacedOffset=true,
+  includePlacedOffset = true,
 ): AffineTransform {
-  const offset = AffineTransform.translation((mask.x ?? 0)+(includePlacedOffset?(mask.placedX??0):0), (mask.y ?? 0)+(includePlacedOffset?(mask.placedY??0):0)).multiply(
+  const offset = AffineTransform.translation(
+    (mask.x ?? 0) + (includePlacedOffset ? (mask.placedX ?? 0) : 0),
+    (mask.y ?? 0) + (includePlacedOffset ? (mask.placedY ?? 0) : 0),
+  ).multiply(
     mask.basis ? AffineTransform.fromJSON(mask.basis) : new AffineTransform(),
   );
   return mask.linked === false ? offset : layer.multiply(offset);
 }
 
 /** Remove an offset already included in a rebased affine placement. */
-export function withoutMaskPlacedOffset(mask:LayerMaskData):LayerMaskData {
-  const{placedX:_x,placedY:_y,...raw}=mask;return raw;
+export function withoutMaskPlacedOffset(mask: LayerMaskData): LayerMaskData {
+  const { placedX: _x, placedY: _y, ...raw } = mask;
+  return raw;
 }
 
 /** Change an independent mask's containing-document frame without linking it
  * to artwork (which may have its own perspective). Geometry stays native. */
-export function rebaseUnlinkedMask(mask:LayerMaskData,frame:AffineTransform):LayerMaskData {
-  if(mask.linked!==false)throw new Error('Mask document rebasing requires an unlinked mask.');
-  const matrix=frame.multiply(maskTransform(mask,new AffineTransform()));
-  return{...withoutMaskPlacedOffset(mask),x:matrix.e,y:matrix.f,
-    basis:{a:matrix.a,b:matrix.b,c:matrix.c,d:matrix.d,e:0,f:0}};
+export function rebaseUnlinkedMask(
+  mask: LayerMaskData,
+  frame: AffineTransform,
+): LayerMaskData {
+  if (mask.linked !== false)
+    throw new Error("Mask document rebasing requires an unlinked mask.");
+  const matrix = frame.multiply(maskTransform(mask, new AffineTransform()));
+  return {
+    ...withoutMaskPlacedOffset(mask),
+    x: matrix.e,
+    y: matrix.f,
+    basis: { a: matrix.a, b: matrix.b, c: matrix.c, d: matrix.d, e: 0, f: 0 },
+  };
 }
 
 /** Capture ordinary mask painting in the placed image plane, including the
  * mask's independent post-perspective translation. */
-export function maskPlacedPerspective(value:import('./perspective').PerspectiveData,width:number,height:number,mask:LayerMaskData){
-  const x=mask.placedX??0,y=mask.placedY??0;
-  return x||y?{corners:value.corners.map(p=>({x:p.x+x/width,y:p.y+y/height}))as unknown as import('./projective').ProjectiveQuad}:value;
+export function maskPlacedPerspective(
+  value: import("./perspective").PerspectiveData,
+  width: number,
+  height: number,
+  mask: LayerMaskData,
+) {
+  const x = mask.placedX ?? 0,
+    y = mask.placedY ?? 0;
+  return x || y
+    ? {
+        corners: value.corners.map((p) => ({
+          x: p.x + x / width,
+          y: p.y + y / height,
+        })) as unknown as import("./projective").ProjectiveQuad,
+      }
+    : value;
 }
 
 /** Ordinary mask drag/nudge in containing-document pixels. A linked projected
  * mask moves after perspective; authored geometry and refinements stay native. */
-export function translateMaskData(mask:LayerMaskData,world:AffineTransform,dx:number,dy:number,projected:boolean):LayerMaskData {
-  if(![dx,dy].every(Number.isFinite))throw new Error('Mask movement must use finite canvas pixels.');
-  if(!dx&&!dy)return mask;
-  const inverse=mask.linked===false?new AffineTransform():new AffineTransform(world.a,world.b,world.c,world.d).inverse();
-  const delta=inverse.point({x:dx,y:dy}),placed=projected&&mask.linked!==false;
-  const x=(placed?mask.placedX??0:mask.x??0)+delta.x,y=(placed?mask.placedY??0:mask.y??0)+delta.y;
-  if(![x,y].every(v=>Number.isFinite(v)&&Math.abs(v)<=Number.MAX_SAFE_INTEGER))throw new Error('Mask movement exceeds coordinate precision.');
-  return placed?{...mask,placedX:x,placedY:y}:{...mask,x,y};
+export function translateMaskData(
+  mask: LayerMaskData,
+  world: AffineTransform,
+  dx: number,
+  dy: number,
+  projected: boolean,
+): LayerMaskData {
+  if (![dx, dy].every(Number.isFinite))
+    throw new Error("Mask movement must use finite canvas pixels.");
+  if (!dx && !dy) return mask;
+  const inverse =
+    mask.linked === false
+      ? new AffineTransform()
+      : new AffineTransform(world.a, world.b, world.c, world.d).inverse();
+  const delta = inverse.point({ x: dx, y: dy }),
+    placed = projected && mask.linked !== false;
+  const x = (placed ? (mask.placedX ?? 0) : (mask.x ?? 0)) + delta.x,
+    y = (placed ? (mask.placedY ?? 0) : (mask.y ?? 0)) + delta.y;
+  if (
+    ![x, y].every(
+      (v) => Number.isFinite(v) && Math.abs(v) <= Number.MAX_SAFE_INTEGER,
+    )
+  )
+    throw new Error("Mask movement exceeds coordinate precision.");
+  return placed ? { ...mask, placedX: x, placedY: y } : { ...mask, x, y };
 }
 
 /** Translation-only adapter for existing renderer and tool callers. */
@@ -181,7 +337,9 @@ export function maskGeometry(mask: LayerMaskData) {
         ? [mask.paths, mask.fillRule]
         : mask.kind === "bitmap"
           ? mask.assetId
-          : mask.kind === "raster-erasures" ? [mask.width,mask.height,mask.erasures] : mask.base,
+          : mask.kind === "raster-erasures"
+            ? [mask.width, mask.height, mask.erasures]
+            : mask.base,
     mask.strokes ?? [],
     mask.plane,
   ];

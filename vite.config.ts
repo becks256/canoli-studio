@@ -4,7 +4,18 @@ export default defineConfig({
   // These worker-only imports are discovered after startup otherwise; a cache
   // containing the earlier aggregate CSS parser can force a mid-import reload.
   // SVG/Boolean work also reaches Paper's CommonJS kernel after startup.
-  optimizeDeps: { include: ["exifr", "@jsquash/avif/codec/enc/avif_enc.js", "@xmldom/xmldom", "paper/dist/paper-core.js", "css-tree/parser", "css-tree/walker", "css-tree/generator", "css-tree/utils"] },
+  optimizeDeps: {
+    include: [
+      "exifr",
+      "@jsquash/avif/codec/enc/avif_enc.js",
+      "@xmldom/xmldom",
+      "paper/dist/paper-core.js",
+      "css-tree/parser",
+      "css-tree/walker",
+      "css-tree/generator",
+      "css-tree/utils",
+    ],
+  },
   worker: { format: "es" },
   server: { port: 5173, strictPort: true },
 });

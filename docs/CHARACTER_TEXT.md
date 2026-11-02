@@ -14,23 +14,28 @@ Point-text corner resizing scales the default and explicitly overridden font siz
 
 `new TextLayer({text, characterRanges?})` optionally accepts initialization ranges. `TextLayer.characterRanges` returns an owned readonly snapshot; mutate through methods:
 
-| Method | Contract |
-| --- | --- |
-| `await text.formatRange(start, end, format, control?)` | Overlay character properties on a nonempty interval. `format: null` clears its overrides. |
-| `await text.clearCharacterFormatting(start = 0, end = text.text.length, control?)` | Restore inheritance in the interval; empty whole text is a no-op. |
-| `text.replaceText(start, end, replacement, {affinity?} = {})` | Replace exactly this interval; `before`/`after` chooses the inherited side. Default is `after` for a selected interval and `before` for an insertion. |
-| `await text.reflowNative(control?)` | Prepare current native paragraph geometry and commit an ordinary text update. |
+| Method                                                                             | Contract                                                                                                                                              |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `await text.formatRange(start, end, format, control?)`                             | Overlay character properties on a nonempty interval. `format: null` clears its overrides.                                                             |
+| `await text.clearCharacterFormatting(start = 0, end = text.text.length, control?)` | Restore inheritance in the interval; empty whole text is a no-op.                                                                                     |
+| `text.replaceText(start, end, replacement, {affinity?} = {})`                      | Replace exactly this interval; `before`/`after` chooses the inherited side. Default is `after` for a selected interval and `before` for an insertion. |
+| `await text.reflowNative(control?)`                                                | Prepare current native paragraph geometry and commit an ordinary text update.                                                                         |
 
 `format` supports `fontFamily`, `fontSize`, `color`, `fontWeight`, `fontStyle`, `letterSpacing`, `wordSpacing`, `fontKerning`, `fontVariantCaps`, `fontStretch` and `fontVariationSettings`. Paragraph alignment/direction, wrapping, line height, indent and spacing belong to the frame. Omitted patch keys retain selected overrides; `null` clears all selected properties. `undefined` property values are omitted. No public mutation accepts measured geometry from a script.
 
 `control` is `{signal?: AbortSignal}` for trusted code. Isolated scripts use Scripts-panel cancellation and must await each native preparation. Asynchronous methods reject inside synchronous `Document.transaction` callbacks. They capture source/ranges, owner, source store and revision; cancellation, changed owners/revisions, invalid results, locks or missing sources publish no character edits. Attached changes share `layer.update`, validation, history and the usual plugin permissions. Detached objects remain constructible before collection attachment.
 
 ```js
-const title = document.layers.add(new TextLayer({
-  name: "Title", text: "Canoli Studio", fontSize: 32,
-  fontFamily: "serif", color: "#123456"
-}));
-await title.formatRange(0, 6, {fontSize: 48, color: "#a43e29"});
+const title = document.layers.add(
+  new TextLayer({
+    name: "Title",
+    text: "Canoli Studio",
+    fontSize: 32,
+    fontFamily: "serif",
+    color: "#123456",
+  }),
+);
+await title.formatRange(0, 6, { fontSize: 48, color: "#a43e29" });
 title.replaceText(7, 13, "Design");
 await title.reflowNative();
 ```

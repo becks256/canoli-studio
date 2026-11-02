@@ -89,7 +89,8 @@ const escape = (text) =>
 await mkdir("public/developer", { recursive: true });
 for (const [name, title] of generatedPages) {
   const description =
-    pageDescriptions[name] ?? "Documentation for the Canoli Studio image editor.";
+    pageDescriptions[name] ??
+    "Documentation for the Canoli Studio image editor.";
   const markdown = await readFile(`docs/${name}.md`, "utf8");
   let html = marked.parse(markdown);
   const ids = new Map();

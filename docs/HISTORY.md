@@ -39,7 +39,6 @@ The existing loopback REST host owns its own headless documents. These endpoints
 
 Unbranched documents retain history format 1. Branched history uses strict format 2, while saved comparisons use strict format 3, inside the existing checksummed native project 3/4 and workspace 2 containers; the document schema is unchanged. Older readers reject history versions they do not support; a history-2 reader cannot open comparison-bearing history 3. Workspace recovery and explicitly history-bearing native files preserve both directions and all branches. Normal browser Save project automatically includes history 2 when branches exist and history 3 when saved comparisons exist; unbranched downloads still omit linear history. Independent REST downloads require `?history=true` to include history and branches. Accepted source assets must remain available for retained states and are preserved by the existing project/workspace asset validation. Browser eviction, current format/font/precision limits and the broader professional-editor/performance gates still apply.
 
-
 ## Persistent document branches
 
 The inspector's Document branches section creates a named alternative from the **current document state**, independently of the state selected only for inspection. Move to a selected historical state first if that is your intended fork. The first fork creates Main for the previous route; editing after Undo also creates an automatically named Branch N. Existing alternatives are never silently evicted. Each route retains the existing 60-transition window; a separate exact fork-origin snapshot survives window pruning. The graph records actual in-app parent branches, not authenticated authorship or an operation-time log. More branches require additional memory and project/recovery storage; no constant-memory or all-tool performance claim is made.
@@ -49,11 +48,13 @@ Switch to branch tip restores its latest accepted result with its own undo path,
 Trusted OO API:
 
 ```ts
-const candidate = document.createHistoryBranch('Warm alternative'); // string ID; activates the new branch
+const candidate = document.createHistoryBranch("Warm alternative"); // string ID; activates the new branch
 // Edit with ordinary layer constructors, properties and transactions.
-const main = document.getSnapshot().branches.find(branch => branch.name === 'Main')!;
+const main = document
+  .getSnapshot()
+  .branches.find((branch) => branch.name === "Main")!;
 document.checkoutHistoryBranch(main.id);
-document.renameHistoryBranch(candidate, 'Reviewed alternative');
+document.renameHistoryBranch(candidate, "Reviewed alternative");
 document.deleteHistoryBranch(candidate); // only an inactive leaf
 ```
 
@@ -78,7 +79,6 @@ History 2 validates all current, past, future, branch-tip, branch-history and fo
 
 Successful mutations return the ordinary document snapshot plus `activeBranchId` and branch metadata. Stale revisions return 409; unknown branches, malformed/extra fields and prohibited deletion return 400 without publication. Accepted observer failures return 200 with the actual current state and the existing inspect-before-retrying warning. These independent sessions do not synchronize with browser documents or gain image rendering. Use `GET .../project?history=true` for branch-bearing native delivery.
 
-
 ## Saved comparison regions and branch ancestry
 
 The inspector displays parent-ordered branch ancestry, active and selected markers, level and parent names. Selecting an ancestry row inspects that branch's metadata; **Switch to branch tip** remains the explicit document mutation. The list scrolls, long names wrap and visual indentation caps at six levels while the full actual level/parent remains displayed. Native buttons retain normal Tab/Enter behavior; this is not an ARIA tree widget with undisclosed keyboard rules.
@@ -99,15 +99,19 @@ To edit a pinned state again, enter a new branch name and choose **Continue befo
 // Trusted browser hosting code, outside isolated Scripts.
 const doc = editor.document;
 const comparison = doc.createHistoryComparison(
-  'Earlier versus current',
-  {kind: 'timeline', position: 0},
-  {kind: 'current'},
+  "Earlier versus current",
+  { kind: "timeline", position: 0 },
+  { kind: "current" },
 ); // string ID; omitted region defaults to combined canvas extent
 const preview = await editor.previewHistoryComparison(comparison);
 // preview.before, preview.after and preview.difference are PNG Blobs.
 // preview.width, preview.height and preview.statistics describe the displayed grid.
-doc.updateHistoryComparison(comparison, {name: 'Reviewed comparison'});
-doc.createHistoryBranchFromComparison(comparison, 'after', 'Reviewed alternative');
+doc.updateHistoryComparison(comparison, { name: "Reviewed comparison" });
+doc.createHistoryBranchFromComparison(
+  comparison,
+  "after",
+  "Reviewed alternative",
+);
 doc.deleteHistoryComparison(comparison);
 ```
 
@@ -133,7 +137,6 @@ These are independent headless sessions, not browser synchronization. Native del
 ### History 3 persistence
 
 History 3 stores `{version:3,past,future,branches,activeBranchId,comparisons}`. It requires at least one comparison; branches may be empty only with null activeBranchId. Comparison records include exact before/after models, captured operation/branch labels and a validated region. They contain no inferred author/time, model provenance, billing or cryptographic attestation. Admission validates every pinned model and document ID, comparison IDs/names, regions and the existing strict branch graph/active-tip invariants before installing a session. Source closure includes every comparison side throughout native validation/encoding/decoding, worker transport, recovery, branch continuation and staged-asset cleanup. TIFF/AVIF precision choices and RAW originals remain accepted-source data. Current document schema 41, native project 3/4 and workspace 2 envelopes remain unchanged. History 1/2 remain readable; comparison-bearing files require a reader supporting history 3. Removing the last comparison returns to history 2 when branches exist, otherwise history 1. Authenticated operation provenance, broader W05/release quality and the full roadmap remain unfinished.
-
 
 ## Recorded operation provenance (history 4)
 

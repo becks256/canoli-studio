@@ -34,10 +34,10 @@ retained original bytes, and absence of developer globals are verified. Timing
 runs begin only after the heavy native and production verification suites finish.
 
 | Pair | Baseline p95 | Candidate p95 | Drag long tasks, baseline / candidate |
-| --- | ---: | ---: | ---: |
-| 1 | 85.9 ms | 38.2 ms | 0 / 0 |
-| 2 | 100.4 ms | 37.0 ms | 0 / 0 |
-| 3 | 85.5 ms | 36.0 ms | 0 / 0 |
+| ---- | -----------: | ------------: | ------------------------------------: |
+| 1    |      85.9 ms |       38.2 ms |                                 0 / 0 |
+| 2    |     100.4 ms |       37.0 ms |                                 0 / 0 |
+| 3    |      85.5 ms |       36.0 ms |                                 0 / 0 |
 
 Across 36 inputs per build, nearest-rank p95 is **85.9 → 37.0 ms**.
 These are warm eligible-view observations on one local Linux/Chromium device,

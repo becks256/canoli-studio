@@ -1,85 +1,613 @@
-import{it,expect,vi,afterEach}from'vitest';
-import{PixelProcessor}from'../src/engine/processor';
-class ControlledWorker{
- static current:ControlledWorker;onmessage?:({data}:{data:any})=>void;onerror?:()=>void;postMessage=vi.fn();terminate=vi.fn();constructor(){ControlledWorker.current=this;}ready(){this.onmessage?.({data:{type:'ready'}});}result(id:number,pixels:unknown){this.onmessage?.({data:{id,pixels}});}
+import { it, expect, vi, afterEach } from "vitest";
+import { PixelProcessor } from "../src/engine/processor";
+class ControlledWorker {
+  static current: ControlledWorker;
+  onmessage?: ({ data }: { data: any }) => void;
+  onerror?: () => void;
+  postMessage = vi.fn();
+  terminate = vi.fn();
+  constructor() {
+    ControlledWorker.current = this;
+  }
+  ready() {
+    this.onmessage?.({ data: { type: "ready" } });
+  }
+  result(id: number, pixels: unknown) {
+    this.onmessage?.({ data: { id, pixels } });
+  }
 }
-afterEach(()=>vi.unstubAllGlobals());
-function create(){vi.stubGlobal('Worker',ControlledWorker);const processor=new PixelProcessor();return{processor,worker:ControlledWorker.current};}
-it('placed wet worker snapshots all five coupled channels and rejects malformed replies before a valid retry',async()=>{
- const{processor,worker}=create(),field=new Float32Array([.125,.25,0,.5,.75]),options={sourceWidth:1,sourceHeight:1,field:{x:0,y:0,width:1,height:1},source:{x:0,y:0,width:1,height:1},output:{x:0,y:0,width:1,height:1},background:0,corners:[{x:0,y:0},{x:1,y:0},{x:1,y:1},{x:0,y:1}]as [{x:number;y:number},{x:number;y:number},{x:number;y:number},{x:number;y:number}]};
- const expected=field.slice(),pending=processor.floatProjectiveWet(field,options);field.fill(0);options.corners[0].x=99;worker.ready();await processor.ready;
- try{
-  const[message,transfers]=worker.postMessage.mock.calls[0];expect(message.floatProjectiveWet.alpha).toEqual(expected);expect(message.floatProjectiveWet.options.corners[0].x).toBe(0);expect(transfers).toEqual([message.floatProjectiveWet.alpha.buffer]);expect(transfers).not.toContain(field.buffer);worker.result(message.id,expected.slice());await expect(pending).resolves.toEqual(expected);options.corners[0].x=0;
-  for(const bad of[new Uint8Array(5),new Float32Array(4),new Float32Array([NaN,0,0,.5,.75]),new Float32Array([.75,0,0,.5,.75]),new Float32Array([0,0,0,.75,.5]),new Float32Array([0,0,0,1,2])]){const work=processor.floatProjectiveWet(expected,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,bad);await expect(work).rejects.toThrow();}
-  const retry=processor.floatProjectiveWet(expected,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,expected.slice());await expect(retry).resolves.toEqual(expected);expect(field).toEqual(new Float32Array(5));
- }finally{processor.dispose();}
-});
-it('float tonal captures controls, signed pixels and coverage before readiness and rejects altered alpha',async()=>{
- const{processor,worker}=create(),source=new Float32Array([2,-.125,4,.375]),coverage=new Float32Array([.5]),options={mode:'dodge' as const,range:'highlights' as const,exposure:.625,protectTones:false};
- const pending=processor.floatTonal(source,coverage,options);source.fill(0);coverage.fill(0);options.exposure=0;worker.ready();await processor.ready;
- try{
-  const [message,transfer]=worker.postMessage.mock.calls[0];expect(message.floatTonal.pixels).toEqual(new Float32Array([2,-.125,4,.375]));expect(message.floatTonal.coverage).toEqual(new Float32Array([.5]));expect(message.floatTonal.options.exposure).toBe(.625);
-  expect(transfer).toEqual([message.floatTonal.pixels.buffer,message.floatTonal.coverage.buffer]);expect(transfer).not.toContain(source.buffer);expect(transfer).not.toContain(coverage.buffer);
-  worker.result(message.id,new Float32Array([4,-.25,8,.375]));await expect(pending).resolves.toEqual(new Float32Array([4,-.25,8,.375]));
-  const input=new Float32Array([.25,.5,.75,.375]);
-  for(const bad of[new Float32Array([.25,.5,.75,.5]),new Float32Array(8),new Float32Array([NaN,0,0,.375]),new Uint8Array(4)]){
-   const task=processor.floatTonal(input,coverage,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,bad);await expect(task).rejects.toThrow();
+afterEach(() => vi.unstubAllGlobals());
+function create() {
+  vi.stubGlobal("Worker", ControlledWorker);
+  const processor = new PixelProcessor();
+  return { processor, worker: ControlledWorker.current };
+}
+it("placed wet worker snapshots all five coupled channels and rejects malformed replies before a valid retry", async () => {
+  const { processor, worker } = create(),
+    field = new Float32Array([0.125, 0.25, 0, 0.5, 0.75]),
+    options = {
+      sourceWidth: 1,
+      sourceHeight: 1,
+      field: { x: 0, y: 0, width: 1, height: 1 },
+      source: { x: 0, y: 0, width: 1, height: 1 },
+      output: { x: 0, y: 0, width: 1, height: 1 },
+      background: 0,
+      corners: [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: 1 },
+        { x: 0, y: 1 },
+      ] as [
+        { x: number; y: number },
+        { x: number; y: number },
+        { x: number; y: number },
+        { x: number; y: number },
+      ],
+    };
+  const expected = field.slice(),
+    pending = processor.floatProjectiveWet(field, options);
+  field.fill(0);
+  options.corners[0].x = 99;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfers] = worker.postMessage.mock.calls[0];
+    expect(message.floatProjectiveWet.alpha).toEqual(expected);
+    expect(message.floatProjectiveWet.options.corners[0].x).toBe(0);
+    expect(transfers).toEqual([message.floatProjectiveWet.alpha.buffer]);
+    expect(transfers).not.toContain(field.buffer);
+    worker.result(message.id, expected.slice());
+    await expect(pending).resolves.toEqual(expected);
+    options.corners[0].x = 0;
+    for (const bad of [
+      new Uint8Array(5),
+      new Float32Array(4),
+      new Float32Array([NaN, 0, 0, 0.5, 0.75]),
+      new Float32Array([0.75, 0, 0, 0.5, 0.75]),
+      new Float32Array([0, 0, 0, 0.75, 0.5]),
+      new Float32Array([0, 0, 0, 1, 2]),
+    ]) {
+      const work = processor.floatProjectiveWet(expected, options);
+      await Promise.resolve();
+      worker.result(worker.postMessage.mock.calls.at(-1)![0].id, bad);
+      await expect(work).rejects.toThrow();
+    }
+    const retry = processor.floatProjectiveWet(expected, options);
+    await Promise.resolve();
+    worker.result(
+      worker.postMessage.mock.calls.at(-1)![0].id,
+      expected.slice(),
+    );
+    await expect(retry).resolves.toEqual(expected);
+    expect(field).toEqual(new Float32Array(5));
+  } finally {
+    processor.dispose();
   }
-  const retry=processor.floatTonal(input,coverage,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,input.slice());await expect(retry).resolves.toEqual(input);
- }finally{processor.dispose();}
 });
-it('shadow alpha and Gaussian settings snapshot before readiness with owned transfers and strict reply recovery',async()=>{
- const{processor,worker}=create(),alpha=new Float32Array(9).fill(.375),settings={width:9,height:1,sigma:1,axis:'horizontal' as const},pending=processor.floatConvolveAlpha(alpha,settings);alpha.fill(0);settings.sigma=0;worker.ready();await processor.ready;
- try{const[message,transfers]=worker.postMessage.mock.calls[0];expect(message.floatConvolveAlpha.settings.sigma).toBe(1);expect(message.floatConvolveAlpha.alpha).toEqual(new Float32Array(9).fill(.375));expect(transfers).toEqual([message.floatConvolveAlpha.alpha.buffer]);expect(transfers).not.toContain(alpha.buffer);worker.result(message.id,new Float32Array(3).fill(.375));await expect(pending).resolves.toEqual(new Float32Array(3).fill(.375));
- for(const bad of[new Uint8Array(9),new Float32Array(8),new Float32Array(9).fill(NaN),new Float32Array(9).fill(1.01)]){const work=processor.floatConvolveAlpha(alpha,settings);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,bad);await expect(work).rejects.toThrow();}
- const retry=processor.floatConvolveAlpha(alpha,settings);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,alpha.slice());await expect(retry).resolves.toEqual(alpha);
- }finally{processor.dispose();}
-});
-it('shadow disposal before readiness and after request reject without detaching intrinsic alpha',async()=>{
- for(const ready of[false,true]){const{processor,worker}=create(),alpha=new Float32Array([.375]),work=processor.floatConvolveAlpha(alpha,{width:1,height:1,sigma:0,axis:'vertical'});if(ready){worker.ready();await processor.ready;}processor.dispose();await expect(work).rejects.toThrow('closed');expect(alpha[0]).toBe(.375);}
-});
-it('float worker capture precedes readiness and transfers only private complete samples',async()=>{const{processor,worker}=create();const source=new Float32Array([2.125,-.125,4,.375]),backdrop=new Float32Array([.25,.5,.75,.625]),mask=new Float32Array([.5]),options={mask,opacity:.75};try{const pending=processor.floatComposite(source,backdrop,options);source.fill(0);backdrop.fill(0);mask.fill(0);options.opacity=0;worker.ready();await processor.ready;const[message,transfer]=worker.postMessage.mock.calls[0];expect([...message.floatComposite.source]).toEqual([2.125,-.125,4,.375]);expect([...message.floatComposite.backdrop]).toEqual([.25,.5,.75,.625]);expect([...message.floatComposite.options.mask]).toEqual([.5]);expect(message.floatComposite.options.opacity).toBe(.75);expect(transfer).not.toContain(source.buffer);expect(transfer).not.toContain(backdrop.buffer);expect(transfer).not.toContain(mask.buffer);expect(transfer).toEqual([message.floatComposite.source.buffer,message.floatComposite.backdrop.buffer,message.floatComposite.options.mask.buffer]);const result=new Float32Array([1.125,.125,2,.75]);worker.result(message.id,result);expect(await pending).toEqual(result);}finally{processor.dispose();}});
-it('affine coefficients and original pixels are captured before readiness',async()=>{const{processor,worker}=create(),source=new Float32Array([.3,.2,.1,1]),matrix=[2,0,0,0,0,2,0,0,0,0,2,0];try{const pending=processor.floatAffine(source,matrix);source.fill(0);matrix.fill(0);worker.ready();await processor.ready;const[message,transfer]=worker.postMessage.mock.calls[0];expect(message.floatAffine.matrix).toEqual([2,0,0,0,0,2,0,0,0,0,2,0]);expect(message.floatAffine.pixels[0]).toBe(Math.fround(.3));expect(transfer).toEqual([message.floatAffine.pixels.buffer]);worker.result(message.id,new Float32Array([.6,.4,.2,1]));await expect(pending).resolves.toBeInstanceOf(Float32Array);}finally{processor.dispose();}});
-it('malformed float results reject without poisoning later native requests',async()=>{const{processor,worker}=create();worker.ready();await processor.ready;try{const source=new Float32Array([.1,.2,.3,.5]);for(const bad of[new Uint8ClampedArray(4),new Float32Array(8),new Float32Array([NaN,0,0,1]),new Float32Array([0,0,0,2])]){const pending=processor.floatComposite(source,source);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,bad);await expect(pending).rejects.toThrow();}const retry=processor.floatComposite(source,source);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,source.slice());await expect(retry).resolves.toEqual(source);}finally{processor.dispose();}});
-it('float disposal before readiness rejects work without detaching original sources',async()=>{const{processor,worker}=create(),source=new Float32Array([2.1,-.5,1.3,.5]),before=source.slice(),pending=processor.floatComposite(source,source);processor.dispose();await expect(pending).rejects.toThrow('closed');worker.ready();expect(worker.postMessage).not.toHaveBeenCalled();expect(source).toEqual(before);});
-it('wire-window budget and invalid inputs reject independently of original document geometry',async()=>{const{processor,worker}=create();worker.ready();try{await expect(processor.floatComposite(new Float32Array(262145*4),new Float32Array(262145*4))).rejects.toThrow('working-buffer');await expect(processor.floatComposite(new Float32Array([0,0,NaN,1]),new Float32Array(4))).rejects.toThrow('invalid');await expect(processor.floatAffine(new Float32Array(4),[1,2])).rejects.toThrow('twelve');expect(worker.postMessage).not.toHaveBeenCalled();}finally{processor.dispose();}});
-it('tone snapshots all numeric settings and original samples before worker readiness, and validates replies',async()=>{
- const{processor,worker}=create(),source=new Float32Array([2.125,-.125,4,.375]),settings={exposure:.5,contrast:35,saturation:-60};const pending=processor.floatTone(source,settings);source.fill(0);settings.contrast=0;worker.ready();await processor.ready;try{const[message,transfer]=worker.postMessage.mock.calls[0];expect(message.floatTone.options).toEqual({exposure:.5,contrast:35,saturation:-60});expect([...message.floatTone.pixels]).toEqual([2.125,-.125,4,.375]);expect(transfer).toEqual([message.floatTone.pixels.buffer]);worker.result(message.id,new Float32Array([3,-.5,4,.375]));expect(await pending).toEqual(new Float32Array([3,-.5,4,.375]));const bad=processor.floatTone(source);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,new Float32Array([NaN,0,0,1]));await expect(bad).rejects.toThrow('invalid');}finally{processor.dispose();}
-});
-it('continuous transfer captures nested controls before readiness and validates complete owned replies',async()=>{
- const{processor,worker}=create(),source=new Float32Array([2.125,-.125,4,.375]),adjustment={kind:'curves' as const,rgb:[{x:0,y:16},{x:255,y:240}]},pending=processor.floatTransfer(source,adjustment);source.fill(0);adjustment.rgb[0].y=0;worker.ready();await processor.ready;try{const[message,transfer]=worker.postMessage.mock.calls[0];expect(message.floatTransfer.adjustment.rgb[0].y).toBe(16);expect([...message.floatTransfer.pixels]).toEqual([2.125,-.125,4,.375]);expect(transfer).toEqual([message.floatTransfer.pixels.buffer]);worker.result(message.id,new Float32Array([1,2,3,.375]));await expect(pending).resolves.toEqual(new Float32Array([1,2,3,.375]));for(const invalid of[new Uint8Array(4),new Float32Array(8),new Float32Array([NaN,0,0,1]),new Float32Array([0,0,0,2])]){const failed=processor.floatTransfer(source,adjustment);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,invalid);await expect(failed).rejects.toThrow();}}finally{processor.dispose();}
-});
-
-it('float color captures nested range controls and all source words before readiness, transfers private data and rejects malformed results',async()=>{
- const{processor,worker}=create(),source=new Float32Array([.125,.25,.5,.375]),adjustment={kind:'color-balance'as const,shadows:{red:-25,green:0,blue:15},midtones:{red:35,green:-20,blue:0},highlights:{red:0,green:0,blue:10},preserveLuminosity:true};
- const pending=processor.floatColor(source,adjustment);source.fill(0);adjustment.shadows.red=0;adjustment.preserveLuminosity=false;worker.ready();await processor.ready;
- try{const[message,transfer]=worker.postMessage.mock.calls[0];expect(message.floatColor.adjustment.shadows.red).toBe(-25);expect(message.floatColor.adjustment.preserveLuminosity).toBe(true);expect([...message.floatColor.pixels]).toEqual([.125,.25,.5,.375]);expect(transfer).toEqual([message.floatColor.pixels.buffer]);expect(transfer).not.toContain(source.buffer);worker.result(message.id,new Float32Array([.2,.3,.4,.375]));await expect(pending).resolves.toEqual(new Float32Array([.2,.3,.4,.375]));
-  for(const invalid of[new Uint8Array(4),new Float32Array(8),new Float32Array([NaN,0,0,1]),new Float32Array([0,0,0,2]),new Float32Array([2,0,0,1])]){const failed=processor.floatColor(source,adjustment);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,invalid);await expect(failed).rejects.toThrow();}
-  const retry=processor.floatColor(new Float32Array([.1,.2,.3,.5]),{kind:'hsl',hue:15,saturation:10,lightness:0});await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,new Float32Array([.2,.3,.4,.5]));await expect(retry).resolves.toEqual(new Float32Array([.2,.3,.4,.5]));
- }finally{processor.dispose();}
-});
-
-it('float gradient captures nested stops before readiness, transfers private samples and rejects invalid normalized output',async()=>{
- const{processor,worker}=create(),pixels=new Float32Array([-1,.5,3,.375]),adjustment={kind:'gradient-map'as const,stops:[{position:0,color:'#171b46'},{position:1,color:'#ffe4a0'}],reverse:false},pending=processor.floatGradient(pixels,adjustment);pixels.fill(0);adjustment.stops[0].color='#000000';worker.ready();await processor.ready;try{const[message,transfers]=worker.postMessage.mock.calls[0];expect(message.floatGradient.adjustment.stops[0].color).toBe('#171b46');expect([...message.floatGradient.pixels]).toEqual([-1,.5,3,.375]);expect(transfers).toEqual([message.floatGradient.pixels.buffer]);worker.result(message.id,new Float32Array([.1,.2,.3,.375]));await expect(pending).resolves.toBeInstanceOf(Float32Array);const failed=processor.floatGradient(pixels,adjustment);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,new Float32Array([2,0,0,.5]));await expect(failed).rejects.toThrow('normalized');}finally{processor.dispose();}
-});
-it('float lookup captures table headers once, validates captured handles/results and releases privately on disposal',async()=>{
- const{processor,worker}=create(),{defaultLutAdjustment}=await import('../src/core/lut'),settings=defaultLutAdjustment(),original=settings.lut.data,pending=processor.prepareFloatLookup(settings);settings.lut.data='';settings.lut.domainMax[0]=2;worker.ready();await processor.ready;try{const message=worker.postMessage.mock.calls[0][0];expect(message.floatLookupPrepare.lut.data).toBe(original);expect(message.floatLookupPrepare.lut.domainMax[0]).toBe(1);worker.onmessage?.({data:{id:message.id,floatLookupHandle:7}});const lease=await pending,source=new Float32Array([-.5,2,.125,.375]),applied=lease.apply(source);source.fill(0);await Promise.resolve();const[apply,transfers]=worker.postMessage.mock.calls.at(-1)!;expect(apply.floatLookupApply.handle).toBe(7);expect([...apply.floatLookupApply.pixels]).toEqual([-.5,2,.125,.375]);expect(transfers).toEqual([apply.floatLookupApply.pixels.buffer]);expect(apply.floatLookupPrepare).toBeUndefined();worker.result(apply.id,new Float32Array([1.5,-.5,2,.375]));await expect(applied).resolves.toEqual(new Float32Array([1.5,-.5,2,.375]));const bad=lease.apply(source);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,new Float32Array([NaN,0,0,1]));await expect(bad).rejects.toThrow('invalid');lease.dispose();lease.dispose();await Promise.resolve();const release=worker.postMessage.mock.calls.at(-1)![0];expect(release.floatLookupRelease).toBe(7);worker.result(release.id,undefined);await expect(lease.apply(source)).rejects.toThrow('disposed');}finally{processor.dispose();}
-});
-
-it('float style captures source/backdrop, colors and split ranges before readiness and transfers only private samples',async()=>{
- const{processor,worker}=create(),{defaultStyle}=await import('../src/core/drawing'),source=new Float32Array([2.125,-.125,4,.375]),backdrop=new Float32Array([.25,.5,.75,.625]),style=defaultStyle();style.colorOverlay={enabled:true,color:'#ad3f79',opacity:.375};style.blendIf.enabled=true;style.blendIf.source=[12,64,192,248];
- const pending=processor.floatStyle(source,backdrop,style);source.fill(0);backdrop.fill(0);style.colorOverlay.opacity=0;style.blendIf.source[0]=0;worker.ready();await processor.ready;
- try{const[message,transfers]=worker.postMessage.mock.calls[0];expect([...message.floatStyle.source]).toEqual([2.125,-.125,4,.375]);expect([...message.floatStyle.backdrop]).toEqual([.25,.5,.75,.625]);expect(message.floatStyle.style.colorOverlay.opacity).toBe(.375);expect(message.floatStyle.style.blendIf.source[0]).toBe(12);expect(transfers).toEqual([message.floatStyle.source.buffer,message.floatStyle.backdrop.buffer]);expect(transfers).not.toContain(source.buffer);expect(transfers).not.toContain(backdrop.buffer);
-  const result={pixels:new Float32Array([1.5,-.075,2.5,.375]),coverage:new Float32Array([.5625])};worker.onmessage?.({data:{id:message.id,floatStyle:result}});await expect(pending).resolves.toEqual(result);
- }finally{processor.dispose();}
-});
-it('malformed style coverage, altered alpha and wrong result types reject while a subsequent request succeeds',async()=>{
- const{processor,worker}=create(),{defaultStyle}=await import('../src/core/drawing'),source=new Float32Array([.1,.2,.3,.5]),style=defaultStyle();worker.ready();await processor.ready;
- try{
-  for(const bad of[null,new Float32Array(4),{pixels:source.slice(),coverage:new Uint8Array(1)},{pixels:source.slice(),coverage:new Float32Array(2)},{pixels:source.slice(),coverage:new Float32Array([NaN])},{pixels:source.slice(),coverage:new Float32Array([1.01])},{pixels:new Float32Array([.1,.2,.3,.25]),coverage:new Float32Array([1])},{pixels:source.slice(),coverage:new Float32Array([1]),extra:true}]){
-   const pending=processor.floatStyle(source,source,style);await Promise.resolve();const id=worker.postMessage.mock.calls.at(-1)![0].id;
-   worker.onmessage?.({data:bad===null?{id,pixels:new Float32Array(4)}:{id,floatStyle:bad}});await expect(pending).rejects.toThrow();
+it("float tonal captures controls, signed pixels and coverage before readiness and rejects altered alpha", async () => {
+  const { processor, worker } = create(),
+    source = new Float32Array([2, -0.125, 4, 0.375]),
+    coverage = new Float32Array([0.5]),
+    options = {
+      mode: "dodge" as const,
+      range: "highlights" as const,
+      exposure: 0.625,
+      protectTones: false,
+    };
+  const pending = processor.floatTonal(source, coverage, options);
+  source.fill(0);
+  coverage.fill(0);
+  options.exposure = 0;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfer] = worker.postMessage.mock.calls[0];
+    expect(message.floatTonal.pixels).toEqual(
+      new Float32Array([2, -0.125, 4, 0.375]),
+    );
+    expect(message.floatTonal.coverage).toEqual(new Float32Array([0.5]));
+    expect(message.floatTonal.options.exposure).toBe(0.625);
+    expect(transfer).toEqual([
+      message.floatTonal.pixels.buffer,
+      message.floatTonal.coverage.buffer,
+    ]);
+    expect(transfer).not.toContain(source.buffer);
+    expect(transfer).not.toContain(coverage.buffer);
+    worker.result(message.id, new Float32Array([4, -0.25, 8, 0.375]));
+    await expect(pending).resolves.toEqual(
+      new Float32Array([4, -0.25, 8, 0.375]),
+    );
+    const input = new Float32Array([0.25, 0.5, 0.75, 0.375]);
+    for (const bad of [
+      new Float32Array([0.25, 0.5, 0.75, 0.5]),
+      new Float32Array(8),
+      new Float32Array([NaN, 0, 0, 0.375]),
+      new Uint8Array(4),
+    ]) {
+      const task = processor.floatTonal(input, coverage, options);
+      await Promise.resolve();
+      worker.result(worker.postMessage.mock.calls.at(-1)![0].id, bad);
+      await expect(task).rejects.toThrow();
+    }
+    const retry = processor.floatTonal(input, coverage, options);
+    await Promise.resolve();
+    worker.result(worker.postMessage.mock.calls.at(-1)![0].id, input.slice());
+    await expect(retry).resolves.toEqual(input);
+  } finally {
+    processor.dispose();
   }
-  const pending=processor.floatStyle(source,source,style);await Promise.resolve();worker.onmessage?.({data:{id:worker.postMessage.mock.calls.at(-1)![0].id,floatStyle:{pixels:source.slice(),coverage:new Float32Array([1])}}});await expect(pending).resolves.toMatchObject({pixels:source,coverage:new Float32Array([1])});
- }finally{processor.dispose();}
+});
+it("shadow alpha and Gaussian settings snapshot before readiness with owned transfers and strict reply recovery", async () => {
+  const { processor, worker } = create(),
+    alpha = new Float32Array(9).fill(0.375),
+    settings = { width: 9, height: 1, sigma: 1, axis: "horizontal" as const },
+    pending = processor.floatConvolveAlpha(alpha, settings);
+  alpha.fill(0);
+  settings.sigma = 0;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfers] = worker.postMessage.mock.calls[0];
+    expect(message.floatConvolveAlpha.settings.sigma).toBe(1);
+    expect(message.floatConvolveAlpha.alpha).toEqual(
+      new Float32Array(9).fill(0.375),
+    );
+    expect(transfers).toEqual([message.floatConvolveAlpha.alpha.buffer]);
+    expect(transfers).not.toContain(alpha.buffer);
+    worker.result(message.id, new Float32Array(3).fill(0.375));
+    await expect(pending).resolves.toEqual(new Float32Array(3).fill(0.375));
+    for (const bad of [
+      new Uint8Array(9),
+      new Float32Array(8),
+      new Float32Array(9).fill(NaN),
+      new Float32Array(9).fill(1.01),
+    ]) {
+      const work = processor.floatConvolveAlpha(alpha, settings);
+      await Promise.resolve();
+      worker.result(worker.postMessage.mock.calls.at(-1)![0].id, bad);
+      await expect(work).rejects.toThrow();
+    }
+    const retry = processor.floatConvolveAlpha(alpha, settings);
+    await Promise.resolve();
+    worker.result(worker.postMessage.mock.calls.at(-1)![0].id, alpha.slice());
+    await expect(retry).resolves.toEqual(alpha);
+  } finally {
+    processor.dispose();
+  }
+});
+it("shadow disposal before readiness and after request reject without detaching intrinsic alpha", async () => {
+  for (const ready of [false, true]) {
+    const { processor, worker } = create(),
+      alpha = new Float32Array([0.375]),
+      work = processor.floatConvolveAlpha(alpha, {
+        width: 1,
+        height: 1,
+        sigma: 0,
+        axis: "vertical",
+      });
+    if (ready) {
+      worker.ready();
+      await processor.ready;
+    }
+    processor.dispose();
+    await expect(work).rejects.toThrow("closed");
+    expect(alpha[0]).toBe(0.375);
+  }
+});
+it("float worker capture precedes readiness and transfers only private complete samples", async () => {
+  const { processor, worker } = create();
+  const source = new Float32Array([2.125, -0.125, 4, 0.375]),
+    backdrop = new Float32Array([0.25, 0.5, 0.75, 0.625]),
+    mask = new Float32Array([0.5]),
+    options = { mask, opacity: 0.75 };
+  try {
+    const pending = processor.floatComposite(source, backdrop, options);
+    source.fill(0);
+    backdrop.fill(0);
+    mask.fill(0);
+    options.opacity = 0;
+    worker.ready();
+    await processor.ready;
+    const [message, transfer] = worker.postMessage.mock.calls[0];
+    expect([...message.floatComposite.source]).toEqual([
+      2.125, -0.125, 4, 0.375,
+    ]);
+    expect([...message.floatComposite.backdrop]).toEqual([
+      0.25, 0.5, 0.75, 0.625,
+    ]);
+    expect([...message.floatComposite.options.mask]).toEqual([0.5]);
+    expect(message.floatComposite.options.opacity).toBe(0.75);
+    expect(transfer).not.toContain(source.buffer);
+    expect(transfer).not.toContain(backdrop.buffer);
+    expect(transfer).not.toContain(mask.buffer);
+    expect(transfer).toEqual([
+      message.floatComposite.source.buffer,
+      message.floatComposite.backdrop.buffer,
+      message.floatComposite.options.mask.buffer,
+    ]);
+    const result = new Float32Array([1.125, 0.125, 2, 0.75]);
+    worker.result(message.id, result);
+    expect(await pending).toEqual(result);
+  } finally {
+    processor.dispose();
+  }
+});
+it("affine coefficients and original pixels are captured before readiness", async () => {
+  const { processor, worker } = create(),
+    source = new Float32Array([0.3, 0.2, 0.1, 1]),
+    matrix = [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0];
+  try {
+    const pending = processor.floatAffine(source, matrix);
+    source.fill(0);
+    matrix.fill(0);
+    worker.ready();
+    await processor.ready;
+    const [message, transfer] = worker.postMessage.mock.calls[0];
+    expect(message.floatAffine.matrix).toEqual([
+      2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0,
+    ]);
+    expect(message.floatAffine.pixels[0]).toBe(Math.fround(0.3));
+    expect(transfer).toEqual([message.floatAffine.pixels.buffer]);
+    worker.result(message.id, new Float32Array([0.6, 0.4, 0.2, 1]));
+    await expect(pending).resolves.toBeInstanceOf(Float32Array);
+  } finally {
+    processor.dispose();
+  }
+});
+it("malformed float results reject without poisoning later native requests", async () => {
+  const { processor, worker } = create();
+  worker.ready();
+  await processor.ready;
+  try {
+    const source = new Float32Array([0.1, 0.2, 0.3, 0.5]);
+    for (const bad of [
+      new Uint8ClampedArray(4),
+      new Float32Array(8),
+      new Float32Array([NaN, 0, 0, 1]),
+      new Float32Array([0, 0, 0, 2]),
+    ]) {
+      const pending = processor.floatComposite(source, source);
+      await Promise.resolve();
+      worker.result(worker.postMessage.mock.calls.at(-1)![0].id, bad);
+      await expect(pending).rejects.toThrow();
+    }
+    const retry = processor.floatComposite(source, source);
+    await Promise.resolve();
+    worker.result(worker.postMessage.mock.calls.at(-1)![0].id, source.slice());
+    await expect(retry).resolves.toEqual(source);
+  } finally {
+    processor.dispose();
+  }
+});
+it("float disposal before readiness rejects work without detaching original sources", async () => {
+  const { processor, worker } = create(),
+    source = new Float32Array([2.1, -0.5, 1.3, 0.5]),
+    before = source.slice(),
+    pending = processor.floatComposite(source, source);
+  processor.dispose();
+  await expect(pending).rejects.toThrow("closed");
+  worker.ready();
+  expect(worker.postMessage).not.toHaveBeenCalled();
+  expect(source).toEqual(before);
+});
+it("wire-window budget and invalid inputs reject independently of original document geometry", async () => {
+  const { processor, worker } = create();
+  worker.ready();
+  try {
+    await expect(
+      processor.floatComposite(
+        new Float32Array(262145 * 4),
+        new Float32Array(262145 * 4),
+      ),
+    ).rejects.toThrow("working-buffer");
+    await expect(
+      processor.floatComposite(
+        new Float32Array([0, 0, NaN, 1]),
+        new Float32Array(4),
+      ),
+    ).rejects.toThrow("invalid");
+    await expect(
+      processor.floatAffine(new Float32Array(4), [1, 2]),
+    ).rejects.toThrow("twelve");
+    expect(worker.postMessage).not.toHaveBeenCalled();
+  } finally {
+    processor.dispose();
+  }
+});
+it("tone snapshots all numeric settings and original samples before worker readiness, and validates replies", async () => {
+  const { processor, worker } = create(),
+    source = new Float32Array([2.125, -0.125, 4, 0.375]),
+    settings = { exposure: 0.5, contrast: 35, saturation: -60 };
+  const pending = processor.floatTone(source, settings);
+  source.fill(0);
+  settings.contrast = 0;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfer] = worker.postMessage.mock.calls[0];
+    expect(message.floatTone.options).toEqual({
+      exposure: 0.5,
+      contrast: 35,
+      saturation: -60,
+    });
+    expect([...message.floatTone.pixels]).toEqual([2.125, -0.125, 4, 0.375]);
+    expect(transfer).toEqual([message.floatTone.pixels.buffer]);
+    worker.result(message.id, new Float32Array([3, -0.5, 4, 0.375]));
+    expect(await pending).toEqual(new Float32Array([3, -0.5, 4, 0.375]));
+    const bad = processor.floatTone(source);
+    await Promise.resolve();
+    worker.result(
+      worker.postMessage.mock.calls.at(-1)![0].id,
+      new Float32Array([NaN, 0, 0, 1]),
+    );
+    await expect(bad).rejects.toThrow("invalid");
+  } finally {
+    processor.dispose();
+  }
+});
+it("continuous transfer captures nested controls before readiness and validates complete owned replies", async () => {
+  const { processor, worker } = create(),
+    source = new Float32Array([2.125, -0.125, 4, 0.375]),
+    adjustment = {
+      kind: "curves" as const,
+      rgb: [
+        { x: 0, y: 16 },
+        { x: 255, y: 240 },
+      ],
+    },
+    pending = processor.floatTransfer(source, adjustment);
+  source.fill(0);
+  adjustment.rgb[0].y = 0;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfer] = worker.postMessage.mock.calls[0];
+    expect(message.floatTransfer.adjustment.rgb[0].y).toBe(16);
+    expect([...message.floatTransfer.pixels]).toEqual([
+      2.125, -0.125, 4, 0.375,
+    ]);
+    expect(transfer).toEqual([message.floatTransfer.pixels.buffer]);
+    worker.result(message.id, new Float32Array([1, 2, 3, 0.375]));
+    await expect(pending).resolves.toEqual(new Float32Array([1, 2, 3, 0.375]));
+    for (const invalid of [
+      new Uint8Array(4),
+      new Float32Array(8),
+      new Float32Array([NaN, 0, 0, 1]),
+      new Float32Array([0, 0, 0, 2]),
+    ]) {
+      const failed = processor.floatTransfer(source, adjustment);
+      await Promise.resolve();
+      worker.result(worker.postMessage.mock.calls.at(-1)![0].id, invalid);
+      await expect(failed).rejects.toThrow();
+    }
+  } finally {
+    processor.dispose();
+  }
+});
+
+it("float color captures nested range controls and all source words before readiness, transfers private data and rejects malformed results", async () => {
+  const { processor, worker } = create(),
+    source = new Float32Array([0.125, 0.25, 0.5, 0.375]),
+    adjustment = {
+      kind: "color-balance" as const,
+      shadows: { red: -25, green: 0, blue: 15 },
+      midtones: { red: 35, green: -20, blue: 0 },
+      highlights: { red: 0, green: 0, blue: 10 },
+      preserveLuminosity: true,
+    };
+  const pending = processor.floatColor(source, adjustment);
+  source.fill(0);
+  adjustment.shadows.red = 0;
+  adjustment.preserveLuminosity = false;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfer] = worker.postMessage.mock.calls[0];
+    expect(message.floatColor.adjustment.shadows.red).toBe(-25);
+    expect(message.floatColor.adjustment.preserveLuminosity).toBe(true);
+    expect([...message.floatColor.pixels]).toEqual([0.125, 0.25, 0.5, 0.375]);
+    expect(transfer).toEqual([message.floatColor.pixels.buffer]);
+    expect(transfer).not.toContain(source.buffer);
+    worker.result(message.id, new Float32Array([0.2, 0.3, 0.4, 0.375]));
+    await expect(pending).resolves.toEqual(
+      new Float32Array([0.2, 0.3, 0.4, 0.375]),
+    );
+    for (const invalid of [
+      new Uint8Array(4),
+      new Float32Array(8),
+      new Float32Array([NaN, 0, 0, 1]),
+      new Float32Array([0, 0, 0, 2]),
+      new Float32Array([2, 0, 0, 1]),
+    ]) {
+      const failed = processor.floatColor(source, adjustment);
+      await Promise.resolve();
+      worker.result(worker.postMessage.mock.calls.at(-1)![0].id, invalid);
+      await expect(failed).rejects.toThrow();
+    }
+    const retry = processor.floatColor(new Float32Array([0.1, 0.2, 0.3, 0.5]), {
+      kind: "hsl",
+      hue: 15,
+      saturation: 10,
+      lightness: 0,
+    });
+    await Promise.resolve();
+    worker.result(
+      worker.postMessage.mock.calls.at(-1)![0].id,
+      new Float32Array([0.2, 0.3, 0.4, 0.5]),
+    );
+    await expect(retry).resolves.toEqual(
+      new Float32Array([0.2, 0.3, 0.4, 0.5]),
+    );
+  } finally {
+    processor.dispose();
+  }
+});
+
+it("float gradient captures nested stops before readiness, transfers private samples and rejects invalid normalized output", async () => {
+  const { processor, worker } = create(),
+    pixels = new Float32Array([-1, 0.5, 3, 0.375]),
+    adjustment = {
+      kind: "gradient-map" as const,
+      stops: [
+        { position: 0, color: "#171b46" },
+        { position: 1, color: "#ffe4a0" },
+      ],
+      reverse: false,
+    },
+    pending = processor.floatGradient(pixels, adjustment);
+  pixels.fill(0);
+  adjustment.stops[0].color = "#000000";
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfers] = worker.postMessage.mock.calls[0];
+    expect(message.floatGradient.adjustment.stops[0].color).toBe("#171b46");
+    expect([...message.floatGradient.pixels]).toEqual([-1, 0.5, 3, 0.375]);
+    expect(transfers).toEqual([message.floatGradient.pixels.buffer]);
+    worker.result(message.id, new Float32Array([0.1, 0.2, 0.3, 0.375]));
+    await expect(pending).resolves.toBeInstanceOf(Float32Array);
+    const failed = processor.floatGradient(pixels, adjustment);
+    await Promise.resolve();
+    worker.result(
+      worker.postMessage.mock.calls.at(-1)![0].id,
+      new Float32Array([2, 0, 0, 0.5]),
+    );
+    await expect(failed).rejects.toThrow("normalized");
+  } finally {
+    processor.dispose();
+  }
+});
+it("float lookup captures table headers once, validates captured handles/results and releases privately on disposal", async () => {
+  const { processor, worker } = create(),
+    { defaultLutAdjustment } = await import("../src/core/lut"),
+    settings = defaultLutAdjustment(),
+    original = settings.lut.data,
+    pending = processor.prepareFloatLookup(settings);
+  settings.lut.data = "";
+  settings.lut.domainMax[0] = 2;
+  worker.ready();
+  await processor.ready;
+  try {
+    const message = worker.postMessage.mock.calls[0][0];
+    expect(message.floatLookupPrepare.lut.data).toBe(original);
+    expect(message.floatLookupPrepare.lut.domainMax[0]).toBe(1);
+    worker.onmessage?.({ data: { id: message.id, floatLookupHandle: 7 } });
+    const lease = await pending,
+      source = new Float32Array([-0.5, 2, 0.125, 0.375]),
+      applied = lease.apply(source);
+    source.fill(0);
+    await Promise.resolve();
+    const [apply, transfers] = worker.postMessage.mock.calls.at(-1)!;
+    expect(apply.floatLookupApply.handle).toBe(7);
+    expect([...apply.floatLookupApply.pixels]).toEqual([-0.5, 2, 0.125, 0.375]);
+    expect(transfers).toEqual([apply.floatLookupApply.pixels.buffer]);
+    expect(apply.floatLookupPrepare).toBeUndefined();
+    worker.result(apply.id, new Float32Array([1.5, -0.5, 2, 0.375]));
+    await expect(applied).resolves.toEqual(
+      new Float32Array([1.5, -0.5, 2, 0.375]),
+    );
+    const bad = lease.apply(source);
+    await Promise.resolve();
+    worker.result(
+      worker.postMessage.mock.calls.at(-1)![0].id,
+      new Float32Array([NaN, 0, 0, 1]),
+    );
+    await expect(bad).rejects.toThrow("invalid");
+    lease.dispose();
+    lease.dispose();
+    await Promise.resolve();
+    const release = worker.postMessage.mock.calls.at(-1)![0];
+    expect(release.floatLookupRelease).toBe(7);
+    worker.result(release.id, undefined);
+    await expect(lease.apply(source)).rejects.toThrow("disposed");
+  } finally {
+    processor.dispose();
+  }
+});
+
+it("float style captures source/backdrop, colors and split ranges before readiness and transfers only private samples", async () => {
+  const { processor, worker } = create(),
+    { defaultStyle } = await import("../src/core/drawing"),
+    source = new Float32Array([2.125, -0.125, 4, 0.375]),
+    backdrop = new Float32Array([0.25, 0.5, 0.75, 0.625]),
+    style = defaultStyle();
+  style.colorOverlay = { enabled: true, color: "#ad3f79", opacity: 0.375 };
+  style.blendIf.enabled = true;
+  style.blendIf.source = [12, 64, 192, 248];
+  const pending = processor.floatStyle(source, backdrop, style);
+  source.fill(0);
+  backdrop.fill(0);
+  style.colorOverlay.opacity = 0;
+  style.blendIf.source[0] = 0;
+  worker.ready();
+  await processor.ready;
+  try {
+    const [message, transfers] = worker.postMessage.mock.calls[0];
+    expect([...message.floatStyle.source]).toEqual([2.125, -0.125, 4, 0.375]);
+    expect([...message.floatStyle.backdrop]).toEqual([0.25, 0.5, 0.75, 0.625]);
+    expect(message.floatStyle.style.colorOverlay.opacity).toBe(0.375);
+    expect(message.floatStyle.style.blendIf.source[0]).toBe(12);
+    expect(transfers).toEqual([
+      message.floatStyle.source.buffer,
+      message.floatStyle.backdrop.buffer,
+    ]);
+    expect(transfers).not.toContain(source.buffer);
+    expect(transfers).not.toContain(backdrop.buffer);
+    const result = {
+      pixels: new Float32Array([1.5, -0.075, 2.5, 0.375]),
+      coverage: new Float32Array([0.5625]),
+    };
+    worker.onmessage?.({ data: { id: message.id, floatStyle: result } });
+    await expect(pending).resolves.toEqual(result);
+  } finally {
+    processor.dispose();
+  }
+});
+it("malformed style coverage, altered alpha and wrong result types reject while a subsequent request succeeds", async () => {
+  const { processor, worker } = create(),
+    { defaultStyle } = await import("../src/core/drawing"),
+    source = new Float32Array([0.1, 0.2, 0.3, 0.5]),
+    style = defaultStyle();
+  worker.ready();
+  await processor.ready;
+  try {
+    for (const bad of [
+      null,
+      new Float32Array(4),
+      { pixels: source.slice(), coverage: new Uint8Array(1) },
+      { pixels: source.slice(), coverage: new Float32Array(2) },
+      { pixels: source.slice(), coverage: new Float32Array([NaN]) },
+      { pixels: source.slice(), coverage: new Float32Array([1.01]) },
+      {
+        pixels: new Float32Array([0.1, 0.2, 0.3, 0.25]),
+        coverage: new Float32Array([1]),
+      },
+      { pixels: source.slice(), coverage: new Float32Array([1]), extra: true },
+    ]) {
+      const pending = processor.floatStyle(source, source, style);
+      await Promise.resolve();
+      const id = worker.postMessage.mock.calls.at(-1)![0].id;
+      worker.onmessage?.({
+        data:
+          bad === null
+            ? { id, pixels: new Float32Array(4) }
+            : { id, floatStyle: bad },
+      });
+      await expect(pending).rejects.toThrow();
+    }
+    const pending = processor.floatStyle(source, source, style);
+    await Promise.resolve();
+    worker.onmessage?.({
+      data: {
+        id: worker.postMessage.mock.calls.at(-1)![0].id,
+        floatStyle: { pixels: source.slice(), coverage: new Float32Array([1]) },
+      },
+    });
+    await expect(pending).resolves.toMatchObject({
+      pixels: source,
+      coverage: new Float32Array([1]),
+    });
+  } finally {
+    processor.dispose();
+  }
 });

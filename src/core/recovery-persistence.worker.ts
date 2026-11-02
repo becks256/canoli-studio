@@ -12,14 +12,18 @@ self.onmessage = async ({ data }: MessageEvent<RecoveryJob>) => {
       self.postMessage({ result: await repository.readRestoration(data.id) });
       return;
     }
-    const entry: RecoveryEntry = JSON.parse(new TextDecoder().decode(data.bytes));
+    const entry: RecoveryEntry = JSON.parse(
+      new TextDecoder().decode(data.bytes),
+    );
     entry.version = 2;
     entry.checksum = data.checksum;
     self.postMessage({ result: await repository.persist(entry, data.assets) });
   } catch (error) {
-    self.postMessage({ error: {
-      name: error instanceof Error ? error.name : "Error",
-      message: error instanceof Error ? error.message : String(error),
-    } });
+    self.postMessage({
+      error: {
+        name: error instanceof Error ? error.name : "Error",
+        message: error instanceof Error ? error.message : String(error),
+      },
+    });
   }
 };

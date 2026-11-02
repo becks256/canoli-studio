@@ -4,13 +4,13 @@ These actions run through the existing local Recipes dialog, deterministic dry-r
 
 ## Actions
 
-| Action | Fields | Behavior |
-| --- | --- | --- |
-| `paragraphStyle.ensure` | `name`, `format` | Create a fresh document-scoped style or reuse the same normalized name with identical formatting. Different formatting is a conflict, with no automatic overwrite or suffix. |
-| `paragraphStyle.update` | `style`, `name`, `format` | Replace the resolved style's full format/name, updating followers through shared commands and retaining their overrides. |
-| `paragraphStyle.remove` | `style` | Remove the definition and detach its followers, keeping their resolved typography. |
-| `text.paragraphStyle` | `style` or `null`, optional `keepOverrides` (default false) | Apply a style to text; null detaches while preserving appearance. Applying clears overrides unless requested otherwise. Requires the step's ordinary layer `target`. |
-| `text.paragraphOverrides.clear` | optional `keys` | Reset all overrides when omitted; otherwise reset the unique known format keys supplied. An empty list clears none. Requires a linked text target. |
+| Action                          | Fields                                                      | Behavior                                                                                                                                                                     |
+| ------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `paragraphStyle.ensure`         | `name`, `format`                                            | Create a fresh document-scoped style or reuse the same normalized name with identical formatting. Different formatting is a conflict, with no automatic overwrite or suffix. |
+| `paragraphStyle.update`         | `style`, `name`, `format`                                   | Replace the resolved style's full format/name, updating followers through shared commands and retaining their overrides.                                                     |
+| `paragraphStyle.remove`         | `style`                                                     | Remove the definition and detach its followers, keeping their resolved typography.                                                                                           |
+| `text.paragraphStyle`           | `style` or `null`, optional `keepOverrides` (default false) | Apply a style to text; null detaches while preserving appearance. Applying clears overrides unless requested otherwise. Requires the step's ordinary layer `target`.         |
+| `text.paragraphOverrides.clear` | optional `keys`                                             | Reset all overrides when omitted; otherwise reset the unique known format keys supplied. An empty list clears none. Requires a linked text target.                           |
 
 A style selector is exactly `{ "by": "name", "name": "Body" }` or `{ "by": "stepResult", "stepId": "body" }`. Names match after trimming and case folding, consistent with the document library's uniqueness rule. A step reference uses a previous ensure/update step ID or its outputVar alias. The reference survives subsequent renames. Style outputs and layer outputs have separate namespaces. A missing, skipped, removed, forward or wrong-kind reference is an error. Library actions reject layer targets; text actions reject missing or non-text targets.
 
@@ -31,6 +31,7 @@ Recipes keep schema version 1 and portable packages keep version 1; older runtim
 Save the JSON below and import it in Recipes. Select a text layer named `Text`, or change the target. The first run creates Body and applies it. Replaying reuses Body if its format still matches; edit the definition or use an explicit update to handle a changed library.
 
 <!-- example: paragraph-style-recipe -->
+
 ```json
 {
   "schemaVersion": 1,
@@ -38,24 +39,49 @@ Save the JSON below and import it in Recipes. Select a text layer named `Text`, 
   "name": "Apply reusable body style",
   "description": "Local linked typography with a configurable size",
   "version": 1,
-  "parameters": [{"name":"size","label":"Body size","type":"number","default":28,"min":1,"max":200}],
+  "parameters": [
+    {
+      "name": "size",
+      "label": "Body size",
+      "type": "number",
+      "default": 28,
+      "min": 1,
+      "max": 200
+    }
+  ],
   "steps": [
     {
-      "id":"body", "name":"Prepare Body style",
-      "action":{
-        "type":"paragraphStyle.ensure", "name":"Body",
-        "format":{
-          "fontSize":"${size}", "fontFamily":"sans-serif", "color":"#315b2a",
-          "align":"left", "lineHeight":1.4, "letterSpacing":0, "wordSpacing":0,
-          "fontKerning":"auto", "fontWeight":"normal", "fontStyle":"normal",
-          "direction":"ltr", "paragraphJustify":"none", "paragraphSpacing":10, "firstLineIndent":0
+      "id": "body",
+      "name": "Prepare Body style",
+      "action": {
+        "type": "paragraphStyle.ensure",
+        "name": "Body",
+        "format": {
+          "fontSize": "${size}",
+          "fontFamily": "sans-serif",
+          "color": "#315b2a",
+          "align": "left",
+          "lineHeight": 1.4,
+          "letterSpacing": 0,
+          "wordSpacing": 0,
+          "fontKerning": "auto",
+          "fontWeight": "normal",
+          "fontStyle": "normal",
+          "direction": "ltr",
+          "paragraphJustify": "none",
+          "paragraphSpacing": 10,
+          "firstLineIndent": 0
         }
       }
     },
     {
-      "id":"apply", "name":"Apply Body to Text",
-      "target":{"by":"name","pattern":"Text","literal":true},
-      "action":{"type":"text.paragraphStyle","style":{"by":"stepResult","stepId":"body"}}
+      "id": "apply",
+      "name": "Apply Body to Text",
+      "target": { "by": "name", "pattern": "Text", "literal": true },
+      "action": {
+        "type": "text.paragraphStyle",
+        "style": { "by": "stepResult", "stepId": "body" }
+      }
     }
   ]
 }

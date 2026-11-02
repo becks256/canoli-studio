@@ -4,8 +4,16 @@ import { readFile, writeFile } from "node:fs/promises";
 async function main() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  const manrope = (await readFile("node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2")).toString("base64");
-  const dmMono = (await readFile("node_modules/@fontsource/dm-mono/files/dm-mono-latin-500-normal.woff2")).toString("base64");
+  const manrope = (
+    await readFile(
+      "node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2",
+    )
+  ).toString("base64");
+  const dmMono = (
+    await readFile(
+      "node_modules/@fontsource/dm-mono/files/dm-mono-latin-500-normal.woff2",
+    )
+  ).toString("base64");
 
   const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <rect width="64" height="64" rx="14" fill="#181c1b"/>

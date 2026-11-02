@@ -1,4 +1,4 @@
-import type {HistoryOrigin} from '../core/history-provenance';
+import type { HistoryOrigin } from "../core/history-provenance";
 /**
  * Versioned Host Scripting Bridge
  *
@@ -60,8 +60,8 @@ export interface HostBridgeOptions {
   permissions?: readonly PluginPermission[];
   pluginId?: string;
   isTrustedScript?: boolean;
-  historyOrigin?:HistoryOrigin;
-  assertCanCommit?:()=>void;
+  historyOrigin?: HistoryOrigin;
+  assertCanCommit?: () => void;
 }
 
 export interface HostCallMessage {
@@ -86,8 +86,8 @@ export class HostBridge {
   private pluginId?: string;
   private isTrustedScript: boolean;
   private inBandRevisionsCount = 0;
-  private historyOrigin?:HistoryOrigin;
-  private assertCanCommit?:()=>void;
+  private historyOrigin?: HistoryOrigin;
+  private assertCanCommit?: () => void;
   private submittedJobIds = new Set<string>();
 
   get callerPluginId(): string | undefined {
@@ -100,7 +100,8 @@ export class HostBridge {
 
   constructor(options: HostBridgeOptions = {}) {
     this.ai = options.ai;
-    this.historyOrigin=options.historyOrigin;this.assertCanCommit=options.assertCanCommit;
+    this.historyOrigin = options.historyOrigin;
+    this.assertCanCommit = options.assertCanCommit;
     this.assets = options.assets;
     this.document = options.document;
     this.permissions = options.permissions ?? [];
@@ -326,13 +327,31 @@ export class HostBridge {
     if (!this.ai || !this.document || !this.assets) {
       throw new Error("Application services not available to apply candidate.");
     }
-    const before=this.document.getSnapshot().revision,origin={...(this.historyOrigin??this.document._getHistoryOrigin()),requestId:crypto.randomUUID()};
+    const before = this.document.getSnapshot().revision,
+      origin = {
+        ...(this.historyOrigin ?? this.document._getHistoryOrigin()),
+        requestId: crypto.randomUUID(),
+      };
     try {
-      const layer = await this.ai.applyCandidate(candidateId, {
-        ...options,document:this.document,assetStore:this.assets,expectedRevision:before,
-      },origin,this.assertCanCommit);
-      return {layerId:layer.id};
-    }finally{const point=this.document.getSnapshot().provenance.current;if(point?.origin.requestId===origin.requestId&&point.acceptedRevision>before)this.inBandRevisionsCount++;}
-
+      const layer = await this.ai.applyCandidate(
+        candidateId,
+        {
+          ...options,
+          document: this.document,
+          assetStore: this.assets,
+          expectedRevision: before,
+        },
+        origin,
+        this.assertCanCommit,
+      );
+      return { layerId: layer.id };
+    } finally {
+      const point = this.document.getSnapshot().provenance.current;
+      if (
+        point?.origin.requestId === origin.requestId &&
+        point.acceptedRevision > before
+      )
+        this.inBandRevisionsCount++;
+    }
   }
 }

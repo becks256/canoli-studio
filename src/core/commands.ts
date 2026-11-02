@@ -1,13 +1,32 @@
-import {usesNativeTextWriting} from './text-writing';
-import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
-import {replaceDocumentFont} from './font-management';
-import {documentFontUsage,fontFamilyRequestSchema} from './font-management';
-import {fontFileSchema,documentFontFiles,visitFontFileScopes,type FontFileData} from './font-files';
-import {sameFontResource} from '../fonts/resources';
-import {fontFamilyNames,replaceFontFamilyToken} from './font-families';
-import {paragraphStyleSchema,resolveParagraphStyleLibrary,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
-import {normalizeCharacterRanges,replaceCharacterText} from './text-ranges';
-import {vectorStrokeKeys} from './vector-stroke';
+import { usesNativeTextWriting } from "./text-writing";
+import {
+  replaceVectorPaths,
+  type VectorBooleanSelection,
+} from "./vector-boolean";
+import { replaceDocumentFont } from "./font-management";
+import { documentFontUsage, fontFamilyRequestSchema } from "./font-management";
+import {
+  fontFileSchema,
+  documentFontFiles,
+  visitFontFileScopes,
+  type FontFileData,
+} from "./font-files";
+import { sameFontResource } from "../fonts/resources";
+import { fontFamilyNames, replaceFontFamilyToken } from "./font-families";
+import {
+  paragraphStyleSchema,
+  resolveParagraphStyleLibrary,
+  paragraphOverrideKeysSchema,
+  paragraphFormat,
+  paragraphTextLayers,
+  PARAGRAPH_FORMAT_KEYS,
+  resolveParagraphBinding,
+  sameParagraphFormat,
+  type ParagraphStyleData,
+  type ParagraphFormat,
+} from "./paragraph-styles";
+import { normalizeCharacterRanges, replaceCharacterText } from "./text-ranges";
+import { vectorStrokeKeys } from "./vector-stroke";
 import { isImmutable, shareUnchanged } from "./immutable";
 import { lassoSelection, polygonSelectionSchema } from "./lasso";
 import {
@@ -31,7 +50,7 @@ import type { SmartComponentDefinition } from "./smart/types";
 import type { GuideData } from "./guides";
 import { AffineTransform } from "./affine";
 import { resizeImage } from "./image-resize";
-import { alphaChannelSchema, type AlphaChannelData } from './alpha-channels';
+import { alphaChannelSchema, type AlphaChannelData } from "./alpha-channels";
 import { cropDocument } from "./crop";
 import type { CropBounds } from "./crop";
 import type {
@@ -84,8 +103,9 @@ export type LayerPatch = Partial<
     | "x"
     | "y"
   >
-> & { blendMode?: LayerBlendMode; frequencyRadius?: number | null } &
-  Partial<Pick<RasterLayerData, "width" | "height" | "erasures">> &
+> & { blendMode?: LayerBlendMode; frequencyRadius?: number | null } & Partial<
+    Pick<RasterLayerData, "width" | "height" | "erasures">
+  > &
   Partial<
     Pick<
       TextLayerData,
@@ -119,23 +139,44 @@ export type LayerPatch = Partial<
 // Serializable commands are the single mutation boundary for UI, automation,
 // and a future AI adapter. No renderer or UI code mutates document nodes.
 export type EditorCommand =
-  | {type:'document.precision.float';sources?:{layerId:string;assetId:string}[]}
-  | {type:'layer.align';ids:string[];alignment:LayerAlignment;target?:AlignmentTarget}
-  | {type:'font.file.add';file:FontFileData}
-  | {type:'font.file.rename';id:string;name:string}
-  | {type:'font.file.remove';id:string;replaceWith?:string}
-  | {type:'paragraphStyle.set';style:ParagraphStyleData}
-  | {type:'paragraphStyle.remove';id:string}
-  | {type:'document.font.replace';from:string;to:string}
-  | {type:'text.paragraphStyle';id:string;styleId:string|null;keepOverrides?:boolean}
-  | {type:'text.paragraphOverrides.clear';id:string;keys?:(keyof ParagraphFormat)[]}
+  | {
+      type: "document.precision.float";
+      sources?: { layerId: string; assetId: string }[];
+    }
+  | {
+      type: "layer.align";
+      ids: string[];
+      alignment: LayerAlignment;
+      target?: AlignmentTarget;
+    }
+  | { type: "font.file.add"; file: FontFileData }
+  | { type: "font.file.rename"; id: string; name: string }
+  | { type: "font.file.remove"; id: string; replaceWith?: string }
+  | { type: "paragraphStyle.set"; style: ParagraphStyleData }
+  | { type: "paragraphStyle.remove"; id: string }
+  | { type: "document.font.replace"; from: string; to: string }
+  | {
+      type: "text.paragraphStyle";
+      id: string;
+      styleId: string | null;
+      keepOverrides?: boolean;
+    }
+  | {
+      type: "text.paragraphOverrides.clear";
+      id: string;
+      keys?: (keyof ParagraphFormat)[];
+    }
   | { type: "document.guides"; guides: GuideData[] }
   | { type: "document.rename"; name: string }
   | { type: "document.resize"; width: number; height: number }
   | { type: "document.resizeImage"; width: number; height: number }
   | { type: "document.crop"; bounds: CropBounds }
   | { type: "selection.set"; selection: SelectionData | null }
-  | { type: "selection.polygon"; points: Point[]; operation?: "replace" | SelectionOperation }
+  | {
+      type: "selection.polygon";
+      points: Point[];
+      operation?: "replace" | SelectionOperation;
+    }
   | {
       type: "layer.place";
       id: string;
@@ -153,13 +194,17 @@ export type EditorCommand =
       patch: Partial<Omit<VectorPathData, "id">>;
     }
   | { type: "path.remove"; id: string; pathId: string }
-  | { type: "paths.replace"; operands: VectorBooleanSelection['operands']; result: VectorPathData | null }
+  | {
+      type: "paths.replace";
+      operands: VectorBooleanSelection["operands"];
+      result: VectorPathData | null;
+    }
   | { type: "smartObject.filterMask"; id: string; mask: LayerMaskData | null }
   | { type: "smartObject.filters"; id: string; filters: SmartFilterData[] }
   | { type: "layerComp.set"; comp: LayerCompData }
-  | { type: 'alphaChannel.set'; channel: AlphaChannelData }
-  | { type: 'alphaChannel.remove'; id: string }
-  | { type: 'alphaChannel.reorder'; id: string; direction: 'up'|'down' }
+  | { type: "alphaChannel.set"; channel: AlphaChannelData }
+  | { type: "alphaChannel.remove"; id: string }
+  | { type: "alphaChannel.reorder"; id: string; direction: "up" | "down" }
   | { type: "layerComp.remove"; id: string }
   | { type: "layerComp.apply"; id: string }
   | { type: "component.set"; definition: SmartComponentDefinition }
@@ -220,91 +265,256 @@ export type EditorCommand =
   | { type: "mask.setFromMatting"; id: string; mask: LayerMaskData }
   | { type: "transaction"; label: string; commands: EditorCommand[] };
 
-function reflowText(layer:TextLayerData){
-  if(usesNativeTextWriting(layer)&&layer.characterRanges===undefined)layer.characterRanges=[];
-  const bounds=measureTextBounds(layer.text,layer.fontSize,layer.fontFamily,layer.lineHeight,{
-    textPath:layer.textPath,characterRanges:layer.characterRanges,writingMode:layer.writingMode,textOrientation:layer.textOrientation,color:layer.color,align:layer.align,
-    letterSpacing:layer.letterSpacing,wordSpacing:layer.wordSpacing,fontKerning:layer.fontKerning,
-    direction:layer.direction,fontWeight:layer.fontWeight,fontStyle:layer.fontStyle,wrapWidth:layer.wrapWidth,
-    fontVariantCaps:layer.fontVariantCaps,fontStretch:layer.fontStretch,fontVariationSettings:layer.fontVariationSettings,
-    paragraphSpacing:layer.paragraphSpacing,firstLineIndent:layer.firstLineIndent,paragraphJustify:layer.paragraphJustify,
-  });
-  layer.width=bounds.width;layer.height=bounds.height;delete layer.textPathOrigin;delete layer.textFrameOrigin;delete layer.textInlineExtent;if(bounds.origin){if(layer.textPath)layer.textPathOrigin={...bounds.origin};else layer.textFrameOrigin={...bounds.origin};}if(bounds.inlineExtent!==undefined)layer.textInlineExtent=bounds.inlineExtent;
+function reflowText(layer: TextLayerData) {
+  if (usesNativeTextWriting(layer) && layer.characterRanges === undefined)
+    layer.characterRanges = [];
+  const bounds = measureTextBounds(
+    layer.text,
+    layer.fontSize,
+    layer.fontFamily,
+    layer.lineHeight,
+    {
+      textPath: layer.textPath,
+      characterRanges: layer.characterRanges,
+      writingMode: layer.writingMode,
+      textOrientation: layer.textOrientation,
+      color: layer.color,
+      align: layer.align,
+      letterSpacing: layer.letterSpacing,
+      wordSpacing: layer.wordSpacing,
+      fontKerning: layer.fontKerning,
+      direction: layer.direction,
+      fontWeight: layer.fontWeight,
+      fontStyle: layer.fontStyle,
+      wrapWidth: layer.wrapWidth,
+      fontVariantCaps: layer.fontVariantCaps,
+      fontStretch: layer.fontStretch,
+      fontVariationSettings: layer.fontVariationSettings,
+      paragraphSpacing: layer.paragraphSpacing,
+      firstLineIndent: layer.firstLineIndent,
+      paragraphJustify: layer.paragraphJustify,
+    },
+  );
+  layer.width = bounds.width;
+  layer.height = bounds.height;
+  delete layer.textPathOrigin;
+  delete layer.textFrameOrigin;
+  delete layer.textInlineExtent;
+  if (bounds.origin) {
+    if (layer.textPath) layer.textPathOrigin = { ...bounds.origin };
+    else layer.textFrameOrigin = { ...bounds.origin };
+  }
+  if (bounds.inlineExtent !== undefined)
+    layer.textInlineExtent = bounds.inlineExtent;
 }
 // Presence matters: reflow() deliberately submits the current text again.
 // Explicit legacy width/height requests still normalize to measured bounds.
 const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
-  'text','textPath','writingMode','textOrientation','characterRanges','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
-  'fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle',
-  'direction','wrapWidth','paragraphSpacing','firstLineIndent','paragraphJustify',
-  'width','height',
+  "text",
+  "textPath",
+  "writingMode",
+  "textOrientation",
+  "characterRanges",
+  "fontSize",
+  "fontFamily",
+  "lineHeight",
+  "letterSpacing",
+  "wordSpacing",
+  "fontKerning",
+  "fontVariantCaps",
+  "fontStretch",
+  "fontVariationSettings",
+  "fontWeight",
+  "fontStyle",
+  "direction",
+  "wrapWidth",
+  "paragraphSpacing",
+  "firstLineIndent",
+  "paragraphJustify",
+  "width",
+  "height",
 ];
 function apply(document: DocumentData, command: EditorCommand): void {
-  if(command.type==='document.precision.float'){
-    if(command.sources?.length&&document.precision==='float32')throw new Error('Prepared source replacements require a byte-to-float precision conversion.');
-    const seen=new Set<string>();
-    for(const source of command.sources??[]){
-      const layer=findLayer(document,source.layerId);
-      if(!layer||layer.kind!=='raster'||seen.has(source.layerId)||typeof source.assetId!=='string'||!source.assetId||source.assetId.length>240)throw new Error('Precision source replacements require distinct existing raster layers and valid asset IDs.');
-      seen.add(source.layerId);layer.assetId=source.assetId;
+  if (command.type === "document.precision.float") {
+    if (command.sources?.length && document.precision === "float32")
+      throw new Error(
+        "Prepared source replacements require a byte-to-float precision conversion.",
+      );
+    const seen = new Set<string>();
+    for (const source of command.sources ?? []) {
+      const layer = findLayer(document, source.layerId);
+      if (
+        !layer ||
+        layer.kind !== "raster" ||
+        seen.has(source.layerId) ||
+        typeof source.assetId !== "string" ||
+        !source.assetId ||
+        source.assetId.length > 240
+      )
+        throw new Error(
+          "Precision source replacements require distinct existing raster layers and valid asset IDs.",
+        );
+      seen.add(source.layerId);
+      layer.assetId = source.assetId;
     }
-    document.schemaVersion=SCHEMA_VERSION;document.colorSpace='linear-srgb';document.precision='float32';return;
+    document.schemaVersion = SCHEMA_VERSION;
+    document.colorSpace = "linear-srgb";
+    document.precision = "float32";
+    return;
   }
-  if(command.type==='font.file.add'){
-    const file=fontFileSchema.parse(command.file),existing=documentFontFiles(document).find(value=>value.id===file.id);
-    if(existing){if(!sameFontResource(existing.resource,file.resource))throw new Error('Font resource identity collision.');return;}
-    const family=file.resource.report.faces[0].cssFamily.toLowerCase();
-    for(const request of documentFontUsage(document))if(fontFamilyNames(request.family).includes(family))replaceDocumentFont(document,request.family,request.family,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}),true);
-    document.fontFiles=[...(document.fontFiles??[]),file];return;
+  if (command.type === "font.file.add") {
+    const file = fontFileSchema.parse(command.file),
+      existing = documentFontFiles(document).find(
+        (value) => value.id === file.id,
+      );
+    if (existing) {
+      if (!sameFontResource(existing.resource, file.resource))
+        throw new Error("Font resource identity collision.");
+      return;
+    }
+    const family = file.resource.report.faces[0].cssFamily.toLowerCase();
+    for (const request of documentFontUsage(document))
+      if (fontFamilyNames(request.family).includes(family))
+        replaceDocumentFont(
+          document,
+          request.family,
+          request.family,
+          reflowText,
+          (scope, definitions) =>
+            apply(scope, { type: "component.replaceAll", definitions }),
+          true,
+        );
+    document.fontFiles = [...(document.fontFiles ?? []), file];
+    return;
   }
-  if(command.type==='font.file.rename'){
-    const name=fontFileSchema.shape.name.parse(command.name);let found=false;
-    visitFontFileScopes(document,scope=>{for(const file of scope.fontFiles??[])if(file.id===command.id){file.name=name;found=true;}});
-    if(!found)throw new Error('Font file not found.');return;
+  if (command.type === "font.file.rename") {
+    const name = fontFileSchema.shape.name.parse(command.name);
+    let found = false;
+    visitFontFileScopes(document, (scope) => {
+      for (const file of scope.fontFiles ?? [])
+        if (file.id === command.id) {
+          file.name = name;
+          found = true;
+        }
+    });
+    if (!found) throw new Error("Font file not found.");
+    return;
   }
-  if(command.type==='font.file.remove'){
-    const file=documentFontFiles(document).find(value=>value.id===command.id);if(!file)throw new Error('Font file not found.');
-    const family=file.resource.report.faces[0].cssFamily,requests=documentFontUsage(document).filter(request=>fontFamilyNames(request.family).includes(family.toLowerCase()));
-    if(requests.length&&command.replaceWith===undefined)throw new Error('This font file is in use. Choose a replacement before removing it.');
-    if(command.replaceWith!==undefined){fontFamilyRequestSchema.parse(command.replaceWith);if(fontFamilyNames(command.replaceWith).includes(family.toLowerCase()))throw new Error('The replacement still references the font being removed.');}
-    const replacements=requests.map(request=>({from:request.family,to:fontFamilyRequestSchema.parse(replaceFontFamilyToken(request.family,family,command.replaceWith!))}));
-    for(const replacement of replacements)replaceDocumentFont(document,replacement.from,replacement.to,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}));
-    visitFontFileScopes(document,scope=>{if(scope.fontFiles)scope.fontFiles=scope.fontFiles.filter(value=>value.id!==file.id);});return;
+  if (command.type === "font.file.remove") {
+    const file = documentFontFiles(document).find(
+      (value) => value.id === command.id,
+    );
+    if (!file) throw new Error("Font file not found.");
+    const family = file.resource.report.faces[0].cssFamily,
+      requests = documentFontUsage(document).filter((request) =>
+        fontFamilyNames(request.family).includes(family.toLowerCase()),
+      );
+    if (requests.length && command.replaceWith === undefined)
+      throw new Error(
+        "This font file is in use. Choose a replacement before removing it.",
+      );
+    if (command.replaceWith !== undefined) {
+      fontFamilyRequestSchema.parse(command.replaceWith);
+      if (fontFamilyNames(command.replaceWith).includes(family.toLowerCase()))
+        throw new Error(
+          "The replacement still references the font being removed.",
+        );
+    }
+    const replacements = requests.map((request) => ({
+      from: request.family,
+      to: fontFamilyRequestSchema.parse(
+        replaceFontFamilyToken(request.family, family, command.replaceWith!),
+      ),
+    }));
+    for (const replacement of replacements)
+      replaceDocumentFont(
+        document,
+        replacement.from,
+        replacement.to,
+        reflowText,
+        (scope, definitions) =>
+          apply(scope, { type: "component.replaceAll", definitions }),
+      );
+    visitFontFileScopes(document, (scope) => {
+      if (scope.fontFiles)
+        scope.fontFiles = scope.fontFiles.filter(
+          (value) => value.id !== file.id,
+        );
+    });
+    return;
   }
-  if(command.type==='document.font.replace'){
-    replaceDocumentFont(document,command.from,command.to,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}));return;
+  if (command.type === "document.font.replace") {
+    replaceDocumentFont(
+      document,
+      command.from,
+      command.to,
+      reflowText,
+      (scope, definitions) =>
+        apply(scope, { type: "component.replaceAll", definitions }),
+    );
+    return;
   }
-  if (command.type === 'paths.replace') { replaceVectorPaths(document, command.operands, command.result); return; }
+  if (command.type === "paths.replace") {
+    replaceVectorPaths(document, command.operands, command.result);
+    return;
+  }
   if (command.type === "transaction") {
     for (const child of command.commands) apply(document, child);
     return;
   }
-  if(command.type==='paragraphStyle.set'){
-    const style=paragraphStyleSchema.parse(command.style),entries=[...(document.paragraphStyles??[])],index=entries.findIndex(value=>value.id===style.id);
-    if(index<0)entries.push(style);else entries[index]=style;
-    const resolved=resolveParagraphStyleLibrary(entries),updated=resolved.find(value=>value.id===style.id)!;
-    if(!sameParagraphFormat(updated.format,style.format))throw new Error('Paragraph style formatting disagrees with its base and overrides.');
-    const byId=new Map(resolved.map(value=>[value.id,value]));
-    for(const layer of paragraphTextLayers(document.children))if(layer.paragraphStyle){
-      const definition=byId.get(layer.paragraphStyle.id);if(!definition)throw new Error('Paragraph style not found.');
-      const expected={...definition.format,...layer.paragraphStyle.overrides};
-      if(!sameParagraphFormat(paragraphFormat(layer),expected)){
-        if(isLocked(document,layer.id))throw new Error('Unlock text and its parent groups before changing a linked paragraph style.');
-        resolveParagraphBinding(layer,definition);reflowText(layer);
+  if (command.type === "paragraphStyle.set") {
+    const style = paragraphStyleSchema.parse(command.style),
+      entries = [...(document.paragraphStyles ?? [])],
+      index = entries.findIndex((value) => value.id === style.id);
+    if (index < 0) entries.push(style);
+    else entries[index] = style;
+    const resolved = resolveParagraphStyleLibrary(entries),
+      updated = resolved.find((value) => value.id === style.id)!;
+    if (!sameParagraphFormat(updated.format, style.format))
+      throw new Error(
+        "Paragraph style formatting disagrees with its base and overrides.",
+      );
+    const byId = new Map(resolved.map((value) => [value.id, value]));
+    for (const layer of paragraphTextLayers(document.children))
+      if (layer.paragraphStyle) {
+        const definition = byId.get(layer.paragraphStyle.id);
+        if (!definition) throw new Error("Paragraph style not found.");
+        const expected = {
+          ...definition.format,
+          ...layer.paragraphStyle.overrides,
+        };
+        if (!sameParagraphFormat(paragraphFormat(layer), expected)) {
+          if (isLocked(document, layer.id))
+            throw new Error(
+              "Unlock text and its parent groups before changing a linked paragraph style.",
+            );
+          resolveParagraphBinding(layer, definition);
+          reflowText(layer);
+        }
       }
-    }
-    document.paragraphStyles=resolved;return;
+    document.paragraphStyles = resolved;
+    return;
   }
-  if(command.type==='paragraphStyle.remove'){
-    if(!document.paragraphStyles?.some(style=>style.id===command.id))throw new Error('Paragraph style not found.');
-    for(const layer of paragraphTextLayers(document.children))if(layer.paragraphStyle?.id===command.id){
-      if(isLocked(document,layer.id))throw new Error('Unlock linked text before removing its paragraph style.');
-      delete layer.paragraphStyle;
-    }
-    document.paragraphStyles=document.paragraphStyles.filter(style=>style.id!==command.id).map(style=>{
-      if(style.basedOn?.id!==command.id)return style;
-      const detached={...style};delete detached.basedOn;return detached;
-    });return;
+  if (command.type === "paragraphStyle.remove") {
+    if (!document.paragraphStyles?.some((style) => style.id === command.id))
+      throw new Error("Paragraph style not found.");
+    for (const layer of paragraphTextLayers(document.children))
+      if (layer.paragraphStyle?.id === command.id) {
+        if (isLocked(document, layer.id))
+          throw new Error(
+            "Unlock linked text before removing its paragraph style.",
+          );
+        delete layer.paragraphStyle;
+      }
+    document.paragraphStyles = document.paragraphStyles
+      .filter((style) => style.id !== command.id)
+      .map((style) => {
+        if (style.basedOn?.id !== command.id) return style;
+        const detached = { ...style };
+        delete detached.basedOn;
+        return detached;
+      });
+    return;
   }
   if (command.type === "component.replaceAll") {
     const before = new ComponentRegistry(document.components);
@@ -368,20 +578,32 @@ function apply(document: DocumentData, command: EditorCommand): void {
       .values();
     return;
   }
-  if(command.type==='alphaChannel.set'){
-    const channel=alphaChannelSchema.parse(command.channel),entries=document.alphaChannels??[];
-    const index=entries.findIndex(entry=>entry.id===channel.id);
-    if(index<0)entries.push(channel);else entries[index]=channel;
-    document.alphaChannels=entries;return;
+  if (command.type === "alphaChannel.set") {
+    const channel = alphaChannelSchema.parse(command.channel),
+      entries = document.alphaChannels ?? [];
+    const index = entries.findIndex((entry) => entry.id === channel.id);
+    if (index < 0) entries.push(channel);
+    else entries[index] = channel;
+    document.alphaChannels = entries;
+    return;
   }
-  if(command.type==='alphaChannel.remove'||command.type==='alphaChannel.reorder'){
-    const entries=document.alphaChannels??[],index=entries.findIndex(entry=>entry.id===command.id);
-    if(index<0)throw new Error('Alpha channel not found.');
-    if(command.type==='alphaChannel.remove')document.alphaChannels=entries.filter(entry=>entry.id!==command.id);
-    else{
-      if(command.direction!=='up'&&command.direction!=='down')throw new Error('Invalid alpha channel direction.');
-      const target=index+(command.direction==='up'?-1:1);
-      if(target>=0&&target<entries.length)[entries[index],entries[target]]=[entries[target],entries[index]];
+  if (
+    command.type === "alphaChannel.remove" ||
+    command.type === "alphaChannel.reorder"
+  ) {
+    const entries = document.alphaChannels ?? [],
+      index = entries.findIndex((entry) => entry.id === command.id);
+    if (index < 0) throw new Error("Alpha channel not found.");
+    if (command.type === "alphaChannel.remove")
+      document.alphaChannels = entries.filter(
+        (entry) => entry.id !== command.id,
+      );
+    else {
+      if (command.direction !== "up" && command.direction !== "down")
+        throw new Error("Invalid alpha channel direction.");
+      const target = index + (command.direction === "up" ? -1 : 1);
+      if (target >= 0 && target < entries.length)
+        [entries[index], entries[target]] = [entries[target], entries[index]];
     }
     return;
   }
@@ -390,13 +612,22 @@ function apply(document: DocumentData, command: EditorCommand): void {
     return;
   }
   if (command.type === "selection.polygon") {
-    const { points, operation } = polygonSelectionSchema.parse({ points: command.points, operation: command.operation });
+    const { points, operation } = polygonSelectionSchema.parse({
+      points: command.points,
+      operation: command.operation,
+    });
     const selection = lassoSelection(points, document.width, document.height);
     if (!selection.regions.length)
       throw new Error("The polygon must cover at least one canvas pixel.");
-    document.selection = operation === "replace" ? selection : {
-      regions: [...(document.selection?.regions ?? []), { ...selection.regions[0], operation }],
-    };
+    document.selection =
+      operation === "replace"
+        ? selection
+        : {
+            regions: [
+              ...(document.selection?.regions ?? []),
+              { ...selection.regions[0], operation },
+            ],
+          };
     return;
   }
   if (command.type === "layerComp.set") {
@@ -428,11 +659,18 @@ function apply(document: DocumentData, command: EditorCommand): void {
       apply(document, change);
     return;
   }
-  if(command.type==='layer.align'){
+  if (command.type === "layer.align") {
     // Layout moves authored boxes; ordinary text updates may reflow against a
     // different available font set, changing the very bounds being aligned.
-    for(const change of alignmentCommands(document,command.ids,command.alignment,command.target)){
-      const layer=findLayer(document,change.id)!;layer.x=change.patch.x;layer.y=change.patch.y;
+    for (const change of alignmentCommands(
+      document,
+      command.ids,
+      command.alignment,
+      command.target,
+    )) {
+      const layer = findLayer(document, change.id)!;
+      layer.x = change.patch.x;
+      layer.y = change.patch.y;
     }
     return;
   }
@@ -489,19 +727,42 @@ function apply(document: DocumentData, command: EditorCommand): void {
     throw new Error("Unlock this layer and its parent groups first.");
   const siblings = findContainer(document.children, layer.id)!;
   switch (command.type) {
-    case 'text.paragraphStyle': {
-      if(layer.kind!=='text')throw new Error('Paragraph styles require a text layer.');
-      if(command.styleId===null){delete layer.paragraphStyle;return;}
-      const style=document.paragraphStyles?.find(value=>value.id===command.styleId);if(!style)throw new Error('Paragraph style not found.');
-      layer.paragraphStyle={id:style.id,overrides:command.keepOverrides?structuredClone(layer.paragraphStyle?.overrides??{}):{}};
-      resolveParagraphBinding(layer,style);reflowText(layer);return;
+    case "text.paragraphStyle": {
+      if (layer.kind !== "text")
+        throw new Error("Paragraph styles require a text layer.");
+      if (command.styleId === null) {
+        delete layer.paragraphStyle;
+        return;
+      }
+      const style = document.paragraphStyles?.find(
+        (value) => value.id === command.styleId,
+      );
+      if (!style) throw new Error("Paragraph style not found.");
+      layer.paragraphStyle = {
+        id: style.id,
+        overrides: command.keepOverrides
+          ? structuredClone(layer.paragraphStyle?.overrides ?? {})
+          : {},
+      };
+      resolveParagraphBinding(layer, style);
+      reflowText(layer);
+      return;
     }
-    case 'text.paragraphOverrides.clear': {
-      if(layer.kind!=='text'||!layer.paragraphStyle)throw new Error('Select text with a linked paragraph style.');
-      const style=document.paragraphStyles?.find(value=>value.id===layer.paragraphStyle!.id);if(!style)throw new Error('Paragraph style not found.');
-      layer.paragraphStyle=structuredClone(layer.paragraphStyle);
-      for(const key of command.keys===undefined?PARAGRAPH_FORMAT_KEYS:paragraphOverrideKeysSchema.parse(command.keys))delete layer.paragraphStyle.overrides[key];
-      resolveParagraphBinding(layer,style);reflowText(layer);return;
+    case "text.paragraphOverrides.clear": {
+      if (layer.kind !== "text" || !layer.paragraphStyle)
+        throw new Error("Select text with a linked paragraph style.");
+      const style = document.paragraphStyles?.find(
+        (value) => value.id === layer.paragraphStyle!.id,
+      );
+      if (!style) throw new Error("Paragraph style not found.");
+      layer.paragraphStyle = structuredClone(layer.paragraphStyle);
+      for (const key of command.keys === undefined
+        ? PARAGRAPH_FORMAT_KEYS
+        : paragraphOverrideKeysSchema.parse(command.keys))
+        delete layer.paragraphStyle.overrides[key];
+      resolveParagraphBinding(layer, style);
+      reflowText(layer);
+      return;
     }
     case "smartObject.filterMask": {
       if (layer.kind !== "smart-object")
@@ -560,11 +821,21 @@ function apply(document: DocumentData, command: EditorCommand): void {
       if (layer.kind !== "raster")
         throw new Error("Conversion currently requires a raster layer.");
       const content = intrinsicLocalBounds(layer)!;
-      if(content.x<0||content.y<0||content.x+content.width>layer.width||content.y+content.height>layer.height){
+      if (
+        content.x < 0 ||
+        content.y < 0 ||
+        content.x + content.width > layer.width ||
+        content.y + content.height > layer.height
+      ) {
         // Prepared wet pixels can extend past the original image. Use the
         // existing containing-master conversion, including its mask rebasing
         // and interpolation/style halo, rather than clip them to the bitmap.
-        convertLayers(document,[layer.id],command.componentId,command.instanceId);
+        convertLayers(
+          document,
+          [layer.id],
+          command.componentId,
+          command.instanceId,
+        );
         return;
       }
       if (
@@ -592,9 +863,10 @@ function apply(document: DocumentData, command: EditorCommand): void {
       const definition: SmartComponentDefinition = {
         id: command.componentId,
         name: layer.name,
-        source: effects.length || erasures?.length
-          ? { kind: "document", document: master }
-          : { kind: "asset", assetId, width, height },
+        source:
+          effects.length || erasures?.length
+            ? { kind: "document", document: master }
+            : { kind: "asset", assetId, width, height },
       };
       document.components = new ComponentRegistry(document.components)
         .withDefinitions([definition])
@@ -608,11 +880,41 @@ function apply(document: DocumentData, command: EditorCommand): void {
       return;
     }
     case "layer.update":
-      if ('perspective' in command.patch && layer.kind!=='raster'&&layer.kind!=='smart-object')throw new Error('Perspective requires a raster or smart-object layer.');
-      if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
-      if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
-      if (layer.kind !== 'text' && ['text','textPath','writingMode','textOrientation','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
-        throw new Error('Typography properties require a text layer.');
+      if (
+        "perspective" in command.patch &&
+        layer.kind !== "raster" &&
+        layer.kind !== "smart-object"
+      )
+        throw new Error("Perspective requires a raster or smart-object layer.");
+      if ("frequencyRadius" in command.patch && layer.kind !== "group")
+        throw new Error("A shared frequency radius requires a group.");
+      if ("erasures" in command.patch && layer.kind !== "raster")
+        throw new Error("Erasures require a raster layer.");
+      if (
+        layer.kind !== "text" &&
+        [
+          "text",
+          "textPath",
+          "writingMode",
+          "textOrientation",
+          "characterRanges",
+          "fontSize",
+          "fontFamily",
+          "color",
+          "align",
+          "lineHeight",
+          "letterSpacing",
+          "wordSpacing",
+          "fontKerning",
+          "fontVariantCaps",
+          "fontStretch",
+          "fontVariationSettings",
+          "fontWeight",
+          "fontStyle",
+          "direction",
+        ].some((key) => key in command.patch)
+      )
+        throw new Error("Typography properties require a text layer.");
       if (
         Object.keys(command.patch).some(
           (key) =>
@@ -676,19 +978,47 @@ function apply(document: DocumentData, command: EditorCommand): void {
       if (layer.kind !== "adjustment" && "adjustment" in command.patch) {
         throw new Error("Only adjustment layers have adjustment settings.");
       }
-      if(layer.kind==='text'&&command.patch.text!==undefined&&command.patch.characterRanges===undefined&&layer.characterRanges!==undefined)layer.characterRanges=replaceCharacterText(layer.text,layer.characterRanges,command.patch.text);
+      if (
+        layer.kind === "text" &&
+        command.patch.text !== undefined &&
+        command.patch.characterRanges === undefined &&
+        layer.characterRanges !== undefined
+      )
+        layer.characterRanges = replaceCharacterText(
+          layer.text,
+          layer.characterRanges,
+          command.patch.text,
+        );
       Object.assign(layer, command.patch);
       if (layer.kind === "text") {
-        if(layer.characterRanges!==undefined)layer.characterRanges=structuredClone(normalizeCharacterRanges(layer.text,layer.characterRanges));
-        if(layer.paragraphStyle&&PARAGRAPH_FORMAT_KEYS.some(key=>Object.hasOwn(command.patch,key))){
-          const style=document.paragraphStyles?.find(value=>value.id===layer.paragraphStyle!.id);if(!style)throw new Error('Paragraph style not found.');
-          const overrides={...layer.paragraphStyle.overrides};
-          for(const key of PARAGRAPH_FORMAT_KEYS)if(key in command.patch){
-            const value=command.patch[key];if(value===undefined)delete overrides[key];else(overrides as Record<string,unknown>)[key]=value;
-          }
-          layer.paragraphStyle={id:style.id,overrides};resolveParagraphBinding(layer,style);
+        if (layer.characterRanges !== undefined)
+          layer.characterRanges = structuredClone(
+            normalizeCharacterRanges(layer.text, layer.characterRanges),
+          );
+        if (
+          layer.paragraphStyle &&
+          PARAGRAPH_FORMAT_KEYS.some((key) => Object.hasOwn(command.patch, key))
+        ) {
+          const style = document.paragraphStyles?.find(
+            (value) => value.id === layer.paragraphStyle!.id,
+          );
+          if (!style) throw new Error("Paragraph style not found.");
+          const overrides = { ...layer.paragraphStyle.overrides };
+          for (const key of PARAGRAPH_FORMAT_KEYS)
+            if (key in command.patch) {
+              const value = command.patch[key];
+              if (value === undefined) delete overrides[key];
+              else (overrides as Record<string, unknown>)[key] = value;
+            }
+          layer.paragraphStyle = { id: style.id, overrides };
+          resolveParagraphBinding(layer, style);
         }
-        if(TEXT_REFLOW_KEYS.some(key=>Object.hasOwn(command.patch,key))||(layer.textPath||usesNativeTextWriting(layer))&&Object.hasOwn(command.patch,'align'))reflowText(layer);
+        if (
+          TEXT_REFLOW_KEYS.some((key) => Object.hasOwn(command.patch, key)) ||
+          ((layer.textPath || usesNativeTextWriting(layer)) &&
+            Object.hasOwn(command.patch, "align"))
+        )
+          reflowText(layer);
       }
       break;
     case "mask.setFromMatting":
@@ -712,7 +1042,8 @@ function apply(document: DocumentData, command: EditorCommand): void {
         if (node.kind === "vector")
           node.paths.forEach((path) => {
             path.id = command.newIds?.[path.id] ?? id();
-            for (const contour of path.subpaths ?? []) contour.id = command.newIds?.[contour.id] ?? id();
+            for (const contour of path.subpaths ?? [])
+              contour.id = command.newIds?.[contour.id] ?? id();
           });
       }
       copy.name = `${copy.name.slice(0, 234)} copy`;
@@ -828,16 +1159,26 @@ function apply(document: DocumentData, command: EditorCommand): void {
       if (
         Object.keys(command.patch).some(
           (key) =>
-            !["points", "closed", "fill", "stroke", "strokeWidth","fillGradient","fillRule","subpaths",...vectorStrokeKeys].includes(
-              key,
-            ),
+            ![
+              "points",
+              "closed",
+              "fill",
+              "stroke",
+              "strokeWidth",
+              "fillGradient",
+              "fillRule",
+              "subpaths",
+              ...vectorStrokeKeys,
+            ].includes(key),
         )
       )
         throw new Error("Unsupported path property.");
       const { points, ...properties } = command.patch;
       Object.assign(path, structuredClone(properties));
       if ("points" in command.patch)
-        path.points = points?.map(point => isImmutable(point) ? point : structuredClone(point)) as typeof path.points;
+        path.points = points?.map((point) =>
+          isImmutable(point) ? point : structuredClone(point),
+        ) as typeof path.points;
       break;
     }
     case "path.remove":
@@ -885,36 +1226,68 @@ export function execute(
 ): DocumentData {
   // Store-owned snapshots are recursively frozen. Common editing commands only
   // need a new root and the path to their target, never copies of pixel coverage.
-  while (command.type === "transaction" && command.commands.length === 1) command = command.commands[0];
+  while (command.type === "transaction" && command.commands.length === 1)
+    command = command.commands[0];
   let next: DocumentData;
-  const rootOnly = ["document.precision.float", "document.rename", "document.resize", "document.guides", "selection.set", "selection.polygon"].includes(command.type);
-  const targeted = command.type === "layer.update" || command.type === "paint.add" || command.type === "paint.remove" || command.type === "path.update" || command.type === "path.add" || command.type === "path.remove";
-  if (isImmutable(document) && rootOnly && !(command.type==='document.precision.float'&&command.sources?.length)) next = { ...document };
-  else if (isImmutable(document) && command.type === 'paths.replace') {
-    const targets=new Set(command.operands.map(ref=>ref.layerId));
-    const copy=(nodes:LayerData[]):LayerData[]=>nodes.map(node=>{
-      if(node.kind==='vector'&&targets.has(node.id))return {...node};
-      if(node.kind==='group'){
-        const children=copy(node.children);
-        if(children.some((child,index)=>child!==node.children[index]))return {...node,children};
-      }
-      return node;
-    });
-    next={...document,children:copy(document.children)};
-  }
-  else if (isImmutable(document) && targeted) {
+  const rootOnly = [
+    "document.precision.float",
+    "document.rename",
+    "document.resize",
+    "document.guides",
+    "selection.set",
+    "selection.polygon",
+  ].includes(command.type);
+  const targeted =
+    command.type === "layer.update" ||
+    command.type === "paint.add" ||
+    command.type === "paint.remove" ||
+    command.type === "path.update" ||
+    command.type === "path.add" ||
+    command.type === "path.remove";
+  if (
+    isImmutable(document) &&
+    rootOnly &&
+    !(command.type === "document.precision.float" && command.sources?.length)
+  )
+    next = { ...document };
+  else if (isImmutable(document) && command.type === "paths.replace") {
+    const targets = new Set(command.operands.map((ref) => ref.layerId));
+    const copy = (nodes: LayerData[]): LayerData[] =>
+      nodes.map((node) => {
+        if (node.kind === "vector" && targets.has(node.id)) return { ...node };
+        if (node.kind === "group") {
+          const children = copy(node.children);
+          if (children.some((child, index) => child !== node.children[index]))
+            return { ...node, children };
+        }
+        return node;
+      });
+    next = { ...document, children: copy(document.children) };
+  } else if (isImmutable(document) && targeted) {
     const targetId = "id" in command ? command.id : "";
-    const copyPath = (nodes: LayerData[]): LayerData[] => nodes.map(node => {
-      if (node.id === targetId) {
-        if (command.type === "path.add" && node.kind === "vector") return { ...node, paths: [...node.paths] };
-        if (command.type === "path.update" && node.kind === "vector")
-          return { ...node, paths: node.paths.map(path => path.id === command.pathId ? { ...path } : path) };
-        if (command.type === "paint.add" && node.kind === "paint") return { ...node, strokes: [...node.strokes] };
-        return { ...node };
-      }
-      if (node.kind === "group" && findLayer({ ...document, children: node.children }, targetId)) return { ...node, children: copyPath(node.children) };
-      return node;
-    });
+    const copyPath = (nodes: LayerData[]): LayerData[] =>
+      nodes.map((node) => {
+        if (node.id === targetId) {
+          if (command.type === "path.add" && node.kind === "vector")
+            return { ...node, paths: [...node.paths] };
+          if (command.type === "path.update" && node.kind === "vector")
+            return {
+              ...node,
+              paths: node.paths.map((path) =>
+                path.id === command.pathId ? { ...path } : path,
+              ),
+            };
+          if (command.type === "paint.add" && node.kind === "paint")
+            return { ...node, strokes: [...node.strokes] };
+          return { ...node };
+        }
+        if (
+          node.kind === "group" &&
+          findLayer({ ...document, children: node.children }, targetId)
+        )
+          return { ...node, children: copyPath(node.children) };
+        return node;
+      });
     next = { ...document, children: copyPath(document.children) };
   } else next = structuredClone(document);
   // Erasure updates append to immutable prior records. Copy only new records;
@@ -923,7 +1296,9 @@ export function execute(
     const { erasures, ...rest } = command.patch;
     const patch = structuredClone(rest) as LayerPatch;
     if ("erasures" in command.patch)
-      patch.erasures = erasures?.map(entry => isImmutable(entry) ? entry : structuredClone(entry));
+      patch.erasures = erasures?.map((entry) =>
+        isImmutable(entry) ? entry : structuredClone(entry),
+      );
     apply(next, { ...command, patch });
   } else apply(next, command);
   validateDocument(next, checkComponents);
@@ -932,19 +1307,38 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
-    case 'document.precision.float':return 'Use 32-bit linear editing';
-    case 'layer.align':return command.target?.type==='canvas'?'Align layers to canvas':command.target?.type==='layer'?'Align layers to key object':'Align selected layers';
-    case 'font.file.add':return 'Embed font file';
-    case 'font.file.rename':return 'Rename font file';
-    case 'font.file.remove':return 'Remove font file';
-    case 'document.font.replace':return 'Replace document font';
-    case 'paragraphStyle.set':return 'Edit paragraph style';
-    case 'paragraphStyle.remove':return 'Remove paragraph style';
-    case 'text.paragraphStyle':return command.styleId?'Apply paragraph style':'Detach paragraph style';
-    case 'text.paragraphOverrides.clear':return 'Reset paragraph style overrides';
-    case 'alphaChannel.set': return 'Save alpha channel';
-    case 'alphaChannel.remove': return 'Remove alpha channel';
-    case 'alphaChannel.reorder': return 'Reorder alpha channel';
+    case "document.precision.float":
+      return "Use 32-bit linear editing";
+    case "layer.align":
+      return command.target?.type === "canvas"
+        ? "Align layers to canvas"
+        : command.target?.type === "layer"
+          ? "Align layers to key object"
+          : "Align selected layers";
+    case "font.file.add":
+      return "Embed font file";
+    case "font.file.rename":
+      return "Rename font file";
+    case "font.file.remove":
+      return "Remove font file";
+    case "document.font.replace":
+      return "Replace document font";
+    case "paragraphStyle.set":
+      return "Edit paragraph style";
+    case "paragraphStyle.remove":
+      return "Remove paragraph style";
+    case "text.paragraphStyle":
+      return command.styleId
+        ? "Apply paragraph style"
+        : "Detach paragraph style";
+    case "text.paragraphOverrides.clear":
+      return "Reset paragraph style overrides";
+    case "alphaChannel.set":
+      return "Save alpha channel";
+    case "alphaChannel.remove":
+      return "Remove alpha channel";
+    case "alphaChannel.reorder":
+      return "Reorder alpha channel";
     case "layer.flip":
       return "Flip selected layers";
     case "layer.distribute":
@@ -1018,7 +1412,11 @@ export function describe(command: EditorCommand): string {
               ? "Add text layer"
               : "Import image";
     case "layer.update":
-      return 'characterRanges'in command.patch?('text'in command.patch?'Edit formatted text':'Format characters'):"Edit layer";
+      return "characterRanges" in command.patch
+        ? "text" in command.patch
+          ? "Edit formatted text"
+          : "Format characters"
+        : "Edit layer";
     case "layer.remove":
       return "Delete layer";
     case "layer.duplicate":
@@ -1047,7 +1445,7 @@ export function describe(command: EditorCommand): string {
 /** Session tool coordinates must be discarded after these operations, including undo/redo. */
 export function changesCanvasSpace(command: EditorCommand): boolean {
   return (
-    command.type === 'document.precision.float' ||
+    command.type === "document.precision.float" ||
     command.type === "document.resizeImage" ||
     command.type === "document.crop" ||
     command.type === "document.resize" ||
