@@ -51,7 +51,7 @@ export function TypographyPanel({
   onAction,
   onPreview,
 }: TypographyPanelProps) {
-  const family = layer.fontFamily;
+  const family = layer.fontFamily, float=layer.document?.precision==='float32';
   const vertical=layer.writingMode!=='horizontal-tb',writingSupported=typeof CSS!=='undefined'&&CSS.supports('writing-mode','vertical-rl')&&CSS.supports('text-orientation','upright');
   const [characterSelection,setCharacterSelection]=useState({id:layer.id,text:layer.text,start:0,end:0});
   const selection=characterSelection.id===layer.id&&characterSelection.text===layer.text?characterSelection:{start:0,end:0};
@@ -156,13 +156,14 @@ export function TypographyPanel({
         layout="stacked"
         value={layer.fontFamily}
         disabled={disabled}
-        options={[...embeddedFonts.map(file=>({value:file.family,label:`${file.name} (embedded)`})),...families.filter(value=>!embeddedFonts.some(file=>file.family===value)).map(value=>({value,label:value}))]}
+        options={[...embeddedFonts.map(file=>({value:file.family,label:`${file.name} (embedded)`})),...families.filter(value=>!embeddedFonts.some(file=>file.family===value)).map(value=>({value,label:float?`${value} (embed first)`:value,disabled:float}))]}
         onChange={(val) => {
           onAction(() => {
             layer.fontFamily = val;
           });
         }}
       />
+      {float&&<p>Embed a font in Manage document fonts to use it in this float document. Original font files are retained with your project.</p>}
       {canListFonts ? (
         <Button disabled={loadingFonts} onClick={() => void loadFonts()}>
           {loadingFonts ? "Reading system fonts…" : localFonts.length ? "Refresh system fonts" : "Access system fonts"}
@@ -217,17 +218,8 @@ export function TypographyPanel({
           })
         }
       />
-      <ColorField
-        label="Color"
-        ariaLabel="Text color"
-        value={layer.color}
-        disabled={disabled}
-        onChange={(val) => {
-          onAction(() => {
-            layer.color = val;
-          });
-        }}
-      />
+      {float?<TextInput label="Text color" layout="stacked" value={layer.color} disabled={disabled} placeholder="color(srgb-linear 1 1 1 / 1)" onCommit={color=>onAction(()=>{if(!CSS.supports('color',color))throw new Error('Enter a valid CSS text color.');layer.color=color;})}/>:<ColorField
+        label="Color" ariaLabel="Text color" value={layer.color} disabled={disabled} onChange={color=>onAction(()=>{layer.color=color;})}/>}
       <SegmentedControl
         label="Alignment"
         value={layer.align}

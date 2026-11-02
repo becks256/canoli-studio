@@ -1,5 +1,16 @@
 # Plugins and extensions
 
+## Native float text (schema 60)
+
+Existing isolated TextLayer/FontFile constructors and document-write commands
+can edit float typography using already declared original font families. Selected
+native faces still preload privately; no bytes, font chooser, renderer, file,
+network or provider service is exposed to command code. Installation remains
+inert. Host commit rechecks document grants, revision, source ownership and shared
+validation before one Undo; a failed script publishes no edits. Independent REST
+font/session support adds no browser synchronization. Package/runtime transport
+versions and permissions stay unchanged. [Defaults, example and errors](SCRIPTING_API.md#native-float-textlayer-schema-60).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair

@@ -10,10 +10,74 @@ styled, vertical, path and complete ordinary 50 MP regressions also pass. This
 remains private groundwork; float TextLayer/tool gates below still apply.
 [Verification and limits](benchmarks/native-styled-bidi-2026-11-01.md).
 
-TextLayer integration remains required for the full F08/F10 roadmap. Float
-documents still reject text and the text tool remains unavailable. The private
-color dependency below is implemented; it is not a public text-rendering API or
-evidence that native float typography has shipped.
+Schema 60 now connects the existing TextLayer and Text tool to the main float
+scene. This integration is under verification, with the earlier private native
+results above serving as its dependency evidence. The exact public contract is
+below; broad typography and the original roadmap remain unfinished.
+
+## Connected TextLayer contract (schema 60, under verification)
+
+Existing constructors and attached commands retain their options/defaults. Float
+text requires each resolved style's first requested family to be a declared
+FontFile backed by its complete original source in that document's AssetStore.
+The Text tool stages bundled Manrope WOFF2 and admits its declaration and layer
+in one ordinary transaction. Other fonts require explicit trusted embedding.
+Unowned primary requests reject model admission/conversion atomically. Already
+owned ordered fallbacks retain original priority; actual unowned/missing/intrinsic
+or unmatched glyph paint rejects native capture, never substitutes partial output.
+
+Native measurement preserves full character/paragraph/path/writing inputs and
+world transforms. Every nonempty line passes complete original ink and per-color
+ownership checks before source-linear glyph paint is retained. Empty lines retain
+layout and paint transparent. Glyph coverage supplies scalar alpha only; finite
+signed/HDR colors never traverse byte Canvas RGB. Existing masks, clipping,
+fill/layer opacity, styles, shadows and group composition apply to native fields.
+SDR display remains a final conversion. Trusted TIFF/PNG/PDF output uses the
+native scene and retains its existing color/output contracts. Unsupported float
+interchange remains an explicit rejection.
+
+Renderer-owned preparations survive viewport requests and wrapper-only edits.
+A 16-cell LRU retains canonical 256×256 Float32 RGBA cells (16 MiB of retained
+pixel data), with caller-owned output copies. Preparation capacity defaults to
+128 and never evicts pinned scenes. These are cache budgets, not image/document
+limits or total process-memory bounds. A cancelled view releases its waiter;
+owner clear/disposal aborts work and invalidates leases. Original sources, font
+declarations and all private native registrations are checked even on pixel hits.
+Private source/font checks stay separate from match deadlines and avoid recursive
+glyph-owner callbacks.
+
+Whole-layer and selected-character custom color fields retain full CSS strings.
+Use explicit `color(srgb-linear r g b / a)` for source-linear values. Existing
+10,000-unit text, typography/native preparation, script and transport budgets
+remain; there is no new import-resolution/file-size limit. Invalid/contextual
+colors, stale or missing sources, changed native registrations, unsupported glyph
+paint, invalid native layout, deadline, cancellation and owner retirement reject
+capture/delivery before output publication. Ordinary commands remain reversible;
+a rendering failure does not silently rewrite or flatten authored text.
+
+Scripts/plugins reuse declared FontFile.family through the existing OO surface,
+private native-face preload, shared validation and one-Undo commit. No chooser,
+source bytes, pixel renderer, file, network or new grant is exposed. Independent
+REST supports the same data/ownership/history with estimated headless metrics;
+it has no native text renderer or browser synchronization. Native project 5,
+workspace, semantic recipe/package and history formats retain existing font-source
+closure. Schema labels before 60 reject float TextLayers; valid older documents
+migrate without changing typography. No new public layer class is introduced.
+
+The isolated predecessor passed nine real browser cases, including actual Text
+tool/native source SHA, Undo/Redo/project reopening, exact windows/cache lifetimes,
+scripts/inert plugins/recipes/redo-only workspace, styled scenes and independently
+composed original-font Float32 TIFF samples read by native libtiff. Ten focused
+model/API cases pass after adding the schema gate. Warm isolated 64×48 cached
+reads measured 1–1.4 ms on this host; this does not establish cold preparation or
+editor-wide responsiveness. Main build/typecheck, all 3,427 unit/API tests, eleven focused browser cases
+(including selected-character HDR editing and a genuine 50 MP edit window),
+and twenty-one production cases pass. The complete affected 240-case source
+regression also passes with zero skipped or flaky cases.
+All 384 fallback layouts/36 independent references, curved/cross-span/default-
+ignorable/missing/intrinsic/native/legacy/optical/host acceptance and every other
+unfinished original roadmap gate remain required. Earlier sections below retain
+private implementation history and its original narrower acceptance boundaries.
 
 ## Original script and native direction items (private)
 
@@ -834,3 +898,259 @@ public Float32 TextLayer or universal host support.
 [Findings and remaining scope](benchmarks/svg-styled-glyph-2026-11-01.md) and
 [compact verification receipt](benchmarks/svg-styled-glyph-2026-11-01.json.gz)
 retain failed/corrected pilots, raw results and source/release identities.
+
+
+## Owned native fallback under verification (private)
+
+The developing `matchStyledGlyphLine` path now assembles source-owned fonts
+inside original spans. It walks authored family order, shapes complete original
+native items with full UTF-16 context, and assigns supported complete clusters
+to the first covering source. A missing glyph invalidates the entire shaped
+cluster, including supported bases with missing combining marks. Remaining
+ranges continue through the stack. Unknown families before a usable source and
+uncovered/intrinsic glyphs return unavailable without partial paint; an unused
+trailing generic can remain. This does not implement system-font discovery or
+unowned/color/missing-glyph integration.
+
+Each selected owner retains original source data and its effective clamped,
+filtered fallback tuple. Only private preparation uses that tuple as its virtual
+primary; original authored stacks, primary coordinates, colors and SVG chunks
+remain unchanged. No character or font-range spans are inserted. Whole-source
+script/bracket/direction resolution is reused and clipped by binary search,
+without a complete text scan for every selected range.
+
+Lazy candidates deliberately have no matched status. The ordinary single-source
+entry points retain their exact native ink gate. Fallback assembly explores
+coherent and independent original-item projections, reuses only byte-identical
+paint candidates from the same owner, and validates complete native union ink at
+opacities 1 and 0.5 plus canonical per-color ownership before publication. It
+retains original within-cluster glyph order while checking captured native and
+source-item paint ordering. Synthetic labels never supply actual RGB, alpha,
+glyph identities or coordinates. Source/parent/font checks, iterator cleanup,
+cooperative yields and the existing matching deadline remain required.
+
+The first nine-case implementation pilot matched seven supported owned stacks
+exactly and correctly withheld fields for unowned-first and missing emoji cases.
+Independent FontTools fixture generation retains source glyph IDs/layout and
+records narrower fallback variation ranges. Eleven coverage, source-priority,
+complete-search and itemization unit checks pass. These are focused evidence,
+not release acceptance. Expanded negative-tracking vertical tests exposed native
+anchor, direction, clipping/orientation and inline rounding gaps. The current
+extended eight-case pilot passes three and returns mismatches for five, without
+partial fields. Full build/typecheck, all 3,422 unit/API checks across 343 files, and all fifteen
+existing production regressions now pass. The complete 210-case source run is
+still active. Its new durable-owner tests reproduce the matching-deadline leak
+for both single-source and fallback fields; abort/release/decode/timeout cleanup,
+healthy retry and font-stack priority cases pass. Independent Float32/large-
+original acceptance for this developing change remains incomplete.
+
+The native diagnostic confirms an unfolded path can hide a negatively tracked
+cluster and report rotation zero; a translated diagnostic path restores its
+metadata. The browser's
+[SVG character-query implementation](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/layout/svg/svg_text_query.cc)
+also explicitly returns zero geometry/orientation for hidden layout items.
+Restored diagnostic coordinates are observations, not permission to fit poses
+from pixels or substitute a rewritten text layout. Complete fallback and native
+layout handling, durable owner lifetimes, all connected public Float32 text
+controls/scenes/export/shared transport/persistence, and every unfinished
+original roadmap gate remain required.
+
+
+### Durable glyph ownership after matching
+
+The developing styled/fallback matchers now end only their invocation deadline
+when matching and iterator cleanup finish. Their retained source/font/parent,
+registration and abort checks remain active for the captured plan's lifetime.
+A prepared glyph owner must not expire merely because more than 60 seconds have
+passed since the completed match. The fix awaits fallback completion before
+retiring the outer deadline; it does not remove source observers or cancellation.
+
+The complete pre-fix source regression finished with 208 passes and the two new
+deadline failures. Both failures then pass with the fix in the workspace; all
+seven source lifetime/cleanup/priority checks pass, including explicit abort
+retirement after clock advancement. Typecheck passes. Existing production
+coverage now additionally checks the emitted capture callbacks after advancing
+the clock; all fifteen production regressions pass. Full acceptance remains
+open for the broader fallback change, including vertical tracking and independent
+Float32/large-original verification.
+
+### Signed native path allocation under verification
+
+Negative path preparation now additionally captures `paint.inlineAllocation` in
+the original SVG/font context. Disposable complete-source probes retain original
+spans and spacing, expose clipped clusters on a padded straight baseline, and
+measure native start/end anchor separation. The padding follows measured native
+source geometry; it is not a source-size limit. Original `pathCharacters` stay
+separate because clamped character rectangles and signed typographic allocations
+serve different purposes. Invalid reads, cancellation and host removal retire
+both clones and their baseline definition before publication.
+
+The private vertical candidate stream now also retains signed source/private
+fragment allocation, half-grid native anchors and original zero-advance mark
+attachment. A separate straight-inline candidate retains native RTL rounding.
+Existing candidates remain available; every successful assembly still requires
+the complete original ink and paint-ownership gates. Space counts are cached per
+original cluster rather than rescanned for every attached glyph.
+
+Before the shaping-scale/frame correction below, the actual captured-plan
+negative mixed-vertical pilot matched seven of eight layouts exactly, compared
+with three previously; the transformed RTL curve exceeded the full matching
+budget. Four new browser tests pass,
+including eight source-restoration controls and abort/removal/nonfinite cleanup;
+typecheck passes. The first independent colored Float32 pilot also stopped on a
+matching deadline before completing its comparisons. Its reference painter now
+retains writing/baseline styles after assigning CSS, and records completed rows
+incrementally for subsequent verification. No fallback acceptance or connected
+public Float32 TextLayer is established. Full post-change regression and all
+384 layout/36 independent-reference targets remain required.
+
+### Independently measured native shaping scale (under verification)
+
+The existing one-em raster-advance calibration is insufficient to recover native
+GPOS scale at fractional transformed sizes. A second original CC0 calibration
+font retains a one-em A advance and adds exactly one em to A+A through GPOS.
+`captureNativeLayoutSize` measures kerned pair width minus unkerned pair width;
+it neither reads source artwork nor fits coordinates to reference pixels. It
+uses private registration, original host-state/abort/deadline checks and final
+cleanup. The reproducible generator is
+`scripts/build-native-layout-size-font.py`; the 944-byte font has SHA-256
+`98c1d44caa15fa4a75d89e66f99a0304cfff3553462fda7a5fb6fca71ca3c72f`.
+Native SVG metric projection uses this shaping scale while native source glyph
+advance/bounds callbacks remain independently measured. The prior raster probe
+and its non-native projection remain intact.
+
+`native-svg-inline-frames.ts` assembles complete original single-span signed
+layout advances across owned font items before rounding the inline frame.
+Enclosed/clamped character rectangles cannot supply that signed allocation.
+Existing placements remain available alongside the correction: the first
+integration regression caught a previously matching straight RTL preparation
+being displaced, so replacement of existing candidates was corrected. Both
+variants require complete original ink and per-color ownership equality. Multiple
+authored spans still need native parent allocation; the helper returns no guessed
+per-span correction. Candidate deduplication retains allocation metadata, and
+reversed source-item ordering uses the same selected corrected/original poses.
+
+An independent FontTools reference empties every original Shaping outline except
+GID8's combining mark, retaining byte-identical cmap/hmtx/vmtx/vhea/GSUB/GPOS/GDEF.
+It observes actual native mark placement without using the renderer's glyph
+preparation. Actual shaping WASM proves the independent calibration's one-em
+pair adjustment. The corrected source browser run passes all 21 focused checks,
+including four fractional mark sizes, all eight signed fallback controls, native
+calibration cleanup, durable ownership and independent Float32 paint checks.
+Fresh build/typecheck, all 3,424 unit/API tests across 344 files, fifteen existing
+production checks and the separately selected emitted native metric/worker/
+independent-mark check pass. The full 219-case source regression is active. This
+does not establish the complete 384 layouts, 36 Float32 references, public text
+authoring/scene/transport or full roadmap acceptance.
+
+### Original straight-span allocation candidates (under verification)
+
+Straight negative-tracking preparation additionally retains native physical
+glyph advances and Float32 spacing for each original shaping fragment. The new
+`native-svg-span-frames.ts` assembles complete authored spans before layout-unit
+truncation. Per-cluster truncation can lose a layout unit at transformed sizes;
+SVG character-query rectangles do not recover that allocation. An additional
+RTL preparation retains an unrounded parent for a single cluster and signed
+span extent for multiple clusters. These are candidate states with no publication
+authority: complete original ink and per-color ownership must still match.
+Existing raw/single-span preparations remain available. Original DOM spans,
+source fonts/tuples, glyph IDs, styles and linear color stay intact. Cross-span
+clusters and paths retain other preparations; their full acceptance remains open.
+
+The actual captured-plan regression matches all eight single-font/fallback,
+LTR/RTL and identity/affine controls, preserving source priority, complete original
+contexts and colored ownership. Four real-font cancellation, missing-spacing,
+nonfinite and incomplete-coverage tests withhold partial fields and permit retry.
+The full focused source run passes 22 tests; the four assembly checks pass
+separately. Twelve independent FontTools/actual-WASM Float32 controls cover both
+directions and affine states at three alpha values, including tiny alpha. Every
+alpha/RGB result and window word matches exactly with nonzero colored overlap.
+These tests are retained in the repository. A fresh full build/typecheck, all
+3,424 unit/API tests across 344 files and all seventeen production checks pass.
+Production includes the actual emitted span matcher/metrics/shaping worker with
+prepared original-font adapters and independent original native SVG spans in
+four direction/affine controls. The expanded 225-test source regression completed
+with all 225 passing, zero skipped and zero flaky cases. This includes the
+ordinary 50 MP native text workflows and the original-bearing RAW regression.
+The preceding sizing/frame integration completed all 219 source tests, zero
+skipped/flaky, including its 50 MP vertical workflow; it is pre-span-change evidence.
+All original 384-layout/36-reference targets and connected public Float32 text
+authoring, complete scenes/transport and the full roadmap remain required.
+
+### Initial connected authoring prototype (predecessor evidence)
+
+An isolated copy now connects the existing OO TextLayer to native linear scene
+paint, including a Text tool that retains the bundled original Manrope font in
+the same undoable transaction. A real browser check verifies source identity,
+layer/font Undo and Redo, editable signed/HDR color, and native-project save and
+reopen. A separate browser check independently composes original-font glyph
+coverage in Float32 and matches every output alpha with unchanged authored
+geometry. The corrected reference has zero alpha error; this run also has
+identical byte-projected alpha. An earlier run recorded two one-byte overlap
+differences, retained for investigation rather than classified as accepted
+precision behavior. No tolerance replaces the exact matching/reference gates. A scene test also preserves
+every Float32 word across window partitions and preparation reuse.
+
+These three passing prototype cases do not establish product integration,
+complete scene/style/export/transport behavior, durable cache ownership,
+responsiveness or full native fallback acceptance. The prototype lives outside
+product source at `/tmp/canoli-float-text-authoring-2026-11-02/`. At that stage
+main still rejected public float text; subsequent schema-60 integration is
+described above. All original acceptance targets remain required.
+
+### 2026-11-02 connected integration verification update
+
+The main build/typecheck passes. All 3,427 unit/API cases across 346 files pass,
+and all eleven new native browser workflow cases pass. The latter include the
+actual selected-character HDR Inspector workflow, the tested scripting-guide
+example, inert plugins/recipes/redo-only workspace, styled scenes and exact native
+TIFF samples. The genuine 50 MP original retains its complete source and 10000×5000
+geometry; all 16,384 edited-window words match independent original-font Canvas
+coverage composed over the native base, with exact Undo/Redo. This is window
+acceptance, not a full 50 MP rendered-output or process-memory claim.
+
+The first full unit run had one obsolete blanket-text-rejection error assertion;
+the corrected complete rerun passes. Equivalent legacy isolation assertions now
+check the missing-original-font error while retaining atomic rollback. The first
+production run passes twenty cases, including the actual new Text tool/source/
+HDR/Undo/project/native TIFF flow and existing vector regressions. Its sole failure
+is the old guide assertion that float text is unavailable; the assertion now
+checks schema 60, original source ownership and the remaining full native gates.
+The corrected production run and complete affected source regression are pending.
+The failed discovery run, failure logs, corrected runs and exact snapshots remain
+at `/tmp/canoli-float-text-integration-2026-11-02/`. No release sealing, full native
+fallback/typography or roadmap completion is claimed.
+
+Corrected production verification: all twenty-one cases pass, with zero skipped
+or flaky cases. The new Text tool/HDR/native-source/Undo/project/native TIFF flow
+runs without development globals; the no-JavaScript guide now verifies current
+schema-60 ownership and unfinished native acceptance. Actual test discovery and
+the live browser-run header confirm 240 affected source cases across 38 files,
+including all 225 preceding native cases, eleven connected workflows and four
+legacy isolated atomic-refusal cases. That run is active, not yet a passing
+result. Source, tests and scripts are frozen for it. No full fallback release,
+final acceptance/sealing/commit or roadmap completion is claimed.
+
+### 2026-11-02 terminal checkpoint and remaining curved failures
+
+The full affected source regression is terminal: all 240 cases across 38 files
+pass, zero skipped and zero flaky, in 28.7 minutes. All earlier 225 native cases,
+eleven connected workflows and four legacy isolation checks remain selected.
+Build/typecheck, all 3,427 unit/API checks across 346 files, the eleven focused
+browser cases and all twenty-one production cases pass. A source-hash audit
+confirms no engine/test/script drift during the complete run. These results form
+a development checkpoint, not complete F08/F10 or roadmap acceptance.
+
+Further isolated curved-span work retains raw native fragment advances before
+whole-span rounding, complete original text/font context and the exact ink/color
+ownership gates. It still passes only six of eight original controls. Retaining
+each authored span as a separate source selection also leaves both transformed
+RTL controls failing the real 60-second matching budget. These experiments are
+not product code. Native paint isolation locates the single-font discrepancy in
+the first `AV ` span; the combining-mark and final spans match independently.
+Chromium paint-command traces expose a different internal paint origin. This is
+diagnostic evidence, not permission to fit coordinates from pixel differences.
+Plain/positive-spacing controls and current Chromium source consultation do not
+yet establish the correct native parent-allocation rule. All original 384-layout/
+36-reference targets and broader native/public/font/host/performance acceptance
+remain. [Checkpoint findings and exact evidence](../docs/benchmarks/native-float-text-2026-11-02.md).

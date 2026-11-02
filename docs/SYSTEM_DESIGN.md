@@ -1,5 +1,62 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Connected native float text ownership
+
+Schema 60 extends the existing TextLayer/command boundary to float documents with
+declared original primary fonts. Native browser layout and exact whole-source
+ink/per-color matching produce private linear glyph fields. Generic float scene
+composition supplies ancestry, masks, clipping, styles and shadows; output never
+uses display RGB as a precision source. Preparation and canonical Float32 cells
+belong to the renderer. Caller cancellation does not retire reusable owner work;
+clear/dispose does. Cache hits validate original sources and private registrations,
+and output arrays are copied. Mutable inputs are snapshotted before awaits.
+Isolated execution retains existing source/revision/grant validation; independent
+REST owns its fonts and estimated geometry. No new capability grant or browser
+synchronization is introduced. Integration verification and broad native/public/
+large-original/performance acceptance remain required. [Contract](FLOAT_TEXT.md).
+
+## Native shaping scale and complete inline frames (under verification)
+
+Private native SVG preparation distinguishes the font host's shaping scale from
+its rasterized one-em advance. An independent original CC0 font adds exactly one
+em to a pair through GPOS; the difference between kerned/unkerned pair widths
+measures shaping scale without source ink, reference pixels or browser-specific
+rounding constants. Temporary registration, cancellation, host-state checks and
+cleanup remain enforced. Native source glyph advances and bounds stay separately
+measured; original font bytes, IDs and contexts remain authoritative.
+
+Complete original single-span signed allocation can be assembled across owned
+font items before candidate verification. Native enclosed character rectangles
+do not supply signed advances. Both the corrected frame and previous placements
+remain candidates, and complete native ink/color ownership decide acceptance.
+Straight authored spans additionally retain original native fragment advances
+and Float32 spacing until complete-span truncation. A separate candidate can use
+signed span extent or an unrounded single-cluster RTL parent. It grants no match
+authority; all previous placements and exact complete ink/ownership checks remain.
+Cross-span clusters and curved original-span parent allocation still require
+further work. Full fallback, public float text integration and the complete
+roadmap remain open. See [FLOAT_TEXT.md](FLOAT_TEXT.md).
+
+## Developing owned font fallback
+
+Whole-cluster source coverage assigns original font-stack priority; per-font
+private variation tuples cannot rewrite authored styles. Keep unverified lazy
+paint candidates separate from matched results. Assemble complete original
+source items, preserve within-cluster order, and publish only after exact native
+ink and per-color ownership checks. Enumerate independent item choices without a
+beam or font-count cutoff; reuse whole-source itemization and identical paint
+preparations, with cooperative cancellation/deadlines and iterator retirement.
+Expanded negative vertical tracking, complete fallback semantics and connected
+public Float32 text remain unverified/unfinished.
+Keep signed typographic allocation separate from clamped addressable-character
+rectangles. Supplemental probes retain the complete original text and spans,
+derive their disposable baseline margin from native geometry, and retire on
+every exit. Zero-advance attachments follow their original cluster pose. Native
+half-grid anchors must not be rounded again to the coarser character grid.
+These preparations have no publication authority without complete original ink
+and paint-ownership equality.
+[Current development boundary](FLOAT_TEXT.md#owned-native-fallback-under-verification-private).
+
 ## Original cluster provenance and complete native paint order
 
 Retain original UTF-16 cluster provenance through private glyph projections.

@@ -1,5 +1,5 @@
 import {test,expect} from 'vitest';
-import {nativeSvgTextItems} from '../src/engine/native-text-items';
+import {nativeSvgTextItems,sliceNativeTextItems} from '../src/engine/native-text-items';
 import {unicodeTextProperties} from '../src/fonts/unicode-text-data';
 import type {StyledTextCharacterGeometry} from '../src/engine/styled-text';
 function geometry(text:string,zero=false):StyledTextCharacterGeometry[]{return Array.from({length:text.length},(_,index)=>{const bidi=unicodeTextProperties(text.codePointAt(index)!).bidi,reverse=bidi==='R'||bidi==='AL';return{index,start:{x:index*20,y:40},end:{x:index*20+(zero?0:reverse?-20:20),y:40},rotation:0,extent:{x:index*20,y:0,width:20,height:40}};});}
@@ -25,4 +25,11 @@ test('whole-source native visual hints retain bidi resolution erased by clamped 
  const text='A אב V',directions=['ltr','rtl','rtl','rtl','rtl','ltr']as const,positions=[292,272,248,224,204,180],visual=positions.map((order,index)=>({order,direction:directions[index]}));
  expect(nativeSvgTextItems(text,geometry(text,true),'rtl',0,text.length,visual).map(item=>[item.start,item.end,item.direction])).toEqual([[0,1,'ltr'],[1,2,'rtl'],[2,5,'rtl'],[5,6,'ltr']]);
  expect(()=>nativeSvgTextItems(text,geometry(text),'rtl',0,text.length,[])).toThrow('visual ordering');expect(()=>nativeSvgTextItems(text,geometry(text),'rtl',0,text.length,visual.map(value=>({...value,order:NaN})))).toThrow('visual ordering');
+});
+
+
+test('fallback selections reuse whole-source bracket and direction resolution across every source boundary',()=>{
+ const text='A(אב)AVa\u0301ببلا',characters=geometry(text),items=nativeSvgTextItems(text,characters,'rtl');
+ for(let start=0;start<=text.length;start++)for(let end=start;end<=text.length;end++)expect(sliceNativeTextItems(items,start,end)).toEqual(nativeSvgTextItems(text,characters,'rtl',start,end));
+ const large='אA'.repeat(5000),whole=nativeSvgTextItems(large,geometry(large),'ltr');expect(sliceNativeTextItems(whole,9998,10000)).toEqual(whole.slice(-2));expect(sliceNativeTextItems(whole,10000,10000)).toEqual([]);expect(Object.isFrozen(sliceNativeTextItems(whole,9998,10000))).toBe(true);
 });

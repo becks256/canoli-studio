@@ -1,5 +1,24 @@
 # Canoli Studio editor requirements
 
+## Connected float text requirement (schema 60)
+
+Retain editable TextLayer typography and original declared font sources through
+shared OO commands/history, native linear rendering, Inspector character colors,
+complete scene masks/clipping/styles/shadows, source-bearing persistence and
+precision delivery. Text creation must retain its bundled source and layer in
+one Undo. Original source-linear RGB must never come from byte text pixels.
+Private matching must verify whole native ink and per-color ownership before
+publication; missing/unowned/intrinsic/unsupported paint must refuse output.
+Keep original text, font priority/tuples, geometry and source resolution.
+
+Schema 60 now admits the existing layer type in float documents when every
+resolved style begins with a declared original font. Installed fonts require
+explicit embedding. Current integration is under verification; broader fallback,
+384 native layouts/36 independent references, full public typography/transport,
+large-original, host/device/quality and sustained performance gates remain.
+[Current behavior and evidence](FLOAT_TEXT.md). Earlier private-dependency
+sections below describe their narrower verification, not current tool admission.
+
 ## Original script and native direction ranges
 
 Private source-owned text paint must retain complete original context and
@@ -10,7 +29,7 @@ original/candidate ink before publishing any fields; mismatch must not return
 partial paint. Pin property-source versions/hashes and retain Unicode notices.
 The private dependency passes its affected regression matrix. Owned fallback,
 broader native bidi itemization/ordering and connected public Float32 text remain
-required; no public Float32 text is admitted.
+required for full acceptance; current schema-60 integration is described above.
 [Current evidence and limits](FLOAT_TEXT.md#original-script-and-native-direction-items-private).
 
 ## Private styled native paint dependency
@@ -85,8 +104,8 @@ Source shaping must retain original font bytes/context/axes, validate original
 GIDs and UTF-16 clusters, share the font-job queue and honor cancellation/source
 retirement before publication. Whole Canvas-run verification must publish no
 paint placements for differing advance/ink, missing glyphs or intrinsic-color
-paint. Float32 TextLayer/tool admission stays gated pending complete native
-layout, paint, transport, persistence and large-original acceptance.
+paint. Current schema-60 admission is described above; complete native layout,
+paint, transport, persistence and large-original acceptance remain required.
 [Implemented private contract and limits](FLOAT_TEXT.md#source-font-shaping-and-whole-canvas-run-matching-private).
 
 ## Native linear Patch and Spot Healing

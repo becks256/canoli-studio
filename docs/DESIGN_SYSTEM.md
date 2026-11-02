@@ -1,5 +1,18 @@
 # Canoli Studio design system
 
+## Float typography controls
+
+Use the existing Text tool (T), custom Typography disclosure and character
+selection controls. In float mode the tool retains bundled Manrope and creates
+its editable layer in one Undo, then selects it after commit. Whole-layer and
+selected-range color inputs accept complete CSS strings, including explicit
+linear signed/HDR colors; keep sRGB color pickers for byte documents. The font
+picker retains the shared installed-family list while marking unembedded choices
+as unavailable with an explanation and the existing Manage document fonts action.
+No shortcut, icon, cloud operation or component library is introduced. Preserve
+native typing and expose source/layout/cancellation failures through existing
+error handling. [Current native float text contract](FLOAT_TEXT.md).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair

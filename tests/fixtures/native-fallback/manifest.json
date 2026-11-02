@@ -1,0 +1,62 @@
+{
+  "purpose": "Native owned fallback fixtures; original glyph data/layout retained, complementary cmap coverage and independently reduced variable axes force observable fallback sources. Original CC0 fixture artwork; test assets only.",
+  "originals": {
+    "tests/fixtures/shaping-font/Shaping.ttf": {
+      "bytes": 2308,
+      "sha256": "50731d8a540f1ed632dee94ef84b6a0a92152575deee5fbce684fc3c5ff7b15b"
+    },
+    "tests/fixtures/font-variations/Axes.ttf": {
+      "bytes": 1296,
+      "sha256": "d02d9039782d362160439f17607f8ecfce3f0d763fc2eeeec40a05a29c2f20fa"
+    },
+    "tests/fixtures/vertical-font/Vertical.ttf": {
+      "bytes": 1444,
+      "sha256": "15b9a89a90012d99bf89850240432b1190fe2ee47a6b241fe0bb53f992ffa944"
+    }
+  },
+  "derived": {
+    "Fallback-axes-B.ttf": {
+      "bytes": 1572,
+      "sha256": "e244bb9af925c15cb03fe577491511fc714ae9439724ce96b3fd0f64b625a9be"
+    },
+    "Latin-no-mark.ttf": {
+      "bytes": 2252,
+      "sha256": "806d8f024ae85dd626adac4a64434cf990e3a87169a91799faaca6735ba1660a"
+    }
+  },
+  "latinCoverage": [
+    32,
+    65,
+    86,
+    97,
+    102,
+    105
+  ],
+  "variableFallback": {
+    "coverageChange": "A becomes B, source GID retained",
+    "requestedAxes": {
+      "TEST": [
+        25,
+        50,
+        75
+      ],
+      "wght": [
+        300,
+        500,
+        700
+      ]
+    },
+    "effectiveAxes": {
+      "TEST": [
+        25,
+        50,
+        75
+      ],
+      "wght": [
+        400.0,
+        500,
+        700
+      ]
+    }
+  }
+}

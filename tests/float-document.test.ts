@@ -10,10 +10,10 @@ it('float constructor and old schema validation reject contradictory precision i
 });
 it('unsupported operations and mixed transactions reject before changing a float document or its history',()=>{
  const document=new Document({precision:'float32'}),raster=new RasterLayer({assetId:'float-original',width:10,height:10});document.layers.add(raster);const before=document.toJSON(),revision=document.getSnapshot().revision;
- expect(()=>document.layers.add(new TextLayer())).toThrow('Other layer types');expect(()=>document.transaction('Unsupported float edit',()=>{raster.opacity=.25;document.layers.add(new TextLayer());})).toThrow();expect(document.toJSON()).toEqual(before);expect(document.getSnapshot().revision).toBe(revision);
+ expect(()=>document.layers.add(new TextLayer())).toThrow('declared original font');expect(()=>document.transaction('Unsupported float edit',()=>{raster.opacity=.25;document.layers.add(new TextLayer());})).toThrow();expect(document.toJSON()).toEqual(before);expect(document.getSnapshot().revision).toBe(revision);
 });
 it('conversion gates unsupported legacy content and wire commands remain strict',()=>{
- const document=new Document();document.layers.add(new TextLayer());const before=document.toJSON();expect(()=>document.convertToFloat()).toThrow('Other layer types');expect(document.toJSON()).toEqual(before);expect(parseCommands([{type:'document.precision.float'}])).toEqual([{type:'document.precision.float'}]);expect(()=>parseCommands([{type:'document.precision.float',force:true}])).toThrow();
+ const document=new Document();document.layers.add(new TextLayer());const before=document.toJSON();expect(()=>document.convertToFloat()).toThrow('declared original font');expect(document.toJSON()).toEqual(before);expect(parseCommands([{type:'document.precision.float'}])).toEqual([{type:'document.precision.float'}]);expect(()=>parseCommands([{type:'document.precision.float',force:true}])).toThrow();
 });
 
 it('float tone parameters share ordinary OO transactions, strict limits and exact Undo',()=>{

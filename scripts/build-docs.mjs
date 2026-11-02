@@ -69,7 +69,7 @@ const generatedPages = [
   ["FLOAT_PAINT", "Editable linear float paint"],
   ["FLOAT_CLONE", "Native float clone paint"],
   ["FLOAT_RETOUCH", "Native linear Patch and Spot Healing"],
-  ["FLOAT_TEXT", "Native float text groundwork"],
+  ["FLOAT_TEXT", "Native float text"],
   ["FLOAT_VECTORS", "Editable linear float vectors"],
   ["FLOAT_PROOFING", "Float device soft proofing"],
 ];

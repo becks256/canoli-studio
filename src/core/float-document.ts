@@ -1,3 +1,6 @@
+import {normalizeCharacterText,characterInputForLayer} from './character-layout';
+import {documentFontFiles} from './font-files';
+import {fontFamilyNames} from './font-families';
 import{compileFloatColor,isFloatColorAdjustment}from'./float-color';
 import {floatTonalOptionsSchema} from './float-tonal';
 import{compileFloatGradient}from'./float-gradient';
@@ -25,6 +28,8 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='paint'){
         if(layer.strokes.some(stroke=>stroke.kind==='clone'&&stroke.precision!=='float32'))return 'Float clone strokes require explicit native float sources.';
         if(layer.strokes.some(stroke=>stroke.kind==='wet'&&stroke.precision!=='float32'))return 'Float paint replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
+      }else if(layer.kind==='text'){
+        try{const files=documentFontFiles(document),source=normalizeCharacterText(characterInputForLayer(layer));for(const style of source.styles){const primary=fontFamilyNames(style.fontFamily)[0];if(!files.some(file=>file.resource.report.faces[0].cssFamily.toLowerCase()===primary))return 'Float text requires a declared original font as its first requested family.';}}catch(error){return String(error);}
       }else if(layer.kind==='vector'){
         // Existing strict paths and paint transforms are native geometry.
       }else if(layer.kind==='adjustment'){

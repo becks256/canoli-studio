@@ -1,5 +1,15 @@
 # Float document editing
 
+## Native editable float text (schema 60, under verification)
+
+The existing TextLayer and Text tool now participate in the native float scene
+with declared original fonts, separate linear color and native glyph coverage,
+ordinary masks/clipping/styles/shadows and shared history. The tool retains its
+bundled Manrope original; other families require explicit embedding. Complete
+native matching remains mandatory, with no substitute bitmap RGB or partial
+paint on failure. Broader typography and integration acceptance remain open.
+[Exact contract, errors, limits and verification](FLOAT_TEXT.md).
+
 ## Editable native float vectors
 
 Existing VectorLayer/VectorPath commands now support linear solid and continuous

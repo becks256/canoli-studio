@@ -1,3 +1,4 @@
+import {insertEditorText} from './insert-text';
 import {translateMaskData} from '../core/masks';
 import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
 import {activePerspective} from '../core/perspective';
@@ -75,7 +76,7 @@ import {
   X,
 } from "lucide-react";
 import { EditorApplication } from "../editor";
-import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, SmartObjectLayer, TextLayer } from "../dom";
+import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, SmartObjectLayer } from "../dom";
 import {
   defaultCurvesAdjustment,
   defaultHslAdjustment,
@@ -1564,15 +1565,8 @@ export function App({ editor }: { editor: EditorApplication }) {
         return;
       }
       if (tool === "text") {
-        attempt(() => {
-          const textLayer = new TextLayer({
-            name: "Text",
-            text: "Text",
-            x: Math.round(point.x),
-            y: Math.round(point.y),
-          });
-          dom.layers.add(textLayer);
-          dom.selectedLayer = textLayer;
+        void task(async () => {
+          await insertEditorText(editor,point);
           chooseTool("move");
         });
         return;

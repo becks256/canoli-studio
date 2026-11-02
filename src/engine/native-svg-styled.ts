@@ -1,3 +1,4 @@
+import {matchNativeFallbackSvgLine} from './native-svg-fallback';
 import {characterFormatSchema} from '../core/character-format';
 import {fontFamilyNames} from '../core/font-families';
 import type {FontFileData} from '../core/font-files';
@@ -14,11 +15,13 @@ import type {StyledTextPlan} from './styled-text';
 /** Style boundaries select original shaping items, never new DOM text chunks.
  * Color-only boundaries retain ligatures and original cluster paint ownership. */
 export async function matchNativeStyledSvgLine(plan:StyledTextPlan,index:number,files:readonly FontFileData[],control:NativeGlyphFontControl={}):Promise<NativeSvgGlyphMatch>{
- const owners=new Map<string,NativeGlyphFont>();
+ const owners=new Map<string,NativeGlyphFont>();let matching=true;
  const options={...control},started=performance.now(),timeout=options.timeoutMs??60000;
  if(!Number.isInteger(timeout)||timeout<=0||timeout>0x7fffffff)throw new Error('Invalid native styled matching time budget.');
- const baseCheck=()=>{options.signal?.throwIfAborted();plan.check();options.check?.();options.signal?.throwIfAborted();plan.check();if(performance.now()-started>=timeout)throw new Error('Native styled glyph matching exceeded its time budget.');},check=()=>{baseCheck();for(const font of owners.values())font.check();},budget=()=>Math.max(1,Math.ceil(timeout-(performance.now()-started)));check();
+ const baseCheck=()=>{options.signal?.throwIfAborted();plan.check();options.check?.();options.signal?.throwIfAborted();plan.check();if(matching&&performance.now()-started>=timeout)throw new Error('Native styled glyph matching exceeded its time budget.');},check=()=>{baseCheck();for(const font of owners.values())font.check();},budget=()=>Math.max(1,Math.ceil(timeout-(performance.now()-started)));check();
+ try{
  if(!Number.isInteger(index)||index<0||index>=plan.scene.lines.length)throw new Error('Native styled line index is outside its captured source.');const line=plan.scene.lines[index];if(!plan.paint||!line.spans.length)return Object.freeze({status:'unavailable',reason:'Styled glyph matching requires captured native paint geometry.'});
+ if(line.spans.some(span=>fontFamilyNames(span.style.fontFamily).length>1))return await matchNativeFallbackSvgLine(plan,index,files,{...options,timeoutMs:budget(),check});
  const fields=Object.keys(characterFormatSchema.shape).filter(key=>key!=='color')as (keyof typeof line.spans[number]['style'])[],groups:{first:number;last:number}[]=[];
  for(let i=0;i<line.spans.length;i++){const last=groups.at(-1);if(last&&fields.every(key=>line.spans[last.first].style[key]===line.spans[i].style[key]))last.last=i+1;else groups.push({first:i,last:i+1});}
  const glyphs:Readonly<FloatGlyph>[]=[],runs:OwnedFontRun[]=[];let hidden=0;
@@ -38,4 +41,5 @@ export async function matchNativeStyledSvgLine(plan:StyledTextPlan,index:number,
  const visual=plan.paint.visual?.[index],ordered=visual?nativeSvgPaintOrder(glyphs,visual):Object.freeze(glyphs);
  const paint=await compareNativeSvgGlyphPaint(plan,index,captureNativeSvgLineRoot(plan,index),ordered,{...options,check},budget),ownership=paint.error?undefined:await compareNativeSvgPaintOwnership(plan,index,ordered,paint.bounds,{...options,check},budget),evidence=Object.freeze({projection:'styled'as const,hiddenGlyphs:hidden,svgAdvance:plan.metrics[index].advance,svgPixelsCompared:paint.pixels,svgMaxAlphaError:paint.error,sourceGlyphs:runs.reduce((n,r)=>n+r.glyphs.length,0),sourceClusters:runs.reduce((n,r)=>n+new Set(r.glyphs.map(g=>g.cluster)).size,0),opacitySamples:Object.freeze([1,.5]),bounds:paint.bounds,paintOwnership:ownership});
  if(paint.error||ownership?.error)return Object.freeze({status:'mismatch',reason:'The complete native styled ink or paint ownership differs from source-font glyph paint.',evidence});check();return Object.freeze({status:'matched',run:runs[0],runs:Object.freeze(runs),glyphs:ordered,evidence});
+ }finally{matching=false;}
 }

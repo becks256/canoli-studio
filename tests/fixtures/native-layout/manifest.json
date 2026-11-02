@@ -1,0 +1,22 @@
+{
+  "purpose": "Original GID8 mark ink; all source character mappings, metrics and positioning tables unchanged. Independent native mark placement reference, not a product font.",
+  "source": {
+    "bytes": 2308,
+    "sha256": "50731d8a540f1ed632dee94ef84b6a0a92152575deee5fbce684fc3c5ff7b15b"
+  },
+  "probe": {
+    "bytes": 1740,
+    "sha256": "cd486f0fd6104f7ef1354863ebe4b5e73d292c4ae0fd7e4b69f5a586d5eb9ddd"
+  },
+  "glyphId": 8,
+  "glyphName": "acutecomb",
+  "retainedTables": [
+    "cmap",
+    "hmtx",
+    "GSUB",
+    "GPOS",
+    "GDEF",
+    "vmtx",
+    "vhea"
+  ]
+}

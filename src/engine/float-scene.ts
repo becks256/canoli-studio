@@ -1,3 +1,4 @@
+import {FloatTextCache,type FloatTextLease} from './float-text';
 import {renderFloatPaint,type FloatPaintCoverage,type FloatCloneRead} from './float-paint';
 import {renderFloatVector} from './float-vector';
 import {captureFloatPatch,applyFloatPatch,type CapturedFloatPatch} from './float-patch';
@@ -63,12 +64,13 @@ interface CachedSource{original:Blob;key:string;source:FloatRasterSource}
 /** Owns original-source leases and a bounded native float preview cache, never authored data.
  * A captured scene pins its own shares across awaits and renderer-cache eviction. */
 export class FloatSceneRenderer {
+ private readonly text:FloatTextCache;
  private readonly displayOwner=Symbol('float display owner');
  private readonly appearance=new FloatAppearanceCache();
  private entries=new Map<Blob,Map<string,CachedSource>>();
  private lru=new Map<CachedSource,true>();private epoch=0;private closed=false;
  private captures=new Set<AbortController>();
- constructor(private processor:Pick<PixelProcessor,'floatMappedHdrWet'|'floatCompositeHdrWet'|'floatProjective'|'floatTonal'|'floatConvolveAlpha'|'floatStyle'|'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'|'floatColor'|'floatGradient'|'prepareFloatLookup'>){}
+ constructor(private processor:Pick<PixelProcessor,'floatMappedHdrWet'|'floatCompositeHdrWet'|'floatProjective'|'floatTonal'|'floatConvolveAlpha'|'floatStyle'|'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'|'floatColor'|'floatGradient'|'prepareFloatLookup'>){this.text=new FloatTextCache(this.processor);}
  private source(store:AssetStore,asset:ImageAsset):FloatRasterSource{
   if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF sources. Byte editing proxies are not precision sources.');
   const key=JSON.stringify([asset.width,asset.height,asset.tiff,asset.tiffColor.source]);let entries=this.entries.get(asset.blob);if(!entries){entries=new Map();this.entries.set(asset.blob,entries);}let entry=entries.get(key);
@@ -77,8 +79,8 @@ export class FloatSceneRenderer {
   while(this.lru.size>64){const oldest=this.lru.keys().next().value!;this.lru.delete(oldest);const group=this.entries.get(oldest.original)!;group.delete(oldest.key);if(!group.size)this.entries.delete(oldest.original);oldest.source.dispose();}
   return share;
  }
- clear(){this.appearance.clear();this.epoch++;const captures=[...this.captures];this.captures.clear();for(const capture of captures)capture.abort(new Error('Float scene capture is closed or superseded.'));retireFloatDisplay(this.displayOwner);for(const entry of this.lru.keys())entry.source.dispose();this.lru.clear();this.entries.clear();}
- dispose(){this.closed=true;this.clear();}
+ clear(){this.text.clear();this.appearance.clear();this.epoch++;const captures=[...this.captures];this.captures.clear();for(const capture of captures)capture.abort(new Error('Float scene capture is closed or superseded.'));retireFloatDisplay(this.displayOwner);for(const entry of this.lru.keys())entry.source.dispose();this.lru.clear();this.entries.clear();}
+ dispose(){this.closed=true;this.clear();this.text.dispose();}
  async render(document:DocumentData,assets:AssetStore,mask:FloatMaskService,frame:FloatSceneFrame,control:FloatSceneControl={},readback=false,proof:ColorProof|null=null,cache=true,strokeService?:FloatStrokeService):Promise<HTMLCanvasElement>{
   const capturedProof=proof?Object.freeze({...proof}):null;
   const scene=await this.capture(document,assets,mask,control,strokeService);let output:HTMLCanvasElement|undefined,display:Awaited<ReturnType<typeof borrowFloatDisplay>>|undefined,accepted=false;
@@ -109,7 +111,7 @@ export class FloatSceneRenderer {
   if(this.closed)throw new Error('Float scene renderer is closed.');const document=isImmutable(input)?input:freeze(structuredClone(input));validateDocument(document);const issue=floatSceneIssue(document);if(issue)throw new Error(issue);
   assertFloatSources(document,assets);
   const epoch=this.epoch,lifetime=assets.captureLifetime(),sources=new Map<string,{asset:ImageAsset;source:FloatRasterSource;tiff:ImageAsset['tiff'];color:ImageAsset['tiffColor']}>(),masks=new Map<string,{asset:ImageAsset;bitmap:ImageBitmap;blob:Blob;width:number;height:number}>();let closed=false;
-  const shadowCache=new FloatShadowCache();
+  const shadowCache=new FloatShadowCache(),texts=new Map<string,FloatTextLease>();
   const erasureCaptures=new Map<object,import('./projected-erasure').CapturedProjectedErasure>();
   const wetCaptures=new Map<object,CapturedFloatWetReplay>();
   const cloneCaptures=new Map<object,CapturedFloatClone>();
@@ -122,9 +124,9 @@ export class FloatSceneRenderer {
   const check=()=>{control.signal?.throwIfAborted();checkRenderCurrent(control.isCancelled);if(closed||this.closed||epoch!==this.epoch)throw new Error('Float scene capture is closed or superseded.');lifetime();
    for(const[id,value]of sources)if(!assets.has(id)||assets.get(id)!==value.asset||value.asset.blob!==value.source.original||value.asset.width!==value.source.width||value.asset.height!==value.source.height||value.asset.tiff!==value.tiff||value.asset.tiffColor!==value.color)throw new Error('Float scene source changed.');
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
-   for(const pin of gridPins.values())pin.check();
+   for(const pin of gridPins.values())pin.check();for(const text of texts.values())text.check();
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();for(const capture of patchCaptures.values())capture.dispose();patchCaptures.clear();shadowCache.clear();maskService.clear?.();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const text of texts.values())text.dispose();texts.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();for(const capture of patchCaptures.values())capture.dispose();patchCaptures.clear();shadowCache.clear();maskService.clear?.();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    const hdrReferences=floatPaintAssetReferences(layer);
    visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'||hdrReferences.has(reference)){if(!gridPins.has(reference.assetId))gridPins.set(reference.assetId,captureAssetSource(assets,reference.assetId));return;}if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
@@ -157,6 +159,12 @@ export class FloatSceneRenderer {
     }
    }};
    await prepareWet(document.children);check();
+   const prepareText=async(layers:LayerData[],parent:AffineTransform)=>{for(const layer of layers){
+    check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer));
+    if(layer.kind==='group')await prepareText(layer.children,world);
+    else if(layer.kind==='text'){const text=await this.text.capture(document,layer,assets,world,control);try{check();texts.set(layer.id,text);}catch(error){text.dispose();throw error;}}
+   }};
+   await prepareText(document.children,new AffineTransform());check();
    const prepareLookups=async(layers:LayerData[])=>{for(const layer of layers){if(layer.kind==='group')await prepareLookups(layer.children);else if(layer.kind==='adjustment'&&layer.adjustment.kind==='lut'){const lookup=await this.processor.prepareFloatLookup(layer.adjustment);try{check();lookups.set(layer.id,lookup);}catch(error){lookup.dispose();throw error;}}}};
    await prepareLookups(document.children);check();
    // All source preparation precedes acquisition of any display/output CMM
@@ -282,6 +290,7 @@ export class FloatSceneRenderer {
       const readIntrinsic=async(region:FloatSourceWindow):Promise<Float32Array>=>{
        check();validateWindow(region);
        if(layer.kind==='raster')return raster(layer,world,region);
+       if(layer.kind==='text'){const text=texts.get(layer.id);if(!text)throw new Error('Float text source was not captured.');return text.read(region);}
        if(layer.kind==='vector')return renderFloatVector(layer,region,world,this.processor,check);
        if(layer.kind==='paint'){
         if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');const preview=strokeService.clonePreview?.layerId===layer.id?strokeService.clonePreview:undefined;
@@ -314,7 +323,7 @@ export class FloatSceneRenderer {
       if(clipped.length){
        // A pass-through base supplies isolated intrinsic coverage; member
        // pass-through groups still see this stack's working color plane.
-       const intrinsic=layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'||layer.kind==='group'?await readIntrinsic(area):null;
+       const intrinsic=layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'||layer.kind==='text'||layer.kind==='group'?await readIntrinsic(area):null;
        if(!intrinsic)throw new Error('A clipping base requires intrinsic pixels.');
        const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true,area),pixels=await restoreFloatClipping(colors,prepared.shape,check);
        backdrop=await compositeStyled(pixels,1);
@@ -323,7 +332,7 @@ export class FloatSceneRenderer {
         if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world,false,area);
         else{const after=await paint(layer.children,backdrop.slice(),world,false,area);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
        }else{const pixels=await readIntrinsic(area);backdrop=await compositeStyled(pixels,layer.fillOpacity??1);}
-      }else if(layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'){
+      }else if(layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'||layer.kind==='text'){
        const fill=layer.fillOpacity??1,pixels=directRaster&&fill===0?undefined:await readIntrinsic(area);check();backdrop=await compositeStyled(pixels,fill);
       }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='patch'){
        const corrected=await patchCaptures.get(layer.adjustment)!.read(area,world);check();const after=await applyFloatPatch(backdrop,corrected,check),styled=await applyFloatStyle(layer,after,backdrop,coverage,this.processor,check);check();backdrop=await blendFloatAdjustment(backdrop,styled.pixels,mode,opacity,styled.mask,{floatComposite:composite},check);

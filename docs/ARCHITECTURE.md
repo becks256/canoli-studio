@@ -1,5 +1,74 @@
 # Architecture
 
+## Connected native float text (schema 60, under verification)
+
+The existing OO TextLayer now enters the float scene through
+`engine/float-text.ts`. Capture snapshots typography and world placement before
+awaiting native layout, preserves original SVG chunks and owned font tuples, and
+publishes source-linear glyph paint only after exact native ink/color ownership
+checks. FloatSceneRenderer prepares visible text before output and reuses its
+existing intrinsic-mask/clipping/style/shadow/composition paths.
+
+Renderer-owned preparation is keyed by intrinsic text input, alignment extent,
+world matrix, document geometry and asset owner. Wrapper opacity/masks/styles do
+not change that intrinsic key. A 16-cell LRU retains canonical 256-square native
+Float32 RGBA cells; callers receive owned copies. Preparation eviction retains
+pinned scenes. View cancellation releases only its waiter; cache clear/dispose
+aborts owner work and invalidates all leases. Every cache hit checks original
+sources and private glyph registrations. These are cache budgets, not document
+or image limits. Main integration verification is pending; the preceding isolated
+nine-case browser and ten-case focused model/API runs passed. See [the exact
+contract, verification scope and remaining work](FLOAT_TEXT.md).
+
+## Owned font-stack preparation under verification (private)
+
+`native-svg-fallback.ts` traverses the original ordered font stack and assigns
+whole supported shaping clusters from retained original font sources. Missing
+marks invalidate their complete cluster. Each font keeps its effective private
+axis tuple; original styles, SVG chunks and source bytes remain intact. Unknown
+families before a usable owned source cannot be skipped; an unused trailing
+family does not invalidate a fully covered owned prefix.
+
+Private lazy candidates have no matched status or publication authority.
+`native-svg-candidates.ts` preserves the existing single-source exact ink gate;
+fallback assembly verifies the complete original line and per-color ownership
+before returning any glyph fields. Candidate search prefers coherent source
+instances but retains independent native-item choices, cancellation and finite
+budgets. An invocation deadline ends with matching/cleanup; retained fonts keep
+source/parent/registration/abort checks until explicit retirement. It removes
+only identical paint preparations for one retained font
+owner. Whole-source script/direction itemization is reused across selected
+ranges. The expanded vertical negative-tracking matrix remains under repair;
+this is not accepted public Float32 text support.
+`native-svg-inline.ts` additionally retains unclipped complete-source path
+geometry and signed start/end anchor separation in disposable native probes.
+The vertical candidate stream can preserve signed source/private allocation,
+half-grid anchors and zero-advance attachments while retaining existing
+projections. Straight negative RTL preparation has a separate native-inline
+rounding candidate. These are private candidates with the same complete ink and
+ownership gates. The focused eight-layout mixed-vertical pilot now matches all
+eight, including the transformed RTL curve; broader fallback and independent
+reference acceptance remain open.
+[Contract and verification boundary](FLOAT_TEXT.md#owned-native-fallback-under-verification-private).
+
+Native metric projection now measures shaping scale independently from raster
+advance size. `native-layout-size.ts` subtracts an unkerned calibration pair from
+the same pair with an original one-em GPOS adjustment. The private CC0 probe has
+no artwork dependency; its temporary font retires before returning. Original
+native glyph advance/bounds callbacks remain separate. The existing raster size
+probe stays intact for its existing projection.
+`native-svg-inline-frames.ts` can assemble complete original single-span signed
+advances across font items, rather than infer the inline frame from enclosed
+character rectangles. Corrected and existing candidates retain the same exact
+ink/ownership checks. `native-svg-span-frames.ts` additionally prepares straight
+original-span candidates from raw native fragment advances and Float32 spacing,
+truncating after the complete original span is present. Its RTL candidate retains
+an unrounded single-cluster parent and signed extent for multi-cluster spans;
+complete ink/ownership checks decide whether this preparation matches. Existing
+placements remain available. Cross-span clusters and curved original-span parent
+allocation still require further work. Integrated verification is in progress;
+this does not admit public Float32 text.
+
 ## Cross-span source-cluster paint provenance (private)
 
 Private SVG primitives retain original source clusters across projections.

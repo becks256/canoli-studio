@@ -1,5 +1,36 @@
 # Scripting API
 
+## Native float TextLayer (schema 60)
+
+The existing `TextLayer` constructor, attached typography/character-range
+setters, `formatRange`, `Document.convertToFloat()` and history methods retain
+their signatures/defaults. Float documents require a declared original font as
+the first family in every resolved character style, including default/empty
+text. `new TextLayer()` still defaults to sans-serif; attaching that unowned
+request in float mode rejects. Reuse an embedded FontFile's `family`, or embed a
+font through trusted host/UI preparation before running isolated commands.
+
+```js
+if (document.precision !== 'float32') throw new Error('Use a float document.');
+const font = document.fonts.files.items[0];
+if (!font) throw new Error('Embed an original font before running this script.');
+document.layers.add(new TextLayer({
+  text: 'AV', fontFamily: font.family, fontSize: 40, x: 16, y: 10,
+  color: 'color(srgb-linear 4 -.25 1.5 / .5)'
+}));
+```
+
+Explicit linear CSS colors retain finite signed/HDR Float32 RGB and alpha in
+[0,1]. Native scalar antialias coverage is separate from those colors. Invalid or
+context-dependent paint, unavailable native matching, missing/intrinsic glyph
+paint, cancellation and changed source/registration reject rendering without
+partial output. Model edits retain shared validation/locks and atomic Undo;
+isolated failures do not commit staged edits. The existing 10,000-unit text,
+script deadline/command/payload limits remain; there is no new image/file cap,
+renderer/file/font-chooser capability or plugin grant. REST remains separate
+with estimated metrics. Broader native layouts and public workflow acceptance
+remain required. [Complete current contract and evidence](FLOAT_TEXT.md).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair

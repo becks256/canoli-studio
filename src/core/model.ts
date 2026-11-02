@@ -52,7 +52,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 59;
+export const SCHEMA_VERSION = 60;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -232,6 +232,7 @@ export interface DocumentData {
     | 56
     | 57
     | 58
+    | 59
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -861,6 +862,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           yield;
         }
       } else if (node.kind === "text") {
+        if(value.precision==='float32'&&Number(value.schemaVersion)<60)throw new Error('Native float text requires document schema version 60.');
         assertFontFeaturesVersion(node,Number(value.schemaVersion));
         if(node.fontVariantCaps!==undefined)fontVariantCapsSchema.parse(node.fontVariantCaps);
         if(node.fontStretch!==undefined)fontStretchSchema.parse(node.fontStretch);

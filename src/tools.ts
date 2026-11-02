@@ -437,7 +437,7 @@ export class ToolController {
   }
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
-    if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
+    if(['move','hand','marquee','lasso','artboard','crop','text'].includes(tool))return true;
     if(tool==='dodge'||tool==='burn'||tool==='fill'||tool==='clone'||tool==='heal'||tool==='patch')return true;
     if(tool==='brush'||tool==='pencil')return this.state.settings.paintTarget==='layer'||this.state.settings.paintTarget.startsWith('mask-')&&!!this.editor.document.selectedLayer?.mask;
     if(tool==='smudge'||tool==='mixer'){

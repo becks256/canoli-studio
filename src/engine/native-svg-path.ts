@@ -9,12 +9,12 @@ import type {NativeGlyphFont,NativeGlyphFontControl} from './native-glyph-font';
 import type {StyledTextPlan} from './styled-text';
 import {captureSvgGlyphDocument,measureSvgGlyphAdvances} from './svg-glyph-paint';
 
-const nativeInlineRanges=new WeakMap<readonly import('./styled-text').StyledTextCharacterGeometry[],Readonly<{min:number;max:number}>>();
-function nativeInlineRange(flat:readonly import('./styled-text').StyledTextCharacterGeometry[]){
- const cached=nativeInlineRanges.get(flat);if(cached)return cached;let min=Infinity,max=-Infinity;
- for(const character of flat){min=Math.min(min,character.start.x,character.end.x);max=Math.max(max,character.start.x,character.end.x);}
- if(!Number.isFinite(min)||!Number.isFinite(max))throw new Error('Native baseline inline range is invalid.');
- const range=Object.freeze({min,max});if(Object.isFrozen(flat))nativeInlineRanges.set(flat,range);return range;
+const nativeInlineRanges=new WeakMap<readonly import('./styled-text').StyledTextCharacterGeometry[],Readonly<Record<'x'|'y',Readonly<{min:number;max:number}>>>>();
+export function nativeInlineRange(flat:readonly import('./styled-text').StyledTextCharacterGeometry[],axis:'x'|'y'='x'){
+ const cached=nativeInlineRanges.get(flat);if(cached)return cached[axis];const ranges={x:{min:Infinity,max:-Infinity},y:{min:Infinity,max:-Infinity}};
+ for(const character of flat)for(const key of ['x','y']as const){ranges[key].min=Math.min(ranges[key].min,character.start[key],character.end[key]);ranges[key].max=Math.max(ranges[key].max,character.start[key],character.end[key]);}
+ if(!Object.values(ranges).every(range=>Number.isFinite(range.min)&&Number.isFinite(range.max)))throw new Error('Native baseline inline range is invalid.');
+ const value=Object.freeze({x:Object.freeze(ranges.x),y:Object.freeze(ranges.y)});if(Object.isFrozen(flat))nativeInlineRanges.set(flat,value);return value[axis];
 }
 
 /** Replay the original baseline with the original native typographic items.

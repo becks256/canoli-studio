@@ -6,6 +6,15 @@ const weak=(script:string)=>script==='Zyyy'||script==='Zinh'||script==='Zzzz';
 const normalize=(script:string)=>script==='Kana'||script==='Hrkt'?'Hira':script;
 interface Token {start:number;end:number;choices:string[];primary?:string;direction?:'ltr'|'rtl';bracket?:Readonly<{pair:number;open:boolean}>;point:number}
 
+/** Reuse whole-source script/bracket/direction resolution. Binary search avoids
+ * rescanning earlier text for each original style or fallback source range. */
+export function sliceNativeTextItems(items:readonly Readonly<NativeTextItem>[],start:number,end:number):readonly Readonly<NativeTextItem>[]{
+ const result:Readonly<NativeTextItem>[]=[];let lo=0,hi=items.length;
+ while(lo<hi){const mid=(lo+hi)>>>1;if(items[mid].end<=start)lo=mid+1;else hi=mid;}
+ for(let i=lo;i<items.length&&items[i].start<end;i++){const item=items[i],a=Math.max(start,item.start),b=Math.min(end,item.end);if(a<b)result.push(a===item.start&&b===item.end?item:Object.freeze({...item,start:a,end:b}));}
+ return Object.freeze(result);
+}
+
 /** Original graphemes and UCD script sets select shaping ranges. Native carets
  * supply resolved direction; neither metadata surface supplies glyph IDs. */
 export function nativeSvgTextItems(text:string,characters:readonly StyledTextCharacterGeometry[],fallback:'ltr'|'rtl',start=0,end=text.length,visual?:readonly NativeTextVisualPosition[]|null):readonly Readonly<NativeTextItem>[]{

@@ -1,5 +1,17 @@
 # REST and scripting APIs
 
+## Native float TextLayer (schema 60)
+
+Existing `layer.add`/`layer.update`, font metadata commands and precision
+conversion admit editable text in float documents when each resolved style's
+first family is a declared original font. Unowned font changes reject an entire
+command batch. Upload the font into the same independent REST session first;
+source ownership, locks, expectedRevision, Undo and native-project closure remain
+shared. REST font metrics remain estimated; the service neither renders native
+float text nor synchronizes with the browser. Browser capture additionally
+requires exact native paint matching and valid retained font registrations.
+[Defaults, errors, limits and developing verification](FLOAT_TEXT.md).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair

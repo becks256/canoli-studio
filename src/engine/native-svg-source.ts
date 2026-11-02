@@ -2,12 +2,15 @@ import type {CharacterFormat} from '../core/character-format';
 import type {LinearTextColor} from './float-text-color';
 import type {StyledTextPlan} from './styled-text';
 import {captureNativeSvgLineRoot} from './native-svg-verify';
+import type {NativeTextItem} from './native-text-items';
 
 /** Private source selection. Original DOM spans and full UTF-16 shaping context
  * remain intact; scalar opacity only selects the original paint for verification. */
 export interface NativeSvgGlyphSource {
  readonly text:string;readonly start:number;readonly end:number;
  readonly style:Readonly<CharacterFormat>;readonly root:Element;
+ /** Already itemized original context, clipped to this private selection. */
+ readonly items?:readonly Readonly<NativeTextItem>[];
  color(cluster:number):LinearTextColor;
 }
 export function captureNativeSvgGlyphSource(plan:StyledTextPlan,index:number,first:number,last:number):NativeSvgGlyphSource{
