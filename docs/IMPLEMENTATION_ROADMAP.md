@@ -11468,3 +11468,23 @@ next native-layout work must establish actual parent allocation and retain every
 original target. All other unfinished public typography/photographic/precision/
 workflow/device/quality/performance/provider/installedChatGPT/liveidentity/commercial
 and roadmap gates remain required. The complete original goal stays active.
+
+### 2026-11-02 — F08/F10 native SVG context assumptions verified
+
+This continuation adds evidence that changes the next native-layout action.
+An independent calibration font now checks shaping scale, raster advances and
+five tracking values across three sizes and identity/affine SVG contexts. All
+six main browser tests pass, including this new regression, native mark placement,
+failure cleanup and the existing eight single-span mixed vertical controls.
+Typecheck and four actual-WASM/calibration units pass. SVG and Canvas agree within
+complete-run geometry quantization; neither transformed font scale nor tracking
+scale explains the remaining original multi-span path error.
+
+A separate per-cluster path-parent allocation experiment still matches only six
+of the original eight controls; transformed RTL retains alpha error48/deadline
+failures. It stays outside main and changes no exact ink/ownership gate. The
+preceding real60-second failures remain recorded. Native parent allocation,
+all384fallback layouts/all36independent references and every other unfinished
+original roadmap requirement remain required. [Measurements, failed candidate
+and compact receipt](benchmarks/native-svg-context-2026-11-02.md). The full goal
+remains active; this is verification progress, not F08/F10 or roadmap completion.
