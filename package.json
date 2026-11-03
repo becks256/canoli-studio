@@ -12,7 +12,7 @@
     "start:chatgpt": "tsx server/chatgpt/index.ts",
     "build:docs": "node --import tsx scripts/build-docs.mjs",
     "build:seo-assets": "node scripts/generate-seo-assets.mjs",
-    "build:engine": "npm run build:wasm && npm run build:runtime && npm run build:font-worker && npm run build:font-notices && npm run build:svg-notices && npm run build:chatgpt && npm run build:site && npm run build:docs",
+    "build:engine": "npm run build:wasm && npm run build:font-worker && npm run build:runtime && npm run build:font-notices && npm run build:svg-notices && npm run build:chatgpt && npm run build:site && npm run build:docs",
     "build:wasm": "asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
     "build": "npm run build:engine && tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",

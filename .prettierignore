@@ -1,0 +1,9 @@
+# Compiler output is pinned byte-for-byte by the codec build manifests.
+src/**/canoli_*.js
+
+# Independent numerical corpora bind these references by their exact SHA-256.
+tests/fixtures/white-balance-reference.json
+tests/fixtures/float-transfer/histogram.json
+
+# This fixture helper is bound to a checked native project by its checksum.
+tests/helpers/hdr-wet-document.ts
