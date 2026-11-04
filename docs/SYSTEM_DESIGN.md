@@ -33,9 +33,13 @@ Straight authored spans additionally retain original native fragment advances
 and Float32 spacing until complete-span truncation. A separate candidate can use
 signed span extent or an unrounded single-cluster RTL parent. It grants no match
 authority; all previous placements and exact complete ink/ownership checks remain.
-Cross-span clusters and curved original-span parent allocation still require
-further work. Full fallback, public float text integration and the complete
-roadmap remain open. See [FLOAT_TEXT.md](FLOAT_TEXT.md).
+Curved authored spans additionally propose frames from complete native cluster
+sizes. RTL parent preparation retains the source layout grid before returning to
+the screen-font grid; LTR keeps its original accumulation. Negative vertical paths
+use joint complete-source assembly even with one owned font. Original placements
+and exact whole-ink/color ownership gates retain publication authority. Cross-span
+clusters, broad curved/font/host acceptance, complete public float typography and
+the full roadmap remain open. See [FLOAT_TEXT.md](FLOAT_TEXT.md).
 
 ## Developing owned font fallback
 

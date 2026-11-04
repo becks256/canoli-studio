@@ -1,6 +1,7 @@
 import { matchNativeFallbackSvgLine } from "./native-svg-fallback";
 import { characterFormatSchema } from "../core/character-format";
 import { fontFamilyNames } from "../core/font-families";
+import { verticalWriting } from "../core/text-writing";
 import type { FontFileData } from "../core/font-files";
 import { yieldTask } from "../core/task-yield";
 import { nativeSvgPaintOrder } from "./native-paint-order";
@@ -71,7 +72,17 @@ export async function matchNativeStyledSvgLine(
         reason:
           "Styled glyph matching requires captured native paint geometry.",
       });
+    const jointPath =
+      !!line.path &&
+      line.spans.length > 1 &&
+      verticalWriting(line.writing) &&
+      line.spans.some(
+        (span) =>
+          span.style.letterSpacing < 0 ||
+          span.style.wordSpacing + line.wordSpacingDelta < 0,
+      );
     if (
+      jointPath ||
       line.spans.some(
         (span) => fontFamilyNames(span.style.fontFamily).length > 1,
       )

@@ -81,6 +81,19 @@ private implementation history and its original narrower acceptance boundaries.
 
 ## Original script and native direction items (private)
 
+The curved original-span preparation retains native per-cluster allocation and
+both source/screen layout grids for RTL parents. Joint whole-source assembly now
+handles negatively tracked multi-span vertical paths with one owned font as well
+as ordered owned fallback. Eight direction/affine/font-stack controls match exact
+original ink and color ownership, and three independent affine Float32 references
+match every output/partition word, including alpha 1e-8. Actual production source
+capture, native PNG output, isolated opacity edits, one Undo and original-bearing
+project reopening pass in both directions. All 243 affected main source cases
+pass, with zero skipped/flaky cases and unchanged source inputs. Cross-span clusters, wider upright/Arabic/CJK/font/host cases and the
+original 384/36 acceptance requirements remain open. No comparison-pixel fitting
+or relaxed exact-ink check is introduced.
+[Integration evidence and remaining gates](benchmarks/native-curved-integration-2026-11-04.md).
+
 The horizontal SVG matcher now selects script and resolved-direction ranges
 inside an existing original span. Every item retains the entire normalized line
 as shaping context and selects an original UTF-16 range. It never creates new

@@ -22,6 +22,15 @@ contract, verification scope and remaining work](FLOAT_TEXT.md).
 
 ## Owned font-stack preparation under verification (private)
 
+Negative vertical paths with multiple original spans use complete-source assembly
+for a single owned font as well as owned fallback stacks. Path span frames sum
+original native cluster allocations; RTL parent preparation retains the source
+layout grid before returning to the screen-font grid. Straight frames retain
+native fragment accumulation. Every original placement and exact whole-ink/color
+ownership gate remains. Cross-span clusters and broad font/host acceptance are
+still open; no public model, command, scripting or REST contract changes.
+[Current integration evidence](benchmarks/native-curved-integration-2026-11-04.md).
+
 `native-svg-fallback.ts` traverses the original ordered font stack and assigns
 whole supported shaping clusters from retained original font sources. Missing
 marks invalidate their complete cluster. Each font keeps its effective private

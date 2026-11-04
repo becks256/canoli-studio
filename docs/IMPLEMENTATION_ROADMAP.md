@@ -11298,3 +11298,56 @@ all384fallback layouts/all36independent references and every other unfinished
 original roadmap requirement remain required. [Measurements, failed candidate
 and compact receipt](benchmarks/native-svg-context-2026-11-02.md). The full goal
 remains active; this is verification progress, not F08/F10 or roadmap completion.
+
+### 2026-11-04 — F08/F10 curved source integration resumed
+
+Previous goal work made implementation and verification progress. After the
+separate deployment build repair, the verified curved-span implementation now
+enters the main checkout. Compiled preimages match despite the intervening
+formatting commit. Signed native path allocations and the RTL source/screen grid
+preparation preserve exact ink/color ownership; a single owned font also uses
+joint assembly for negative multi-span vertical paths. No public contract,
+permission, authored text/font identity or pixel acceptance gate changes.
+
+Main build/typecheck, all 3,427 unit/API tests and nine focused browser tests pass.
+The existing 21 production checks pass. Two new actual-production source-capture
+workflows pass in LTR/RTL affine contexts, preserving rendered PNGs, one isolated
+opacity edit/Undo, complete geometry and original fonts through reopening. Their
+initial profiled-PNG reader mismatch is corrected in the harness; failure logs
+remain. Final guide rebuild, combined 23-case production and full 243-case affected
+source validation remain pending.
+
+The separate frozen visual-order/script-spacing experiment is now terminal:
+five tests pass and five fail, with all 872 input hashes unchanged. Matched-status
+counts are 57/64 marks, 61/64 bidi, 61/64 joining, 30/64 CJK, 64/64 axes and 5/64
+cross-span colors. All 36 independent Float32 references pass there, but its full
+384-layout gate fails; its changes remain outside main. Both complete original
+matrices and every other unfinished original roadmap gate remain required.
+[Current implementation, evidence and exact remaining scope](benchmarks/native-curved-integration-2026-11-04.md).
+The complete original goal remains active; this is not roadmap completion.
+
+Verification update: final build/typecheck/guides and all 23 combined production
+cases pass, zero skipped/flaky. The full 243-case affected source run is active
+against 3,831 frozen input identities; its terminal result is unconfirmed. An
+independent original-font diagnostic matches complete ink and color ownership
+with correct original source priority while preserving grapheme paint. The
+original fallback SVG reports incorrect character addresses after the cross-span
+mark; unchanged glyph poses from a verified single-font control recover the
+native match. Character-level recoloring instead fails ownership and is rejected.
+[Exact diagnostic scope and next native-layout action](benchmarks/native-cross-span-2026-11-04.md).
+Do not replace the original 384/36 acceptance targets with this diagnostic.
+
+Terminal verification update: all 243 affected source cases across 40 files pass
+in 30.4 minutes, with zero skipped/flaky cases. Every one of the 3,831 frozen
+engine/test/script/build/release identities is unchanged through completion. The
+177-file tested release is preserved by value before refreshing guide status.
+Main build/typecheck, all 3,427 unit/API checks, nine focused cases and 23 production
+cases pass. This closes verification for the curved integration checkpoint only.
+
+The separate source-derived parent prototype now matches four of the original
+eight horizontal direction/transform/spacing controls. Original-priority shaping,
+source advances and the original first-cluster parent anchor recover both identity
+negative-spacing controls without reference-pixel displacement inputs. All four
+affine controls still fail exact ink/ownership; the prototype remains outside main.
+Every original 384-layout/36-reference and unfinished roadmap requirement remains
+required. The complete original goal remains active.

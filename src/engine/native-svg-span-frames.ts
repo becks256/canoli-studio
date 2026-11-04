@@ -3,13 +3,14 @@ import type { FloatGlyph } from "./float-glyph";
 import type { StyledTextLine } from "./styled-text";
 import type { NativeSvgGlyphCandidate } from "./native-svg-candidates";
 
-/** A complete original-span allocation candidate for straight vertical ink.
+/** A complete original-span allocation candidate for vertical ink.
  * Preserve Float32 native fragment advances until the original span is complete.
  * A one-cluster RTL span retains its unrounded parent preparation; multi-cluster
  * spans can use their own signed inline extent. These are candidate placements,
  * never inferred from comparison pixels; the original ink/ownership gates still
- * decide whether the complete assembly matches. Cross-span clusters and paths
- * retain the other preparations until their native parent allocation is known. */
+ * decide whether the complete assembly matches. Paths retain per-cluster native
+ * sizes; RTL parent preparation also retains the source-coordinate layout grid.
+ * Cross-span clusters keep the other preparations until their allocation is known. */
 export async function resolveNativeSvgSpanFrames(
   line: StyledTextLine,
   candidates: readonly Readonly<NativeSvgGlyphCandidate>[],
@@ -17,10 +18,12 @@ export async function resolveNativeSvgSpanFrames(
 ) {
   check();
   if (
-    line.path ||
     line.spans.length < 2 ||
     !candidates.length ||
-    candidates.some((c) => !c.inlineAllocation?.fragments)
+    candidates.some(
+      (c) =>
+        !c.inlineAllocation || (!line.path && !c.inlineAllocation.fragments),
+    )
   )
     return;
   const factor = candidates[0].inlineAllocation!.factor,
@@ -57,6 +60,7 @@ export async function resolveNativeSvgSpanFrames(
     total += span.text.length;
     ends.push(total);
   }
+  const widths = line.spans.map(() => 0);
   let cursor = 0,
     span = 0;
   for (const size of sizes) {
@@ -76,52 +80,68 @@ export async function resolveNativeSvgSpanFrames(
     counts[span]++;
     cursor = size.end;
     await checkpoint();
+    if (line.path) {
+      widths[span] += size.advance;
+      if (!Number.isSafeInteger(widths[span] * 64))
+        throw new Error("Native source span exceeds exact coordinates.");
+    }
   }
   if (cursor !== length) return;
-  const widths = line.spans.map(() => 0),
-    spaced = new Set<number>();
-  for (const candidate of candidates)
-    for (const fragment of candidate.inlineAllocation!.fragments!) {
-      const parts = new Map<number, { width: number; spacing: number }>();
-      const part = (cluster: number) => {
-        const owner = owners.get(cluster);
-        if (owner === undefined)
-          throw new Error("Native fragment has no original span.");
-        let value = parts.get(owner);
-        if (!value) {
-          value = { width: 0, spacing: 0 };
-          parts.set(owner, value);
+  if (!line.path) {
+    const spaced = new Set<number>();
+    for (const candidate of candidates)
+      for (const fragment of candidate.inlineAllocation!.fragments!) {
+        const parts = new Map<number, { width: number; spacing: number }>();
+        const part = (cluster: number) => {
+          const owner = owners.get(cluster);
+          if (owner === undefined)
+            throw new Error("Native fragment has no original span.");
+          let value = parts.get(owner);
+          if (!value) {
+            value = { width: 0, spacing: 0 };
+            parts.set(owner, value);
+          }
+          return value;
+        };
+        for (const glyph of fragment.glyphs) {
+          if (!Number.isFinite(glyph.advance))
+            throw new Error("Invalid native fragment advance.");
+          const value = part(glyph.cluster);
+          value.width = Math.fround(value.width + glyph.advance);
+          await checkpoint();
         }
-        return value;
-      };
-      for (const glyph of fragment.glyphs) {
-        if (!Number.isFinite(glyph.advance))
-          throw new Error("Invalid native fragment advance.");
-        const value = part(glyph.cluster);
-        value.width = Math.fround(value.width + glyph.advance);
-        await checkpoint();
+        for (const spacing of fragment.spacings) {
+          if (!Number.isFinite(spacing.advance) || spaced.has(spacing.cluster))
+            throw new Error("Invalid native fragment spacing.");
+          spaced.add(spacing.cluster);
+          part(spacing.cluster).spacing += spacing.advance;
+          await checkpoint();
+        }
+        for (const [owner, value] of parts) {
+          widths[owner] = Math.fround(
+            widths[owner] +
+              Math.fround(value.width + Math.fround(value.spacing)),
+          );
+          await checkpoint();
+        }
       }
-      for (const spacing of fragment.spacings) {
-        if (!Number.isFinite(spacing.advance) || spaced.has(spacing.cluster))
-          throw new Error("Invalid native fragment spacing.");
-        spaced.add(spacing.cluster);
-        part(spacing.cluster).spacing += spacing.advance;
-        await checkpoint();
-      }
-      for (const [owner, value] of parts) {
-        widths[owner] = Math.fround(
-          widths[owner] + Math.fround(value.width + Math.fround(value.spacing)),
-        );
-        await checkpoint();
-      }
-    }
-  if (spaced.size !== owners.size)
-    throw new Error("Native span allocation is missing source spacing.");
+    if (spaced.size !== owners.size)
+      throw new Error("Native span allocation is missing source spacing.");
+  }
   const frames: { start: number; end: number; offset: number }[] = [];
   let start = 0,
     advance = 0;
   for (let i = 0; i < widths.length; i++) {
-    const width = Math.trunc(widths[i] * 64) / 64;
+    let width = Math.trunc(widths[i] * 64) / 64;
+    if (line.path && line.direction === "rtl") {
+      // Preserve both coordinate grids before rounding the RTL parent's line top.
+      // This proposes a frame from native metrics; exact ink/ownership still decides
+      // whether it can be published, without searching displacement from pixels.
+      const sourceWidth = Math.trunc(Math.fround(width / factor) * 64) / 64;
+      if (!Number.isSafeInteger(sourceWidth * 64))
+        throw new Error("Native source span exceeds exact coordinates.");
+      width = Math.trunc(Math.fround(sourceWidth * factor) * 64) / 64;
+    }
     if (!Number.isSafeInteger(width * 64))
       throw new Error("Native source span exceeds exact coordinates.");
     const offset =
