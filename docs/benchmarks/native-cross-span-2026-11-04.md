@@ -27,7 +27,7 @@ independently verified whole-line control places them at x=236.390625 and
 x=256.390625. This diagnostic records those positions; it does not use their
 observed differences as rendering constants or fit candidate displacements.
 
-The grapheme paint ownership rule remains correct. Pinned HarfBuzz cluster level 1
+In these identity controls, grapheme paint ownership remains correct. Pinned HarfBuzz cluster level 1
 can associate the mark with source character 4 without changing glyph IDs or
 advances/offsets, but recoloring that glyph by character fails the complete native
 ownership check with maximum weighted error 65025. Original grapheme color
@@ -42,6 +42,12 @@ samples and both native color ownership planes exactly across 524,288 samples.
 This is possible because these specific fixture fonts share the relevant source
 outlines and metrics. It does not justify substituting fonts or reusing another
 font's poses in the editor. Document data remains unchanged throughout.
+
+Affine source itemization is a separate case: later original-span selections
+retain the full source text and original font assignment while allowing the host's
+native mark item and color boundary. The new parent/authored implementation and
+its independent paint checks are recorded in the
+[developing fallback checkpoint](native-parent-baseline-2026-11-04.md).
 
 ## Source-derived parent allocation prototype
 

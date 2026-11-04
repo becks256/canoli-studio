@@ -79,6 +79,16 @@ ignorable/missing/intrinsic/native/legacy/optical/host acceptance and every othe
 unfinished original roadmap gate remain required. Earlier sections below retain
 private implementation history and its original narrower acceptance boundaries.
 
+## Developing fallback implementation
+
+An isolated parent/authored-item preparation passes all eight horizontal
+cross-span controls and 48 independent paint references. Original screen-size
+baseline metrics improve CJK fallback; original-span allocation at zero tracking
+also fixes two actual production colored CJK exports. These changes are not yet
+in the main engine. Complete latest source/production verification, all original
+384 layouts/36 references and the remaining typography/roadmap gates still apply.
+[Implementation, failures and exact verification status](benchmarks/native-parent-baseline-2026-11-04.md).
+
 ## Original script and native direction items (private)
 
 The curved original-span preparation retains native per-cluster allocation and

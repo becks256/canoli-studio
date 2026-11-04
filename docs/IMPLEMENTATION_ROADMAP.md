@@ -11351,3 +11351,31 @@ negative-spacing controls without reference-pixel displacement inputs. All four
 affine controls still fail exact ink/ownership; the prototype remains outside main.
 Every original 384-layout/36-reference and unfinished roadmap requirement remains
 required. The complete original goal remains active.
+
+### 2026-11-04 — F08/F10 native fallback parent, authored items and inherited baselines
+
+The preceding turn verified the existing main production build, clean generated
+outputs, all 3,427 unit/API cases and three production browser checks. The full
+original roadmap remains active. New isolated implementation now matches all eight
+horizontal cross-span controls and passes sixteen focused tests, including 48
+independent Float32 references and cancellation/lifetime guards. Both prototype
+stages pass all 36 original paint references. Original font priority, complete
+source context, glyph identity and exact ink/color publication gates remain.
+
+Native screen-size inherited-baseline metrics improve the original CJK cohort
+from 30/64 to 62/64 under its 12-second diagnostic deadline. The full ordinary
+60-second cohort reaches 63/64; transformed RTL negative curve placement still
+fails. Real production colored CJK then exposes a zero-tracking span-allocation
+gap. The follow-up correction passes both previously failing production exports,
+including exact Undo and original-bearing reopening. Four new horizontal and
+two prior curved source-capture production workflows also pass.
+
+The latest correction builds successfully. All 3,427 unit/API cases across 346
+files and all 29 production cases pass, with unchanged frozen source/release
+inputs. Its complete 243-case affected source run is active and unconfirmed.
+Engine changes remain isolated; complete source, failed/passing evidence and
+exact remaining scope are retained in the
+[developing fallback checkpoint](benchmarks/native-parent-baseline-2026-11-04.md).
+All original 384-layout/36-reference and unfinished public typography, professional,
+AI/provider/evaluation, workflow/commercial/device/performance roadmap gates remain
+required. This advances the original objective without redefining or completing it.
