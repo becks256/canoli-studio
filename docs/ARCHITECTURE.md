@@ -1,5 +1,30 @@
 # Architecture
 
+## Vertical source-parent review implementation
+
+`native-svg-vertical-parent.ts` offers a parent frame for straight upright Latin
+runs whose uniform metric styling crosses a grapheme boundary. It preserves full
+original shaping contexts, font priority, GIDs, axis tuples and source colors.
+Original font advances and the first native anchor establish positions when
+later SVG character addresses are unreliable. Scalar-splitting boundaries and
+unsupported/mixed allocations retain the existing candidate preparations.
+Cluster anchors are read once; repeated combining glyphs do not rescan a range.
+Only complete original ink at both opacity samples and per-color ownership can
+publish a result.
+
+Fallback verification also owns a sixteen-plane reference LRU for one matching
+operation. Hits and misses check source/font lifetimes and cancellation; every
+candidate still compares all pixels and ownership. Exit clears the cache. These
+planes never supply working RGB, positions or document/import geometry limits.
+No public constructor, schema, scripting/REST signature or grant changes.
+
+The identical isolated implementation passes build/typecheck, all 3,428 unit/API
+checks, all four original upright identity controls and all 33 production
+workflows. Its expanded source suite and original colored cohort remain active;
+affine controls and the full native/roadmap acceptance gates remain open.
+[Exact evidence and boundaries](benchmarks/native-verification-continuation-2026-11-05.md).
+
+
 ## Connected native float text (schema 60, under verification)
 
 The existing OO TextLayer now enters the float scene through

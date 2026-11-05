@@ -32,6 +32,13 @@ export async function compareNativeSvgGlyphPaint(
   glyphs: readonly Readonly<FloatGlyph>[],
   control: NativeGlyphFontControl,
   budget: () => number,
+  sourceAlpha?: (
+    x: number,
+    y: number,
+    cell: number,
+    gutter: number,
+    alpha: number,
+  ) => Promise<Uint8ClampedArray>,
 ) {
   const options = { ...control },
     check = () => {
@@ -91,15 +98,13 @@ export async function compareNativeSvgGlyphPaint(
   for (let cy = Math.floor(y / cell) * cell; cy < bottom; cy += cell)
     for (let cx = Math.floor(x / cell) * cell; cx < right; cx += cell)
       for (const alpha of [1, 0.5]) {
-        const expected = await renderSvgCellAlpha(
-            source,
-            cx,
-            cy,
-            cell,
-            gutter,
-            alpha,
-            { ...options, timeoutMs: budget(), check },
-          ),
+        const expected = sourceAlpha
+            ? await sourceAlpha(cx, cy, cell, gutter, alpha)
+            : await renderSvgCellAlpha(source, cx, cy, cell, gutter, alpha, {
+                ...options,
+                timeoutMs: budget(),
+                check,
+              }),
           actual = await renderSvgCellAlpha(
             candidate,
             cx,

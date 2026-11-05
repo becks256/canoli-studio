@@ -1,4 +1,6 @@
 import { nativeAuthoredSvgCandidates } from "./native-svg-authored";
+import { resolveNativeSvgVerticalParent } from "./native-svg-vertical-parent";
+import { renderSvgCellAlpha } from "./svg-glyph-paint";
 import { prepareNativeSvgParent } from "./native-svg-parent";
 import {
   resolveNativeSvgSpanFrames,
@@ -74,7 +76,8 @@ export async function matchNativeFallbackSvgLine(
     started = performance.now(),
     timeout = options.timeoutMs ?? 60000,
     owners = new Map<string, NativeGlyphFont>(),
-    iterators: NativeSvgCandidates[] = [];
+    iterators: NativeSvgCandidates[] = [],
+    sourcePlanes = new Map<string, Uint8ClampedArray>();
   let matching = true;
   if (!Number.isInteger(timeout) || timeout <= 0 || timeout > 0x7fffffff)
     throw new Error("Invalid native fallback matching time budget.");
@@ -314,6 +317,41 @@ export async function matchNativeFallbackSvgLine(
     const maximums: (number | undefined)[] = Array(slots.length).fill(
       undefined,
     );
+    const reference = captureNativeSvgLineRoot(plan, index);
+    // Reference tiles belong only to this operation. The bounded LRU avoids
+    // repeated font/image work; every candidate, sample, work cell and exact
+    // pixel comparison still participates in verification.
+    const sourceAlpha = async (
+      x: number,
+      y: number,
+      cell: number,
+      gutter: number,
+      alpha: number,
+    ) => {
+      check();
+      const key = JSON.stringify([x, y, cell, gutter, alpha]);
+      const existing = sourcePlanes.get(key);
+      if (existing) {
+        sourcePlanes.delete(key);
+        sourcePlanes.set(key, existing);
+        check();
+        return existing;
+      }
+      const plane = await renderSvgCellAlpha(
+        reference,
+        x,
+        y,
+        cell,
+        gutter,
+        alpha,
+        { ...options, timeoutMs: budget(), check },
+      );
+      check();
+      sourcePlanes.set(key, plane);
+      if (sourcePlanes.size > 16)
+        sourcePlanes.delete(sourcePlanes.keys().next().value!);
+      return plane;
+    };
     let last: NativeSvgGlyphMatch | undefined;
     for await (const values of nativeSvgCandidateChoices(
       slots.map((slot) => slot.cohort),
@@ -398,7 +436,13 @@ export async function matchNativeFallbackSvgLine(
             check,
           )
         : undefined;
-      const orders = spanResolved
+      const parentResolved = await resolveNativeSvgVerticalParent(
+        line,
+        selected,
+        paint.characters[index],
+        check,
+      );
+      const existingOrders = spanResolved
         ? [
             ...(visualResolved
               ? prepareOrders(visualResolved.glyphs, visualResolved)
@@ -414,6 +458,10 @@ export async function matchNativeFallbackSvgLine(
                 : []),
             ]
           : prepareOrders(original, undefined);
+      const orders = [
+        ...(parentResolved ? prepareOrders(parentResolved, undefined) : []),
+        ...existingOrders,
+      ];
       for (let i = 0; i < orders.length; i++) {
         const order = orders[i],
           ordered = order.glyphs;
@@ -429,10 +477,11 @@ export async function matchNativeFallbackSvgLine(
           comparison = await compareNativeSvgGlyphPaint(
             plan,
             index,
-            captureNativeSvgLineRoot(plan, index),
+            reference,
             ordered,
             { ...options, check },
             budget,
+            sourceAlpha,
           ),
           ownership = comparison.error
             ? undefined
@@ -509,6 +558,7 @@ export async function matchNativeFallbackSvgLine(
     try {
       for (const iterator of iterators) await iterator.return(undefined);
     } finally {
+      sourcePlanes.clear();
       matching = false;
     }
   }
