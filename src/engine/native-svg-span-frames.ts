@@ -1,4 +1,5 @@
 import { yieldTask } from "../core/task-yield";
+import { verticalWriting } from "../core/text-writing";
 import type { FloatGlyph } from "./float-glyph";
 import type { StyledTextLine } from "./styled-text";
 import type { NativeSvgGlyphCandidate } from "./native-svg-candidates";
@@ -190,6 +191,63 @@ export async function resolveNativeSvgSpanFrames(
     factor,
     nativeWidths: Object.freeze(nativeWidths),
   });
+}
+
+/** A zero-advance attachment can retain its captured native pose while its
+ * signed spacing allocates a negative cell. Offer that preparation separately
+ * from the advancing original-span frame. Original glyphs, fonts, text and paint
+ * remain intact; complete ink and ownership still decide acceptance. */
+export async function resolveNativeSvgSignedAttachments(
+  line: StyledTextLine,
+  candidates: readonly Readonly<NativeSvgGlyphCandidate>[],
+  allocation: NonNullable<Awaited<ReturnType<typeof resolveNativeSvgSpanFrames>>>,
+  check: () => void,
+): Promise<readonly Readonly<FloatGlyph>[] | undefined> {
+  check();
+  if (line.path || !verticalWriting(line.writing)) return;
+  const glyphs: Readonly<FloatGlyph>[] = [];
+  let at = 0,
+    changed = false,
+    deadline = performance.now() + 2;
+  const checkpoint = async () => {
+    check();
+    if (performance.now() >= deadline) {
+      await yieldTask();
+      check();
+      deadline = performance.now() + 2;
+    }
+  };
+  for (const candidate of candidates) {
+    const negative = new Set<number>(),
+      attachments = new Set<string>();
+    for (const size of candidate.inlineAllocation!.sizes) {
+      if (size.advance < 0) negative.add(size.start);
+      await checkpoint();
+    }
+    for (const run of candidate.runs)
+      for (const glyph of run.glyphs) {
+        if (!glyph.xAdvance && !glyph.yAdvance)
+          attachments.add(`${glyph.cluster}:${glyph.glyphId}`);
+        await checkpoint();
+      }
+    for (const original of candidate.glyphs) {
+      const placed = allocation.glyphs[at++];
+      if (!placed)
+        throw new Error("Native signed attachment lost its span placement.");
+      const glyph =
+        negative.has(original.sourceCluster!) &&
+        attachments.has(`${original.sourceCluster}:${original.glyphId}`)
+          ? original
+          : placed;
+      changed ||= glyph !== placed;
+      glyphs.push(glyph);
+      await checkpoint();
+    }
+  }
+  if (at !== allocation.glyphs.length)
+    throw new Error("Native signed attachment lost a source glyph.");
+  check();
+  return changed ? Object.freeze(glyphs) : undefined;
 }
 
 /** An independent parent preparation in native visual span order. All source

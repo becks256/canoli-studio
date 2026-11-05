@@ -20,6 +20,15 @@ No command/history, model, account, provider or synchronization boundary changes
 The complete 384-layout/native-public/device/performance and broader roadmap
 acceptance targets remain required.
 
+Signed allocation additionally offers captured zero-advance glyph poses after
+source-span and visual-span placement. Advancing glyphs retain their frame;
+negative cells do not force every attachment into that frame. Source runs and
+signed allocations supply the selection, with no comparison-pixel fitting.
+All original preparations, full source/font/GID/axis/color identity, complete
+opacity comparisons and color ownership remain mandatory. Main integration passes
+build/typecheck, unit/API and focused production/native regressions; the complete
+native typography and original roadmap acceptance gates remain open.
+
 
 ## Connected native float text ownership
 

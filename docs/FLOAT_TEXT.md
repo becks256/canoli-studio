@@ -17,8 +17,9 @@ The complete 256-case affected source suite and all 36 independent paint referen
 also pass. The original colored cohort matches 42/64 layouts and retains every
 prior cache match; 22 colored layouts still fail. Main integration `0a36bb8` also
 passes build/typecheck, all 3,428 unit/API checks, all 33 production workflows and
-the focused four-control browser regression. A full integrated 384-layout run is
-not claimed. Affine and full native/public/host/device/memory/performance and
+the focused four-control browser regression. Its complete original main matrix
+finishes at 352/384 exact matches; all 36 independent references pass. Affine and
+full native/public/host/device/memory/performance and
 broader roadmap acceptance remain open.
 [Source, evidence and exact verification status](benchmarks/native-vertical-parent-integration-2026-11-05.md).
 
@@ -26,9 +27,23 @@ The separate signed-attachment review `bd15104` also passes both original uprigh
 affine negative-tracking controls by retaining native zero-advance poses after
 source/visual span placement. Canonical build, all 3,428 unit/API checks, eight
 upright controls, 37 emitted production workflows and 42 independent Float32 paint
-references pass. Its complete source/colored runs remain active; this is not yet
-main integration or complete native acceptance.
-[Review implementation and exact boundaries](benchmarks/native-signed-attachments-2026-11-05.md).
+references pass. Its original colored cohort finishes at 44/64 and retains every
+prior main colored match. Its source run passes 255 cases; the identical tracked
+48-reference test omitted by a temporary filename alias also passes separately.
+These are separate runs. Main integration also passes build/typecheck, all 3,428
+unit/API checks, all 37 production workflows and the eight original colored
+upright controls. A fresh canonical source run remains required, and complete
+native acceptance stays open.
+[Integration and exact boundaries](benchmarks/native-signed-attachments-integration-2026-11-05.md).
+
+## Repeatable native-text acceptance
+
+`npm run test:native-text` selects the canonical source regression, isolated legacy
+checks, all 384 original fallback layouts and the expanded independent paint
+references. Missing filenames fail discovery. A dedicated server belongs to the
+tested checkout. `npm run test:native-text:source` selects the 256 source cases;
+the full fallback project remains an additional required acceptance gate with
+known failures. Source coverage does not establish complete native typography.
 
 
 The private original-script and complete styled paint-order dependencies are

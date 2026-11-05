@@ -22,21 +22,33 @@ The identical 751-file isolated source passes build/typecheck, all 3,428 unit/AP
 checks, all 256 affected source cases, all four original upright identity controls
 and all 33 production workflows. Its original colored cohort matches 42/64
 layouts, retaining all 38 prior cache matches and adding the four upright controls.
-Main integration `0a36bb8` also passes build/typecheck, all 3,428 unit/API checks,
+Parent integration `0a36bb8` also passes build/typecheck, all 3,428 unit/API checks,
 all 33 production workflows and the focused four-control browser regression.
-Affine failures and every unfinished native/public/host/performance and broader
-roadmap acceptance gate remain open; a full integrated 384-layout run is not claimed.
+Its full original main matrix now completes at 352/384 exact layouts, with all
+36 independent paint references passing. Remaining native/public/host/performance
+and broader roadmap acceptance gates remain open.
 [Exact evidence and boundaries](benchmarks/native-vertical-parent-integration-2026-11-05.md).
 
-## Signed attachment preparation — isolated review
+## Signed attachment preparation
 
 Review `bd15104` retains the original captured pose of zero-advance glyphs whose
 native allocation is negative, while advancing glyphs keep source/visual span
 placement. Every previous preparation, full original context/font/GID/color and
 exact opacity/ownership gate remains. Its canonical build, 3,428 unit/API checks,
 eight upright controls, 37 production workflows and 42 independent paint references
-pass. The full source/colored regressions remain active; main's engine is unchanged
-at this review checkpoint. [Evidence and remaining scope](benchmarks/native-signed-attachments-2026-11-05.md).
+pass. Its complete colored cohort matches 44/64 layouts, retaining every prior
+match. The source run passes 255 cases; a separately passing canonical test adds
+48 references omitted by an obsolete temporary filename. This is two runs, not a
+single 256-case run. Main includes the reviewed implementation and also passes
+build/typecheck, all 3,428 unit/API checks, all 37 production workflows and the
+eight-control browser regression. A fresh canonical source run remains required;
+full native and broader roadmap acceptance stay open.
+[Integration evidence](benchmarks/native-signed-attachments-integration-2026-11-05.md).
+
+`playwright.native-text.config.ts` names the canonical source, isolated legacy
+and fallback files and rejects missing files before discovery. The full runner
+includes every original fallback layout and its independent paint references;
+the source-only command remains a separate regression surface.
 
 
 ## Connected native float text (schema 60, under verification)

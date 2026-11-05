@@ -11489,3 +11489,25 @@ are preserved separately from corrected acceptance. Main's engine stays at
 public/host/device/memory/performance, provider/evaluation, live integration,
 workflow/commercial or other unfinished original roadmap gate is closed.
 [Source, terminal checks, failed/corrected diagnostics and active-run boundaries](benchmarks/native-signed-attachments-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 signed attachment integration and canonical coverage
+
+The preceding main parent implementation completes its original matrix at
+352/384 exact matches, with all 36 independent references passing and all 3,922
+frozen inputs unchanged. Review `bd15104` completes the colored cohort at 44/64,
+retaining every prior main colored match and adding both affine negative-tracking
+upright controls. Its affected source run passes 255 cases; a separately passing
+canonical test supplies 48 references omitted by an obsolete temporary filename.
+All 3,956 review inputs remain unchanged. The two source runs are not described
+as one complete 256-case run.
+
+Main integrates the reviewed source and passes build/typecheck, all 3,428 unit/API
+checks, 37 emitted-production workflows and all eight original colored upright
+controls. All 751 source files and emitted JavaScript match the tested review.
+A checked-in native-text runner rejects missing filenames: the full corpus
+discovers 263 tests, and its source command selects all 256 cases. A deliberate
+missing-file control fails clearly. A fresh complete canonical main source run
+remains required, alongside the original fallback and every other unfinished
+roadmap gate. Uncolored GPOS-enabled marks still fail; diagnostic feature/metric
+changes are not integrated. The complete original objective stays active.
+[Terminal matrices, exact coverage correction, integration checks and remaining scope](benchmarks/native-signed-attachments-integration-2026-11-05.md).

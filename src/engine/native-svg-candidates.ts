@@ -1,4 +1,7 @@
-import { resolveNativeSvgSpanFrames } from "./native-svg-span-frames";
+import {
+  resolveNativeSvgSpanFrames,
+  resolveNativeSvgSignedAttachments,
+} from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
 import type { FloatGlyph } from "./float-glyph";
 import type { OwnedFontRun } from "../fonts/shaping-types";
@@ -87,8 +90,17 @@ export async function verifyNativeSvgCandidates(
           [value],
           check,
         );
+      const attached = spanResolved
+        ? await resolveNativeSvgSignedAttachments(
+            plan.scene.lines[index],
+            [value],
+            spanResolved,
+            check,
+          )
+        : undefined;
       const variants = spanResolved
         ? [
+            ...(attached ? [{ glyphs: attached, allocation: spanResolved }] : []),
             { glyphs: spanResolved.glyphs, allocation: spanResolved },
             { glyphs: value.glyphs, allocation: undefined },
           ]
