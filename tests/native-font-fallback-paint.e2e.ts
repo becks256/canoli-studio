@@ -176,101 +176,220 @@ test("fallback font paint retains independent original GIDs, colored overlap and
         return result;
       };
       try {
-        for (const name of ["mark", "bidi", "joining"])
+        for (const name of ["mark", "bidi", "joining", "attachment"])
           for (const vertical of [false, true])
             for (const curved of [false, true])
-              for (const alpha of [0.5, 0.64123012345, 1e-8]) {
-                const colors = [
-                    [4, -0.25, 1.5, alpha],
-                    [-0.5, 3, 0.125, alpha / 2],
-                  ].map((color) => color.map(Math.fround)),
-                  pieces =
-                    name === "mark"
-                      ? [
-                          { text: "AV ", paint: 0 },
-                          { text: "a\u0301", paint: 1 },
-                          { text: " fi", paint: 0 },
-                        ]
-                      : name === "bidi"
+              for (const direction of ["ltr", "rtl"] as const)
+                for (const alpha of [0.5, 0.64123012345, 1e-8]) {
+                  if (
+                    name === "attachment"
+                      ? !vertical || curved
+                      : direction !== "rtl"
+                  )
+                    continue;
+                  const colors = [
+                      [4, -0.25, 1.5, alpha],
+                      [-0.5, 3, 0.125, alpha / 2],
+                    ].map((color) => color.map(Math.fround)),
+                    pieces =
+                      name === "attachment"
                         ? [
-                            { text: "A ", paint: 0 },
-                            { text: "אב ", paint: 1 },
-                            { text: "V", paint: 0 },
+                            { text: "AV a", paint: 0 },
+                            { text: "\u0301 fi", paint: 1 },
                           ]
-                        : [
-                            { text: "ببلا ", paint: 1 },
-                            { text: "AV", paint: 0 },
-                          ],
-                  offsets: number[] = [];
-                let length = 0;
-                for (const piece of pieces) {
-                  offsets.push(length);
-                  length += piece.text.length;
-                }
-                const spans = pieces.map((piece) => ({
-                    text: piece.text,
-                    style: {
-                      color: piece.paint
-                        ? `color(srgb-linear -.5 3 .125 / ${alpha / 2})`
-                        : `color(srgb-linear 4 -.25 1.5 / ${alpha})`,
-                    },
-                  })),
-                  plan = await captureStyledTextPlan(
-                    {
-                      width: 512,
-                      height: 512,
+                        : name === "mark"
+                        ? [
+                            { text: "AV ", paint: 0 },
+                            { text: "a\u0301", paint: 1 },
+                            { text: " fi", paint: 0 },
+                          ]
+                        : name === "bidi"
+                          ? [
+                              { text: "A ", paint: 0 },
+                              { text: "אב ", paint: 1 },
+                              { text: "V", paint: 0 },
+                            ]
+                          : [
+                              { text: "ببلا ", paint: 1 },
+                              { text: "AV", paint: 0 },
+                            ],
+                    offsets: number[] = [];
+                  let length = 0;
+                  for (const piece of pieces) {
+                    offsets.push(length);
+                    length += piece.text.length;
+                  }
+                  const spans = pieces.map((piece) => ({
+                      text: piece.text,
                       style: {
-                        fontFamily: firstFont.family + ", " + file.family,
-                        fontSize: 40,
-                        letterSpacing: -30,
+                        color: piece.paint
+                          ? `color(srgb-linear -.5 3 .125 / ${alpha / 2})`
+                          : `color(srgb-linear 4 -.25 1.5 / ${alpha})`,
                       },
-                      lines: [
-                        {
-                          x: 220,
-                          y: 160,
-                          direction: "rtl",
-                          align: "center",
-                          ...(vertical
-                            ? {
-                                writing: {
-                                  mode: "vertical-rl" as const,
-                                  orientation: "mixed" as const,
-                                },
-                              }
-                            : {}),
-                          ...(curved
-                            ? {
-                                path: {
-                                  points: [
-                                    {
-                                      x: 24,
-                                      y: 150,
-                                      in: { x: 24, y: 150 },
-                                      out: { x: 100, y: 30 },
-                                    },
-                                    {
-                                      x: 420,
-                                      y: 150,
-                                      in: { x: 340, y: 30 },
-                                      out: { x: 420, y: 150 },
-                                    },
-                                  ],
-                                  startOffset: 210,
-                                  baselineOffset: 7,
-                                },
-                              }
-                            : {}),
-                          spans,
+                    })),
+                    plan = await captureStyledTextPlan(
+                      {
+                        width: 512,
+                        height: 512,
+                        ...(name === "attachment"
+                          ? { transform: [1.25, 0.125, -0.25, 0.9, 15, 14] as const }
+                          : {}),
+                        style: {
+                          fontFamily: firstFont.family + ", " + file.family,
+                          fontSize: 40,
+                          letterSpacing: -30,
                         },
-                      ],
-                    },
-                    doc.toJSON(),
-                    assets,
-                    { captureLinearPaint: true },
-                  );
-                try {
-                  const match = await plan.matchStyledGlyphLine(0);
-                  if (match.status !== "matched") {
+                        lines: [
+                          {
+                            x: 220,
+                            y: 160,
+                            direction,
+                            align: "center",
+                            ...(vertical
+                              ? {
+                                  writing: {
+                                    mode: "vertical-rl" as const,
+                                    orientation:
+                                      name === "attachment"
+                                        ? ("upright" as const)
+                                        : ("mixed" as const),
+                                  },
+                                }
+                              : {}),
+                            ...(curved
+                              ? {
+                                  path: {
+                                    points: [
+                                      {
+                                        x: 24,
+                                        y: 150,
+                                        in: { x: 24, y: 150 },
+                                        out: { x: 100, y: 30 },
+                                      },
+                                      {
+                                        x: 420,
+                                        y: 150,
+                                        in: { x: 340, y: 30 },
+                                        out: { x: 420, y: 150 },
+                                      },
+                                    ],
+                                    startOffset: 210,
+                                    baselineOffset: 7,
+                                  },
+                                }
+                              : {}),
+                            spans,
+                          },
+                        ],
+                      },
+                      doc.toJSON(),
+                      assets,
+                      { captureLinearPaint: true },
+                    );
+                  try {
+                    const match = await plan.matchStyledGlyphLine(0);
+                    if (match.status !== "matched") {
+                      rows.push({
+                        name,
+                        vertical,
+                        curved,
+                        alpha,
+                        status: match.status,
+                        evidence: match.evidence,
+                      });
+                      continue;
+                    }
+                    const expected = new Float32Array(512 * 512 * 4),
+                      owners = new Uint8Array(512 * 512);
+                    let tracked = 0;
+                    for (const glyph of match.glyphs) {
+                      const cluster = glyph.sourceCluster;
+                      if (
+                        cluster === undefined ||
+                        !Number.isInteger(cluster) ||
+                        cluster < 0 ||
+                        cluster >= length
+                      )
+                        throw new Error(
+                          "Original styled cluster provenance is missing",
+                        );
+                      let source = 0;
+                      while (
+                        source + 1 < offsets.length &&
+                        offsets[source + 1] <= cluster
+                      )
+                        source++;
+                      const paint = pieces[source].paint,
+                        color = colors[paint];
+                      const fallback =
+                        name === "mark" || name === "attachment"
+                          ? cluster === 3 || (name === "attachment" && cluster === 4)
+                          : name === "bidi"
+                            ? cluster === 2 || cluster === 3
+                            : cluster < 4;
+                      if (
+                        glyph.font.sourceFamily !==
+                          (fallback ? file.family : firstFont.family) ||
+                        glyph.color.some((v, i) => v !== color[i])
+                      )
+                        throw new Error(
+                          "Original styled font or source color differs",
+                        );
+                      if (glyph.paintLetterSpacing) tracked++;
+                      const coverage = await mask(glyph);
+                      for (let i = 0; i < coverage.length; i++) {
+                        if (coverage[i]) owners[i] |= 1 << paint;
+                        const p = i * 4,
+                          sa = Math.fround(
+                            color[3] * Math.fround(coverage[i] / 255),
+                          ),
+                          ba = expected[p + 3],
+                          a = sa + ba * (1 - sa);
+                        if (!sa) continue;
+                        for (let c = 0; c < 3; c++)
+                          expected[p + c] =
+                            (sa * (1 - ba) * color[c] +
+                              sa * ba * color[c] +
+                              (1 - sa) * ba * expected[p + c]) /
+                            a;
+                        expected[p + 3] = a;
+                      }
+                    }
+                    const area = { x: 0, y: 0, width: 512, height: 512 },
+                      full = await plan.renderGlyphs(
+                        match.glyphs,
+                        area,
+                        processor,
+                      ),
+                      parts = new Float32Array(full.length);
+                    let alphaError = 0,
+                      rgbError = 0,
+                      overlap = 0;
+                    for (const owner of owners) if (owner === 3) overlap++;
+                    for (let i = 0; i < full.length; i++)
+                      if (i % 4 === 3)
+                        alphaError = Math.max(
+                          alphaError,
+                          Math.abs(full[i] - expected[i]),
+                        );
+                      else
+                        rgbError = Math.max(
+                          rgbError,
+                          Math.abs(full[i] - expected[i]),
+                        );
+                    for (let x = 0; x < 512; x += 137) {
+                      const width = Math.min(137, 512 - x),
+                        part = await plan.renderGlyphs(
+                          match.glyphs,
+                          { ...area, x, width },
+                          processor,
+                        );
+                      for (let y = 0; y < 512; y++)
+                        parts.set(
+                          part.subarray(y * width * 4, (y + 1) * width * 4),
+                          (y * 512 + x) * 4,
+                        );
+                    }
                     rows.push({
                       name,
                       vertical,
@@ -278,138 +397,37 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       alpha,
                       status: match.status,
                       evidence: match.evidence,
+                      tracked,
+                      alphaError,
+                      rgbError,
+                      overlap,
+                      unchanged: JSON.stringify(doc.toJSON()) === before,
+                      partitions: new Uint32Array(full.buffer).every(
+                        (value, index) =>
+                          value === new Uint32Array(parts.buffer)[index],
+                      ),
                     });
-                    continue;
-                  }
-                  const expected = new Float32Array(512 * 512 * 4),
-                    owners = new Uint8Array(512 * 512);
-                  let tracked = 0;
-                  for (const glyph of match.glyphs) {
-                    const cluster = glyph.sourceCluster;
-                    if (
-                      cluster === undefined ||
-                      !Number.isInteger(cluster) ||
-                      cluster < 0 ||
-                      cluster >= length
-                    )
-                      throw new Error(
-                        "Original styled cluster provenance is missing",
-                      );
-                    let source = 0;
-                    while (
-                      source + 1 < offsets.length &&
-                      offsets[source + 1] <= cluster
-                    )
-                      source++;
-                    const paint = pieces[source].paint,
-                      color = colors[paint];
-                    const fallback =
-                      name === "mark"
-                        ? cluster === 3
-                        : name === "bidi"
-                          ? cluster === 2 || cluster === 3
-                          : cluster < 4;
-                    if (
-                      glyph.font.sourceFamily !==
-                        (fallback ? file.family : firstFont.family) ||
-                      glyph.color.some((v, i) => v !== color[i])
-                    )
-                      throw new Error(
-                        "Original styled font or source color differs",
-                      );
-                    if (glyph.paintLetterSpacing) tracked++;
-                    const coverage = await mask(glyph);
-                    for (let i = 0; i < coverage.length; i++) {
-                      if (coverage[i]) owners[i] |= 1 << paint;
-                      const p = i * 4,
-                        sa = Math.fround(
-                          color[3] * Math.fround(coverage[i] / 255),
-                        ),
-                        ba = expected[p + 3],
-                        a = sa + ba * (1 - sa);
-                      if (!sa) continue;
-                      for (let c = 0; c < 3; c++)
-                        expected[p + c] =
-                          (sa * (1 - ba) * color[c] +
-                            sa * ba * color[c] +
-                            (1 - sa) * ba * expected[p + c]) /
-                          a;
-                      expected[p + 3] = a;
+                  } catch (error) {
+                    rows.push({
+                      name,
+                      vertical,
+                      curved,
+                      alpha,
+                      status: "error",
+                      error: String(error),
+                    });
+                  } finally {
+                    plan.release();
+                    if (rows.length > published) {
+                      await (
+                        globalThis as unknown as {
+                          __keepFallbackFloat(row: unknown): Promise<void>;
+                        }
+                      ).__keepFallbackFloat(rows.at(-1));
+                      published = rows.length;
                     }
                   }
-                  const area = { x: 0, y: 0, width: 512, height: 512 },
-                    full = await plan.renderGlyphs(
-                      match.glyphs,
-                      area,
-                      processor,
-                    ),
-                    parts = new Float32Array(full.length);
-                  let alphaError = 0,
-                    rgbError = 0,
-                    overlap = 0;
-                  for (const owner of owners) if (owner === 3) overlap++;
-                  for (let i = 0; i < full.length; i++)
-                    if (i % 4 === 3)
-                      alphaError = Math.max(
-                        alphaError,
-                        Math.abs(full[i] - expected[i]),
-                      );
-                    else
-                      rgbError = Math.max(
-                        rgbError,
-                        Math.abs(full[i] - expected[i]),
-                      );
-                  for (let x = 0; x < 512; x += 137) {
-                    const width = Math.min(137, 512 - x),
-                      part = await plan.renderGlyphs(
-                        match.glyphs,
-                        { ...area, x, width },
-                        processor,
-                      );
-                    for (let y = 0; y < 512; y++)
-                      parts.set(
-                        part.subarray(y * width * 4, (y + 1) * width * 4),
-                        (y * 512 + x) * 4,
-                      );
-                  }
-                  rows.push({
-                    name,
-                    vertical,
-                    curved,
-                    alpha,
-                    status: match.status,
-                    evidence: match.evidence,
-                    tracked,
-                    alphaError,
-                    rgbError,
-                    overlap,
-                    unchanged: JSON.stringify(doc.toJSON()) === before,
-                    partitions: new Uint32Array(full.buffer).every(
-                      (value, index) =>
-                        value === new Uint32Array(parts.buffer)[index],
-                    ),
-                  });
-                } catch (error) {
-                  rows.push({
-                    name,
-                    vertical,
-                    curved,
-                    alpha,
-                    status: "error",
-                    error: String(error),
-                  });
-                } finally {
-                  plan.release();
-                  if (rows.length > published) {
-                    await (
-                      globalThis as unknown as {
-                        __keepFallbackFloat(row: unknown): Promise<void>;
-                      }
-                    ).__keepFallbackFloat(rows.at(-1));
-                    published = rows.length;
-                  }
                 }
-              }
         return rows;
       } finally {
         assets.dispose();
@@ -426,7 +444,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
     info.outputPath("native-fallback-float.json"),
     JSON.stringify(rows, null, 2),
   );
-  expect(rows).toHaveLength(36);
+  expect(rows).toHaveLength(42);
   for (const row of rows) {
     expect(row).toMatchObject({
       status: "matched",

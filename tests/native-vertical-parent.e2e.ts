@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFile, writeFile, appendFile } from "node:fs/promises";
-test("source parent and authored items retain exact native fallback ink and colors in all four original upright identity controls", async ({
+test("source parent and signed attachments retain exact native fallback ink and colors in all eight original upright controls", async ({
   page,
 }, info) => {
   test.setTimeout(600000);
@@ -32,7 +32,7 @@ test("source parent and authored items retain exact native fallback ink and colo
       rows = [];
     try {
       for (const direction of ["ltr", "rtl"] as const)
-        for (const affine of [false])
+        for (const affine of [false, true])
           for (const letterSpacing of [0, -30]) {
             const plan = await captureStyledTextPlan(
               {
@@ -136,7 +136,7 @@ test("source parent and authored items retain exact native fallback ink and colo
     JSON.stringify(result, null, 2),
   );
   expect(result).toMatchObject({ unchanged: true, probes: 0, faces: 0 });
-  expect(result.rows).toHaveLength(4);
+  expect(result.rows).toHaveLength(8);
   for (const row of result.rows) {
     expect(row.status, JSON.stringify(row)).toBe("matched");
     expect(row.evidence).toMatchObject({

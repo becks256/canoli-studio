@@ -4,6 +4,7 @@ import { renderSvgCellAlpha } from "./svg-glyph-paint";
 import { prepareNativeSvgParent } from "./native-svg-parent";
 import {
   resolveNativeSvgSpanFrames,
+  resolveNativeSvgSignedAttachments,
   resolveNativeSvgVisualSpanFrames,
 } from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
@@ -442,6 +443,26 @@ export async function matchNativeFallbackSvgLine(
         paint.characters[index],
         check,
       );
+      const attached = spanResolved
+        ? await resolveNativeSvgSignedAttachments(
+            line,
+            selected,
+            spanResolved,
+            check,
+          )
+        : undefined;
+      const visualAttached =
+        visualResolved &&
+        visualResolved.glyphs.some(
+          (glyph, i) => glyph !== spanResolved!.glyphs[i],
+        )
+          ? await resolveNativeSvgSignedAttachments(
+              line,
+              selected,
+              visualResolved,
+              check,
+            )
+          : undefined;
       const existingOrders = spanResolved
         ? [
             ...(visualResolved
@@ -460,6 +481,8 @@ export async function matchNativeFallbackSvgLine(
           : prepareOrders(original, undefined);
       const orders = [
         ...(parentResolved ? prepareOrders(parentResolved, undefined) : []),
+        ...(visualAttached ? prepareOrders(visualAttached, visualResolved) : []),
+        ...(attached ? prepareOrders(attached, spanResolved) : []),
         ...existingOrders,
       ];
       for (let i = 0; i < orders.length; i++) {
