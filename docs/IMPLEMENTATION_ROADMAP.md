@@ -11436,3 +11436,19 @@ unchanged. The main engine remains at the preceding integration checkpoint.
 Every original native/public/host/device/memory/performance and professional,
 AI/provider/evaluation, live ChatGPT/identity, workflow and commercial gate remains
 required. This continues the full original objective without closing or narrowing it.
+
+### 2026-11-05 UTC — F08/F10 canonical review commit and reference-cache source completion
+
+The reference-cache predecessor's complete 255-case affected source suite passes
+without skips/flakes and with all 3,967 frozen identities unchanged. Vertical
+source-parent implementation `75a3c4e` is committed on
+`codex/native-vertical-parent-20261105`; all 751 source files match the isolated
+implementation that passes four upright controls and all 33 production workflows.
+The canonical checkout also passes its full build/typecheck, all 3,428 unit/API
+checks and the updated guide check. Its complete seven-entry marketplace package
+is separately verified; the temporary source checkouts omitted static descriptors,
+so their native/app evidence is not package-installation acceptance. The 256-case
+vertical source run and original colored cohort remain active, and affine and
+all other unfinished original roadmap gates remain required. Main engine source
+is unchanged at this review checkpoint.
+[Canonical release proof and exact remaining scope](benchmarks/native-verification-continuation-2026-11-05.md#canonical-review-checkout-and-subsequent-source-result).
