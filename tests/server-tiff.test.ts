@@ -254,19 +254,28 @@ it("service disposal cancels real native staging and a queued source without lea
       { type: "image/tiff" },
     );
     let closing: Promise<void> | undefined;
+    let queued: Promise<PromiseSettledResult<unknown>[]> | undefined;
     const active = service.prepare(
       original,
       { editingPrecision: "float32" },
       {
         onProgress: (value) => {
-          if (value.phase === "converting") closing ??= service.dispose();
+          if (value.phase === "converting" && !closing) {
+            // Admission includes asynchronous inspection and hashing. Start the
+            // queued request after this source actually owns native conversion.
+            queued = Promise.allSettled([
+              service.prepare(original, { editingPrecision: "float32" }),
+            ]);
+            closing = service.dispose();
+          }
         },
       },
     );
-    const queued = service.prepare(original, { editingPrecision: "float32" });
-    const results = await Promise.allSettled([active, queued]);
+    const activeResults = await Promise.allSettled([active]);
     await closing;
     expect(closing).toBeDefined();
+    expect(queued).toBeDefined();
+    const results = [...activeResults, ...(await queued!)];
     expect(results.map((result) => result.status)).toEqual([
       "rejected",
       "rejected",
