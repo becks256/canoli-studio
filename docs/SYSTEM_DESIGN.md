@@ -27,7 +27,10 @@ signed allocations supply the selection, with no comparison-pixel fitting.
 All original preparations, full source/font/GID/axis/color identity, complete
 opacity comparisons and color ownership remain mandatory. Main integration passes
 build/typecheck, unit/API and focused production/native regressions; the complete
-native typography and original roadmap acceptance gates remain open.
+native typography and original roadmap acceptance gates remain open. Main also
+passes one complete canonical source run of 256 cases across 46 files, including
+the previously omitted 48-reference test in that same invocation.
+[Canonical source evidence](benchmarks/native-signed-attachments-source-2026-11-05.md).
 
 
 ## Connected native float text ownership

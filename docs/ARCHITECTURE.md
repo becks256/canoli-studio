@@ -41,8 +41,10 @@ match. The source run passes 255 cases; a separately passing canonical test adds
 48 references omitted by an obsolete temporary filename. This is two runs, not a
 single 256-case run. Main includes the reviewed implementation and also passes
 build/typecheck, all 3,428 unit/API checks, all 37 production workflows and the
-eight-control browser regression. A fresh canonical source run remains required;
-full native and broader roadmap acceptance stay open.
+eight-control browser regression. Its one complete canonical source run now passes
+all 256 cases across 46 files, including the 48-reference source-parent test in
+that same invocation. Full native and broader roadmap acceptance stay open.
+[Canonical source completion](benchmarks/native-signed-attachments-source-2026-11-05.md).
 [Integration evidence](benchmarks/native-signed-attachments-integration-2026-11-05.md).
 
 `playwright.native-text.config.ts` names the canonical source, isolated legacy

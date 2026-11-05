@@ -11511,3 +11511,27 @@ remains required, alongside the original fallback and every other unfinished
 roadmap gate. Uncolored GPOS-enabled marks still fail; diagnostic feature/metric
 changes are not integrated. The complete original objective stays active.
 [Terminal matrices, exact coverage correction, integration checks and remaining scope](benchmarks/native-signed-attachments-integration-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 complete canonical main source regression
+
+Main checkpoint `0cf724f` now passes one complete checked-in
+`npm run test:native-text:source` invocation: all 256 cases across 46 files,
+with zero retries, skips, flaky or unexpected results. The actual canonical
+`native-parent-paint.e2e.ts` test and its 48 independent source-parent references
+are inside this run. The earlier isolated review remains a 255-case run plus a
+separate test; its historical evidence is not relabeled.
+
+All 3,971 frozen source/test/original/release and top-level documentation inputs
+remain unchanged through terminal completion. The established main build,
+3,428 unit/API checks, 37 production workflows and eight original colored
+upright controls remain the existing integration evidence; this is not a new
+full fallback acceptance result. Main's original full matrix remains 352/384,
+and the signed review's colored cohort remains 44/64; no new combined aggregate
+is inferred. Full native/public/host/device/memory/performance and the complete
+original roadmap gates remain required.
+
+Separate rounded-position review `a82a49f` passes its core checks and now runs
+its complete 257-case source and original 384-layout fallback regressions from
+frozen isolated inputs. It has not been integrated into main. No provider call,
+upload, account, public API/schema/grant or source-resolution limit changes.
+[Terminal main source evidence](benchmarks/native-signed-attachments-source-2026-11-05.md).

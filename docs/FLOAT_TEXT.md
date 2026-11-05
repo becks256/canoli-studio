@@ -32,8 +32,10 @@ prior main colored match. Its source run passes 255 cases; the identical tracked
 48-reference test omitted by a temporary filename alias also passes separately.
 These are separate runs. Main integration also passes build/typecheck, all 3,428
 unit/API checks, all 37 production workflows and the eight original colored
-upright controls. A fresh canonical source run remains required, and complete
-native acceptance stays open.
+upright controls. Its one complete canonical source run now passes all 256 cases
+across 46 files, including the 48-reference source-parent test in the same
+invocation. Complete native acceptance stays open.
+[Canonical source completion](benchmarks/native-signed-attachments-source-2026-11-05.md).
 [Integration and exact boundaries](benchmarks/native-signed-attachments-integration-2026-11-05.md).
 
 ## Repeatable native-text acceptance
