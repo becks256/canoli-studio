@@ -34,9 +34,11 @@ removing or replacing another cohort.
 Build/typecheck, all 3,428 unit/API checks across 346 files, all 29 production
 workflows and all 36 original independent paint references pass. All 64 original
 CJK layouts now pass, including the formerly timing-out RTL control. The complete
-384-layout run remains active with other failures; matched statuses so far are
-marks 59/64, bidi 62/64, joining 61/64 and axes 64/64. These partial matrix statuses
-are not acceptance of those failing cohorts. Colored-span results are pending.
+384-layout run has now finished: 346 exact matches, eight mismatches and thirty
+timeouts. Marks match 59/64, bidi 62/64, joining 61/64, axes 64/64 and colored spans
+36/64. All six cohorts retain their complete 64 rows and unchanged documents,
+with no remaining probe nodes or private faces. The original complete target is
+still unmet. [Terminal report and immutable source receipt](native-fallback-matrix-2026-11-05.md).
 The expanded 255-case affected source suite across 45 files also passes, with
 zero skipped/flaky cases, in 44.2 minutes under shared load. All 3,956 frozen
 source/test/original/release identities remain unchanged through its terminal

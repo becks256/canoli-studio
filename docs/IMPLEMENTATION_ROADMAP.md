@@ -11407,3 +11407,32 @@ metric investigation. [Source, rejected probes and exact search status](benchmar
 Every original 384/36, public typography and unfinished professional-editor,
 AI/provider/evaluation, workflow/commercial/device/performance requirement remains
 required. The full original goal stays active and incomplete.
+
+### 2026-11-05 UTC — F08/F10 original native matrix terminal evidence
+
+The original 384-layout run on the exact source integrated in `ea27ff2` finishes
+with 346 exact matches, eight mismatches and thirty ordinary-deadline timeouts.
+All 36 original independent paint references pass. Every cohort retains all
+64 rows, unchanged document snapshots and zero remaining probes/private faces;
+all 3,956 frozen inputs remain unchanged. CJK and axes pass completely, while
+marks, bidi, joining and colored spans retain genuine failures. The complete
+384/36 acceptance target and every unfinished roadmap gate remain required.
+[Terminal source/evidence receipt and exact cohort counts](benchmarks/native-fallback-matrix-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 reference reuse and vertical source-parent implementation
+
+An isolated operation-owned native reference-plane LRU retains every exact
+comparison and passes build/typecheck, all 3,428 unit/API checks, all 29 production
+workflows, all 64 CJK layouts and all 36 original independent paint references.
+Its full 255-case source run and original 384-layout matrix are still active.
+A second isolated implementation adds a source-derived vertical parent for
+cross-span Latin marks. It passes build/typecheck, all 3,428 unit/API checks,
+all four formerly failing original upright identity controls and all 33 production
+workflows, including four new vertical export/Undo/original-bearing reopening
+cases. Its full 256-case source run and original 64 colored layouts/36 independent
+references are active; affine controls still fail. Both frozen input sets remain
+unchanged. The main engine remains at the preceding integration checkpoint.
+[Exact source, rejected probes, passing evidence and pending gates](benchmarks/native-verification-continuation-2026-11-05.md).
+Every original native/public/host/device/memory/performance and professional,
+AI/provider/evaluation, live ChatGPT/identity, workflow and commercial gate remains
+required. This continues the full original objective without closing or narrowing it.
