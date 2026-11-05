@@ -28,6 +28,25 @@ source and original 384-layout matrix reruns and broader public/host/device/
 memory/performance and full-roadmap acceptance are still required.
 [Core reports and diagnostic evidence](benchmarks/native-shared-origin-2026-11-05.md).
 
+The complete review `f020fb1` now passes one canonical source invocation of
+258 cases across 46 files, including the actual 48-reference source-parent test,
+with zero retries, skips, flaky or unexpected results. Its original 384-layout
+matrix finishes at 361 exact matches, three mismatches and 20 matching-budget
+errors. Every prior 360 full-matrix match, original 352 match and 44 earlier
+colored-cohort match remains. Cohorts are CJK 64/64, marks 64/64, bidi 62/64,
+joining 61/64, axes 64/64 and colored 46/64. The last original mark control is
+now exact; 23 native layouts and broader roadmap acceptance still require work.
+
+All 60 independent fallback Float32 references pass in that same fallback
+invocation. The audit checks 2,296 matched glyph metadata records and 1,395
+original full-context requests, including font priority and axis tuples, with
+zero ink/ownership errors. Every cohort retires probes/private faces without
+model changes. All 4,030 frozen inputs remain unchanged through both terminal
+runs. The newer horizontal development is separate and contributes no cases to
+this aggregate. Main integration and broad public/host/device/memory/performance
+and original roadmap gates remain required.
+[Terminal reports and retention audit](benchmarks/native-shared-origin-terminal-2026-11-05.md).
+
 ## Correlated native position preparation
 
 Retain the original captured shaping run as provenance. A separate vertical
