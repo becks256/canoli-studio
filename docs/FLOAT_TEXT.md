@@ -1,5 +1,24 @@
 # Native float text — implementation in progress
 
+## Vertical source-parent review implementation — 2026-11-05 UTC
+
+A new private parent preparation retains original per-font advances and the first
+native anchor when a cross-span Latin mark makes later SVG character addresses
+unreliable. Complete text, original fonts/GIDs/axes and source colors remain;
+exact original ink at both opacities and per-color ownership still decide
+acceptance. A separate sixteen-plane operation-owned reference cache avoids
+repeated source-image work while retaining every exact comparison and sample.
+
+The identical isolated source passes build/typecheck, all 3,428 unit/API checks,
+all four original upright identity controls and all 33 production workflows.
+The four new production cases preserve native PNGs, isolated opacity changes,
+exact Undo and original-bearing project reopening without development globals.
+The 256-case affected source suite and original colored cohort/independent
+references are still running; affine prototype cases and full native/public/
+host/device/memory/performance and broader roadmap acceptance remain open.
+[Source, evidence and exact verification status](benchmarks/native-verification-continuation-2026-11-05.md).
+
+
 The private original-script and complete styled paint-order dependencies are
 verified by 3,415 unit/API tests across 341 files, 203 affected native-browser cases
 across 24 files and fifteen production cases. All 96 mixed-script layouts and 64

@@ -1,5 +1,26 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Operation-owned native reference planes and vertical source allocation
+
+Fallback matching retains at most sixteen canonical reference alpha planes,
+keyed by world cell, gutter and opacity, for its own captured source line. The
+LRU is local to one operation and cleared in `finally`; the complete source/font
+lifetime checks also run on hits. Candidate rendering, complete per-pixel
+comparison at both opacities and per-color ownership remain mandatory. Cache
+storage does not constrain document geometry or import resolution.
+
+The vertical parent preparation uses retained per-font advances, the original
+first native anchor and a 1/64 screen-coordinate allocation. It changes only
+private candidate placement. Full source/GID/font/axis/color identity, existing
+preparations and exact publication gates remain. Its current preparation applies
+to straight upright Latin items with uniform metric styling and an original
+span boundary inside a grapheme; unsupported/bidi/negative-allocation cases keep
+the existing search. Old native anchors are computed once per cluster.
+No command/history, model, account, provider or synchronization boundary changes.
+The complete 384-layout/native-public/device/performance and broader roadmap
+acceptance targets remain required.
+
+
 ## Connected native float text ownership
 
 Schema 60 extends the existing TextLayer/command boundary to float documents with
