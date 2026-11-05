@@ -11436,3 +11436,106 @@ unchanged. The main engine remains at the preceding integration checkpoint.
 Every original native/public/host/device/memory/performance and professional,
 AI/provider/evaluation, live ChatGPT/identity, workflow and commercial gate remains
 required. This continues the full original objective without closing or narrowing it.
+
+### 2026-11-05 UTC — F08/F10 canonical review commit and reference-cache source completion
+
+The reference-cache predecessor's complete 255-case affected source suite passes
+without skips/flakes and with all 3,967 frozen identities unchanged. Vertical
+source-parent implementation `75a3c4e` is committed on
+`codex/native-vertical-parent-20261105`; all 751 source files match the isolated
+implementation that passes four upright controls and all 33 production workflows.
+The canonical checkout also passes its full build/typecheck, all 3,428 unit/API
+checks and the updated guide check. Its complete seven-entry marketplace package
+is separately verified; the temporary source checkouts omitted static descriptors,
+so their native/app evidence is not package-installation acceptance. The 256-case
+vertical source run and original colored cohort remain active, and affine and
+all other unfinished original roadmap gates remain required. Main engine source
+is unchanged at this review checkpoint.
+[Canonical release proof and exact remaining scope](benchmarks/native-verification-continuation-2026-11-05.md#canonical-review-checkout-and-subsequent-source-result).
+
+### 2026-11-05 UTC — F08/F10 vertical source-parent main integration
+
+Main `0a36bb8` integrates the reviewed implementation after its complete 256-case
+affected source suite and original colored cohort finish. Main build/typecheck,
+all 3,428 unit/API checks, all 33 production workflows and the focused browser
+test containing four original upright controls pass. All 3,922 frozen main input
+identities remain unchanged, with zero skipped/flaky browser cases. Its 751
+non-generated source files match the isolated source exactly.
+
+The reference-cache predecessor's full original matrix finishes at 348/384 exact
+matches; the vertical colored cohort finishes at 42/64, preserving every prior
+colored match and adding four upright identity controls. Both independent
+36-reference suites pass. A new complete integrated 384-layout result is not
+claimed; the remaining affine, native/public/host/device/performance and every
+unfinished broader roadmap gate remain required. This is local build/runtime
+verification, without Vercel redeployment or live ChatGPT/identity acceptance.
+[Terminal reports, row audits, integration proof and remaining scope](benchmarks/native-vertical-parent-integration-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 signed native attachment review
+
+Owner: implementation agent; estimate S within F08/F10. Review commit `bd15104`
+retains original zero-advance attachment poses when their native allocation is
+negative, after source and visual span placement. Complete canonical build,
+all 3,428 unit/API tests, all eight original colored upright controls, all 37
+production workflows and all 42 independent paint references pass without
+skipped/flaky browser cases. The original 36 independent scenes are retained;
+six affine HDR/alpha/partition controls are added. All 3,956 final frozen inputs
+remain unchanged and all six WASM files match main.
+
+The initial RTL visual-frame failure and deliberately interrupted partial runs
+are preserved separately from corrected acceptance. Main's engine stays at
+`0a36bb8`; its original 384/36 matrix is active, alongside the isolated full
+256-case source regression and original 64 colored layouts. No full native,
+public/host/device/memory/performance, provider/evaluation, live integration,
+workflow/commercial or other unfinished original roadmap gate is closed.
+[Source, terminal checks, failed/corrected diagnostics and active-run boundaries](benchmarks/native-signed-attachments-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 signed attachment integration and canonical coverage
+
+The preceding main parent implementation completes its original matrix at
+352/384 exact matches, with all 36 independent references passing and all 3,922
+frozen inputs unchanged. Review `bd15104` completes the colored cohort at 44/64,
+retaining every prior main colored match and adding both affine negative-tracking
+upright controls. Its affected source run passes 255 cases; a separately passing
+canonical test supplies 48 references omitted by an obsolete temporary filename.
+All 3,956 review inputs remain unchanged. The two source runs are not described
+as one complete 256-case run.
+
+Main integrates the reviewed source and passes build/typecheck, all 3,428 unit/API
+checks, 37 emitted-production workflows and all eight original colored upright
+controls. All 751 source files and emitted JavaScript match the tested review.
+A checked-in native-text runner rejects missing filenames: the full corpus
+discovers 263 tests, and its source command selects all 256 cases. A deliberate
+missing-file control fails clearly. A fresh complete canonical main source run
+remains required, alongside the original fallback and every other unfinished
+roadmap gate. Uncolored GPOS-enabled marks still fail; diagnostic feature/metric
+changes are not integrated. The complete original objective stays active.
+[Terminal matrices, exact coverage correction, integration checks and remaining scope](benchmarks/native-signed-attachments-integration-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 correlated native position review
+
+A source-derived private vertical preparation rounds shaped and nominal offsets
+and advances together in screen pixels, using Float32 conversion and ties away
+from zero. Original runs remain provenance; the captured units per em replace
+the prototype's fixture-specific scale. Full original font/text/GID/axis/color
+identity and all fractional preparations remain. Complete ink at both opacity
+samples and exact color ownership retain publication authority.
+
+The isolated review passes canonical build/typecheck, all 3,428 unit/API checks
+across 346 files, both focused browser cases (24 original controls), all 45
+emitted production workflows and all 48 independent fallback Float32 references.
+All 37 prior production workflows and all 42 reference scenes remain. New production
+cases retain complete font originals, opacity edits, exact Undo and native project
+reopening without development globals. New references include signed/HDR colors,
+tiny alpha and exact partition words. Failed pilots retain a TypeScript fixture
+check, an initial navigation/context loss during worker regeneration, and an
+incorrect new-fixture expected fallback cluster; no engine tolerance is relaxed.
+
+The independent diagnostic fixes all four previously failing upright affine
+mark controls; raw preparations remain necessary for identity transforms.
+The tested browser source contains the rounding mode, but its actual face-level
+flag is not claimed proven. Sideways diagnostic combinations still differ.
+The full original 384-layout matrix, 257-case canonical source run, broad native/
+public/host/device/memory/performance gates and the complete original roadmap
+remain required. Main checkpoint `0cf724f` stays unchanged while its earlier
+256-case canonical run is live. [Review evidence and raw diagnostics](benchmarks/native-rounded-positions-2026-11-05.md).

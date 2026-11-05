@@ -18,6 +18,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "npm run build:wasm && npm run build:font-worker && vitest run",
     "test:e2e": "playwright test",
+    "test:native-text": "playwright test --config playwright.native-text.config.ts",
+    "test:native-text:source": "playwright test --config playwright.native-text.config.ts --project=source --project=\"source legacy\"",
     "test:production": "playwright test --config playwright.production.config.ts",
     "benchmark": "VITE_BENCHMARK=1 npm run build && playwright test --config playwright.benchmark.config.ts",
     "start:site": "node dist-site/index.mjs",

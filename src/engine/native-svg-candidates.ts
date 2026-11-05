@@ -26,6 +26,7 @@ export interface NativeSvgGlyphCandidate {
   >;
   readonly projection: NativeSvgGlyphEvidence["projection"];
   readonly nativeMetrics?: boolean;
+  readonly nativePositionRounding?: boolean;
   readonly glyphs: readonly Readonly<FloatGlyph>[];
   readonly runs: readonly OwnedFontRun[];
   readonly hiddenGlyphs: number;
@@ -132,6 +133,9 @@ export async function verifyNativeSvgCandidates(
             ...(value.nativeMetrics === undefined
               ? {}
               : { nativeMetrics: value.nativeMetrics }),
+            ...(value.nativePositionRounding
+              ? { nativePositionRounding: true }
+              : {}),
             hiddenGlyphs: value.hiddenGlyphs,
             svgAdvance: plan.metrics[index].advance,
             svgPixelsCompared: paint.pixels,

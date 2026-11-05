@@ -58,6 +58,7 @@ export interface NativeSvgGlyphEvidence {
     settings: string;
     projection: NativeSvgGlyphEvidence["projection"];
     nativeMetrics?: boolean;
+    nativePositionRounding?: boolean;
   }>[];
   readonly paintOwnership?: Readonly<{
     pixels: number;
@@ -65,6 +66,7 @@ export interface NativeSvgGlyphEvidence {
     colors: number;
   }>;
   readonly nativeMetrics?: boolean;
+  readonly nativePositionRounding?: boolean;
   readonly svgAdvance: number;
   readonly svgPixelsCompared: number;
   readonly svgMaxAlphaError: number;

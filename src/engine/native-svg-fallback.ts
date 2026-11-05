@@ -534,6 +534,9 @@ export async function matchNativeFallbackSvgLine(
                   settings: slots[i].font.settings,
                   projection: value.projection,
                   nativeMetrics: value.nativeMetrics,
+                  ...(value.nativePositionRounding
+                    ? { nativePositionRounding: true }
+                    : {}),
                 }),
               ),
             ),

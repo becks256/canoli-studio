@@ -1,6 +1,24 @@
 # Native float text — implementation in progress
 
-## Vertical source-parent review implementation — 2026-11-05 UTC
+## Correlated native position review — 2026-11-05 UTC
+
+An additional private preparation rounds shaped and nominal positions together
+in screen pixels, retaining original captured runs, complete font sources, GIDs,
+axis tuples, text context and colors. Existing fractional preparations remain
+necessary for identity-transform controls. Every preparation still requires
+exact complete original ink at both opacity samples and exact color ownership.
+
+The isolated review passes build/typecheck, all 3,428 unit/API checks, eight
+existing styled upright controls, sixteen original mark controls with/without
+owned fallback, 45 emitted production workflows and 48 independent fallback
+Float32 references. Original 37 production workflows and all 42 earlier fallback
+references remain. The full 257-case source regression and original 384-layout
+matrix remain required; no new complete native aggregate is claimed. This is
+private preparation work, not completed broad Float32 typography or roadmap
+acceptance. [Raw evidence, failed pilots and remaining gates](benchmarks/native-rounded-positions-2026-11-05.md).
+
+
+## Vertical source-parent integration — 2026-11-05 UTC
 
 A new private parent preparation retains original per-font advances and the first
 native anchor when a cross-span Latin mark makes later SVG character addresses
@@ -13,10 +31,37 @@ The identical isolated source passes build/typecheck, all 3,428 unit/API checks,
 all four original upright identity controls and all 33 production workflows.
 The four new production cases preserve native PNGs, isolated opacity changes,
 exact Undo and original-bearing project reopening without development globals.
-The 256-case affected source suite and original colored cohort/independent
-references are still running; affine prototype cases and full native/public/
-host/device/memory/performance and broader roadmap acceptance remain open.
-[Source, evidence and exact verification status](benchmarks/native-verification-continuation-2026-11-05.md).
+The complete 256-case affected source suite and all 36 independent paint references
+also pass. The original colored cohort matches 42/64 layouts and retains every
+prior cache match; 22 colored layouts still fail. Main integration `0a36bb8` also
+passes build/typecheck, all 3,428 unit/API checks, all 33 production workflows and
+the focused four-control browser regression. Its complete original main matrix
+finishes at 352/384 exact matches; all 36 independent references pass. Affine and
+full native/public/host/device/memory/performance and
+broader roadmap acceptance remain open.
+[Source, evidence and exact verification status](benchmarks/native-vertical-parent-integration-2026-11-05.md).
+
+The separate signed-attachment review `bd15104` also passes both original upright
+affine negative-tracking controls by retaining native zero-advance poses after
+source/visual span placement. Canonical build, all 3,428 unit/API checks, eight
+upright controls, 37 emitted production workflows and 42 independent Float32 paint
+references pass. Its original colored cohort finishes at 44/64 and retains every
+prior main colored match. Its source run passes 255 cases; the identical tracked
+48-reference test omitted by a temporary filename alias also passes separately.
+These are separate runs. Main integration also passes build/typecheck, all 3,428
+unit/API checks, all 37 production workflows and the eight original colored
+upright controls. A fresh canonical source run remains required, and complete
+native acceptance stays open.
+[Integration and exact boundaries](benchmarks/native-signed-attachments-integration-2026-11-05.md).
+
+## Repeatable native-text acceptance
+
+`npm run test:native-text` selects the canonical source regression, isolated legacy
+checks, all 384 original fallback layouts and the expanded independent paint
+references. Missing filenames fail discovery. A dedicated server belongs to the
+tested checkout. `npm run test:native-text:source` selects the 257 source cases, including the new mark-control test;
+the full fallback project remains an additional required acceptance gate with
+known failures. Source coverage does not establish complete native typography.
 
 
 The private original-script and complete styled paint-order dependencies are

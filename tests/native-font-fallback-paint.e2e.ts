@@ -176,13 +176,19 @@ test("fallback font paint retains independent original GIDs, colored overlap and
         return result;
       };
       try {
-        for (const name of ["mark", "bidi", "joining", "attachment"])
+        for (const name of [
+          "mark",
+          "bidi",
+          "joining",
+          "attachment",
+          "rounded-mark",
+        ])
           for (const vertical of [false, true])
             for (const curved of [false, true])
               for (const direction of ["ltr", "rtl"] as const)
                 for (const alpha of [0.5, 0.64123012345, 1e-8]) {
                   if (
-                    name === "attachment"
+                    name === "attachment" || name === "rounded-mark"
                       ? !vertical || curved
                       : direction !== "rtl"
                   )
@@ -192,7 +198,11 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       [-0.5, 3, 0.125, alpha / 2],
                     ].map((color) => color.map(Math.fround)),
                     pieces =
-                      name === "attachment"
+                      name === "rounded-mark"
+                        ? [
+                            { text: "AV fi a\u0301", paint: 0 },
+                          ]
+                        : name === "attachment"
                         ? [
                             { text: "AV a", paint: 0 },
                             { text: "\u0301 fi", paint: 1 },
@@ -231,7 +241,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       {
                         width: 512,
                         height: 512,
-                        ...(name === "attachment"
+                        ...(name === "attachment" || name === "rounded-mark"
                           ? { transform: [1.25, 0.125, -0.25, 0.9, 15, 14] as const }
                           : {}),
                         style: {
@@ -250,7 +260,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                                   writing: {
                                     mode: "vertical-rl" as const,
                                     orientation:
-                                      name === "attachment"
+                                      name === "attachment" || name === "rounded-mark"
                                         ? ("upright" as const)
                                         : ("mixed" as const),
                                   },
@@ -300,7 +310,10 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       continue;
                     }
                     const expected = new Float32Array(512 * 512 * 4),
-                      owners = new Uint8Array(512 * 512);
+                      owners = new Uint8Array(512 * 512),
+                      glyphOwners = name === "rounded-mark"
+                        ? new Uint8Array(512 * 512)
+                        : undefined;
                     let tracked = 0;
                     for (const glyph of match.glyphs) {
                       const cluster = glyph.sourceCluster;
@@ -322,7 +335,9 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       const paint = pieces[source].paint,
                         color = colors[paint];
                       const fallback =
-                        name === "mark" || name === "attachment"
+                        name === "rounded-mark"
+                          ? cluster === 6
+                          : name === "mark" || name === "attachment"
                           ? cluster === 3 || (name === "attachment" && cluster === 4)
                           : name === "bidi"
                             ? cluster === 2 || cluster === 3
@@ -338,7 +353,10 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       if (glyph.paintLetterSpacing) tracked++;
                       const coverage = await mask(glyph);
                       for (let i = 0; i < coverage.length; i++) {
-                        if (coverage[i]) owners[i] |= 1 << paint;
+                        if (coverage[i]) {
+                          owners[i] |= 1 << paint;
+                          if (glyphOwners) glyphOwners[i]++;
+                        }
                         const p = i * 4,
                           sa = Math.fround(
                             color[3] * Math.fround(coverage[i] / 255),
@@ -366,6 +384,9 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       rgbError = 0,
                       overlap = 0;
                     for (const owner of owners) if (owner === 3) overlap++;
+                    const glyphOverlap = glyphOwners?.reduce(
+                      (sum, count) => sum + Number(count > 1), 0,
+                    );
                     for (let i = 0; i < full.length; i++)
                       if (i % 4 === 3)
                         alphaError = Math.max(
@@ -401,6 +422,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       alphaError,
                       rgbError,
                       overlap,
+                      ...(glyphOverlap === undefined ? {} : { glyphOverlap }),
                       unchanged: JSON.stringify(doc.toJSON()) === before,
                       partitions: new Uint32Array(full.buffer).every(
                         (value, index) =>
@@ -444,7 +466,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
     info.outputPath("native-fallback-float.json"),
     JSON.stringify(rows, null, 2),
   );
-  expect(rows).toHaveLength(42);
+  expect(rows).toHaveLength(48);
   for (const row of rows) {
     expect(row).toMatchObject({
       status: "matched",
@@ -455,6 +477,8 @@ test("fallback font paint retains independent original GIDs, colored overlap and
     });
     if (!("overlap" in row))
       throw new Error("The original styled bidi fixture did not match");
-    expect(row.overlap!).toBeGreaterThan(0);
+    if (row.name === "rounded-mark")
+      expect("glyphOverlap" in row ? row.glyphOverlap : 0).toBeGreaterThan(0);
+    else expect(row.overlap!).toBeGreaterThan(0);
   }
 });

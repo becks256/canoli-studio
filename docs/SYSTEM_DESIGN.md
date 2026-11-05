@@ -1,5 +1,20 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Correlated native position preparation
+
+Retain the original captured shaping run as provenance. A separate vertical
+preparation can round both shaped and nominal offsets/advances in screen pixels
+using Float32 conversion and ties away from zero, then restore positions using
+the captured run's units per em. Fractional preparations remain available.
+No native reference pixels supply displacement values or a rounding rule; full
+original ink at two opacity samples and per-color ownership remain publication
+gates. A matching preparation does not prove the tested host's face-level
+subpixel flag. No source asset, public document/command, schema, permission or
+independent REST boundary changes. Full native/public/host/performance and
+broader roadmap acceptance remain open.
+[Isolated review evidence](benchmarks/native-rounded-positions-2026-11-05.md).
+
+
 ## Operation-owned native reference planes and vertical source allocation
 
 Fallback matching retains at most sixteen canonical reference alpha planes,
@@ -19,6 +34,15 @@ the existing search. Old native anchors are computed once per cluster.
 No command/history, model, account, provider or synchronization boundary changes.
 The complete 384-layout/native-public/device/performance and broader roadmap
 acceptance targets remain required.
+
+Signed allocation additionally offers captured zero-advance glyph poses after
+source-span and visual-span placement. Advancing glyphs retain their frame;
+negative cells do not force every attachment into that frame. Source runs and
+signed allocations supply the selection, with no comparison-pixel fitting.
+All original preparations, full source/font/GID/axis/color identity, complete
+opacity comparisons and color ownership remain mandatory. Main integration passes
+build/typecheck, unit/API and focused production/native regressions; the complete
+native typography and original roadmap acceptance gates remain open.
 
 
 ## Connected native float text ownership

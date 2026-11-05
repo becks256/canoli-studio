@@ -73,3 +73,32 @@ binds source, inputs, configs, reports and ongoing-run snapshots to their hashes
 its active-run logs are snapshots rather than terminal results. Earlier immutable
 receipts remain unchanged. The [terminal main-baseline matrix](native-fallback-matrix-2026-11-05.md)
 continues to record 346/384 exact layouts and the remaining 38 failures.
+
+## Canonical review checkout and subsequent source result
+
+The reference-cache implementation's complete 255-case affected source suite
+now passes, with zero skipped/flaky cases, in 42.6 minutes under shared load.
+All 3,967 frozen identities remain unchanged. This closes that source run only;
+the original cache matrix and the vertical implementation's expanded source /
+colored-layout runs remain active.
+
+The implementation is committed as `75a3c4e` on
+`codex/native-vertical-parent-20261105`. All 751 non-generated source files in the
+canonical review worktree match the isolated vertical implementation exactly.
+Its complete repository build/typecheck, all 3,428 unit/API checks and the
+updated no-JavaScript production guide check pass. App runtime assets and the
+bundled MCP server are byte-identical to the isolated tested release.
+
+The temporary checkouts omitted five static marketplace descriptors from their
+build inputs. The complete canonical checkout includes them: all seven package
+entries are checked byte for byte against the marketplace source and its manifest.
+Its three changed guide pages and complete plugin ZIP/manifest account for every
+release difference. The isolated app/native evidence remains scoped to that
+runtime; it does not establish complete package or live-installation acceptance.
+No live ChatGPT, identity, provider or hardware acceptance is implied.
+
+The [canonical review release receipt](native-review-release-2026-11-05.json.gz)
+records these terminal results, the build-input distinction and release identities.
+The earlier source/active-run receipt stays unchanged. Main retains the earlier
+engine integration while the broader vertical regressions complete; the full
+original roadmap objective remains active.

@@ -1,6 +1,28 @@
 # Architecture
 
-## Vertical source-parent review implementation
+## Correlated native position rounding (private review)
+
+`native-svg-position-rounding.ts` offers an additional vertical preparation that
+rounds shaped offsets/advances and nominal offsets/advances together in screen
+pixels, with Float32 conversion and ties away from zero. Each captured run supplies
+its own units per em. Original captured runs remain the provenance; posed copies
+never replace the original font, text context, GIDs, axes or colors. The existing
+fractional preparations remain, including the identity-transform paths that the
+rounded preparation does not match. Private evidence identifies rounded positions.
+Complete original ink at both opacities and exact color ownership still decide
+publication. No public constructor, command, schema, scripting/REST signature or
+grant changes.
+
+The isolated review passes build/typecheck, all 3,428 unit/API checks, 24 focused
+native controls, 45 emitted production workflows and 48 independent fallback
+Float32 references. Those retain all 37 earlier production workflows and 42
+fallback references. The complete 257-case source regression and original
+384-layout matrix remain required; this does not establish full native typography,
+public/device/performance acceptance or completion of the broader roadmap.
+[Source, raw diagnostics and verification boundaries](benchmarks/native-rounded-positions-2026-11-05.md).
+
+
+## Vertical source-parent preparation
 
 `native-svg-vertical-parent.ts` offers a parent frame for straight upright Latin
 runs whose uniform metric styling crosses a grapheme boundary. It preserves full
@@ -18,11 +40,37 @@ candidate still compares all pixels and ownership. Exit clears the cache. These
 planes never supply working RGB, positions or document/import geometry limits.
 No public constructor, schema, scripting/REST signature or grant changes.
 
-The identical isolated implementation passes build/typecheck, all 3,428 unit/API
-checks, all four original upright identity controls and all 33 production
-workflows. Its expanded source suite and original colored cohort remain active;
-affine controls and the full native/roadmap acceptance gates remain open.
-[Exact evidence and boundaries](benchmarks/native-verification-continuation-2026-11-05.md).
+The identical 751-file isolated source passes build/typecheck, all 3,428 unit/API
+checks, all 256 affected source cases, all four original upright identity controls
+and all 33 production workflows. Its original colored cohort matches 42/64
+layouts, retaining all 38 prior cache matches and adding the four upright controls.
+Parent integration `0a36bb8` also passes build/typecheck, all 3,428 unit/API checks,
+all 33 production workflows and the focused four-control browser regression.
+Its full original main matrix now completes at 352/384 exact layouts, with all
+36 independent paint references passing. Remaining native/public/host/performance
+and broader roadmap acceptance gates remain open.
+[Exact evidence and boundaries](benchmarks/native-vertical-parent-integration-2026-11-05.md).
+
+## Signed attachment preparation
+
+Review `bd15104` retains the original captured pose of zero-advance glyphs whose
+native allocation is negative, while advancing glyphs keep source/visual span
+placement. Every previous preparation, full original context/font/GID/color and
+exact opacity/ownership gate remains. Its canonical build, 3,428 unit/API checks,
+eight upright controls, 37 production workflows and 42 independent paint references
+pass. Its complete colored cohort matches 44/64 layouts, retaining every prior
+match. The source run passes 255 cases; a separately passing canonical test adds
+48 references omitted by an obsolete temporary filename. This is two runs, not a
+single 256-case run. Main includes the reviewed implementation and also passes
+build/typecheck, all 3,428 unit/API checks, all 37 production workflows and the
+eight-control browser regression. A fresh canonical source run remains required;
+full native and broader roadmap acceptance stay open.
+[Integration evidence](benchmarks/native-signed-attachments-integration-2026-11-05.md).
+
+`playwright.native-text.config.ts` names the canonical source, isolated legacy
+and fallback files and rejects missing files before discovery. The full runner
+includes every original fallback layout and its independent paint references;
+the source-only command remains a separate regression surface.
 
 
 ## Connected native float text (schema 60, under verification)

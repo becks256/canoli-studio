@@ -1,4 +1,5 @@
 import { splitNativeAuthoredRanges } from "./native-svg-authored-ranges";
+import { roundNativeSvgPositions } from "./native-svg-position-rounding";
 import { nativeSvgTextItems } from "./native-text-items";
 const cursiveScripts = new Set([
   "Arab",
@@ -294,8 +295,12 @@ async function* prepareNativeVerticalSvgCandidates(
           : [style.fontKerning === "none" ? 0 : 1];
     for (const instance of instances)
       for (const kern of kerns)
-        for (const native of signed ? [true, false] : [false, true]) {
-          const glyphs: Readonly<FloatGlyph>[] = [],
+        for (const mode of signed
+          ? ["native", "source", "rounded"]
+          : ["source", "native", "rounded"]) {
+          const native = mode !== "source",
+            positionRounding = mode === "rounded",
+            glyphs: Readonly<FloatGlyph>[] = [],
             pathGlyphs: Readonly<FloatGlyph>[] = [],
             nativePathGlyphs: Readonly<FloatGlyph>[] = [],
             runs: OwnedFontRun[] = [],
@@ -349,8 +354,8 @@ async function* prepareNativeVerticalSvgCandidates(
                   ? ("upright" as const)
                   : ("sideways" as const),
               }),
-              ids = [...new Set(run.glyphs.map((g) => g.glyphId))],
-              metrics = await font.svgMetrics!(
+              ids = [...new Set(run.glyphs.map((g) => g.glyphId))];
+            let metrics = await font.svgMetrics!(
                 ids,
                 style,
                 instance,
@@ -366,6 +371,11 @@ async function* prepareNativeVerticalSvgCandidates(
               check();
             }
             runs.push(run);
+            if (positionRounding) {
+              const rounded = await roundNativeSvgPositions(run, metrics, check);
+              run = rounded.run;
+              metrics = rounded.metrics;
+            }
             const nominals = new Map(metrics.glyphs.map((g) => [g.id, g])),
               scale = metrics.em / (factor * run.unitsPerEm),
               clusters = [...new Set(run.glyphs.map((g) => g.cluster))].sort(
@@ -928,6 +938,7 @@ async function* prepareNativeVerticalSvgCandidates(
                 ...(inlineAllocation ? { inlineAllocation } : {}),
                 projection,
                 nativeMetrics: native,
+                ...(positionRounding ? { nativePositionRounding: true } : {}),
                 hiddenGlyphs:
                   runs.reduce((n, r) => n + r.glyphs.length, 0) -
                   inherited.length,
@@ -939,6 +950,7 @@ async function* prepareNativeVerticalSvgCandidates(
               ...(inlineAllocation ? { inlineAllocation } : {}),
               projection,
               nativeMetrics: native,
+              ...(positionRounding ? { nativePositionRounding: true } : {}),
               hiddenGlyphs:
                 runs.reduce((n, r) => n + r.glyphs.length, 0) -
                 primitives.length,

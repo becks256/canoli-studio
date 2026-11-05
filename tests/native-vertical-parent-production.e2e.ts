@@ -10,10 +10,11 @@ import {
   historyScript,
 } from "./helpers/history-inspector";
 
-for (const letterSpacing of [0, -30])
+for (const roundedMark of [false, true])
+ for (const letterSpacing of [0, -30])
   for (const direction of ["ltr", "rtl"] as const)
     for (const affine of [false, true])
-      test(`production vertical parent ${direction} tracking ${letterSpacing} affine ${affine} float text retains actual source capture, native pixels, Undo and original-bearing reopening`, async ({
+      test(`production vertical parent ${roundedMark ? "rounded mark " : ""}${direction} tracking ${letterSpacing} affine ${affine} float text retains actual source capture, native pixels, Undo and original-bearing reopening`, async ({
         page,
       }, info) => {
         const sources = await Promise.all(
@@ -41,7 +42,7 @@ for (const letterSpacing of [0, -30])
           const layer = document.layers.add(
             new TextLayer({
               name: "Upright spans",
-              text: "AV a\u0301 fi",
+              text: roundedMark ? "AV fi a\u0301" : "AV a\u0301 fi",
               fontFamily: fonts.map((font) => font.family).join(", "),
               fontSize: 40,
               letterSpacing,
@@ -50,7 +51,7 @@ for (const letterSpacing of [0, -30])
               writingMode: "vertical-rl",
               textOrientation: "upright",
               color: "color(srgb-linear 4 -.25 1.5 / .5)",
-              characterRanges: [
+              characterRanges: roundedMark ? [] : [
                 {
                   start: 4,
                   end: 8,
@@ -158,6 +159,7 @@ for (const letterSpacing of [0, -30])
           JSON.stringify(
             {
               direction,
+              roundedMark,
               painted,
               letterSpacing,
               originalBytes: sources.map((source) => source.length),
