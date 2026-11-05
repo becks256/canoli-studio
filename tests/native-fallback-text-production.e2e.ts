@@ -10,12 +10,13 @@ import {
   historyScript,
 } from "./helpers/history-inspector";
 
-for (const mode of ["parent", "authored", "baseline"] as const)
+for (const mode of ["parent", "authored", "baseline", "joining", "joining-single"] as const)
   for (const direction of ["ltr", "rtl"] as const)
     test(`production ${mode} ${direction} float text retains actual source capture, native pixels, Undo and original-bearing reopening`, async ({
       page,
     }, info) => {
-      const sources = await Promise.all(
+      const joining = mode === "joining" || mode === "joining-single",
+        sources = await Promise.all(
         [
           "native-fallback/Latin-no-mark.ttf",
           mode === "baseline"
@@ -43,10 +44,11 @@ for (const mode of ["parent", "authored", "baseline"] as const)
         const layer = document.layers.add(
           new TextLayer({
             name: "Curved spans",
-            text: mode === "baseline" ? "A漢、 B字" : "AV a\u0301 fi",
-            fontFamily: fonts.map((font) => font.family).join(", "),
+            text: joining ? "ببلا AV" : mode === "baseline" ? "A漢、 B字" : "AV a\u0301 fi",
+            fontFamily: (mode === "joining-single" ? [fonts[1]] : fonts)
+              .map((font) => font.family).join(", "),
             fontSize: 40,
-            letterSpacing: mode === "parent" ? -30 : 0,
+            letterSpacing: mode === "parent" || joining ? -30 : 0,
             direction,
             align: "center",
             ...(mode === "baseline"
@@ -56,7 +58,7 @@ for (const mode of ["parent", "authored", "baseline"] as const)
                 }
               : {}),
             color: "color(srgb-linear 4 -.25 1.5 / .5)",
-            characterRanges: [
+            characterRanges: joining ? [] : [
               {
                 start: mode === "baseline" ? 1 : 4,
                 end: mode === "baseline" ? 3 : 8,

@@ -4,6 +4,8 @@ import {
 } from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
 import { shareNativeSvgSourceOrigin } from "./native-svg-source-origin";
+import { nativeSvgPaintOrder } from "./native-paint-order";
+import { verticalWriting } from "../core/text-writing";
 import type { FloatGlyph } from "./float-glyph";
 import type { OwnedFontRun } from "../fonts/shaping-types";
 import type {
@@ -127,6 +129,20 @@ export async function verifyNativeSvgCandidates(
                 : []),
             ]
           : [{ glyphs: value.glyphs, allocation: undefined }];
+      const horizontalShared = !verticalWriting(plan.scene.lines[index].writing)
+        ? await shareNativeSvgSourceOrigin(
+            plan.paint?.visual?.[index]
+              ? nativeSvgPaintOrder(value.glyphs, plan.paint.visual[index]!)
+              : value.glyphs,
+            check,
+          )
+        : undefined;
+      if (horizontalShared)
+        variants.push({
+          glyphs: horizontalShared,
+          allocation: undefined,
+          sharedOrigin: true,
+        });
       for (const { glyphs, allocation, sharedOrigin } of variants) {
         const paint = await compareNativeSvgGlyphPaint(
             plan,
@@ -139,6 +155,9 @@ export async function verifyNativeSvgCandidates(
           evidence = Object.freeze({
             projection: value.projection,
             ...(sharedOrigin ? { nativeSharedOrigin: true } : {}),
+            ...(horizontalShared && glyphs === horizontalShared
+              ? { paintOrder: "native" as const }
+              : {}),
             ...(allocation
               ? {
                   inlineFrames: allocation.frames,

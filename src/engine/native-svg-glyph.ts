@@ -30,6 +30,7 @@ export interface NativeSvgGlyphEvidence {
     | "origin"
     | "path"
     | "screen"
+    | "screen-script-spacing"
     | "vertical"
     | "vertical-matrix"
     | "vertical-path"
@@ -446,6 +447,7 @@ export async function* nativeSvgGlyphCandidates(
           "source-advance-path",
           "native-anchor-path",
           "screen",
+          "screen-script-spacing",
         ] as const) {
           let paints: readonly Readonly<FloatGlyph>[] = glyphs;
           if (projection === "matrix")
@@ -500,11 +502,16 @@ export async function* nativeSvgGlyphCandidates(
             if (!valid) continue;
             paints = positioned;
           }
-          if (projection === "screen") {
+          if (projection === "screen" || projection === "screen-script-spacing") {
             if (
               line.path ||
               !font.svgMetrics ||
               font.axes.some((a) => a.tag === "opsz")
+            )
+              continue;
+            if (
+              projection === "screen-script-spacing" &&
+              records.every((record) => record.paintSpacing === style.letterSpacing)
             )
               continue;
             const factor = Math.fround(
@@ -514,7 +521,7 @@ export async function* nativeSvgGlyphCandidates(
             );
             if (!factor) continue;
             const positioned: Readonly<FloatGlyph>[] = [];
-            for (const { run, glyphs } of records) {
+            for (const { run, glyphs, paintSpacing } of records) {
               if (!glyphs.length) continue;
               const clusters = [
                   ...new Set(run.glyphs.map((g) => g.cluster)),
@@ -535,8 +542,57 @@ export async function* nativeSvgGlyphCandidates(
                   { ...options, timeoutMs: remaining(), check },
                 ),
                 native = new Map(metrics.glyphs.map((g) => [g.id, g])),
+                scale = metrics.em / run.unitsPerEm,
                 inverse = Math.fround(1 / factor),
-                first = glyphs[0].origin!,
+                capturedFirst = glyphs[0].origin!,
+                first = (() => {
+                  if (
+                    projection !== "screen-script-spacing" ||
+                    paintSpacing === style.letterSpacing
+                  )
+                    return capturedFirst;
+                  const initial = run.glyphs[0],
+                    end = ends.get(initial.cluster)!,
+                    spaces = [...span.text.slice(initial.cluster, end)].filter(
+                      (c) => c === " " || c === "\u00a0",
+                    ).length;
+                  if (!spaces) return capturedFirst;
+                  let advance = 0;
+                  for (const glyph of run.glyphs) {
+                    if (glyph.cluster !== initial.cluster) continue;
+                    const metric = native.get(glyph.glyphId)!;
+                    advance = Math.fround(
+                      advance +
+                        Math.fround(
+                          metric.advance +
+                            (glyph.xAdvance - metric.nominal) * scale,
+                        ),
+                    );
+                  }
+                  advance = Math.fround(
+                    advance +
+                      Math.fround(
+                        (style.letterSpacing +
+                          spaces * (style.wordSpacing + line.wordSpacingDelta)) *
+                          factor,
+                      ),
+                  );
+                  if (advance >= 0) return capturedFirst;
+                  // Spaces retain authored tracking in cursive runs. A negative
+                  // first space uses the opposite caret edge from the original
+                  // globally suppressed-spacing preparation. Keep its complete
+                  // source addresses; never infer the displacement from pixels.
+                  return Object.freeze({
+                    x:
+                      Math.max(
+                        ...characters
+                          .slice(initial.cluster, end)
+                          .flatMap((character) => [character.start.x, character.end.x]),
+                      ) +
+                      (initial.xOffset * style.fontSize) / run.unitsPerEm,
+                    y: capturedFirst.y,
+                  });
+                })(),
                 baseX = Math.fround(first.x / inverse),
                 baseY = Math.fround(first.y / inverse),
                 parent = new AffineTransform(
@@ -546,8 +602,7 @@ export async function* nativeSvgGlyphCandidates(
                   world.d / factor,
                   world.e,
                   world.f,
-                ),
-                scale = metrics.em / run.unitsPerEm;
+                );
               let penX = 0,
                 penY = 0;
               for (let i = 0; i < run.glyphs.length; i++) {
@@ -582,13 +637,19 @@ export async function* nativeSvgGlyphCandidates(
                   const source = span.text.slice(
                     g.cluster,
                     ends.get(g.cluster),
-                  );
+                  ),
+                    spaces = [...source].filter(
+                      (c) => c === " " || c === "\u00a0",
+                    ).length,
+                    letterSpacing =
+                      projection === "screen-script-spacing" && !spaces
+                        ? paintSpacing
+                        : style.letterSpacing;
                   penX = Math.fround(
                     penX +
                       Math.fround(
-                        (style.letterSpacing +
-                          [...source].filter((c) => c === " " || c === "\u00a0")
-                            .length *
+                        (letterSpacing +
+                          spaces *
                             (style.wordSpacing + line.wordSpacingDelta)) *
                           factor,
                       ),

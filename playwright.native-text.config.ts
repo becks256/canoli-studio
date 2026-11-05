@@ -44,6 +44,7 @@ const sourceFiles = [
   "native-curved-span-paint.e2e.ts",
   "native-parent.e2e.ts",
   "native-vertical-parent.e2e.ts",
+  "native-horizontal-origin.e2e.ts",
   "native-parent-guards.e2e.ts",
   "native-parent-authored-guards.e2e.ts",
   "native-parent-paint.e2e.ts",

@@ -2,7 +2,7 @@ import { AffineTransform } from "../core/affine";
 import { yieldTask } from "../core/task-yield";
 import type { FloatGlyph } from "./float-glyph";
 
-/** Retain one source fragment's paint origin when replaying sideways glyphs.
+/** Retain one source fragment's paint origin when replaying native glyphs.
  * Moving each offset into a separate SVG text address introduces another
  * layout-coordinate conversion. Keep the first captured pose as the common
  * address and express the retained relative poses in their affine placement.
@@ -11,9 +11,12 @@ import type { FloatGlyph } from "./float-glyph";
 export async function shareNativeSvgSourceOrigin(
   glyphs: readonly Readonly<FloatGlyph>[],
   check: () => void,
+  anchor?: Readonly<FloatGlyph>,
 ): Promise<readonly Readonly<FloatGlyph>[] | undefined> {
   check();
-  const first = glyphs[0];
+  if (anchor && !glyphs.includes(anchor))
+    throw new Error("Native source origin has no captured glyph owner.");
+  const first = anchor ?? glyphs[0];
   if (!first?.origin || glyphs.length < 2) return;
   const world = first.transform,
     fields = ["a", "b", "c", "d", "e", "f"] as const;
@@ -21,8 +24,11 @@ export async function shareNativeSvgSourceOrigin(
     glyphs.some(
       (glyph) =>
         !glyph.origin ||
+        glyph.surface !== "svg" ||
         glyph.path ||
-        glyph.writing?.orientation !== "sideways" ||
+        (glyph.writing &&
+          glyph.writing.mode !== "horizontal-tb" &&
+          glyph.writing.orientation !== "sideways") ||
         fields.some((key) => glyph.transform[key] !== world[key]),
     )
   )

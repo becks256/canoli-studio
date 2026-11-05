@@ -184,15 +184,21 @@ test("fallback font paint retains independent original GIDs, colored overlap and
           "rounded-mark",
           "sideways-mark",
           "sideways-project-mark",
+          "joining-source",
+          "joining-source-single",
         ])
           for (const vertical of [false, true])
             for (const curved of [false, true])
               for (const direction of ["ltr", "rtl"] as const)
                 for (const alpha of [0.5, 0.64123012345, 1e-8]) {
-                  const singleMark = name === "rounded-mark" || name === "sideways-mark" || name === "sideways-project-mark",
+                  const singleJoiningFont = name === "joining-source-single",
+                    singleJoining = name === "joining-source" || singleJoiningFont,
+                    singleMark = name === "rounded-mark" || name === "sideways-mark" || name === "sideways-project-mark",
                     affineMark = name === "attachment" || singleMark;
                   if (
-                    affineMark
+                    singleJoining
+                      ? vertical || curved
+                      : affineMark
                       ? !vertical || curved
                       : direction !== "rtl"
                   )
@@ -202,7 +208,9 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       [-0.5, 3, 0.125, alpha / 2],
                     ].map((color) => color.map(Math.fround)),
                     pieces =
-                      singleMark
+                      singleJoining
+                        ? [{ text: "ببلا AV", paint: 0 }]
+                        : singleMark
                         ? [
                             { text: "AV fi a\u0301", paint: 0 },
                           ]
@@ -245,11 +253,11 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       {
                         width: 512,
                         height: 512,
-                        ...(affineMark
+                        ...(affineMark || singleJoining
                           ? { transform: name === "sideways-project-mark" ? [1.25, 0.125, -0.25, 0.9, 240, 180] as const : [1.25, 0.125, -0.25, 0.9, 15, 14] as const }
                           : {}),
                         style: {
-                          fontFamily: firstFont.family + ", " + file.family,
+                          fontFamily: singleJoiningFont ? file.family : firstFont.family + ", " + file.family,
                           fontSize: 40,
                           letterSpacing: -30,
                         },
@@ -317,7 +325,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                     }
                     const expected = new Float32Array(512 * 512 * 4),
                       owners = new Uint8Array(512 * 512),
-                      glyphOwners = singleMark
+                      glyphOwners = singleMark || singleJoining
                         ? new Uint8Array(512 * 512)
                         : undefined;
                     let tracked = 0;
@@ -341,13 +349,13 @@ test("fallback font paint retains independent original GIDs, colored overlap and
                       const paint = pieces[source].paint,
                         color = colors[paint];
                       const fallback =
-                        singleMark
+                        singleJoiningFont || (singleMark
                           ? cluster === 6
                           : name === "mark" || name === "attachment"
                           ? cluster === 3 || (name === "attachment" && cluster === 4)
                           : name === "bidi"
                             ? cluster === 2 || cluster === 3
-                            : cluster < 4;
+                            : cluster < 4);
                       if (
                         glyph.font.sourceFamily !==
                           (fallback ? file.family : firstFont.family) ||
@@ -472,7 +480,7 @@ test("fallback font paint retains independent original GIDs, colored overlap and
     info.outputPath("native-fallback-float.json"),
     JSON.stringify(rows, null, 2),
   );
-  expect(rows).toHaveLength(60);
+  expect(rows).toHaveLength(72);
   for (const row of rows) {
     expect(row).toMatchObject({
       status: "matched",
@@ -486,7 +494,9 @@ test("fallback font paint retains independent original GIDs, colored overlap and
     if (
       row.name === "rounded-mark" ||
       row.name === "sideways-mark" ||
-      row.name === "sideways-project-mark"
+      row.name === "sideways-project-mark" ||
+      row.name === "joining-source" ||
+      row.name === "joining-source-single"
     )
       expect("glyphOverlap" in row ? row.glyphOverlap : 0).toBeGreaterThan(0);
     else expect(row.overlap!).toBeGreaterThan(0);

@@ -497,6 +497,17 @@ export async function matchNativeFallbackSvgLine(
         ...(attached ? prepareOrders(attached, spanResolved) : []),
         ...existingOrders,
       ];
+      if (!verticalWriting(line.writing)) {
+        const horizontalShared = await shareNativeSvgSourceOrigin(
+          original,
+          check,
+          paint.visual?.[index]
+            ? nativeSvgPaintOrder(original, paint.visual[index]!)[0]
+            : undefined,
+        );
+        if (horizontalShared)
+          orders.push(...prepareOrders(horizontalShared, undefined, true));
+      }
       for (let i = 0; i < orders.length; i++) {
         const order = orders[i],
           ordered = order.glyphs;

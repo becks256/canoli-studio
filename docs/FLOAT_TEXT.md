@@ -1,5 +1,33 @@
 # Native float text — implementation in progress
 
+## Horizontal script-aware source placement (private)
+
+The original screen preparation remains available. An additional preparation
+suppresses letter tracking inside cursive words while retaining authored space
+tracking and word spacing. If a negative space starts the visual run, its complete
+original native caret addresses supply the paint start before the following
+source glyphs are placed. A shared horizontal paint address comes from an original
+glyph in native visual order. Source text, GIDs, font priority, axis tuples and
+linear colors remain intact; no comparison pixel fits a displacement. Complete
+native ink at both opacity samples and per-color ownership still decide
+publication. No constructor, command, schema, isolated/plugin grant or independent
+REST boundary changes.
+
+The isolated core passes build/typecheck, all 3,428 unit/API tests with four
+workers, 72 native controls, 72 independent Float32 references and 57 selected
+production workflows. The new workflows cover both directions with fallback and
+single-font source text, exact opacity/Undo and original-bearing reopening.
+The complete original joining cohort matches 62/64, retaining all 61 previous
+matches. Its remaining vertical-curve cases are explicitly recorded, not waived.
+All 4,031 frozen inputs remain unchanged through terminal core checks. The initial
+review had 71/72 controls, 55 production workflows and 66 independent references;
+its single-font failure and complete preimages are retained before the source-space
+correction. A fresh worktree's initial TypeScript check lacked generated font
+workers; the canonical build generated them and passed. Full 259-case canonical
+source and original 384-layout matrix acceptance, main integration, and broader
+public/host/device/memory/performance and complete-roadmap gates remain required.
+[Core reports, source identities and diagnostic evidence](benchmarks/native-horizontal-origin-2026-11-05.md).
+
 ## Shared native source paint origin (private)
 
 Complete original-span allocation now also covers a single authored span across
