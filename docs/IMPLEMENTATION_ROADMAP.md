@@ -11653,6 +11653,21 @@ this aggregate. Main integration and broad public/host/device/memory/performance
 and original roadmap gates remain required.
 [Terminal reports and retention audit](benchmarks/native-shared-origin-terminal-2026-11-05.md).
 
+### 2026-11-05 UTC — Shared-origin main integration verification
+
+Main `b60da27` passes the production build, all 3,428 unit/API cases across
+346 files with four workers, all three focused browser tests covering 56 native
+layouts and all 53 selected production workflows. Both browser invocations have
+zero retries, skips, flaky or unexpected results. All 3,978 frozen integration
+inputs remain unchanged through their terminal checks. All 753 non-generated
+source files and all 177 emitted release files match the verified review; three
+generated worker manifests differ only in resolved dependency path spelling.
+The complete 258-case source and 361/384 matrix results belong to the review,
+not a second main invocation. The 23 remaining native layouts and all unfinished
+public/host/device/memory/performance and original roadmap gates remain required.
+The newer horizontal review remains separate pending its own broad acceptance.
+[Main reports and byte-identity audit](benchmarks/native-shared-origin-main-2026-11-05.md).
+
 ### 2026-11-05 UTC — F08/F10 horizontal source-origin core review
 
 The original screen preparation remains available. An additional preparation
