@@ -11791,3 +11791,26 @@ assertion checks actual tracked original-source ink against zero tracking while
 retaining every independent Float32, HDR/tiny-alpha, partition and font gate.
 These are separate complete invocations, not a union of partial results.
 [Terminal reports, exact inputs and audits](benchmarks/native-rejected-paint-terminal-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 rejected-paint main integration verified
+
+Main `023dc40` passes `npm run build`, all 3,431 unit/API checks across 347
+files, all 17 focused browser tests and all 57 selected production workflows
+across 17 files. Browser results have zero skips, retries, unexpected or flaky
+results. The focused run includes 16 original horizontal joining layouts,
+tracked Float32 references and original-source retirement/retry faults.
+All 4,036 frozen integration inputs remain unchanged through terminal checks.
+
+All 177 emitted release files match the reviewed build byte for byte. Of 767
+source files, only three generated worker manifests differ; normalizing their
+checkout-relative dependency paths proves identical worker metadata and actual
+dependency content hashes. The initial sandboxed unit invocation was explicitly
+stopped after loopback binding failures caused skips. Its log is retained and
+excluded from acceptance; the full authorized rerun passes without skips.
+
+The complete 262-case source run and 364/384 native matrix remain review
+evidence, not new main invocations. The two native mismatches, 18 matching-budget
+errors and all unfinished original roadmap gates remain required. The separate
+source-parent line-top investigation is unmerged. These local checks do not
+verify a Vercel deployment or establish sustained editor-wide performance.
+[Integration reports, exact inputs and independent identity audit](benchmarks/native-rejected-main-2026-11-05.md).
