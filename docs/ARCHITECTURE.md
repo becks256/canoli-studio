@@ -1,5 +1,35 @@
 # Architecture
 
+## Complete rejected-paint verification
+
+Review `5d21356` passes the complete 262-case canonical source suite across
+48 files and all 57 selected production workflows across 17 files, with zero
+skips, retries, unexpected or flaky results. All 4,036 frozen inputs remain
+unchanged through the terminal source, production and seven-spec matrix runs.
+
+The original 384-layout matrix now matches 364 layouts exactly, retaining every
+prior 362 match, all original 352 matches and the earlier 44 colored matches.
+CJK, marks and axes match 64/64 each; bidi and joining match 62/64 each; colored
+matches 48/64. Two colored RTL affine curves with negative tracking newly match
+in mixed and sideways orientations. Two mismatches and 18 matching-budget errors
+remain. The matrix invocation therefore exits unsuccessfully; full native
+acceptance and the broader roadmap are still open.
+
+All 72 independent Float32 references pass in that same invocation. The audit
+checks 2,318 matched glyph records and 1,406 complete original-text shaping
+requests, retaining source font priority, axes, GIDs, colors and zero native
+ink/ownership errors. Every cohort leaves the document unchanged and retires
+its measurement probes and private font faces. This increases completed coverage;
+it does not establish lower user latency or sustained editor-wide performance.
+
+The separate corrected horizontal source invocation also passes all 259 cases
+across 47 files with all 4,031 inputs unchanged. Its original 258/259 run and
+representation-specific tracking assertion remain preserved. The replacement
+assertion checks actual tracked original-source ink against zero tracking while
+retaining every independent Float32, HDR/tiny-alpha, partition and font gate.
+These are separate complete invocations, not a union of partial results.
+[Terminal reports, exact inputs and audits](benchmarks/native-rejected-paint-terminal-2026-11-05.md).
+
 ## Rejected native paint reuse (private review)
 
 One fallback matching operation retains a bounded LRU of exact ordered paint
