@@ -11589,3 +11589,17 @@ No full combined native aggregate is inferred from those separate runs.
 Main integration verification and broad native/public/host/device/memory/
 performance and the complete original roadmap acceptance remain required.
 [Terminal review reports and retention audit](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
+
+### 2026-11-05 UTC — Rounded-position main integration verification
+
+Main `419a972` passes the production build, all 3,428 unit/API tests across
+346 files, both focused browser tests covering 24 native layouts, and all
+45 selected production workflows. Neither browser invocation skips or retries
+a case. All 3,977 frozen inputs remain unchanged through the terminal checks.
+All 177 emitted release files match the reviewed build byte for byte; the three
+generated worker manifests differ only in resolved dependency path spelling.
+The complete 257-case source and 384-layout matrix results above belong to the
+review run, not a second invocation on main. The full matrix remains at 360/384;
+the separate complete-single-span development remains unaccepted. A successful
+local build does not establish a successful Vercel deployment.
+[Main integration reports and identity audit](benchmarks/native-rounded-positions-main-2026-11-05.md).
