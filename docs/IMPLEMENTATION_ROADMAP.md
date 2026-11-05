@@ -11539,3 +11539,55 @@ The full original 384-layout matrix, 257-case canonical source run, broad native
 public/host/device/memory/performance gates and the complete original roadmap
 remain required. Main checkpoint `0cf724f` stays unchanged while its earlier
 256-case canonical run is live. [Review evidence and raw diagnostics](benchmarks/native-rounded-positions-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 complete canonical main source regression
+
+Main checkpoint `0cf724f` now passes one complete checked-in
+`npm run test:native-text:source` invocation: all 256 cases across 46 files,
+with zero retries, skips, flaky or unexpected results. The actual canonical
+`native-parent-paint.e2e.ts` test and its 48 independent source-parent references
+are inside this run. The earlier isolated review remains a 255-case run plus a
+separate test; its historical evidence is not relabeled.
+
+All 3,971 frozen source/test/original/release and top-level documentation inputs
+remain unchanged through terminal completion. The established main build,
+3,428 unit/API checks, 37 production workflows and eight original colored
+upright controls remain the existing integration evidence; this is not a new
+full fallback acceptance result. Main's original full matrix remains 352/384,
+and the signed review's colored cohort remains 44/64; no new combined aggregate
+is inferred. Full native/public/host/device/memory/performance and the complete
+original roadmap gates remain required.
+
+Separate rounded-position review `a82a49f` passes its core checks and now runs
+its complete 257-case source and original 384-layout fallback regressions from
+frozen isolated inputs. It has not been integrated into main. No provider call,
+upload, account, public API/schema/grant or source-resolution limit changes.
+[Terminal main source evidence](benchmarks/native-signed-attachments-source-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 shared source-origin core review
+
+Complete original-span allocation now also covers a single authored span across
+font items, preserving raw fragment advances before layout-unit conversion.
+Existing per-cluster preparations remain available. A separate sideways
+preparation retains the first captured source paint address and expresses the
+unchanged relative glyph poses through affine translation. This keeps relative
+offsets out of separate per-glyph SVG text-address grid conversions. All source text, font priority,
+GIDs, axes and colors remain retained; no comparison pixel determines a pose.
+Original whole ink at both opacity samples and per-color ownership still decide
+publication. Private evidence identifies `nativeSharedOrigin`; public constructors,
+commands, schema, isolated/plugin grants and independent REST contracts stay
+unchanged.
+
+The isolated core review passes build/typecheck, all 3,428 unit/API checks with
+four workers, 56 native controls, all 64 original mark layouts, 60 independent
+Float32 references and 53 production workflows, including the formerly failing
+RTL sideways affine saved project. The initial unrestricted unit run had eight
+timeouts, and the first reference invocation was interrupted by a Vite navigation;
+both are retained with the successful unchanged-engine reruns. The new single-color
+reference was also routed to the existing per-glyph overlap assertion; all 60
+comparisons were exact before that fixture correction. All 4,030 final inputs
+remain unchanged through the terminal reference rerun; earlier core identities
+and the single test-file change are retained separately. Complete canonical
+source and original 384-layout matrix reruns and broader public/host/device/
+memory/performance and full-roadmap acceptance are still required.
+[Core reports and diagnostic evidence](benchmarks/native-shared-origin-2026-11-05.md).

@@ -1,5 +1,33 @@
 # Native float text — implementation in progress
 
+## Shared native source paint origin (private)
+
+Complete original-span allocation now also covers a single authored span across
+font items, preserving raw fragment advances before layout-unit conversion.
+Existing per-cluster preparations remain available. A separate sideways
+preparation retains the first captured source paint address and expresses the
+unchanged relative glyph poses through affine translation. This keeps relative
+offsets out of separate per-glyph SVG text-address grid conversions. All source text, font priority,
+GIDs, axes and colors remain retained; no comparison pixel determines a pose.
+Original whole ink at both opacity samples and per-color ownership still decide
+publication. Private evidence identifies `nativeSharedOrigin`; public constructors,
+commands, schema, isolated/plugin grants and independent REST contracts stay
+unchanged.
+
+The isolated core review passes build/typecheck, all 3,428 unit/API checks with
+four workers, 56 native controls, all 64 original mark layouts, 60 independent
+Float32 references and 53 production workflows, including the formerly failing
+RTL sideways affine saved project. The initial unrestricted unit run had eight
+timeouts, and the first reference invocation was interrupted by a Vite navigation;
+both are retained with the successful unchanged-engine reruns. The new single-color
+reference was also routed to the existing per-glyph overlap assertion; all 60
+comparisons were exact before that fixture correction. All 4,030 final inputs
+remain unchanged through the terminal reference rerun; earlier core identities
+and the single test-file change are retained separately. Complete canonical
+source and original 384-layout matrix reruns and broader public/host/device/
+memory/performance and full-roadmap acceptance are still required.
+[Core reports and diagnostic evidence](benchmarks/native-shared-origin-2026-11-05.md).
+
 ## Correlated native position review — 2026-11-05 UTC
 
 An additional private preparation rounds shaped and nominal positions together
@@ -50,8 +78,10 @@ prior main colored match. Its source run passes 255 cases; the identical tracked
 48-reference test omitted by a temporary filename alias also passes separately.
 These are separate runs. Main integration also passes build/typecheck, all 3,428
 unit/API checks, all 37 production workflows and the eight original colored
-upright controls. A fresh canonical source run remains required, and complete
-native acceptance stays open.
+upright controls. Its one complete canonical source run now passes all 256 cases
+across 46 files, including the 48-reference source-parent test in the same
+invocation. Complete native acceptance stays open.
+[Canonical source completion](benchmarks/native-signed-attachments-source-2026-11-05.md).
 [Integration and exact boundaries](benchmarks/native-signed-attachments-integration-2026-11-05.md).
 
 ## Repeatable native-text acceptance

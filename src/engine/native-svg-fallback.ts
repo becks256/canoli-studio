@@ -8,6 +8,7 @@ import {
   resolveNativeSvgVisualSpanFrames,
 } from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
+import { shareNativeSvgSourceOrigin } from "./native-svg-source-origin";
 import {
   characterFormatSchema,
   type CharacterFormat,
@@ -397,6 +398,7 @@ export async function matchNativeFallbackSvgLine(
       const prepareOrders = (
         glyphs: readonly Readonly<import("./float-glyph").FloatGlyph>[],
         allocation: typeof resolved | typeof spanResolved,
+        sharedOrigin = false,
       ) => {
         let at = 0;
         const parts = selected.map((value) => {
@@ -407,6 +409,7 @@ export async function matchNativeFallbackSvgLine(
         return [
           {
             name: "native" as const,
+            sharedOrigin,
             glyphs: paint.visual?.[index]
               ? nativeSvgPaintOrder(glyphs, paint.visual[index]!)
               : Object.freeze(glyphs),
@@ -414,6 +417,7 @@ export async function matchNativeFallbackSvgLine(
           },
           {
             name: "source-items" as const,
+            sharedOrigin,
             glyphs: Object.freeze(glyphs),
             allocation,
           },
@@ -421,6 +425,7 @@ export async function matchNativeFallbackSvgLine(
             ? [
                 {
                   name: "reverse-source-items" as const,
+                  sharedOrigin,
                   glyphs: Object.freeze(parts.reverse().flat()),
                   allocation,
                 },
@@ -463,12 +468,19 @@ export async function matchNativeFallbackSvgLine(
               check,
             )
           : undefined;
+      const sharedOrigin = spanResolved
+        ? await shareNativeSvgSourceOrigin(spanResolved.glyphs, check)
+        : undefined;
       const existingOrders = spanResolved
         ? [
             ...(visualResolved
               ? prepareOrders(visualResolved.glyphs, visualResolved)
               : []),
             ...prepareOrders(spanResolved.glyphs, spanResolved),
+            ...(sharedOrigin
+              ? prepareOrders(sharedOrigin, spanResolved, true)
+              : []),
+            ...(resolved ? prepareOrders(resolved.glyphs, resolved) : []),
             ...prepareOrders(original, undefined),
           ]
         : resolved
@@ -518,6 +530,7 @@ export async function matchNativeFallbackSvgLine(
               ),
           evidence: Readonly<NativeSvgGlyphEvidence> = Object.freeze({
             projection: "fallback",
+            ...(order.sharedOrigin ? { nativeSharedOrigin: true } : {}),
             ...(order.allocation
               ? {
                   inlineFrames: order.allocation.frames,

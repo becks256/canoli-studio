@@ -6,6 +6,8 @@ import type { NativeSvgGlyphCandidate } from "./native-svg-candidates";
 
 /** A complete original-span allocation candidate for vertical ink.
  * Preserve Float32 native fragment advances until the original span is complete.
+ * A single authored span can cross font items too; do not truncate each cluster
+ * before assembling its complete parent. Callers retain per-cluster frames.
  * A one-cluster RTL span retains its unrounded parent preparation; multi-cluster
  * spans can use their own signed inline extent. These are candidate placements,
  * never inferred from comparison pixels; the original ink/ownership gates still
@@ -19,7 +21,7 @@ export async function resolveNativeSvgSpanFrames(
 ) {
   check();
   if (
-    line.spans.length < 2 ||
+    !line.spans.length ||
     !candidates.length ||
     candidates.some(
       (c) =>

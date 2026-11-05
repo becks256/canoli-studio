@@ -67,6 +67,7 @@ export interface NativeSvgGlyphEvidence {
   }>;
   readonly nativeMetrics?: boolean;
   readonly nativePositionRounding?: boolean;
+  readonly nativeSharedOrigin?: boolean;
   readonly svgAdvance: number;
   readonly svgPixelsCompared: number;
   readonly svgMaxAlphaError: number;

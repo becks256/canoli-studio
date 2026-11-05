@@ -1,5 +1,33 @@
 # Architecture
 
+## Shared native source paint origin (private)
+
+Complete original-span allocation now also covers a single authored span across
+font items, preserving raw fragment advances before layout-unit conversion.
+Existing per-cluster preparations remain available. A separate sideways
+preparation retains the first captured source paint address and expresses the
+unchanged relative glyph poses through affine translation. This keeps relative
+offsets out of separate per-glyph SVG text-address grid conversions. All source text, font priority,
+GIDs, axes and colors remain retained; no comparison pixel determines a pose.
+Original whole ink at both opacity samples and per-color ownership still decide
+publication. Private evidence identifies `nativeSharedOrigin`; public constructors,
+commands, schema, isolated/plugin grants and independent REST contracts stay
+unchanged.
+
+The isolated core review passes build/typecheck, all 3,428 unit/API checks with
+four workers, 56 native controls, all 64 original mark layouts, 60 independent
+Float32 references and 53 production workflows, including the formerly failing
+RTL sideways affine saved project. The initial unrestricted unit run had eight
+timeouts, and the first reference invocation was interrupted by a Vite navigation;
+both are retained with the successful unchanged-engine reruns. The new single-color
+reference was also routed to the existing per-glyph overlap assertion; all 60
+comparisons were exact before that fixture correction. All 4,030 final inputs
+remain unchanged through the terminal reference rerun; earlier core identities
+and the single test-file change are retained separately. Complete canonical
+source and original 384-layout matrix reruns and broader public/host/device/
+memory/performance and full-roadmap acceptance are still required.
+[Core reports and diagnostic evidence](benchmarks/native-shared-origin-2026-11-05.md).
+
 ## Correlated native position rounding (private review)
 
 `native-svg-position-rounding.ts` offers an additional vertical preparation that
@@ -63,8 +91,10 @@ match. The source run passes 255 cases; a separately passing canonical test adds
 48 references omitted by an obsolete temporary filename. This is two runs, not a
 single 256-case run. Main includes the reviewed implementation and also passes
 build/typecheck, all 3,428 unit/API checks, all 37 production workflows and the
-eight-control browser regression. A fresh canonical source run remains required;
-full native and broader roadmap acceptance stay open.
+eight-control browser regression. Its one complete canonical source run now passes
+all 256 cases across 46 files, including the 48-reference source-parent test in
+that same invocation. Full native and broader roadmap acceptance stay open.
+[Canonical source completion](benchmarks/native-signed-attachments-source-2026-11-05.md).
 [Integration evidence](benchmarks/native-signed-attachments-integration-2026-11-05.md).
 
 `playwright.native-text.config.ts` names the canonical source, isolated legacy

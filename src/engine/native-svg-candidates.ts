@@ -3,6 +3,7 @@ import {
   resolveNativeSvgSignedAttachments,
 } from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
+import { shareNativeSvgSourceOrigin } from "./native-svg-source-origin";
 import type { FloatGlyph } from "./float-glyph";
 import type { OwnedFontRun } from "../fonts/shaping-types";
 import type {
@@ -99,10 +100,23 @@ export async function verifyNativeSvgCandidates(
             check,
           )
         : undefined;
-      const variants = spanResolved
+      const sharedOrigin = spanResolved
+        ? await shareNativeSvgSourceOrigin(spanResolved.glyphs, check)
+        : undefined;
+      const variants: {
+        glyphs: readonly Readonly<FloatGlyph>[];
+        allocation: typeof resolved | typeof spanResolved;
+        sharedOrigin?: boolean;
+      }[] = spanResolved
         ? [
             ...(attached ? [{ glyphs: attached, allocation: spanResolved }] : []),
             { glyphs: spanResolved.glyphs, allocation: spanResolved },
+            ...(sharedOrigin
+              ? [{ glyphs: sharedOrigin, allocation: spanResolved, sharedOrigin: true }]
+              : []),
+            ...(resolved
+              ? [{ glyphs: resolved.glyphs, allocation: resolved }]
+              : []),
             { glyphs: value.glyphs, allocation: undefined },
           ]
         : resolved
@@ -113,7 +127,7 @@ export async function verifyNativeSvgCandidates(
                 : []),
             ]
           : [{ glyphs: value.glyphs, allocation: undefined }];
-      for (const { glyphs, allocation } of variants) {
+      for (const { glyphs, allocation, sharedOrigin } of variants) {
         const paint = await compareNativeSvgGlyphPaint(
             plan,
             index,
@@ -124,6 +138,7 @@ export async function verifyNativeSvgCandidates(
           ),
           evidence = Object.freeze({
             projection: value.projection,
+            ...(sharedOrigin ? { nativeSharedOrigin: true } : {}),
             ...(allocation
               ? {
                   inlineFrames: allocation.frames,

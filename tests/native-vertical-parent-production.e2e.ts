@@ -10,13 +10,15 @@ import {
   historyScript,
 } from "./helpers/history-inspector";
 
-for (const roundedMark of [false, true])
+for (const variant of ["styled", "upright-mark", "sideways-mark"] as const)
  for (const letterSpacing of [0, -30])
   for (const direction of ["ltr", "rtl"] as const)
     for (const affine of [false, true])
-      test(`production vertical parent ${roundedMark ? "rounded mark " : ""}${direction} tracking ${letterSpacing} affine ${affine} float text retains actual source capture, native pixels, Undo and original-bearing reopening`, async ({
+      test(`production vertical parent ${variant === "sideways-mark" ? "complete sideways " : variant === "upright-mark" ? "rounded mark " : ""}${direction} tracking ${letterSpacing} affine ${affine} float text retains actual source capture, native pixels, Undo and original-bearing reopening`, async ({
         page,
       }, info) => {
+        const roundedMark = variant !== "styled",
+          sideways = variant === "sideways-mark";
         const sources = await Promise.all(
           ["native-fallback/Latin-no-mark.ttf", "shaping-font/Shaping.ttf"].map(
             (file) => readFile("tests/fixtures/" + file),
@@ -49,7 +51,7 @@ for (const roundedMark of [false, true])
               direction,
               align: "center",
               writingMode: "vertical-rl",
-              textOrientation: "upright",
+              textOrientation: sideways ? "sideways" : "upright",
               color: "color(srgb-linear 4 -.25 1.5 / .5)",
               characterRanges: roundedMark ? [] : [
                 {
@@ -160,6 +162,7 @@ for (const roundedMark of [false, true])
             {
               direction,
               roundedMark,
+              sideways,
               painted,
               letterSpacing,
               originalBytes: sources.map((source) => source.length),
