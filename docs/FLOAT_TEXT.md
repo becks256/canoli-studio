@@ -22,6 +22,14 @@ not claimed. Affine and full native/public/host/device/memory/performance and
 broader roadmap acceptance remain open.
 [Source, evidence and exact verification status](benchmarks/native-vertical-parent-integration-2026-11-05.md).
 
+The separate signed-attachment review `bd15104` also passes both original upright
+affine negative-tracking controls by retaining native zero-advance poses after
+source/visual span placement. Canonical build, all 3,428 unit/API checks, eight
+upright controls, 37 emitted production workflows and 42 independent Float32 paint
+references pass. Its complete source/colored runs remain active; this is not yet
+main integration or complete native acceptance.
+[Review implementation and exact boundaries](benchmarks/native-signed-attachments-2026-11-05.md).
+
 
 The private original-script and complete styled paint-order dependencies are
 verified by 3,415 unit/API tests across 341 files, 203 affected native-browser cases

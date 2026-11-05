@@ -11470,3 +11470,22 @@ claimed; the remaining affine, native/public/host/device/performance and every
 unfinished broader roadmap gate remain required. This is local build/runtime
 verification, without Vercel redeployment or live ChatGPT/identity acceptance.
 [Terminal reports, row audits, integration proof and remaining scope](benchmarks/native-vertical-parent-integration-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 signed native attachment review
+
+Owner: implementation agent; estimate S within F08/F10. Review commit `bd15104`
+retains original zero-advance attachment poses when their native allocation is
+negative, after source and visual span placement. Complete canonical build,
+all 3,428 unit/API tests, all eight original colored upright controls, all 37
+production workflows and all 42 independent paint references pass without
+skipped/flaky browser cases. The original 36 independent scenes are retained;
+six affine HDR/alpha/partition controls are added. All 3,956 final frozen inputs
+remain unchanged and all six WASM files match main.
+
+The initial RTL visual-frame failure and deliberately interrupted partial runs
+are preserved separately from corrected acceptance. Main's engine stays at
+`0a36bb8`; its original 384/36 matrix is active, alongside the isolated full
+256-case source regression and original 64 colored layouts. No full native,
+public/host/device/memory/performance, provider/evaluation, live integration,
+workflow/commercial or other unfinished original roadmap gate is closed.
+[Source, terminal checks, failed/corrected diagnostics and active-run boundaries](benchmarks/native-signed-attachments-2026-11-05.md).

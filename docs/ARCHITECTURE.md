@@ -28,6 +28,16 @@ Affine failures and every unfinished native/public/host/performance and broader
 roadmap acceptance gate remain open; a full integrated 384-layout run is not claimed.
 [Exact evidence and boundaries](benchmarks/native-vertical-parent-integration-2026-11-05.md).
 
+## Signed attachment preparation — isolated review
+
+Review `bd15104` retains the original captured pose of zero-advance glyphs whose
+native allocation is negative, while advancing glyphs keep source/visual span
+placement. Every previous preparation, full original context/font/GID/color and
+exact opacity/ownership gate remains. Its canonical build, 3,428 unit/API checks,
+eight upright controls, 37 production workflows and 42 independent paint references
+pass. The full source/colored regressions remain active; main's engine is unchanged
+at this review checkpoint. [Evidence and remaining scope](benchmarks/native-signed-attachments-2026-11-05.md).
+
 
 ## Connected native float text (schema 60, under verification)
 
