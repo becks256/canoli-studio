@@ -39,6 +39,12 @@ test("tracked native item fields retain independent source glyph coverage, HDR, 
       const { instantiateKernel } = (await import(
         /* @vite-ignore */ String("/src/engine/wasm.ts")
       )) as typeof import("../src/engine/wasm");
+      const { captureNativeSvgLineRoot } = (await import(
+        /* @vite-ignore */ String("/src/engine/native-svg-verify.ts")
+      )) as typeof import("../src/engine/native-svg-verify");
+      const { renderSvgCellAlpha } = (await import(
+        /* @vite-ignore */ String("/src/engine/svg-glyph-paint.ts")
+      )) as typeof import("../src/engine/svg-glyph-paint");
       const assets = new AssetStore(),
         doc = new window.luma.Document({ assets }),
         file = await doc.fonts.embed(new Blob([new Uint8Array(source)])),
@@ -199,6 +205,49 @@ test("tracked native item fields retain independent source glyph coverage, HDR, 
               { captureLinearPaint: true },
             );
             try {
+              // Tracking can live in retained glyph positions or in native path
+              // allocation. Verify its visible effect against an otherwise
+              // identical original source, independently of that representation.
+              const untracked = await captureStyledTextPlan(
+                {
+                  ...plan.scene,
+                  transform: [...plan.scene.transform] as [number, number, number, number, number, number],
+                  lines: plan.scene.lines.map((line) => ({
+                    ...line,
+                    path: line.path
+                      ? {
+                          ...line.path,
+                          points: line.path.points.map((point) => ({
+                            ...point,
+                            in: { ...point.in },
+                            out: { ...point.out },
+                          })),
+                        }
+                      : undefined,
+                    spans: line.spans.map((span) => ({
+                      ...span,
+                      style: { ...span.style, letterSpacing: 0 },
+                    })),
+                  })),
+                },
+                doc.toJSON(),
+                assets,
+                { captureLinearPaint: true },
+              );
+              let sourceTrackingDifferencePixels = 0;
+              try {
+                const trackedRoot = captureNativeSvgLineRoot(plan, 0),
+                  untrackedRoot = captureNativeSvgLineRoot(untracked, 0);
+                for (let y = 0; y < 512; y += 256)
+                  for (let x = 0; x < 512; x += 256) {
+                    const tracked = await renderSvgCellAlpha(trackedRoot, x, y, 256, 2, 1),
+                      plain = await renderSvgCellAlpha(untrackedRoot, x, y, 256, 2, 1);
+                    for (let i = 0; i < tracked.length; i++)
+                      if (tracked[i] !== plain[i]) sourceTrackingDifferencePixels++;
+                  }
+              } finally {
+                untracked.release();
+              }
               const font = await plan.captureGlyphFont(file.id),
                 match = await plan.matchGlyphLine(font, 0);
               if (match.status !== "matched") {
@@ -291,6 +340,7 @@ test("tracked native item fields retain independent source glyph coverage, HDR, 
                 status: match.status,
                 evidence: match.evidence,
                 tracked,
+                sourceTrackingDifferencePixels,
                 alphaError,
                 rgbError,
                 ink,
@@ -329,8 +379,7 @@ test("tracked native item fields retain independent source glyph coverage, HDR, 
     });
     if (!("tracked" in row))
       throw new Error("The tracked source fixture did not match.");
-    if (row.text === "בבאב") expect(row.tracked).toBe(0);
-    else expect(row.tracked).toBeGreaterThan(0);
+    expect(row.sourceTrackingDifferencePixels).toBeGreaterThan(0);
     expect(row.ink).toBeGreaterThan(0);
     expect(row.invalidErrors).toHaveLength(2);
     for (const error of row.invalidErrors!)
