@@ -1,3 +1,14 @@
+import { splitNativeAuthoredRanges } from "./native-svg-authored-ranges";
+import { nativeSvgTextItems } from "./native-text-items";
+const cursiveScripts = new Set([
+  "Arab",
+  "Rohg",
+  "Mand",
+  "Mong",
+  "Nkoo",
+  "Phag",
+  "Syrc",
+]);
 import {
   verifyNativeSvgCandidates,
   type NativeSvgCandidates,
@@ -38,7 +49,7 @@ const caps: Record<string, string[]> = {
 export function nativeVerticalTextItems(
   plan: StyledTextPlan,
   index: number,
-  selection?: Pick<NativeSvgGlyphSource, "start" | "end">,
+  selection?: Pick<NativeSvgGlyphSource, "start" | "end" | "authoredBreaks">,
 ) {
   const line = plan.scene.lines[index],
     characters = plan.paint!.characters[index],
@@ -48,10 +59,20 @@ export function nativeVerticalTextItems(
   if (!orientationCharacters) return;
   // Native carets resolve bidi independently of the paragraph direction. In
   // upright Arabic, BTT also changes required substitutions; preserve that item.
+  const scripts = nativeSvgTextItems(
+    line.spans.map((span) => span.text).join(""),
+    orientationCharacters,
+    line.direction,
+    0,
+    characters.length,
+    plan.paint!.visual?.[index],
+  );
+  let scriptIndex = 0;
   const items: {
     start: number;
     end: number;
     upright: boolean;
+    script: string;
     direction: "ltr" | "rtl" | "ttb" | "btt";
   }[] = [];
   for (
@@ -59,6 +80,9 @@ export function nativeVerticalTextItems(
     i < (selection?.end ?? characters.length);
     i++
   ) {
+    while (scriptIndex + 1 < scripts.length && scripts[scriptIndex].end <= i)
+      scriptIndex++;
+    const script = scripts[scriptIndex].script;
     const rotation =
       plan.paint!.visual?.[index]?.[i]?.rotation ??
       orientationCharacters[i].rotation;
@@ -75,10 +99,17 @@ export function nativeVerticalTextItems(
             ? last.direction === "rtl" || last.direction === "btt"
             : line.direction === "rtl",
       direction = upright ? (reverse ? "btt" : "ttb") : reverse ? "rtl" : "ltr";
-    if (last && last.upright === upright && last.direction === direction)
+    if (
+      last &&
+      last.upright === upright &&
+      last.direction === direction &&
+      last.script === script
+    )
       last.end = i + 1;
-    else items.push({ start: i, end: i + 1, upright, direction });
+    else items.push({ start: i, end: i + 1, upright, direction, script });
   }
+  if (selection?.authoredBreaks?.length)
+    return splitNativeAuthoredRanges(items, selection.authoredBreaks);
   return items;
 }
 
@@ -117,8 +148,9 @@ export async function* nativeVerticalSvgCandidates(
     );
   if (
     !plan.scene.lines[index].path &&
-    (selection?.style ?? plan.scene.lines[index].spans[0].style).letterSpacing <
-      0
+    ((selection?.style ?? plan.scene.lines[index].spans[0].style)
+      .letterSpacing < 0 ||
+      (!!selection && plan.scene.lines[index].spans.length > 1))
   )
     yield* prepareNativeVerticalSvgCandidates(
       plan,
@@ -211,6 +243,36 @@ async function* prepareNativeVerticalSvgCandidates(
     context = canvas.getContext("2d")!;
   try {
     applyTextStyle(context, style);
+    // SVG inherits the parent baseline even when a glyph comes from another
+    // owned font. Read screen-size font metrics independently of artwork ink;
+    // the complete native comparison still decides whether a placement matches.
+    let baselineDelta = 0;
+    if (selection && line.writing!.orientation !== "sideways") {
+      let end = 0;
+      const parent = line.spans.find((span) => {
+        end += span.text.length;
+        return selection.start < end;
+      });
+      if (!parent)
+        throw new Error("Native fallback has no original baseline span.");
+      const center = (value: typeof style) => {
+        check();
+        applyTextStyle(context, {
+          ...value,
+          fontSize: Math.fround(value.fontSize * factor),
+        });
+        const m = context.measureText("");
+        const result = (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2;
+        check();
+        if (!Number.isFinite(result))
+          throw new Error("Invalid native fallback baseline metrics.");
+        return result;
+      };
+      baselineDelta = (center(style) - center(parent.style)) / factor;
+      if (!Number.isFinite(baselineDelta))
+        throw new Error("Invalid native fallback baseline displacement.");
+      applyTextStyle(context, style);
+    }
     const css = captureNativeFontInstance(
         context,
         style.fontWeight,
@@ -253,6 +315,7 @@ async function* prepareNativeVerticalSvgCandidates(
                 itemOffset: item.start,
                 itemLength: item.end - item.start,
                 direction,
+                ...(item.script === "Zyyy" ? {} : { script: item.script }),
                 features: [
                   { tag: "kern", value: kern },
                   ...(caps[style.fontVariantCaps ?? "normal"] ?? []).map(
@@ -322,8 +385,12 @@ async function* prepareNativeVerticalSvgCandidates(
                   ].filter((c) => c === " " || c === "\u00a0").length,
                 ]),
               ),
+              paintSpacing = (cluster: number) =>
+                cursiveScripts.has(item.script) && !clusterSpaces.get(cluster)
+                  ? 0
+                  : style.letterSpacing,
               spacing = (g: OwnedFontRun["glyphs"][number]) =>
-                style.letterSpacing +
+                paintSpacing(g.cluster) +
                 (item.upright
                   ? -(g.yAdvance - nominals.get(g.glyphId)!.yAdvance)
                   : g.xAdvance - nominals.get(g.glyphId)!.nominal) *
@@ -369,7 +436,7 @@ async function* prepareNativeVerticalSvgCandidates(
               const spaces = clusterSpaces.get(cluster)!,
                 advance =
                   advances.get(cluster)! * scale +
-                  style.letterSpacing +
+                  paintSpacing(cluster) +
                   (signed
                     ? spaces * (style.wordSpacing + line.wordSpacingDelta)
                     : 0);
@@ -377,7 +444,7 @@ async function* prepareNativeVerticalSvgCandidates(
               sourceSizes.set(cluster, Math.trunc(advance * factor * 64) / 64);
               if (advance < 0) negativeClusters.add(cluster);
             }
-            if (inlineTop)
+            if (inlineTop || signed)
               fragments.push(
                 Object.freeze({
                   glyphs: Object.freeze(
@@ -397,7 +464,7 @@ async function* prepareNativeVerticalSvgCandidates(
                       Object.freeze({
                         cluster,
                         advance: Math.fround(
-                          (style.letterSpacing +
+                          (paintSpacing(cluster) +
                             clusterSpaces.get(cluster)! *
                               (style.wordSpacing + line.wordSpacingDelta)) *
                             factor,
@@ -783,7 +850,7 @@ async function* prepareNativeVerticalSvgCandidates(
             const inlineAllocation =
               signed || inlineTop
                 ? Object.freeze({
-                    ...(inlineTop
+                    ...(inlineTop || signed
                       ? { fragments: Object.freeze(fragments) }
                       : {}),
                     factor,
@@ -822,6 +889,52 @@ async function* prepareNativeVerticalSvgCandidates(
                   })
                 : undefined;
             check();
+            if (baselineDelta) {
+              const inherited: Readonly<FloatGlyph>[] = [];
+              for (const glyph of primitives) {
+                const angle = line.path
+                  ? ((characters[glyph.sourceCluster!].rotation -
+                      (glyph.writing?.orientation === "upright" ? 0 : 90)) *
+                      Math.PI) /
+                    180
+                  : 0;
+                const dx = Math.cos(angle) * baselineDelta;
+                const dy = Math.sin(angle) * baselineDelta;
+                inherited.push(
+                  Object.freeze({
+                    ...glyph,
+                    ...(glyph.origin
+                      ? {
+                          origin: Object.freeze({
+                            x: glyph.origin.x + dx,
+                            y: glyph.origin.y + dy,
+                          }),
+                        }
+                      : {
+                          transform: glyph.transform.multiply(
+                            AffineTransform.translation(dx, dy),
+                          ),
+                        }),
+                  }),
+                );
+                if (performance.now() >= deadline) {
+                  await yieldTask();
+                  check();
+                  deadline = performance.now() + 2;
+                }
+              }
+              check();
+              yield Object.freeze({
+                ...(inlineAllocation ? { inlineAllocation } : {}),
+                projection,
+                nativeMetrics: native,
+                hiddenGlyphs:
+                  runs.reduce((n, r) => n + r.glyphs.length, 0) -
+                  inherited.length,
+                runs: Object.freeze(runs),
+                glyphs: Object.freeze(inherited),
+              });
+            }
             yield Object.freeze({
               ...(inlineAllocation ? { inlineAllocation } : {}),
               projection,

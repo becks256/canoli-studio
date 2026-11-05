@@ -115,3 +115,12 @@ binds the source, release and terminal unit/production reports; the checkpoint
 explicitly records that main-engine admission and full source acceptance are
 pending. The compressed repository receipt remains the durable source/evidence
 artifact.
+
+## Subsequent integration status
+
+The latest original-span source run is now terminal: all 243 cases pass with zero
+skipped/flaky cases and unchanged frozen inputs. Its 750-file source graph has
+entered main; main transfer checks are recorded in the
+[integration receipt](native-parent-integration-2026-11-04.md). Earlier isolated
+and pending statements above describe the preserved development checkpoint,
+not the subsequent integration. The complete original roadmap remains active.

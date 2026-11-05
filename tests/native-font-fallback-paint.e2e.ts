@@ -48,8 +48,11 @@ test("fallback font paint retains independent original GIDs, colored overlap and
       const { instantiateKernel } = (await import(
         /* @vite-ignore */ String("/src/engine/wasm.ts")
       )) as typeof import("../src/engine/wasm");
+      const { Document } = (await import(
+        /* @vite-ignore */ String("/src/dom/index.ts")
+      )) as typeof import("../src/dom");
       const assets = new AssetStore(),
-        doc = new window.luma.Document({ assets }),
+        doc = new Document({ assets }),
         firstFont = await doc.fonts.embed(new Blob([new Uint8Array(primary)])),
         file = await doc.fonts.embed(new Blob([new Uint8Array(source)])),
         before = JSON.stringify(doc.toJSON()),

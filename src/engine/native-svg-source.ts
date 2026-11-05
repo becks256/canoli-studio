@@ -14,6 +14,8 @@ export interface NativeSvgGlyphSource {
   readonly root: Element;
   /** Already itemized original context, clipped to this private selection. */
   readonly items?: readonly Readonly<NativeTextItem>[];
+  /** Existing authored span boundaries, for an alternate native item selection. */
+  readonly authoredBreaks?: readonly number[];
   color(cluster: number): LinearTextColor;
 }
 export function captureNativeSvgGlyphSource(

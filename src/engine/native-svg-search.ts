@@ -19,8 +19,8 @@ function* combinations(count: number, rank: number): Generator<number[]> {
   }
 }
 
-/** Prefer coherent choices for matching source instances, then explore every
- * independent item choice. Original native items may round differently even
+/** Try common preparations across all source instances first, then explore
+ * coherent source-instance and every independent item choice. Original native items may round differently even
  * when they share a source font. The caller discovers each finite maximum
  * lazily; this generator observes it on resumption. Working state is O(n+rank). */
 export async function* nativeSvgCandidateChoices(
@@ -45,6 +45,16 @@ export async function* nativeSvgCandidateChoices(
       deadline = performance.now() + 2;
     }
   };
+  // Font items often need the same later native preparation. A sum-of-ranks
+  // search can spend its whole deadline on mixed vectors before reaching it.
+  // This finite diagonal is bounded lazily by the first exhausted source item;
+  // every non-uniform vector still receives the complete existing search below.
+  for (let common = 0; bounds(); common++) {
+    const vector = Array(cohorts.length).fill(common) as number[];
+    if (!valid(vector)) break;
+    await checkpoint();
+    yield vector;
+  }
   for (
     let rank = 0;
     bounds() &&
@@ -56,7 +66,9 @@ export async function* nativeSvgCandidateChoices(
       await checkpoint();
       if (!bounds()) return;
       const vector = cohorts.map((cohort) => values[cohort]);
-      if (valid(vector)) yield vector;
+      // Uniform vectors were already visited, or are now known impossible.
+      if (valid(vector) && vector.some((value) => value !== vector[0]))
+        yield vector;
     }
     if (count === cohorts.length) continue;
     for (const values of combinations(cohorts.length, rank)) {

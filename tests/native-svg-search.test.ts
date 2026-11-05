@@ -56,3 +56,18 @@ test("a source item with no candidates terminates the whole search and cancellat
     }
   }).rejects.toThrow("Retired search");
 });
+
+test("a common later native preparation is tried before mixed alternatives can exhaust the match deadline", async () => {
+  const seen: number[][] = [];
+  for await (const values of nativeSvgCandidateChoices(
+    [0, 1, 0, 1, 1],
+    [6, 8, 6, 8, 8],
+    () => {},
+  )) {
+    seen.push([...values]);
+    if (values.every((value) => value === 5)) break;
+  }
+  expect(seen).toHaveLength(6);
+  expect(seen[0]).toEqual([0, 0, 0, 0, 0]);
+  expect(seen.at(-1)).toEqual([5, 5, 5, 5, 5]);
+});

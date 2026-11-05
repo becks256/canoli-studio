@@ -128,11 +128,14 @@ export async function resolveNativeSvgSpanFrames(
     if (spaced.size !== owners.size)
       throw new Error("Native span allocation is missing source spacing.");
   }
+  const nativeWidths: number[] = [];
   const frames: { start: number; end: number; offset: number }[] = [];
   let start = 0,
     advance = 0;
   for (let i = 0; i < widths.length; i++) {
-    let width = Math.trunc(widths[i] * 64) / 64;
+    const nativeWidth = Math.trunc(widths[i] * 64) / 64;
+    nativeWidths.push(nativeWidth);
+    let width = nativeWidth;
     if (line.path && line.direction === "rtl") {
       // Preserve both coordinate grids before rounding the RTL parent's line top.
       // This proposes a frame from native metrics; exact ink/ownership still decides
@@ -185,5 +188,119 @@ export async function resolveNativeSvgSpanFrames(
     frames: Object.freeze(frames),
     advance,
     factor,
+    nativeWidths: Object.freeze(nativeWidths),
+  });
+}
+
+/** An independent parent preparation in native visual span order. All source
+ * text, clusters, fonts and glyph order remain; this has no matching authority. */
+export async function resolveNativeSvgVisualSpanFrames(
+  line: StyledTextLine,
+  original: NonNullable<Awaited<ReturnType<typeof resolveNativeSvgSpanFrames>>>,
+  candidates: readonly Readonly<NativeSvgGlyphCandidate>[],
+  visual: readonly Readonly<{ order: number }>[] | null | undefined,
+  check: () => void,
+) {
+  check();
+  if (!visual || visual.length !== original.frames.at(-1)!.end) return;
+  const { factor, nativeWidths } = original;
+  const order: { index: number; min: number; max: number }[] = [];
+  let scanDeadline = performance.now() + 2;
+  for (let index = 0; index < original.frames.length; index++) {
+    const frame = original.frames[index];
+    let min = Infinity,
+      max = -Infinity;
+    for (let at = frame.start; at < frame.end; at++) {
+      const value = visual[at].order;
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+      if (performance.now() >= scanDeadline) {
+        await yieldTask();
+        check();
+        scanDeadline = performance.now() + 2;
+      }
+    }
+    order.push({ index, min, max });
+  }
+  order.sort((a, b) => a.min - b.min);
+  if (
+    order.some(
+      (value) => !Number.isFinite(value.min) || !Number.isFinite(value.max),
+    )
+  )
+    throw new Error("Invalid native visual span allocation.");
+  if (order.some((value, index) => index && value.min <= order[index - 1].max))
+    return;
+  const offsets: number[] = [],
+    frames = original.frames.map((frame) => ({ ...frame }));
+  let advance = 0;
+  for (const value of order) {
+    let offset = advance;
+    if (line.path && line.direction === "rtl") {
+      offset =
+        Math.trunc(
+          Math.fround(
+            (Math.trunc(Math.fround(offset / factor) * 64) / 64) * factor,
+          ) * 64,
+        ) / 64;
+    }
+    offsets[value.index] = offset;
+    frames[value.index].offset = offset;
+    advance += nativeWidths[value.index];
+    if (
+      !Number.isSafeInteger(advance * 64) ||
+      !Number.isSafeInteger(offset * 64)
+    )
+      throw new Error("Native visual spans exceed exact coordinates.");
+  }
+  let at = 0,
+    deadline = performance.now() + 2;
+  const glyphs: Readonly<FloatGlyph>[] = [];
+  for (const candidate of candidates)
+    for (let i = 0; i < candidate.glyphs.length; i++) {
+      const glyph = original.glyphs[at++],
+        cluster = glyph.sourceCluster!;
+      let lo = 0,
+        hi = original.frames.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        if (original.frames[mid].end <= cluster) lo = mid + 1;
+        else hi = mid;
+      }
+      const owner =
+        lo < original.frames.length && original.frames[lo].start <= cluster
+          ? lo
+          : -1;
+      if (owner < 0) throw new Error("Native visual glyph has no source span.");
+      const old = original.frames[owner].offset,
+        next = offsets[owner],
+        delta =
+          (Math.floor(next + 0.5) - next - (Math.floor(old + 0.5) - old)) /
+          factor,
+        angle = (candidate.inlineAllocation!.rotations[i] * Math.PI) / 180;
+      glyphs.push(
+        delta
+          ? Object.freeze({
+              ...glyph,
+              origin: Object.freeze({
+                x: (glyph.origin?.x ?? 0) - Math.sin(angle) * delta,
+                y: (glyph.origin?.y ?? 0) + Math.cos(angle) * delta,
+              }),
+            })
+          : glyph,
+      );
+      if (performance.now() >= deadline) {
+        await yieldTask();
+        check();
+        deadline = performance.now() + 2;
+      }
+    }
+  check();
+  return Object.freeze({
+    glyphs: Object.freeze(glyphs),
+    frames: Object.freeze(frames.map((frame) => Object.freeze(frame))),
+    advance,
+    factor,
+    nativeWidths,
   });
 }

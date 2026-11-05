@@ -3,10 +3,10 @@ import { readFile, writeFile, appendFile } from "node:fs/promises";
 import { parseFontVariations } from "../src/core/font-variations";
 
 for (const kind of [
+  "cjk",
   "mark",
   "bidi",
   "joining",
-  "cjk",
   "axes",
   "colored",
 ] as const)
@@ -14,7 +14,9 @@ for (const kind of [
     "owned native fallback retains original source, exact ink and paint ownership: " +
       kind,
     async ({ page }, info) => {
-      test.setTimeout(900000);
+      // All 64 layouts retain the ordinary 60-second match deadline. Allow
+      // the whole matrix to record every result even if several layouts fail.
+      test.setTimeout(4200000);
       const sources = await Promise.all(
         [
           "native-fallback/Latin-no-mark.ttf",
@@ -39,8 +41,11 @@ for (const kind of [
           const { AssetStore } = (await import(
             /* @vite-ignore */ String("/src/core/assets.ts")
           )) as typeof import("../src/core/assets");
+          const { Document } = (await import(
+            /* @vite-ignore */ String("/src/dom/index.ts")
+          )) as typeof import("../src/dom");
           const assets = new AssetStore(),
-            doc = new window.luma.Document({ assets }),
+            doc = new Document({ assets }),
             fonts: Awaited<ReturnType<typeof doc.fonts.embed>>[] = [];
           for (const bytes of sources)
             fonts.push(
@@ -75,6 +80,7 @@ for (const kind of [
                     { text: "fi", style: { color: second } },
                   ]
                 : [{ text, style: { color: first } }];
+          let result;
           try {
             for (const orientation of [
               "horizontal",
@@ -148,9 +154,7 @@ for (const kind of [
                       let row;
                       try {
                         plan.retireMeasurement();
-                        const match = await plan.matchStyledGlyphLine(0, {
-                          timeoutMs: 12000,
-                        });
+                        const match = await plan.matchStyledGlyphLine(0);
                         row = {
                           orientation,
                           direction,
@@ -242,7 +246,7 @@ for (const kind of [
                         }
                       ).__keepFallback(row);
                     }
-            return {
+            result = {
               rows,
               unchanged: JSON.stringify(doc.toJSON()) === before,
               probes: document.querySelectorAll(
@@ -255,6 +259,12 @@ for (const kind of [
           } finally {
             assets.dispose();
           }
+          return {
+            ...result,
+            privateFaces: [...document.fonts].filter((f) =>
+              /Canoli(Glyph|Variation|Size)_/.test(f.family),
+            ).length,
+          };
         },
         { sources, kind },
       );

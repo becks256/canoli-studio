@@ -79,14 +79,26 @@ ignorable/missing/intrinsic/native/legacy/optical/host acceptance and every othe
 unfinished original roadmap gate remain required. Earlier sections below retain
 private implementation history and its original narrower acceptance boundaries.
 
-## Developing fallback implementation
+## Source-parent, authored-item and inherited-baseline preparation
 
-An isolated parent/authored-item preparation passes all eight horizontal
-cross-span controls and 48 independent paint references. Original screen-size
-baseline metrics improve CJK fallback; original-span allocation at zero tracking
-also fixes two actual production colored CJK exports. These changes are not yet
-in the main engine. Complete latest source/production verification, all original
-384 layouts/36 references and the remaining typography/roadmap gates still apply.
+The main engine now includes the source-derived parent stream, original authored
+item selections, visual-span preparation and script-aware vertical spacing.
+Original fonts, complete shaping text and glyph identities remain; only exact
+complete native ink and per-color ownership can admit a candidate. Screen-size
+native font metrics retain inherited central baselines across owned fallback
+fonts. Straight vertical text also retains original-span allocation at zero
+tracking, fixing colored CJK export without flattening or changing typography.
+
+The baseline transfer passes main build/typecheck, all 3,427 unit/API checks,
+nineteen focused browser cases and all 29 production workflows. The subsequent
+common-preparation search priority retains every finite candidate and passes
+main build/typecheck, all 3,428 unit/API checks, all 29 production workflows,
+all 64 original CJK layouts and all 36 independent paint references. All 3,912
+frozen main inputs remain unchanged through completion; browser runs have zero
+skips or flakes. All 750 non-generated main source files match the isolated
+implementation that passes the complete 255-case affected source suite. The
+complete 384-layout target still has other failures, and all unfinished native/
+public/host/device/performance and broader roadmap gates remain required.
 [Implementation, failures and exact verification status](benchmarks/native-parent-baseline-2026-11-04.md).
 
 ## Original script and native direction items (private)

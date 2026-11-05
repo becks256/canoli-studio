@@ -43,12 +43,24 @@ the full roadmap remain open. See [FLOAT_TEXT.md](FLOAT_TEXT.md).
 
 ## Developing owned font fallback
 
+Complete source-parent and authored-item preparations preserve original text,
+font priority and source color ownership while avoiding unreliable cross-span
+caret addresses. Authored alternatives retain the full shaping context and
+existing DOM nodes. Native screen-size font metrics preserve the primary font's
+inherited central baseline; zero-tracked straight vertical spans retain native
+parent allocation. Existing preparations, exact complete ink/ownership checks,
+font/parent/registration lifetime validation and interruption cleanup remain.
+No public mutation, persistence, permission or independent REST boundary changes.
+[Current source and verification evidence](benchmarks/native-parent-baseline-2026-11-04.md).
+
 Whole-cluster source coverage assigns original font-stack priority; per-font
 private variation tuples cannot rewrite authored styles. Keep unverified lazy
 paint candidates separate from matched results. Assemble complete original
 source items, preserve within-cluster order, and publish only after exact native
-ink and per-color ownership checks. Enumerate independent item choices without a
-beam or font-count cutoff; reuse whole-source itemization and identical paint
+ink and per-color ownership checks. Prioritize a finite common-preparation pass
+across source instances, bounded by the first exhausted item, then retain every
+coherent-source and independent-item choice without repetition. There is no beam
+or font-count cutoff; reuse whole-source itemization and identical paint
 preparations, with cooperative cancellation/deadlines and iterator retirement.
 Expanded negative vertical tracking, complete fallback semantics and connected
 public Float32 text remain unverified/unfinished.

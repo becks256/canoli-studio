@@ -22,6 +22,22 @@ contract, verification scope and remaining work](FLOAT_TEXT.md).
 
 ## Owned font-stack preparation under verification (private)
 
+`native-svg-parent.ts` prepares complete source-derived parent streams when
+cross-span character addresses are insufficient. It retains original font
+priority, full text, source advances, the original first-cluster anchor and
+original color ownership. `native-svg-authored.ts` interleaves existing and
+original-authored-range selections; the shared range splitter preserves scalar
+boundaries without changing DOM spans. Both suspended iterators retire on exit.
+
+Vertical preparations additionally retain native script-dependent spacing and
+the original primary font's inherited central baseline, measured from native
+screen-size font metrics. Straight original-span allocation applies at zero
+tracking too. Visual-span frames retain original source ranges and signed/grid
+allocations. Every preparation remains behind the complete exact ink/ownership
+check; existing preparations remain available. These are private engine changes,
+with no document schema, OO command, scripting, REST or permission change.
+[Current integration and remaining gates](benchmarks/native-parent-baseline-2026-11-04.md).
+
 Negative vertical paths with multiple original spans use complete-source assembly
 for a single owned font as well as owned fallback stacks. Path span frames sum
 original native cluster allocations; RTL parent preparation retains the source
@@ -41,9 +57,11 @@ family does not invalidate a fully covered owned prefix.
 Private lazy candidates have no matched status or publication authority.
 `native-svg-candidates.ts` preserves the existing single-source exact ink gate;
 fallback assembly verifies the complete original line and per-color ownership
-before returning any glyph fields. Candidate search prefers coherent source
-instances but retains independent native-item choices, cancellation and finite
-budgets. An invocation deadline ends with matching/cleanup; retained fonts keep
+before returning any glyph fields. Candidate search first offers common native
+preparations across source instances, then retains the complete coherent-source
+and independent native-item search. Lazily discovered bounds terminate the
+common pass; already visited uniform choices are not repeated. Cancellation and
+finite matching budgets remain. An invocation deadline ends with matching/cleanup; retained fonts keep
 source/parent/registration/abort checks until explicit retirement. It removes
 only identical paint preparations for one retained font
 owner. Whole-source script/direction itemization is reused across selected

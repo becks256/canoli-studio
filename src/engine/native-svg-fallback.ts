@@ -1,4 +1,9 @@
-import { resolveNativeSvgSpanFrames } from "./native-svg-span-frames";
+import { nativeAuthoredSvgCandidates } from "./native-svg-authored";
+import { prepareNativeSvgParent } from "./native-svg-parent";
+import {
+  resolveNativeSvgSpanFrames,
+  resolveNativeSvgVisualSpanFrames,
+} from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
 import {
   characterFormatSchema,
@@ -18,7 +23,6 @@ import type {
   NativeSvgGlyphMatch,
   NativeSvgGlyphEvidence,
 } from "./native-svg-glyph";
-import { nativeSvgGlyphCandidates } from "./native-svg-glyph";
 import type {
   NativeSvgCandidates,
   NativeSvgGlyphCandidate,
@@ -251,7 +255,7 @@ export async function matchNativeFallbackSvgLine(
                       }
                     : {}),
                 }),
-                iterator = nativeSvgGlyphCandidates(
+                iterator = nativeAuthoredSvgCandidates(
                   plan,
                   font,
                   index,
@@ -292,6 +296,21 @@ export async function matchNativeFallbackSvgLine(
       if (pending.length) return unavailable(rejection);
     }
     slots.sort((a, b) => a.source.start - b.source.start);
+    const parent = await prepareNativeSvgParent(plan, index, slots, {
+      ...options,
+      timeoutMs: budget(),
+      check,
+    });
+    if (parent)
+      for (let i = 0; i < slots.length; i++) {
+        slots[i].variants.push(parent[i]);
+        slots[i].signatures.add(
+          JSON.stringify({
+            glyphs: parent[i].glyphs.map(({ font: _, ...glyph }) => glyph),
+            inlineAllocation: parent[i].inlineAllocation,
+          }),
+        );
+      }
     const maximums: (number | undefined)[] = Array(slots.length).fill(
       undefined,
     );
@@ -370,8 +389,20 @@ export async function matchNativeFallbackSvgLine(
             : []),
         ];
       };
+      const visualResolved = spanResolved
+        ? await resolveNativeSvgVisualSpanFrames(
+            line,
+            spanResolved,
+            selected,
+            paint.visual?.[index],
+            check,
+          )
+        : undefined;
       const orders = spanResolved
         ? [
+            ...(visualResolved
+              ? prepareOrders(visualResolved.glyphs, visualResolved)
+              : []),
             ...prepareOrders(spanResolved.glyphs, spanResolved),
             ...prepareOrders(original, undefined),
           ]

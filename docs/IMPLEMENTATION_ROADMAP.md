@@ -11379,3 +11379,31 @@ exact remaining scope are retained in the
 All original 384-layout/36-reference and unfinished public typography, professional,
 AI/provider/evaluation, workflow/commercial/device/performance roadmap gates remain
 required. This advances the original objective without redefining or completing it.
+
+### 2026-11-04 — F08/F10 source-parent/baseline integration and complete search continuation
+
+The verified parent/authored-item, visual-span, script-spacing and inherited
+baseline implementation now enters main. Its identical isolated source passes
+all 3,427 unit/API, 29 production and 243 affected source cases, with unchanged
+frozen inputs and zero skipped/flaky browser cases. All 750 non-generated source
+files match after transfer. Main build/typecheck, all 3,427 unit/API cases and
+29 production workflows and all nineteen focused paint/lifetime cases pass, with
+zero skipped/flaky browser cases. All 3,911 frozen main source/test/original/
+release inputs remain unchanged; the tested preview is preserved by value.
+[Integration evidence and exact remaining scope](benchmarks/native-parent-integration-2026-11-04.md).
+
+The subsequent complete-search priority implementation passes all 64 original CJK
+layouts without new glyph poses or relaxed gates. It also passes all 3,428 unit/
+API checks, 29 production cases, 36 original independent paint references and
+1,215 additional finite enumeration controls. The full 384-layout run still has
+other failures; the expanded 255-case source suite passes without skips or flakes.
+All 750 main source files match the verified isolated implementation. Final main
+build/typecheck, all 3,428 unit/API checks, all 29 production workflows, all 64
+original CJK layouts and all 36 independent paint references pass; all 3,912
+frozen main inputs remain unchanged, with zero skipped/flaky browser cases.
+The upright mark
+also fails a single-original-font decomposition control, narrowing the next
+metric investigation. [Source, rejected probes and exact search status](benchmarks/native-search-2026-11-04.md).
+Every original 384/36, public typography and unfinished professional-editor,
+AI/provider/evaluation, workflow/commercial/device/performance requirement remains
+required. The full original goal stays active and incomplete.
