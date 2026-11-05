@@ -1,6 +1,6 @@
 # Architecture
 
-## Vertical source-parent review implementation
+## Vertical source-parent preparation
 
 `native-svg-vertical-parent.ts` offers a parent frame for straight upright Latin
 runs whose uniform metric styling crosses a grapheme boundary. It preserves full
@@ -18,11 +18,15 @@ candidate still compares all pixels and ownership. Exit clears the cache. These
 planes never supply working RGB, positions or document/import geometry limits.
 No public constructor, schema, scripting/REST signature or grant changes.
 
-The identical isolated implementation passes build/typecheck, all 3,428 unit/API
-checks, all four original upright identity controls and all 33 production
-workflows. Its expanded source suite and original colored cohort remain active;
-affine controls and the full native/roadmap acceptance gates remain open.
-[Exact evidence and boundaries](benchmarks/native-verification-continuation-2026-11-05.md).
+The identical 751-file isolated source passes build/typecheck, all 3,428 unit/API
+checks, all 256 affected source cases, all four original upright identity controls
+and all 33 production workflows. Its original colored cohort matches 42/64
+layouts, retaining all 38 prior cache matches and adding the four upright controls.
+Main integration `0a36bb8` also passes build/typecheck, all 3,428 unit/API checks,
+all 33 production workflows and the focused four-control browser regression.
+Affine failures and every unfinished native/public/host/performance and broader
+roadmap acceptance gate remain open; a full integrated 384-layout run is not claimed.
+[Exact evidence and boundaries](benchmarks/native-vertical-parent-integration-2026-11-05.md).
 
 
 ## Connected native float text (schema 60, under verification)

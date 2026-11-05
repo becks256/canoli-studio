@@ -11452,3 +11452,21 @@ vertical source run and original colored cohort remain active, and affine and
 all other unfinished original roadmap gates remain required. Main engine source
 is unchanged at this review checkpoint.
 [Canonical release proof and exact remaining scope](benchmarks/native-verification-continuation-2026-11-05.md#canonical-review-checkout-and-subsequent-source-result).
+
+### 2026-11-05 UTC — F08/F10 vertical source-parent main integration
+
+Main `0a36bb8` integrates the reviewed implementation after its complete 256-case
+affected source suite and original colored cohort finish. Main build/typecheck,
+all 3,428 unit/API checks, all 33 production workflows and the focused browser
+test containing four original upright controls pass. All 3,922 frozen main input
+identities remain unchanged, with zero skipped/flaky browser cases. Its 751
+non-generated source files match the isolated source exactly.
+
+The reference-cache predecessor's full original matrix finishes at 348/384 exact
+matches; the vertical colored cohort finishes at 42/64, preserving every prior
+colored match and adding four upright identity controls. Both independent
+36-reference suites pass. A new complete integrated 384-layout result is not
+claimed; the remaining affine, native/public/host/device/performance and every
+unfinished broader roadmap gate remain required. This is local build/runtime
+verification, without Vercel redeployment or live ChatGPT/identity acceptance.
+[Terminal reports, row audits, integration proof and remaining scope](benchmarks/native-vertical-parent-integration-2026-11-05.md).
