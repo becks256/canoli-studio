@@ -1,6 +1,7 @@
 @import "@fontsource-variable/manrope";
 @import "@fontsource/dm-mono/400.css";
 @import "./tokens.css";
+@import "./AppearanceSelect.css";
 
 .chatgpt-connection-dialog {
   width: min(680px, calc(100vw - 32px));
@@ -41,8 +42,6 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-@import "./AppearanceSelect.css";
-
 * {
   box-sizing: border-box;
 }
