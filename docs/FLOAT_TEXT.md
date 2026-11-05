@@ -12,10 +12,12 @@ The isolated review passes build/typecheck, all 3,428 unit/API checks, eight
 existing styled upright controls, sixteen original mark controls with/without
 owned fallback, 45 emitted production workflows and 48 independent fallback
 Float32 references. Original 37 production workflows and all 42 earlier fallback
-references remain. The full 257-case source regression and original 384-layout
-matrix remain required; no new complete native aggregate is claimed. This is
-private preparation work, not completed broad Float32 typography or roadmap
-acceptance. [Raw evidence, failed pilots and remaining gates](benchmarks/native-rounded-positions-2026-11-05.md).
+references remain. The complete 257-case source suite passes in one invocation.
+The complete original matrix finishes at 360/384, with four mismatches and
+20 matching-budget errors. All previous 352 full-matrix and 44 colored-cohort
+matches remain. The 24 remaining layouts, full public/native/device/performance
+and broader roadmap gates stay open.
+[Terminal reports and retention audit](benchmarks/native-rounded-positions-terminal-2026-11-05.md). [Raw evidence, failed pilots and remaining gates](benchmarks/native-rounded-positions-2026-11-05.md).
 
 
 ## Vertical source-parent integration — 2026-11-05 UTC
@@ -50,8 +52,10 @@ prior main colored match. Its source run passes 255 cases; the identical tracked
 48-reference test omitted by a temporary filename alias also passes separately.
 These are separate runs. Main integration also passes build/typecheck, all 3,428
 unit/API checks, all 37 production workflows and the eight original colored
-upright controls. A fresh canonical source run remains required, and complete
-native acceptance stays open.
+upright controls. Its one complete canonical source run now passes all 256 cases
+across 46 files, including the 48-reference source-parent test in the same
+invocation. Complete native acceptance stays open.
+[Canonical source completion](benchmarks/native-signed-attachments-source-2026-11-05.md).
 [Integration and exact boundaries](benchmarks/native-signed-attachments-integration-2026-11-05.md).
 
 ## Repeatable native-text acceptance

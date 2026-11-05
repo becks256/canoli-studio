@@ -12,7 +12,12 @@ gates. A matching preparation does not prove the tested host's face-level
 subpixel flag. No source asset, public document/command, schema, permission or
 independent REST boundary changes. Full native/public/host/performance and
 broader roadmap acceptance remain open.
-[Isolated review evidence](benchmarks/native-rounded-positions-2026-11-05.md).
+[Isolated core review evidence](benchmarks/native-rounded-positions-2026-11-05.md).
+The complete review additionally passes all 257 canonical source cases and 48
+independent fallback references. Its full original matrix matches 360/384,
+retaining every prior 352 full-matrix and 44 colored-cohort match. Four mismatches
+and 20 matching-budget errors remain; complete native and roadmap acceptance
+is not achieved. [Terminal evidence](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
 
 
 ## Operation-owned native reference planes and vertical source allocation
@@ -42,7 +47,10 @@ signed allocations supply the selection, with no comparison-pixel fitting.
 All original preparations, full source/font/GID/axis/color identity, complete
 opacity comparisons and color ownership remain mandatory. Main integration passes
 build/typecheck, unit/API and focused production/native regressions; the complete
-native typography and original roadmap acceptance gates remain open.
+native typography and original roadmap acceptance gates remain open. Main also
+passes one complete canonical source run of 256 cases across 46 files, including
+the previously omitted 48-reference test in that same invocation.
+[Canonical source evidence](benchmarks/native-signed-attachments-source-2026-11-05.md).
 
 
 ## Connected native float text ownership

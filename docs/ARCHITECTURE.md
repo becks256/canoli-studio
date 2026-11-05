@@ -16,9 +16,11 @@ grant changes.
 The isolated review passes build/typecheck, all 3,428 unit/API checks, 24 focused
 native controls, 45 emitted production workflows and 48 independent fallback
 Float32 references. Those retain all 37 earlier production workflows and 42
-fallback references. The complete 257-case source regression and original
-384-layout matrix remain required; this does not establish full native typography,
-public/device/performance acceptance or completion of the broader roadmap.
+fallback references. Its complete 257-case source suite also passes. The full
+original matrix completes at 360/384 exact matches, retaining all 352 previous
+full-matrix matches and all 44 previous colored matches; 24 layouts still fail.
+Full native/public/device/performance and broader roadmap acceptance stay open.
+[Terminal results and retention audit](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
 [Source, raw diagnostics and verification boundaries](benchmarks/native-rounded-positions-2026-11-05.md).
 
 
@@ -63,8 +65,10 @@ match. The source run passes 255 cases; a separately passing canonical test adds
 48 references omitted by an obsolete temporary filename. This is two runs, not a
 single 256-case run. Main includes the reviewed implementation and also passes
 build/typecheck, all 3,428 unit/API checks, all 37 production workflows and the
-eight-control browser regression. A fresh canonical source run remains required;
-full native and broader roadmap acceptance stay open.
+eight-control browser regression. Its one complete canonical source run now passes
+all 256 cases across 46 files, including the 48-reference source-parent test in
+that same invocation. Full native and broader roadmap acceptance stay open.
+[Canonical source completion](benchmarks/native-signed-attachments-source-2026-11-05.md).
 [Integration evidence](benchmarks/native-signed-attachments-integration-2026-11-05.md).
 
 `playwright.native-text.config.ts` names the canonical source, isolated legacy

@@ -11539,3 +11539,53 @@ The full original 384-layout matrix, 257-case canonical source run, broad native
 public/host/device/memory/performance gates and the complete original roadmap
 remain required. Main checkpoint `0cf724f` stays unchanged while its earlier
 256-case canonical run is live. [Review evidence and raw diagnostics](benchmarks/native-rounded-positions-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 complete canonical main source regression
+
+Main checkpoint `0cf724f` now passes one complete checked-in
+`npm run test:native-text:source` invocation: all 256 cases across 46 files,
+with zero retries, skips, flaky or unexpected results. The actual canonical
+`native-parent-paint.e2e.ts` test and its 48 independent source-parent references
+are inside this run. The earlier isolated review remains a 255-case run plus a
+separate test; its historical evidence is not relabeled.
+
+All 3,971 frozen source/test/original/release and top-level documentation inputs
+remain unchanged through terminal completion. The established main build,
+3,428 unit/API checks, 37 production workflows and eight original colored
+upright controls remain the existing integration evidence; this is not a new
+full fallback acceptance result. Main's original full matrix remains 352/384,
+and the signed review's colored cohort remains 44/64; no new combined aggregate
+is inferred. Full native/public/host/device/memory/performance and the complete
+original roadmap gates remain required.
+
+Separate rounded-position review `a82a49f` passes its core checks and now runs
+its complete 257-case source and original 384-layout fallback regressions from
+frozen isolated inputs. It has not been integrated into main. No provider call,
+upload, account, public API/schema/grant or source-resolution limit changes.
+[Terminal main source evidence](benchmarks/native-signed-attachments-source-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 complete rounded-position review
+
+Review `a82a49f` passes one complete 257-case canonical source invocation across
+46 files, with zero retries, skips, flaky or unexpected results. Its complete
+original 384-layout matrix finishes at 360 exact matches, four mismatches and
+20 matching-budget errors. All 352 previous full-matrix matches and all 44
+previous colored-cohort matches remain. Cohorts are CJK 64/64, marks 63/64,
+bidi 62/64, joining 61/64, axes 64/64 and colored 46/64. The full matrix is
+not green, and the 24 remaining layouts still require implementation work.
+
+Every matched result retains original full contexts, GIDs, owned font priority,
+axis tuples and exact whole ink/ownership checks. All six cohorts retire probes
+and private faces without model changes. All 48 independent fallback Float32
+references also pass. All 3,935 frozen review inputs remain unchanged through
+both terminal runs. Earlier core evidence includes build/typecheck, all 3,428
+unit/API checks, 24 native controls and 45 production workflows.
+
+A separate complete-single-span development checkout passes all 64 original
+mark layouts, 40 focused controls, 3,428 unit/API checks and 54 independent paint
+references, but only 52/53 production workflows. Its actual RTL sideways affine
+project retains a combining-mark mismatch; it is not accepted or integrated.
+No full combined native aggregate is inferred from those separate runs.
+Main integration verification and broad native/public/host/device/memory/
+performance and the complete original roadmap acceptance remain required.
+[Terminal review reports and retention audit](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
