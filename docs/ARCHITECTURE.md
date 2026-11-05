@@ -44,9 +44,11 @@ grant changes.
 The isolated review passes build/typecheck, all 3,428 unit/API checks, 24 focused
 native controls, 45 emitted production workflows and 48 independent fallback
 Float32 references. Those retain all 37 earlier production workflows and 42
-fallback references. The complete 257-case source regression and original
-384-layout matrix remain required; this does not establish full native typography,
-public/device/performance acceptance or completion of the broader roadmap.
+fallback references. Its complete 257-case source suite also passes. The full
+original matrix completes at 360/384 exact matches, retaining all 352 previous
+full-matrix matches and all 44 previous colored matches; 24 layouts still fail.
+Full native/public/device/performance and broader roadmap acceptance stay open.
+[Terminal results and retention audit](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
 [Source, raw diagnostics and verification boundaries](benchmarks/native-rounded-positions-2026-11-05.md).
 
 

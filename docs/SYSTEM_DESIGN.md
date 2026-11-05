@@ -40,7 +40,12 @@ gates. A matching preparation does not prove the tested host's face-level
 subpixel flag. No source asset, public document/command, schema, permission or
 independent REST boundary changes. Full native/public/host/performance and
 broader roadmap acceptance remain open.
-[Isolated review evidence](benchmarks/native-rounded-positions-2026-11-05.md).
+[Isolated core review evidence](benchmarks/native-rounded-positions-2026-11-05.md).
+The complete review additionally passes all 257 canonical source cases and 48
+independent fallback references. Its full original matrix matches 360/384,
+retaining every prior 352 full-matrix and 44 colored-cohort match. Four mismatches
+and 20 matching-budget errors remain; complete native and roadmap acceptance
+is not achieved. [Terminal evidence](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
 
 
 ## Operation-owned native reference planes and vertical source allocation

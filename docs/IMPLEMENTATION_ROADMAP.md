@@ -11564,6 +11564,46 @@ frozen isolated inputs. It has not been integrated into main. No provider call,
 upload, account, public API/schema/grant or source-resolution limit changes.
 [Terminal main source evidence](benchmarks/native-signed-attachments-source-2026-11-05.md).
 
+### 2026-11-05 UTC — F08/F10 complete rounded-position review
+
+Review `a82a49f` passes one complete 257-case canonical source invocation across
+46 files, with zero retries, skips, flaky or unexpected results. Its complete
+original 384-layout matrix finishes at 360 exact matches, four mismatches and
+20 matching-budget errors. All 352 previous full-matrix matches and all 44
+previous colored-cohort matches remain. Cohorts are CJK 64/64, marks 63/64,
+bidi 62/64, joining 61/64, axes 64/64 and colored 46/64. The full matrix is
+not green, and the 24 remaining layouts still require implementation work.
+
+Every matched result retains original full contexts, GIDs, owned font priority,
+axis tuples and exact whole ink/ownership checks. All six cohorts retire probes
+and private faces without model changes. All 48 independent fallback Float32
+references also pass. All 3,935 frozen review inputs remain unchanged through
+both terminal runs. Earlier core evidence includes build/typecheck, all 3,428
+unit/API checks, 24 native controls and 45 production workflows.
+
+A separate complete-single-span development checkout passes all 64 original
+mark layouts, 40 focused controls, 3,428 unit/API checks and 54 independent paint
+references, but only 52/53 production workflows. Its actual RTL sideways affine
+project retains a combining-mark mismatch; it is not accepted or integrated.
+No full combined native aggregate is inferred from those separate runs.
+Main integration verification and broad native/public/host/device/memory/
+performance and the complete original roadmap acceptance remain required.
+[Terminal review reports and retention audit](benchmarks/native-rounded-positions-terminal-2026-11-05.md).
+
+### 2026-11-05 UTC — Rounded-position main integration verification
+
+Main `419a972` passes the production build, all 3,428 unit/API tests across
+346 files, both focused browser tests covering 24 native layouts, and all
+45 selected production workflows. Neither browser invocation skips or retries
+a case. All 3,977 frozen inputs remain unchanged through the terminal checks.
+All 177 emitted release files match the reviewed build byte for byte; the three
+generated worker manifests differ only in resolved dependency path spelling.
+The complete 257-case source and 384-layout matrix results above belong to the
+review run, not a second invocation on main. The full matrix remains at 360/384;
+the separate complete-single-span development remains unaccepted. A successful
+local build does not establish a successful Vercel deployment.
+[Main integration reports and identity audit](benchmarks/native-rounded-positions-main-2026-11-05.md).
+
 ### 2026-11-05 UTC — F08/F10 shared source-origin core review
 
 Complete original-span allocation now also covers a single authored span across
