@@ -11680,3 +11680,41 @@ workers; the canonical build generated them and passed. Full 259-case canonical
 source and original 384-layout matrix acceptance, main integration, and broader
 public/host/device/memory/performance and complete-roadmap gates remain required.
 [Core reports, source identities and diagnostic evidence](benchmarks/native-horizontal-origin-2026-11-05.md).
+
+### 2026-11-05 UTC — F08/F10 bounded rejected-paint review in progress
+
+An original colored sideways layout made 250 native comparison calls but only
+38 distinct paint assemblies before its unchanged 60-second matching deadline.
+A browser-only one-MiB rejection-cache prototype visited 140 distinct candidates
+and avoided 1,062 repeated renders; the layout still timed out. The isolated
+implementation now retains exact ordered rejection identities for one operation,
+checks cancellation/source/font lifetimes on hits, bypasses oversized keys and
+clears working storage in cleanup. Successful publication still requires fresh
+complete native ink and ownership verification. New unit and actual-browser
+retirement checks are being run; broad native/source/production and all unfinished
+original roadmap gates remain required. The horizontal review remains separate
+and frozen through its complete acceptance jobs.
+
+### 2026-11-05 UTC — F08/F10 rejected-paint core verification
+
+The isolated core passes `npm run build`, all 3,431 unit/API tests across
+347 files, and 16 focused browser tests with zero skips/retries/flaky results.
+Three new real-browser faults abort, release the plan or remove its captured
+font on a rejection-cache hit: all withhold publication, retire resources and
+permit a healthy original-source retry. All nine independent tracked Float32
+outputs retain exact HDR/tiny-alpha values and partition words; actual original
+source ink differs from its zero-tracking control in every case.
+
+The unchanged original colored sideways diagnostic still reaches its 60-second
+matching deadline. The implementation avoids 1,034 repeated renders and visits
+138 distinct candidates, versus 38 in the uncached source. It publishes no result
+and retires every private face/probe without changing the document. This measures
+duplicate work, not a solved rendering case, lower user latency or editor-wide
+performance. All 4,036 frozen core inputs remain unchanged through terminal checks.
+The complete 262-case source suite, original 384-layout matrix, 57 selected
+production workflows and broader roadmap acceptance remain required.
+[Core reports, frozen inputs and diagnostics](benchmarks/native-rejected-paint-2026-11-05.md).
+
+The first typechecks exposed test-fixture weight and readonly scene-copy annotations.
+Those were corrected without changing original geometry or numeric assertions.
+The older horizontal review and its corrected source rerun remain separate.

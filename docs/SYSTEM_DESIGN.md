@@ -1,5 +1,38 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Rejected native paint reuse (private review)
+
+One fallback matching operation retains a bounded LRU of exact ordered paint
+identities that already failed complete ink or ownership verification. Font-owner
+identity, geometry, styles, authored colors and paint order distinguish entries.
+Every hit still checks the captured source, font owners and cancellation. Only a
+previous rejection can be skipped; a published match still runs the complete
+original ink and ownership gates. Keys and rejections retire with the operation.
+
+The one-MiB key budget limits retained verification work, not document geometry,
+source resolution or the number of candidate preparations. Larger keys bypass
+the cache and keep normal verification. Key preparation yields between glyphs.
+Public constructors, commands, schema, grants and independent REST contracts
+retain their existing behavior. This review does not solve the remaining curved
+source-placement differences or complete native/full-roadmap acceptance.
+The isolated core passes `npm run build`, all 3,431 unit/API tests across
+347 files, and 16 focused browser tests with zero skips/retries/flaky results.
+Three new real-browser faults abort, release the plan or remove its captured
+font on a rejection-cache hit: all withhold publication, retire resources and
+permit a healthy original-source retry. All nine independent tracked Float32
+outputs retain exact HDR/tiny-alpha values and partition words; actual original
+source ink differs from its zero-tracking control in every case.
+
+The unchanged original colored sideways diagnostic still reaches its 60-second
+matching deadline. The implementation avoids 1,034 repeated renders and visits
+138 distinct candidates, versus 38 in the uncached source. It publishes no result
+and retires every private face/probe without changing the document. This measures
+duplicate work, not a solved rendering case, lower user latency or editor-wide
+performance. All 4,036 frozen core inputs remain unchanged through terminal checks.
+The complete 262-case source suite, original 384-layout matrix, 57 selected
+production workflows and broader roadmap acceptance remain required.
+[Core reports, frozen inputs and diagnostics](benchmarks/native-rejected-paint-2026-11-05.md).
+
 ## Horizontal script-aware source placement (private)
 
 The original screen preparation remains available. An additional preparation

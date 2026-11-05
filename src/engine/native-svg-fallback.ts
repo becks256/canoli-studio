@@ -9,6 +9,7 @@ import {
 } from "./native-svg-span-frames";
 import { resolveNativeSvgInlineFrames } from "./native-svg-inline-frames";
 import { shareNativeSvgSourceOrigin } from "./native-svg-source-origin";
+import { NativeSvgRejectedPaints } from "./native-svg-rejected-paint";
 import {
   characterFormatSchema,
   type CharacterFormat,
@@ -100,6 +101,7 @@ export async function matchNativeFallbackSvgLine(
     budget = () =>
       Math.max(1, Math.ceil(timeout - (performance.now() - started)));
   check();
+  const rejectedPaints = new NativeSvgRejectedPaints(check);
   const line = plan.scene.lines[index],
     paint = plan.paint;
   if (!line || !paint || !line.spans.length)
@@ -519,6 +521,8 @@ export async function matchNativeFallbackSvgLine(
             )
         )
           continue;
+        const paintKey = await rejectedPaints.key(ordered);
+        if (rejectedPaints.has(paintKey)) continue;
         const runs = Object.freeze(selected.flatMap((value) => value.runs)),
           comparison = await compareNativeSvgGlyphPaint(
             plan,
@@ -581,6 +585,7 @@ export async function matchNativeFallbackSvgLine(
             paintOwnership: ownership,
           });
         if (comparison.error || ownership?.error) {
+          rejectedPaints.remember(paintKey);
           if (
             !last ||
             comparison.error < (last.evidence?.svgMaxAlphaError ?? Infinity)
@@ -609,6 +614,7 @@ export async function matchNativeFallbackSvgLine(
       for (const iterator of iterators) await iterator.return(undefined);
     } finally {
       sourcePlanes.clear();
+      rejectedPaints.clear();
       matching = false;
     }
   }
